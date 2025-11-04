@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8746a70e6d2e4c5db1df0f1bae221269, type: 3}
+  m_Name: Item_CarmelizedPopcorn
+  m_EditorClassIdentifier: Assembly-CSharp::SOItemData
+  label: Carmelized Popcorn
+  sprite: {fileID: -2413806693520163455, guid: 5ebc42f13a65a014ea04ba10bd69d5d4, type: 3}
+  worth: 3

@@ -1,22 +1,103 @@
-using TMPro;
+using System;
 using UnityEngine;
 
 public class Tile : MonoBehaviour
 {
-
+    [Header("Tile Properties")]
+    [SerializeField] private Vector2Int gridPosition;
+    [SerializeField] private bool isActive;
+    
     [Header("References")]
-    [SerializeField] private TextMeshPro tileLabel;
     [SerializeField] private SpriteRenderer tileRenderer;
+    [SerializeField] private Color selectedTileColor = new Color(0f, 1f, 0f, 1f);
+    [SerializeField] private Color hoverTileColor = new Color(0f, 1f, 0f, 0.5f);
+    [SerializeField] private Color activeTileColor = new Color(0f, 1f, 0f, 0.1f);
+    [SerializeField] private Color inactiveTileColor = new Color(0.1f, 0.1f, 0.1f, 0.1f);
+    
+    private Item _currentItem;
+    private bool _isSelected;
+    private bool _isHovered;
+    
+    public Vector2Int GridPosition => gridPosition;
+    public bool IsActive => isActive;
+    public Item CurrentItem => _currentItem;
+    public bool CanSelect => isActive && _currentItem && !_isSelected;
     
     
-    
-    public void SetTile(string text, Sprite sprite)
+
+    public void Initialize(Vector2Int position, bool active)
     {
-        if (tileLabel) tileLabel.text = text;
-         if (tileRenderer && sprite) tileRenderer.sprite = sprite;
-         
-         gameObject.name = $"Tile ({text})";
+        gameObject.name = $"Tile ({position.x},{position.y})";
+        _isSelected = false;
+        _isHovered = false;
+        gridPosition = position;
+        isActive = active;
+        UpdateVisuals();
+    }
+
+    public void SetCurrentItem(Item item)
+    {
+        _isSelected = false;
+        _isHovered = false;
+        _currentItem = item;
+    }
+
+    private void UpdateVisuals()
+    {
+        if (!tileRenderer) return;
+
+        if (isActive)
+        {
+            if (_isSelected)
+            {
+                tileRenderer.color = selectedTileColor;
+            }
+            else if (_isHovered)
+            {
+                tileRenderer.color = hoverTileColor;
+            }
+            else
+            {
+                tileRenderer.color = activeTileColor;
+            }
+        }
+        else
+        {
+
+            tileRenderer.color = inactiveTileColor;
+        }
+    }
+
+    private void OnMouseEnter()
+    {
+        if (!CanSelect || _isHovered) return;
+        
+        _isHovered = true;
+        UpdateVisuals();
     }
     
-
+    private void OnMouseExit()
+    {
+        if (!CanSelect || !_isHovered) return;
+        
+        _isHovered = false;
+        UpdateVisuals();
+    }
+    
+    private void OnMouseDown()
+    {
+        if (!CanSelect) return;
+        
+        GridManager.Instance.SelectItemInTile(this, out var selected);
+        SetSelected(selected);
+    }
+    
+    public void SetSelected(bool selected)
+    {
+        _isSelected = selected;
+        UpdateVisuals();
+    }
+    
+    
+    
 }
