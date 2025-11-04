@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 
+#if UNITY_EDITOR
+
 [CustomPropertyDrawer(typeof(Grid))]
 public class GridDrawer : PropertyDrawer
 {
@@ -250,3 +252,6 @@ public class GridDrawer : PropertyDrawer
         return count;
     }
 }
+
+
+#endif

@@ -6,6 +6,10 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
+
+#if UNITY_EDITOR
+
+
 namespace DNExtensions.SerializedInterface
 {
     /// <summary>
@@ -423,3 +427,5 @@ namespace DNExtensions.SerializedInterface
         }
     }
 }
+
+#endif

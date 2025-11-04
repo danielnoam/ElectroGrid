@@ -20,12 +20,16 @@ namespace DNExtensions.InputSystem
         
 
         
-        protected virtual  void OnValidate()
+        protected virtual void OnValidate()
         {
             if (!inputManager) inputManager = FindFirstObjectByType<InputManager>();
             
         }
-        
+
+        protected virtual void Start()
+        {
+            if (!inputManager) inputManager = FindFirstObjectByType<InputManager>();
+        }
 
         /// <summary>
         /// Subscribes a callback method to all phases of an InputAction (started, performed, canceled).
@@ -34,7 +38,11 @@ namespace DNExtensions.InputSystem
         /// <param name="callback">The callback method to invoke for all action phases.</param>
         protected void SubscribeToAction(InputAction action, Action<InputAction.CallbackContext> callback)
         {
-            if (action == null) return;
+            if (action == null)
+            {
+                Debug.LogError("Null action found!");
+                return;
+            }
 
             action.performed += callback;
             action.started += callback;
@@ -48,7 +56,11 @@ namespace DNExtensions.InputSystem
         /// <param name="callback">The callback method to remove from all action phases.</param>
         protected void UnsubscribeFromAction(InputAction action, Action<InputAction.CallbackContext> callback)
         {
-            if (action == null) return;
+            if (action == null)
+            {
+                Debug.LogError("Null action found!");
+                return;
+            }
 
             action.performed -= callback;
             action.started -= callback;

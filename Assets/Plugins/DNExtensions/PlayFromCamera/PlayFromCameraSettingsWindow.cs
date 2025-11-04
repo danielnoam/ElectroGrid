@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 
-
+#if UNITY_EDITOR
 namespace DNExtensions
 {
     public class PlayFromCameraSettingsWindow : EditorWindow
@@ -118,3 +118,5 @@ namespace DNExtensions
         }
     }
 }
+
+#endif

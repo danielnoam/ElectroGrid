@@ -19,10 +19,10 @@ public class Tile : MonoBehaviour
     private bool _isHovered;
     
     public Vector2Int GridPosition => gridPosition;
-    public bool IsActive => isActive;
     public MatchObject CurrentMatchObject => _currentMatchObject;
     public bool CanSelect => isActive && _currentMatchObject && !_isSelected;
-    
+    public bool IsActive => isActive;
+    public bool HasObject => isActive && _currentMatchObject;
     
 
     public void Initialize(Vector2Int position, bool active)
@@ -67,34 +67,21 @@ public class Tile : MonoBehaviour
             tileRenderer.color = inactiveTileColor;
         }
     }
-
-    private void OnMouseEnter()
-    {
-        if (!CanSelect || _isHovered) return;
-        
-        _isHovered = true;
-        UpdateVisuals();
-    }
     
-    private void OnMouseExit()
-    {
-        if (!CanSelect || !_isHovered) return;
-        
-        _isHovered = false;
-        UpdateVisuals();
-    }
     
-    private void OnMouseDown()
+    public void SetHovered(bool hovered)
     {
         if (!CanSelect) return;
         
-        GridManager.Instance.SelectItemInTile(this, out var selected);
-        SetSelected(selected);
+        _isHovered = hovered;
+        UpdateVisuals();
     }
+    
     
     public void SetSelected(bool selected)
     {
         _isSelected = selected;
+        _isHovered = false;
         UpdateVisuals();
     }
     

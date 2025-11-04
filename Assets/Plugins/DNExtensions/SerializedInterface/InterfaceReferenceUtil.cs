@@ -1,6 +1,8 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
+
 namespace DNExtensions.SerializedInterface
 {
     public class InterfaceReferenceUtil
@@ -55,3 +57,5 @@ namespace DNExtensions.SerializedInterface
         }
     }
 }
+
+#endif
