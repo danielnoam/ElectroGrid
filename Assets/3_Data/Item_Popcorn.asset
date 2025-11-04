@@ -13,5 +13,9 @@ MonoBehaviour:
   m_Name: Item_Popcorn
   m_EditorClassIdentifier: Assembly-CSharp::SOItemData
   label: Popcorn
-  sprite: {fileID: 21300000, guid: f609c9b3b1675f947a865ec558b5ad90, type: 3}
   worth: 1
+  sprites:
+    internalItems:
+    - item: {fileID: 21300000, guid: 98a0dcc3605617249afcabc0b006a810, type: 3}
+      chance: 100
+      isLocked: 0

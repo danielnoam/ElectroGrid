@@ -13,5 +13,9 @@ MonoBehaviour:
   m_Name: Item_CarmelizedPopcorn
   m_EditorClassIdentifier: Assembly-CSharp::SOItemData
   label: Carmelized Popcorn
-  sprite: {fileID: -2413806693520163455, guid: 5ebc42f13a65a014ea04ba10bd69d5d4, type: 3}
   worth: 3
+  sprites:
+    internalItems:
+    - item: {fileID: 21300000, guid: 7b478149e43db214f9ff927dc217dea5, type: 3}
+      chance: 100
+      isLocked: 0

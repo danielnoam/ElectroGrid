@@ -14,14 +14,14 @@ public class Tile : MonoBehaviour
     [SerializeField] private Color activeTileColor = new Color(0f, 1f, 0f, 0.1f);
     [SerializeField] private Color inactiveTileColor = new Color(0.1f, 0.1f, 0.1f, 0.1f);
     
-    private Item _currentItem;
+    private MatchObject _currentMatchObject;
     private bool _isSelected;
     private bool _isHovered;
     
     public Vector2Int GridPosition => gridPosition;
     public bool IsActive => isActive;
-    public Item CurrentItem => _currentItem;
-    public bool CanSelect => isActive && _currentItem && !_isSelected;
+    public MatchObject CurrentMatchObject => _currentMatchObject;
+    public bool CanSelect => isActive && _currentMatchObject && !_isSelected;
     
     
 
@@ -35,11 +35,11 @@ public class Tile : MonoBehaviour
         UpdateVisuals();
     }
 
-    public void SetCurrentItem(Item item)
+    public void SetCurrentItem(MatchObject matchObject)
     {
         _isSelected = false;
         _isHovered = false;
-        _currentItem = item;
+        _currentMatchObject = matchObject;
     }
 
     private void UpdateVisuals()
