@@ -794,9 +794,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   level: {fileID: 11400000, guid: 69ffbccbccefb6f4e91fd3f5f0606330, type: 2}
-  gridOffset: {x: -4, y: -4, z: 0}
-  tileSize: {x: 1, y: 1}
-  tileOffset: {x: 0.1, y: 0.1}
   tilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
   matchObjectPrefab: {fileID: 1608689241954614118, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}
   matchObjectsParent: {fileID: 76786952}
@@ -804,6 +801,7 @@ MonoBehaviour:
   mouseIndicator: {fileID: 820176654}
   inputReader: {fileID: 586155250}
   defaultGridShape: {fileID: 11400000, guid: 4b006d4db34ba604db69250255ef3754, type: 2}
+  movesMade: 0
   hoveredTile: {fileID: 0}
   selectedTile: {fileID: 0}
   heldMatchObject: {fileID: 0}
@@ -1196,6 +1194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f6c8a0ee730924db6cdae46a13f218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  currentPopcorns: 0
+  totalPopcornsCollected: 0
 --- !u!1 &1063539252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1274,7 +1274,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0.47058824}
   m_FlipX: 0

@@ -10,7 +10,6 @@ public class GridDrawer : PropertyDrawer
     private const int MaxSize = 20;
     
     private const float CellSize = 16f;
-    private const float HeaderHeight = 60f;
     private const float ButtonHeight = 20f;
     private const float Spacing = 5f;
     private const float CellBorder = 1f;
@@ -26,10 +25,26 @@ public class GridDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        SerializedProperty heightProp = property.FindPropertyRelative("height");
+        SerializedProperty gridSizeProp = property.FindPropertyRelative("gridSize");
+        SerializedProperty tileSizeProp = property.FindPropertyRelative("tileSize");
+        SerializedProperty tileSpacingProp = property.FindPropertyRelative("tileSpacing");
+        
+        int height = gridSizeProp.vector2IntValue.y;
 
-        float gridHeight = heightProp.intValue * CellSize;
-        float totalHeight = HeaderHeight + EditorGUIUtility.singleLineHeight + gridHeight + ButtonHeight * 2 + Spacing * 4;
+        float gridHeight = height * CellSize;
+        
+
+        float tileSizeHeight = EditorGUI.GetPropertyHeight(tileSizeProp);
+        float tileSpacingHeight = EditorGUI.GetPropertyHeight(tileSpacingProp);
+        
+        float totalHeight = EditorGUIUtility.singleLineHeight + Spacing + 
+                           EditorGUIUtility.singleLineHeight + Spacing + 
+                           EditorGUIUtility.singleLineHeight + Spacing +
+                           tileSizeHeight + Spacing +
+                           tileSpacingHeight + Spacing + 
+                           EditorGUIUtility.singleLineHeight + Spacing + 
+                           gridHeight + Spacing + 
+                           ButtonHeight; 
 
         return totalHeight;
     }
@@ -38,43 +53,61 @@ public class GridDrawer : PropertyDrawer
     {
         EditorGUI.BeginProperty(position, label, property);
 
-        SerializedProperty widthProp = property.FindPropertyRelative("width");
-        SerializedProperty heightProp = property.FindPropertyRelative("height");
+        SerializedProperty gridSizeProp = property.FindPropertyRelative("gridSize");
+        SerializedProperty tileSizeProp = property.FindPropertyRelative("tileSize");
+        SerializedProperty tileSpacingProp = property.FindPropertyRelative("tileSpacing");
         SerializedProperty tilesProp = property.FindPropertyRelative("tiles");
+
+        Vector2Int gridSize = gridSizeProp.vector2IntValue;
+        int width = gridSize.x;
+        int height = gridSize.y;
 
         Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
 
+        // Label
         EditorGUI.LabelField(currentRect, label, EditorStyles.boldLabel);
         currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
 
-        currentRect = new Rect(position.x, currentRect.y, position.width, EditorGUIUtility.singleLineHeight);
-
+        // Grid Width Slider
         EditorGUI.BeginChangeCheck();
-        int newWidth = EditorGUI.IntSlider(currentRect, "Width", widthProp.intValue, MinSize, MaxSize);
+        int newWidth = EditorGUI.IntSlider(currentRect, "Grid Width", width, MinSize, MaxSize);
         currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
 
-        int newHeight = EditorGUI.IntSlider(currentRect, "Height", heightProp.intValue, MinSize, MaxSize);
-        currentRect.y += Spacing;
+        // Grid Height Slider
+        int newHeight = EditorGUI.IntSlider(currentRect, "Grid Height", height, MinSize, MaxSize);
+        currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
 
         if (EditorGUI.EndChangeCheck())
         {
             ResizeGrid(property, newWidth, newHeight);
+            gridSize = new Vector2Int(newWidth, newHeight);
+            width = newWidth;
+            height = newHeight;
         }
 
-        currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
+        // Tile Size
+        EditorGUI.PropertyField(currentRect, tileSizeProp, new GUIContent("Tile Size"));
+        currentRect.y += EditorGUI.GetPropertyHeight(tileSizeProp) + Spacing;
 
+        // Tile Spacing
+        EditorGUI.PropertyField(currentRect, tileSpacingProp, new GUIContent("Tile Spacing"));
+        currentRect.y += EditorGUI.GetPropertyHeight(tileSpacingProp) + Spacing;
+
+        // Active Tiles Count
         int activeCount = GetActiveCount(tilesProp);
-        EditorGUI.LabelField(currentRect, $"Active Tiles: {activeCount} / {widthProp.intValue * heightProp.intValue}");
+        EditorGUI.LabelField(currentRect, $"Active Tiles: {activeCount} / {width * height}");
         currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
 
-        float gridWidth = widthProp.intValue * CellSize;
-        float gridHeight = heightProp.intValue * CellSize;
+        // Shape Painter (Grid Visualization)
+        float gridWidth = width * CellSize;
+        float gridHeight = height * CellSize;
         Rect gridRect = new Rect(currentRect.x + (currentRect.width - gridWidth) / 2, currentRect.y, gridWidth, gridHeight);
 
-        DrawGrid(gridRect, widthProp.intValue, heightProp.intValue, tilesProp);
+        DrawGrid(gridRect, width, height, tilesProp);
 
         currentRect.y += gridHeight + Spacing;
 
+        // Buttons
         Rect buttonRect = new Rect(currentRect.x, currentRect.y, currentRect.width / 3 - 5, ButtonHeight);
 
         if (GUI.Button(buttonRect, "Activate All"))
@@ -115,6 +148,7 @@ public class GridDrawer : PropertyDrawer
                 _dragState = !tilesProp.GetArrayElementAtIndex(index).boolValue;
                 tilesProp.GetArrayElementAtIndex(index).boolValue = _dragState;
                 tilesProp.serializedObject.ApplyModifiedProperties();
+                GUI.changed = true;
                 e.Use();
             }
         }
@@ -128,6 +162,7 @@ public class GridDrawer : PropertyDrawer
                 int index = y * width + x;
                 tilesProp.GetArrayElementAtIndex(index).boolValue = _dragState;
                 tilesProp.serializedObject.ApplyModifiedProperties();
+                GUI.changed = true;
                 e.Use();
             }
         }
@@ -136,6 +171,7 @@ public class GridDrawer : PropertyDrawer
             _isDragging = false;
         }
 
+        // Draw tiles
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -162,6 +198,7 @@ public class GridDrawer : PropertyDrawer
             }
         }
 
+        // Draw grid lines
         Handles.color = GridLineColor;
         for (int x = 0; x <= width; x++)
         {
@@ -173,16 +210,22 @@ public class GridDrawer : PropertyDrawer
             float yPos = gridRect.y + y * CellSize;
             Handles.DrawLine(new Vector3(gridRect.x, yPos), new Vector3(gridRect.x + gridRect.width, yPos));
         }
+
+        // Request repaint if mouse is over the grid to show hover effect
+        if (gridRect.Contains(Event.current.mousePosition))
+        {
+            HandleUtility.Repaint();
+        }
     }
 
     private void ResizeGrid(SerializedProperty property, int newWidth, int newHeight)
     {
-        SerializedProperty widthProp = property.FindPropertyRelative("width");
-        SerializedProperty heightProp = property.FindPropertyRelative("height");
+        SerializedProperty gridSizeProp = property.FindPropertyRelative("gridSize");
         SerializedProperty tilesProp = property.FindPropertyRelative("tiles");
 
-        int oldWidth = widthProp.intValue;
-        int oldHeight = heightProp.intValue;
+        Vector2Int oldGridSize = gridSizeProp.vector2IntValue;
+        int oldWidth = oldGridSize.x;
+        int oldHeight = oldGridSize.y;
 
         bool[] newTiles = new bool[newWidth * newHeight];
 
@@ -210,8 +253,7 @@ public class GridDrawer : PropertyDrawer
             }
         }
 
-        widthProp.intValue = newWidth;
-        heightProp.intValue = newHeight;
+        gridSizeProp.vector2IntValue = new Vector2Int(newWidth, newHeight);
         tilesProp.arraySize = newWidth * newHeight;
 
         for (int i = 0; i < newTiles.Length; i++)
@@ -229,6 +271,7 @@ public class GridDrawer : PropertyDrawer
             tilesProp.GetArrayElementAtIndex(i).boolValue = value;
         }
         tilesProp.serializedObject.ApplyModifiedProperties();
+        GUI.changed = true;
     }
 
     private void InvertGrid(SerializedProperty tilesProp)
@@ -239,6 +282,7 @@ public class GridDrawer : PropertyDrawer
             element.boolValue = !element.boolValue;
         }
         tilesProp.serializedObject.ApplyModifiedProperties();
+        GUI.changed = true;
     }
 
     private int GetActiveCount(SerializedProperty tilesProp)

@@ -11,15 +11,9 @@ public class Match3Manager : MonoBehaviour
 {
     public static Match3Manager Instance { get; private set; }
     
-    
     [Header("Level")]
     [SerializeField] private SOMatch3Level level;
     
-    
-    [Header("Grid Settings")]
-    [SerializeField] private Vector3 gridOffset = Vector3.zero;
-    [SerializeField] private Vector2 tileSize = Vector2.one;
-    [SerializeField] private Vector2 tileOffset = Vector2.zero;
     
     [Header("References")]
     [SerializeField] private Tile tilePrefab;
@@ -66,33 +60,75 @@ public class Match3Manager : MonoBehaviour
     private void OnEnable()
     {
         inputReader.OnSelect += OnSelect;
+        inputReader.OnSwipe += OnSwipe;
     }
     
     private void OnDisable()
     {
         inputReader.OnSelect -= OnSelect;
+        inputReader.OnSwipe -= OnSwipe;
+    }
+
+    private void OnSwipe(Vector2 direction)
+    {
+        if (!_canSelectTiles || !heldMatchObject) return;
+
+        Vector2Int gridDirection;
+
+        float absX = Mathf.Abs(direction.x);
+        float absY = Mathf.Abs(direction.y);
+
+        if (absX > absY)
+        {
+            if (absY > absX * inputReader.SwipeDeadzone)
+            {
+                ReleaseObject(false);
+                return;
+            }
+            gridDirection = direction.x > 0 ? Vector2Int.left : Vector2Int.right;
+        }
+        else
+        {
+            if (absX > absY * inputReader.SwipeDeadzone)
+            {
+                ReleaseObject(false);
+                return;
+            }
+            gridDirection = direction.y > 0 ? Vector2Int.down : Vector2Int.up;
+        }
+
+        var newTilePos = selectedTile.GridPosition + gridDirection;
+        var newTile = GetTile(newTilePos);
+
+        TrySwapHeldObject(newTile);
     }
 
     private void OnSelect(InputAction.CallbackContext callbackContext)
     {
         if (!_canSelectTiles) return;
-        
-        Vector3 worldPos = _camera.ScreenToWorldPoint(inputReader.MousePosition);
-        worldPos.z = 0;
+
+        if (!heldMatchObject && callbackContext.started)
+        {
+            Vector3 worldPos = _camera.ScreenToWorldPoint(inputReader.MousePosition);
+            worldPos.z = 0;
     
-        var gridPos = GetPositionInGird(worldPos);
-        var tile = GetTile(gridPos);
+            var gridPos = GridShape.Grid.GetPositionInGird(worldPos);
+            var tile = GetTile(gridPos);
         
         
-        if (heldMatchObject)
-        {
-            TrySwapHeldObject(tile);
-        }
-        else
-        {
             SelectObjectInTile(tile);
+
+        }            
+        else if (heldMatchObject && callbackContext.canceled)
+        {
+            ReleaseObject(false);
         }
+
+
+        
+
     }
+    
     
     private void Update()
     {
@@ -247,8 +283,7 @@ public class Match3Manager : MonoBehaviour
     {
         if (!tile || !tile.IsActive) return null;
 
-        var item = Instantiate(matchObjectPrefab, new Vector3(tile.transform.position.x,tile.transform.position.y, matchObjectsParent.position.z), Quaternion.identity, matchObjectsParent);
-        item.transform.localScale = new Vector3(tileSize.x, tileSize.y, 1f);
+        var item = Instantiate(matchObjectPrefab, tile.transform.position, Quaternion.identity, matchObjectsParent);
         item.Initialize(itemData);
         
         tile.SetCurrentItem(item);
@@ -269,7 +304,6 @@ public class Match3Manager : MonoBehaviour
     private Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
     {
         var tile = Instantiate(tilePrefab, position, Quaternion.identity, tilesParent);
-        tile.transform.localScale = new Vector3(tileSize.x, tileSize.y, 1f);
         tile.Initialize(gridPos, isActive);
         return tile;
     }
@@ -288,17 +322,13 @@ public class Match3Manager : MonoBehaviour
         {
             for (int y = 0; y < grid.Height; y++)
             {
-                var tileState = grid.IsTileActive(x, y);
-                Vector2Int gridPos = new Vector2Int(x, y);
-                
-                Vector3 tilePosition = gridOffset + new Vector3(
-                    x * (tileSize.x + tileOffset.x), 
-                    (grid.Height - 1 - y) * (tileSize.y + tileOffset.y), 
-                    0
-                );
 
-                var tile = CreateTile(tilePosition, gridPos, tileState);
-                _tiles.Add(gridPos, tile);
+                Vector2Int tileGridPosition = new Vector2Int(x, y);
+                Vector3 tileWorldPosition = grid.GetTileWorldPosition(x,y);
+                bool tileState = grid.IsTileActive(x, y);
+
+                var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState);
+                _tiles.Add(tileGridPosition, tile);
             }
         }
         
@@ -386,13 +416,13 @@ public class Match3Manager : MonoBehaviour
     {
         if (!IsValidTile(tile))
         {
-            ReleaseItem(true);
+            ReleaseObject(true);
             return;
         } 
 
         if (tile == selectedTile)
         {
-            ReleaseItem(false);
+            ReleaseObject(false);
             return;
         }
 
@@ -403,7 +433,7 @@ public class Match3Manager : MonoBehaviour
         }
         else
         {
-            ReleaseItem(true);
+            ReleaseObject(true);
         }
     }
     
@@ -417,7 +447,7 @@ public class Match3Manager : MonoBehaviour
         mouseIndicator.EnableIndicator(selectedTile);
     }
     
-    private void ReleaseItem(bool animateReturn)
+    private void ReleaseObject(bool animateReturn)
     {
         selectedTile?.SetSelected(false);
         selectedTile = null;
@@ -484,7 +514,7 @@ public class Match3Manager : MonoBehaviour
         itemA.SetCurrentTile(tileB);
         itemB.SetCurrentTile(tileA);
 
-        ReleaseItem(false);
+        ReleaseObject(false);
         yield return new WaitForSeconds(0.3f);
     }
     
@@ -672,36 +702,7 @@ public class Match3Manager : MonoBehaviour
         
         return (deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1);
     }
-
-    public Vector2Int GetPositionInGird(Vector3 position)
-    {
-        var grid = GridShape.Grid;
-        for (int x = 0; x < grid.Width; x++)
-        {
-            for (int y = 0; y < grid.Height; y++)
-            {
-                Vector3 tilePosition = gridOffset + new Vector3(
-                    x * (tileSize.x + tileOffset.x), 
-                    (grid.Height - 1 - y) * (tileSize.y + tileOffset.y), 
-                    0
-                );
-
-                Rect tileRect = new Rect(
-                    tilePosition.x - tileSize.x / 2,
-                    tilePosition.y - tileSize.y / 2,
-                    tileSize.x,
-                    tileSize.y
-                );
-
-                if (tileRect.Contains(new Vector2(position.x, position.y)))
-                {
-                    return new Vector2Int(x, y);
-                }
-            }
-        }
-
-        return new Vector2Int(-1, -1);
-    }
+    
 
     #endregion
 
@@ -710,34 +711,9 @@ public class Match3Manager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!GridShape) return;
-    
-        var grid = GridShape.Grid;
-        var labelStyle = new GUIStyle()
-        {
-
-            fontSize = 12,
-            normal = { textColor = Color.white },
-            alignment = TextAnchor.MiddleCenter
-        };
-
-        for (int x = 0; x < grid.Width; x++)
-        {
-            for (int y = 0; y < grid.Height; y++)
-            {
-                var tileState = grid.IsTileActive(x, y);
-                
-                Vector3 tilePosition = gridOffset + new Vector3(
-                    x * (tileSize.x + tileOffset.x), 
-                    (grid.Height - 1 - y) * (tileSize.y + tileOffset.y), 
-                    0
-                );
-                
-                Gizmos.color = tileState ? Color.green : Color.white;
-                Gizmos.DrawWireCube(tilePosition, tileSize);
-                Handles.Label(tilePosition, $"{x},{y}", labelStyle);
-            }
-        }
+        GridShape?.Grid?.DrawGrid();
     }
+
+
 #endif
 }

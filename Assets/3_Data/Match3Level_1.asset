@@ -12,9 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f1b43a145a04e729c1b4bdcefcab301, type: 3}
   m_Name: Match3Level_1
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
-  gridShape: {fileID: 11400000, guid: 3c386d78e38322a448a056f80e2497c0, type: 2}
-  populationDirection: 1
-  populationDuration: 1
+  allowedMoves: 15
   matchObjects:
     internalItems:
     - item: {fileID: 11400000, guid: 06c7eecdb5f79c542a8465be434742cc, type: 2}
@@ -29,3 +27,6 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 06fa80ac6d8463442a977ad4d41d493f, type: 2}
       chance: 25
       isLocked: 0
+  gridShape: {fileID: 11400000, guid: 4b006d4db34ba604db69250255ef3754, type: 2}
+  populationDirection: 1
+  populationDuration: 1
