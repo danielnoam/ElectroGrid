@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace DNExtensions.InputSystem
 {
+
     public class InputManager : MonoBehaviour
     {
         public static InputManager Instance { get; private set; }
@@ -22,9 +23,13 @@ namespace DNExtensions.InputSystem
         [SerializeField] private TMP_SpriteAsset gamepadSpriteAsset;
 
 
+        [Separator]
+        [SerializeField, ReadOnly] private bool isCurrentDeviceGamepad;
+        [SerializeField, ReadOnly] private bool isCurrentDeviceTouchscreen;
 
-
-        public bool IsCurrentDeviceGamepad { get; private set; }
+        public bool IsCurrentDeviceGamepad => isCurrentDeviceGamepad;
+        public bool IsCurrentDeviceTouchscreen => isCurrentDeviceTouchscreen;
+        
 
         public PlayerInput PlayerInput => playerInput;
 
@@ -111,7 +116,8 @@ namespace DNExtensions.InputSystem
 
         private void SetActiveControlScheme(PlayerInput input)
         {
-            IsCurrentDeviceGamepad = input.currentControlScheme == "Gamepad";
+            isCurrentDeviceGamepad = input.currentControlScheme == "Gamepad";
+            isCurrentDeviceTouchscreen = input.currentControlScheme == "Touch";
         }
 
 
@@ -155,7 +161,7 @@ namespace DNExtensions.InputSystem
         {
             if (!Instance) return text;
 
-            TMP_SpriteAsset spriteAsset = Instance.IsCurrentDeviceGamepad
+            TMP_SpriteAsset spriteAsset = Instance.isCurrentDeviceGamepad
                 ? Instance.gamepadSpriteAsset
                 : Instance.keyboardMouseSpriteAsset;
 
@@ -176,7 +182,7 @@ namespace DNExtensions.InputSystem
         {
             if (!Instance?.playerInput || action == null) return action?.name ?? "Unknown";
     
-            TMP_SpriteAsset spriteAsset = asSprite ? Instance.IsCurrentDeviceGamepad 
+            TMP_SpriteAsset spriteAsset = asSprite ? Instance.isCurrentDeviceGamepad 
                 ? Instance.gamepadSpriteAsset 
                 : Instance.keyboardMouseSpriteAsset : null;
     

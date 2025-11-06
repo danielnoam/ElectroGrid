@@ -32,6 +32,12 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            Application.targetFrameRate = 60;
+        }
     }
     
     private void Start()

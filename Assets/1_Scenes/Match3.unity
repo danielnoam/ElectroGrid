@@ -490,7 +490,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 9
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -771,7 +771,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84fc9b39c825b3540ae4a1dbeafc448f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  maxPossibleMatches: 10
+  maxAttemptsToRecheckMatches: 50
+  maxImmediateMatches: 0
+  minPossibleMatches: 3
   populationDuration: 1
   level: {fileID: 11400000, guid: 69ffbccbccefb6f4e91fd3f5f0606330, type: 2}
   tilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
@@ -798,7 +800,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62006526678b37e44a8a36ccf5577657, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputReader
-  inputManager: {fileID: 0}
+  inputManager: {fileID: 1468544195}
   swipeThreshold: 0.3
   swipeDeadzone: 0.3
   mousePosition: {x: 0, y: 0}
@@ -1283,6 +1285,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b4853befcd479f744b1c91ff139210c6, type: 3}
+--- !u!114 &1468544195 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3635964787785189804, guid: b4853befcd479f744b1c91ff139210c6, type: 3}
+  m_PrefabInstance: {fileID: 1105389517}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e7ea91dfbd4e3b46b833e32591440fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.InputSystem.InputManager
 --- !u!1 &1783371856
 GameObject:
   m_ObjectHideFlags: 0

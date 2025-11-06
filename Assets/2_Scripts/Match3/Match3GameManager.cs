@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,13 @@ public class Match3GameManager : MonoBehaviour
 
 
     [Header("Settings")]
-    [SerializeField] private int maxPossibleMatches = 10;
+    [Tooltip("Max attempts to recheck for matches when populating the grid")]
+    [SerializeField] private int maxAttemptsToRecheckMatches = 50;
+    [Tooltip("Max possible matches allowed in grid when populating")]
+    [SerializeField] private int maxImmediateMatches = 3;
+    [Tooltip("Minimum possible matches required in grid")]
+    [SerializeField] private int minPossibleMatches = 3;
+    [Tooltip("Duration to populate the grid with match objects")]
     [SerializeField, Min(1)] private float populationDuration = 1f;
     [SerializeField] private SOMatch3Level level;
     
@@ -41,6 +48,13 @@ public class Match3GameManager : MonoBehaviour
     private Camera _camera;
     
     
+    private const int MinMatchCount = 3;
+    private const float SwapDuration = 0.3f;
+    private const float MatchHandleDelay = 0.1f;
+    private const float MoveObjectsDelay = 0.1f;
+    private const int MaxGuaranteedMatchAttempts = 100;
+    
+    
 
     private void Awake()
     {
@@ -55,6 +69,10 @@ public class Match3GameManager : MonoBehaviour
         }
         
         _camera = Camera.main;
+    }
+
+    private void Start()
+    {
         StartNewGame();
     }
 
@@ -161,7 +179,6 @@ public class Match3GameManager : MonoBehaviour
 
     private IEnumerator PopulateGrid()
     {
-
         if (!level)
         {
             Debug.LogError("Level is not set, Cannot populate grid");
@@ -169,9 +186,6 @@ public class Match3GameManager : MonoBehaviour
         }
         
         ReleaseObject(false);
-        
-        ChanceList<SOItemData> matchObjects = level.MatchObjects;
-        
 
         int totalActiveTiles = 0;
         foreach (var kvp in _tiles)
@@ -196,38 +210,89 @@ public class Match3GameManager : MonoBehaviour
             if (pos.x > maxX) maxX = pos.x;
             if (pos.y > maxY) maxY = pos.y;
         }
-
-        // Populate from bottom tiles
+        
+        // Create a dictionary of tiles that need to be populated
+        var tilesToPopulate = new Dictionary<Tile, SOItemData>();
         for (int y = maxY; y >= 0; y--)
         {
             for (int x = 0; x <= maxX; x++)
             {
-                if (_tiles.TryGetValue(new Vector2Int(x, y), out var tile) && tile.IsActive && !tile.HasObject)
+                if (_tiles.TryGetValue(new Vector2Int(x, y), out var tile) && !tile.HasObject)
                 {
-                    var randomItemData = matchObjects.GetRandomItem();
-                    if (randomItemData)
-                    {
-                        CreateMatchObject(randomItemData, tile);
-                        yield return new WaitForSeconds(populationDuration / totalActiveTiles);
-                    }
+                    tilesToPopulate.Add(tile, null);
                 }
             }
         }
         
-        // Check if there are to many matches or no available possible matches in grid
-        if (FindMatchesInGrid().Count > maxPossibleMatches || !GridHasPossibleMatches())
+        // Step 1: Identify positions where we'll force possible matches
+        List<(Vector2Int posA, Vector2Int posB)> guaranteedMatchPairs = CreateGuaranteedMatchPositions(minPossibleMatches);
+        
+        // Step 2: Assign random items to tiles, ensuring no immediate matches
+        // BUT respect the guaranteed match pairs
+        foreach (var tileItemPair in tilesToPopulate.ToList())
         {
+            // Check if this tile is part of a guaranteed match pair
+            SOItemData forcedItem = GetForcedItemForGuaranteedMatch(tileItemPair.Key.GridPosition, guaranteedMatchPairs, tilesToPopulate);
+            
+            if (forcedItem != null)
+            {
+                // This tile is part of a guaranteed match setup
+                tilesToPopulate[tileItemPair.Key] = forcedItem;
+            }
+            else
+            {
+                // Normal random assignment avoiding immediate matches
+                SOItemData selectedItem;
+                int attempts = 0;
+
+                do
+                {
+                    selectedItem = level.MatchObjects.GetRandomItem();
+                    attempts++;
+            
+                    if (attempts >= maxAttemptsToRecheckMatches)
+                    {
+                        Debug.Log("Could not find non-matching item");
+                        break;
+                    }
+                } 
+                while (WouldCreateMatchDuringPopulation(tileItemPair.Key.GridPosition, selectedItem, tilesToPopulate));
+
+                tilesToPopulate[tileItemPair.Key] = selectedItem;
+            }
+        }
+
+        // Create objects
+        foreach (var tileObjectMatch in tilesToPopulate)
+        {
+            CreateMatchObject(tileObjectMatch.Value, tileObjectMatch.Key);
+            yield return new WaitForSeconds(populationDuration / totalActiveTiles);
+        }
+        
+        // Validate
+        var immediateMatchesInGrid = FindImmediateMatches();
+        if (immediateMatchesInGrid.Count > maxImmediateMatches)
+        {
+            Debug.Log($"Too many immediate matches found in grid ({immediateMatchesInGrid.Count})");
             CreateGird();
             yield break;
         }
         
+        var possibleMatchesInGrid = FindPossibleMatches();
+        if (possibleMatchesInGrid.Count < minPossibleMatches)
+        {
+            Debug.Log($"Failed to create enough possible matches ({possibleMatchesInGrid.Count}/{minPossibleMatches})");
+            CreateGird();
+            yield break;
+        }
+        
+        Debug.Log($"Grid populated successfully with {possibleMatchesInGrid.Count} possible matches");
         canSelectTiles = true;
     }
     
-    
     private MatchObject CreateMatchObject(SOItemData itemData, Tile tile)
     {
-        if (!tile || !tile.IsActive) return null;
+        if (!IsValidTile(tile)) return null;
 
 
         var topMostTile = GetTile(new Vector2Int(tile.GridPosition.x, 0));
@@ -345,6 +410,8 @@ public class Match3GameManager : MonoBehaviour
     
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
     
+        
+        if (inputReader.IsCurrentDeviceTouchscreen) return;
         Tile newHoveredTile = null;
         if (hit.collider)
         {
@@ -428,18 +495,6 @@ public class Match3GameManager : MonoBehaviour
         yield return StartCoroutine(HandleMatches(matchesWithTile));
         
         
-        
-        // Find matches in all of board
-        List<Tile> matches = FindMatchesInGrid();
-        if (matches.Count == 0)
-        {
-            CreateGird();
-            yield break;
-        }
-        yield return StartCoroutine(HandleMatches(matches));
-        
-        
-        
         // Make objects fall
         yield return StartCoroutine(MoveObjects());
         
@@ -467,7 +522,7 @@ public class Match3GameManager : MonoBehaviour
         itemB.SetCurrentTile(tileA);
 
         ReleaseObject(false);
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(SwapDuration);
     }
     
 
@@ -477,7 +532,7 @@ public class Match3GameManager : MonoBehaviour
         {
             match.CurrentMatchObject.MatchFound();
             match.SetCurrentItem(null);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(MatchHandleDelay);
         }
     }
 
@@ -499,7 +554,7 @@ public class Match3GameManager : MonoBehaviour
                             aboveTile.SetCurrentItem(null);
                             tile.SetCurrentItem(matchObject);
                             matchObject.SetCurrentTile(tile);
-                            yield return new WaitForSeconds(0.1f);
+                            yield return new WaitForSeconds(MoveObjectsDelay);
                             break;
                         }
                     }
@@ -509,7 +564,35 @@ public class Match3GameManager : MonoBehaviour
     }
 
 
-    private List<Tile> FindMatchesInGrid()
+
+    
+
+    #endregion
+
+
+    #region Helper
+
+    private Tile GetTile(Vector2Int position)
+    {
+        _tiles.TryGetValue(position, out Tile tile);
+        return tile;
+    }
+    
+    
+    private bool IsValidTile(Tile tile)
+    {
+        return tile && tile.IsActive;
+    }
+    
+    private bool IsPositionsTouching(Vector2Int positionA, Vector2Int positionB)
+    {
+        int deltaX = Mathf.Abs(positionA.x - positionB.x);
+        int deltaY = Mathf.Abs(positionA.y - positionB.y);
+        
+        return (deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1);
+    }
+    
+        private List<Tile> FindImmediateMatches()
     {
         HashSet<Tile> matches = new HashSet<Tile>();
 
@@ -615,7 +698,7 @@ public class Match3GameManager : MonoBehaviour
             verticalMatches.Add(checkTile);
         }
         
-        if (verticalMatches.Count >= 3)
+        if (verticalMatches.Count >= MinMatchCount)
         {
             foreach (var match in verticalMatches)
                 matches.Add(match);
@@ -624,45 +707,47 @@ public class Match3GameManager : MonoBehaviour
         return new List<Tile>(matches);
     }
     
-    private bool GridHasPossibleMatches()
+    
+    
+    private List<Tile> FindPossibleMatches()
     {
+        HashSet<Tile> possibleMatchTiles = new HashSet<Tile>();
+        HashSet<(Vector2Int, Vector2Int)> checkedPairs = new HashSet<(Vector2Int, Vector2Int)>();
+
         foreach (var tile in _tiles.Values)
         {
             if (!IsValidTile(tile) || !tile.HasObject) continue;
-        
-            if (IsTherePossibleMatches(tile.GridPosition))
-                return true;
-        }
     
-        return false;
-    }
-
-    private bool IsTherePossibleMatches(Vector2Int tilePosition)
-    {
-        var tile = GetTile(tilePosition);
-        if (!IsValidTile(tile) || !tile.HasObject) return false;
+            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+    
+            foreach (var direction in directions)
+            {
+                var neighborPos = tile.GridPosition + direction;
+                var neighborTile = GetTile(neighborPos);
         
-        var currentItemData = tile.CurrentMatchObject.ItemData;
+                if (!IsValidTile(neighborTile) || !neighborTile.HasObject) continue;
         
-        Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+                // Avoid checking the same pair twice
+                var pair = tile.GridPosition.x < neighborPos.x || (tile.GridPosition.x == neighborPos.x && tile.GridPosition.y < neighborPos.y)
+                    ? (tile.GridPosition, neighborPos)
+                    : (neighborPos, tile.GridPosition);
+            
+                if (checkedPairs.Contains(pair)) continue;
+                checkedPairs.Add(pair);
         
-        foreach (var direction in directions)
-        {
-            var neighborPos = tilePosition + direction;
-            var neighborTile = GetTile(neighborPos);
-            
-            if (!IsValidTile(neighborTile) || !neighborTile.HasObject) continue;
-            
-            var neighborItemData = neighborTile.CurrentMatchObject.ItemData;
-            
-            if (WouldCreateMatch(neighborPos, currentItemData))
-                return true;
-            
-            if (WouldCreateMatch(tilePosition, neighborItemData))
-                return true;
+                // Check if swapping these would create a match
+                var currentItemData = tile.CurrentMatchObject.ItemData;
+                var neighborItemData = neighborTile.CurrentMatchObject.ItemData;
+        
+                if (WouldCreateMatch(neighborPos, currentItemData) || WouldCreateMatch(tile.GridPosition, neighborItemData))
+                {
+                    possibleMatchTiles.Add(tile);
+                    possibleMatchTiles.Add(neighborTile);
+                }
+            }
         }
-        
-        return false;
+
+        return new List<Tile>(possibleMatchTiles);
     }
 
     private bool WouldCreateMatch(Vector2Int position, SOItemData itemData)
@@ -685,7 +770,7 @@ public class Match3GameManager : MonoBehaviour
             horizontalCount++;
         }
         
-        if (horizontalCount >= 3) return true;
+        if (horizontalCount >= MinMatchCount) return true;
         int verticalCount = 1;
         for (int y = position.y - 1; y >= 0; y--)
         {
@@ -704,38 +789,177 @@ public class Match3GameManager : MonoBehaviour
             verticalCount++;
         }
         
-        return verticalCount >= 3;
+        return verticalCount >= MinMatchCount;
     }
     
-
-    #endregion
-
-
-    #region Helper
-
-    public Tile GetTile(Vector2Int position)
+    private bool WouldCreateMatchDuringPopulation(Vector2Int position, SOItemData itemData, Dictionary<Tile, SOItemData> tilesToPopulate)
     {
-        _tiles.TryGetValue(position, out Tile tile);
-        return tile;
-    }
-    
-    public MatchObject GetItem(Vector2Int position)
-    {
-        var tile = GetTile(position);
-        return tile ? tile.CurrentMatchObject : null;
-    }
-    
-    public bool IsValidTile(Tile tile)
-    {
-        return tile && tile.IsActive;
-    }
-    
-    public bool IsPositionsTouching(Vector2Int positionA, Vector2Int positionB)
-    {
-        int deltaX = Mathf.Abs(positionA.x - positionB.x);
-        int deltaY = Mathf.Abs(positionA.y - positionB.y);
+        // Check horizontal
+        int horizontalCount = 1;
+        for (int x = position.x - 1; x >= 0; x--)
+        {
+            var checkTile = GetTile(new Vector2Int(x, position.y));
+            if (!IsValidTile(checkTile)) break;
+            
+            // Check if tile already has an object OR is in the populate queue
+            SOItemData checkItemData = null;
+            if (checkTile.HasObject)
+                checkItemData = checkTile.CurrentMatchObject.ItemData;
+            else if (tilesToPopulate.ContainsKey(checkTile))
+                checkItemData = tilesToPopulate[checkTile];
+            
+            if (checkItemData == null || checkItemData != itemData)
+                break;
+                
+            horizontalCount++;
+        }
+        for (int x = position.x + 1; x < GridShape.Grid.Width; x++)
+        {
+            var checkTile = GetTile(new Vector2Int(x, position.y));
+            if (!IsValidTile(checkTile)) break;
+            
+            SOItemData checkItemData = null;
+            if (checkTile.HasObject)
+                checkItemData = checkTile.CurrentMatchObject.ItemData;
+            else if (tilesToPopulate.ContainsKey(checkTile))
+                checkItemData = tilesToPopulate[checkTile];
+            
+            if (checkItemData == null || checkItemData != itemData)
+                break;
+                
+            horizontalCount++;
+        }
         
-        return (deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1);
+        if (horizontalCount >= MinMatchCount) return true;
+        
+        // Check vertical (same pattern)
+        int verticalCount = 1;
+        for (int y = position.y - 1; y >= 0; y--)
+        {
+            var checkTile = GetTile(new Vector2Int(position.x, y));
+            if (!IsValidTile(checkTile)) break;
+            
+            SOItemData checkItemData = null;
+            if (checkTile.HasObject)
+                checkItemData = checkTile.CurrentMatchObject.ItemData;
+            else if (tilesToPopulate.ContainsKey(checkTile))
+                checkItemData = tilesToPopulate[checkTile];
+            
+            if (checkItemData == null || checkItemData != itemData)
+                break;
+                
+            verticalCount++;
+        }
+        for (int y = position.y + 1; y < GridShape.Grid.Height; y++)
+        {
+            var checkTile = GetTile(new Vector2Int(position.x, y));
+            if (!IsValidTile(checkTile)) break;
+            
+            SOItemData checkItemData = null;
+            if (checkTile.HasObject)
+                checkItemData = checkTile.CurrentMatchObject.ItemData;
+            else if (tilesToPopulate.ContainsKey(checkTile))
+                checkItemData = tilesToPopulate[checkTile];
+            
+            if (checkItemData == null || checkItemData != itemData)
+                break;
+                
+            verticalCount++;
+        }
+        
+        return verticalCount >= MinMatchCount;
+    }
+    
+    private List<(Vector2Int posA, Vector2Int posB)> CreateGuaranteedMatchPositions(int count)
+    {
+        List<(Vector2Int, Vector2Int)> pairs = new List<(Vector2Int, Vector2Int)>();
+        List<Vector2Int> usedPositions = new List<Vector2Int>();
+        
+        int attempts = 0;
+        while (pairs.Count < count && attempts < MaxGuaranteedMatchAttempts)
+        {
+            attempts++;
+            
+            // Find a random tile
+            var randomTile = GetRandomValidTile();
+            if (randomTile == null) break;
+            
+            if (usedPositions.Contains(randomTile.GridPosition)) continue;
+            
+            // Find an adjacent tile
+            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+            foreach (var dir in directions.OrderBy(x => UnityEngine.Random.value))
+            {
+                var neighborPos = randomTile.GridPosition + dir;
+                var neighborTile = GetTile(neighborPos);
+                
+                if (!IsValidTile(neighborTile) || usedPositions.Contains(neighborPos)) continue;
+                
+                pairs.Add((randomTile.GridPosition, neighborPos));
+                usedPositions.Add(randomTile.GridPosition);
+                usedPositions.Add(neighborPos);
+                break;
+            }
+        }
+        
+        return pairs;
+    }
+
+    private SOItemData GetForcedItemForGuaranteedMatch(Vector2Int position, List<(Vector2Int posA, Vector2Int posB)> guaranteedPairs, Dictionary<Tile, SOItemData> tilesToPopulate)
+    {
+        foreach (var pair in guaranteedPairs)
+        {
+            if (pair.posA == position)
+            {
+                // This is position A - find a third tile to create the match pattern
+                // Pattern: A-B where if we swap A with neighbor, B matches with something
+                var neighborPos = pair.posB;
+                
+                // Look for a tile 2 steps away from B in the same direction
+                Vector2Int direction = neighborPos - position;
+                Vector2Int thirdPos = neighborPos + direction;
+                var thirdTile = GetTile(thirdPos);
+                
+                if (IsValidTile(thirdTile))
+                {
+                    // Create pattern: A-B-C where A and C are the same
+                    var itemData = level.MatchObjects.GetRandomItem();
+                    
+                    // Make sure C gets the same item
+                    if (tilesToPopulate.ContainsKey(thirdTile))
+                    {
+                        tilesToPopulate[thirdTile] = itemData;
+                    }
+                    
+                    return itemData;
+                }
+            }
+            else if (pair.posB == position)
+            {
+                // This is position B - it should get a different item
+                // Find what A is getting and pick something different
+                var tileA = GetTile(pair.posA);
+                if (tilesToPopulate.ContainsKey(tileA) && tilesToPopulate[tileA] != null)
+                {
+                    // Pick a different item
+                    SOItemData differentItem;
+                    do
+                    {
+                        differentItem = level.MatchObjects.GetRandomItem();
+                    } while (differentItem == tilesToPopulate[tileA] && level.MatchObjects.Count > 1);
+                    
+                    return differentItem;
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    private Tile GetRandomValidTile()
+    {
+        var validTiles = _tiles.Values.Where(t => IsValidTile(t)).ToList();
+        return validTiles.Count > 0 ? validTiles[UnityEngine.Random.Range(0, validTiles.Count)] : null;
     }
     
 

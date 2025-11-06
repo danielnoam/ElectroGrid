@@ -15,6 +15,8 @@ namespace DNExtensions.InputSystem
     
     
         public bool IsCurrentDeviceGamepad => inputManager?.IsCurrentDeviceGamepad ?? false;
+        public bool IsCurrentDeviceTouchscreen => inputManager?.IsCurrentDeviceTouchscreen ?? false;
+        
         protected PlayerInput PlayerInput => inputManager?.PlayerInput;
         
         
@@ -25,16 +27,12 @@ namespace DNExtensions.InputSystem
             if (!inputManager) inputManager = FindFirstObjectByType<InputManager>();
             
         }
+        
 
         protected virtual void Start()
         {
-            if (!inputManager)
-            {
-             
-                Debug.Log("no input");
-                inputManager = FindFirstObjectByType<InputManager>();
-                Debug.Log(inputManager);
-            }
+            if (!inputManager) inputManager = FindFirstObjectByType<InputManager>();
+            
         }
 
         /// <summary>
@@ -44,12 +42,17 @@ namespace DNExtensions.InputSystem
         /// <param name="callback">The callback method to invoke for all action phases.</param>
         protected void SubscribeToAction(InputAction action, Action<InputAction.CallbackContext> callback)
         {
+            
             if (action == null)
             {
                 Debug.LogError("Null action found!");
                 return;
             }
 
+            action.performed -= callback;
+            action.started -= callback;
+            action.canceled -= callback;
+            
             action.performed += callback;
             action.started += callback;
             action.canceled += callback;

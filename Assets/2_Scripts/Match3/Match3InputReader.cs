@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using DNExtensions;
+using DNExtensions.Button;
 using DNExtensions.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -45,6 +47,8 @@ public class Match3InputReader : InputReaderBase
         
         SubscribeToAction(_selectAction, OnSelectAction);
         SubscribeToAction(_mousePositionAction, OnMousePositionAction);
+
+        StartCoroutine(ResubscribeToActions());
     }
     
 
@@ -87,5 +91,17 @@ public class Match3InputReader : InputReaderBase
         }
 
     }
+    
+    
+    // Resubscribe to actions in case of reloading the scene
+    // Called when with a coroutine with a delay after start
+    // Because inputManager gets lost and this is a piece of shit Unity Input System design
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    private IEnumerator ResubscribeToActions()
+    {
+        yield return new WaitForSeconds(1f);
+        Start();
+    }
+    
     
 }
