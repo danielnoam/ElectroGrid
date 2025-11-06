@@ -801,6 +801,7 @@ MonoBehaviour:
   mouseIndicator: {fileID: 820176654}
   inputReader: {fileID: 586155250}
   defaultGridShape: {fileID: 11400000, guid: 4b006d4db34ba604db69250255ef3754, type: 2}
+  canSelectTiles: 0
   movesMade: 0
   hoveredTile: {fileID: 0}
   selectedTile: {fileID: 0}
@@ -818,7 +819,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputReader
   inputManager: {fileID: 446634971}
+  swipeThreshold: 0.3
+  swipeDeadzone: 0.3
   mousePosition: {x: 0, y: 0}
+  isPressing: 0
+  pressStartPosition: {x: 0, y: 0}
+  swipeDirection: {x: 0, y: 0}
 --- !u!1001 &604789036
 PrefabInstance:
   m_ObjectHideFlags: 0

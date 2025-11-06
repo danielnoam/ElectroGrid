@@ -28,7 +28,13 @@ namespace DNExtensions.InputSystem
 
         protected virtual void Start()
         {
-            if (!inputManager) inputManager = FindFirstObjectByType<InputManager>();
+            if (!inputManager)
+            {
+             
+                Debug.Log("no input");
+                inputManager = FindFirstObjectByType<InputManager>();
+                Debug.Log(inputManager);
+            }
         }
 
         /// <summary>

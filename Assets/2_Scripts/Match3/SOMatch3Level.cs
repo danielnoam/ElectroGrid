@@ -10,16 +10,14 @@ public class SOMatch3Level : ScriptableObject
     
     [Header("Grid")]
     [SerializeField] private SOGridShape gridShape;
-    [SerializeField] private PopulationDirection populationDirection = PopulationDirection.TopToBottom;
-    [SerializeField, Min(1)] private float populationDuration = 1f;
+
+
     
     
 
     
 
     public SOGridShape GridShape => gridShape;
-    public PopulationDirection PopulationDirection => populationDirection;
-    public float PopulationDuration => populationDuration;
     public ChanceList<SOItemData> MatchObjects => matchObjects;
     public int AllowedMoves => allowedMoves;
 }

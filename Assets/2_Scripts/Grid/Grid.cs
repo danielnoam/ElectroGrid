@@ -207,6 +207,18 @@ public class Grid
         );
     }
     
+    public Vector2Int GetNeighboringTile(Vector2Int tile, Vector2Int direction)
+    {
+        Vector2Int neighboringTile = tile + direction;
+
+        if (neighboringTile.x < 0 || neighboringTile.x >= Width || neighboringTile.y < 0 || neighboringTile.y >= Height)
+        {
+            return new Vector2Int(-1, -1);
+        }
+
+        return neighboringTile;
+    }
+    
     
     public void DrawGrid()
     {

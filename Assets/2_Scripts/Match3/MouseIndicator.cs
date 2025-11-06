@@ -39,16 +39,18 @@ public class MouseIndicator : MonoBehaviour
         
         _tile = tile;
         spriteRenderer.sprite = _tile.CurrentMatchObject.ItemData.Sprite;
-        Tween.Scale(spriteRenderer.transform, _baseScale, 0.2f, Ease.OutBack);
+        if (spriteRenderer.transform.localScale != _baseScale) Tween.Scale(spriteRenderer.transform, _baseScale, 0.2f, Ease.OutBack);
         
-        enabled = true;
+        _enabled = true;
     }
     
     public void DisableIndicator(bool animateReturn = false)
     {
+        if (!_enabled) return;
+        
         _sequence.Stop();
         
-        enabled = false;
+        _enabled = false;
         lineRenderer.SetPosition(0, Vector3.zero);
         lineRenderer.SetPosition(1, Vector3.zero);
         
@@ -69,7 +71,7 @@ public class MouseIndicator : MonoBehaviour
         }
         else
         {
-            Tween.Scale(spriteRenderer.transform, Vector3.zero, 0.2f, Ease.OutBack);
+            if (spriteRenderer.transform.localScale != Vector3.zero) Tween.Scale(spriteRenderer.transform, Vector3.zero, 0.2f, Ease.OutBack);
             _tile = null;
             spriteRenderer.sprite = null;
         }
@@ -80,7 +82,7 @@ public class MouseIndicator : MonoBehaviour
 
     private void UpdateIndicatorPosition()
     {
-        if (!_camera || !enabled || !_tile) return;
+        if (!_camera || !_enabled || !_tile) return;
         
         
         Vector3 mousePosition = _camera.ScreenToWorldPoint(inputReader.MousePosition);
