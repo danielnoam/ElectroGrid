@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using DNExtensions;
@@ -10,15 +11,15 @@ public class Match3Manager : MonoBehaviour
 {
     public static Match3Manager Instance { get; private set; }
     
+    
+    [Header("Level")]
+    [SerializeField] private SOMatch3Level level;
+    
+    
     [Header("Grid Settings")]
-    [SerializeField] private SOGridShape gridShape;
     [SerializeField] private Vector3 gridOffset = Vector3.zero;
     [SerializeField] private Vector2 tileSize = Vector2.one;
     [SerializeField] private Vector2 tileOffset = Vector2.zero;
-    
-    [Header("Population Settings")]
-    [SerializeField] private PopulationDirection populationDirection = PopulationDirection.TopToBottom;
-    [SerializeField, Min(1)] private float populationDuration = 1f;
     
     [Header("References")]
     [SerializeField] private Tile tilePrefab;
@@ -27,22 +28,27 @@ public class Match3Manager : MonoBehaviour
     [SerializeField] private Transform tilesParent;
     [SerializeField] private MouseIndicator mouseIndicator;
     [SerializeField] private Match3InputReader inputReader;
-    [SerializeField] private ChanceList<SOItemData> items = new ChanceList<SOItemData>();
+    [SerializeField] private SOGridShape defaultGridShape;
     
     [Separator]
+    [SerializeField, ReadOnly] private int movesMade;
     [SerializeField, ReadOnly] private Tile hoveredTile;
     [SerializeField, ReadOnly] private Tile selectedTile;
     [SerializeField, ReadOnly] private MatchObject heldMatchObject;
+
+
+    private SOGridShape GridShape => level ? level.GridShape : defaultGridShape;
     
-    private enum PopulationDirection { TopToBottom, BottomToTop, LeftToRight, RightToLeft }
+    
     private readonly Dictionary<Vector2Int, Tile> _tiles = new Dictionary<Vector2Int, Tile>();
     private Coroutine _gridPopulationRoutine;
     private bool _canSelectTiles;
     private Camera _camera;
+    
+    
 
     private void Awake()
     {
-        
         if (!Instance || Instance == this)
         {
             Instance = this;
@@ -54,7 +60,7 @@ public class Match3Manager : MonoBehaviour
         }
         
         _camera = Camera.main;
-        CreateGird();
+        StartNewGame();
     }
 
     private void OnEnable()
@@ -69,13 +75,23 @@ public class Match3Manager : MonoBehaviour
 
     private void OnSelect(InputAction.CallbackContext callbackContext)
     {
+        if (!_canSelectTiles) return;
         
         Vector3 worldPos = _camera.ScreenToWorldPoint(inputReader.MousePosition);
         worldPos.z = 0;
     
-        var gridPos = GetGridPosition(worldPos);
+        var gridPos = GetPositionInGird(worldPos);
         var tile = GetTile(gridPos);
-        SelectTile(tile);
+        
+        
+        if (heldMatchObject)
+        {
+            TrySwapHeldObject(tile);
+        }
+        else
+        {
+            SelectObjectInTile(tile);
+        }
     }
     
     private void Update()
@@ -84,13 +100,46 @@ public class Match3Manager : MonoBehaviour
     }
 
 
+    #region Game Managemenet
+    
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    private void StartNewGame()
+    {
+        if (!level) return;
+
+        movesMade = level.AllowedMoves;
+        CreateGird();
+    }
+
+    private void CheckMovesLeft()
+    {
+        if (movesMade <= 0)
+        {
+            _canSelectTiles = false;
+            Debug.Log("No more moves left");
+        }
+    }
+    
+    #endregion
     
 
     #region Objects Creation
     
 
-    private IEnumerator PopulateGrid(float duration, PopulationDirection direction)
+    private IEnumerator PopulateGrid()
     {
+
+        if (!level)
+        {
+            Debug.LogError("Level is not set, Cannot populate grid");
+            yield break;
+        }
+        
+        float duration = level.PopulationDuration;
+        PopulationDirection direction = level.PopulationDirection;
+        ChanceList<SOItemData> matchObjects = level.MatchObjects;
+        
+
         int totalActiveTiles = 0;
         foreach (var kvp in _tiles)
         {
@@ -124,7 +173,7 @@ public class Match3Manager : MonoBehaviour
                     {
                         if (_tiles.TryGetValue(new Vector2Int(x, y), out var tile) && tile.IsActive && !tile.HasObject)
                         {
-                            var randomItemData = items.GetRandomItem();
+                            var randomItemData = level.MatchObjects.GetRandomItem();
                             if (randomItemData)
                             {
                                 CreateMatchObject(randomItemData, tile);
@@ -142,7 +191,7 @@ public class Match3Manager : MonoBehaviour
                     {
                         if (_tiles.TryGetValue(new Vector2Int(x, y), out var tile) && tile.IsActive && !tile.HasObject)
                         {
-                            var randomItemData = items.GetRandomItem();
+                            var randomItemData = matchObjects.GetRandomItem();
                             if (randomItemData)
                             {
                                 CreateMatchObject(randomItemData, tile);
@@ -160,7 +209,7 @@ public class Match3Manager : MonoBehaviour
                     {
                         if (_tiles.TryGetValue(new Vector2Int(x, y), out var tile) && tile.IsActive && !tile.HasObject)
                         {
-                            var randomItemData = items.GetRandomItem();
+                            var randomItemData = matchObjects.GetRandomItem();
                             if (randomItemData)
                             {
                                 CreateMatchObject(randomItemData, tile);
@@ -178,7 +227,7 @@ public class Match3Manager : MonoBehaviour
                     {
                         if (_tiles.TryGetValue(new Vector2Int(x, y), out var tile) && tile.IsActive && !tile.HasObject)
                         {
-                            var randomItemData = items.GetRandomItem();
+                            var randomItemData = matchObjects.GetRandomItem();
                             if (randomItemData)
                             {
                                 CreateMatchObject(randomItemData, tile);
@@ -213,6 +262,9 @@ public class Match3Manager : MonoBehaviour
 
 
     #region Grid Setup
+    
+
+
 
     private Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
     {
@@ -222,16 +274,15 @@ public class Match3Manager : MonoBehaviour
         return tile;
     }
     
-    
-    [Button]
+
     private void CreateGird()
     {
-        if (!gridShape || !tilePrefab || !matchObjectPrefab) return;
+        if (!GridShape || !tilePrefab || !matchObjectPrefab) return;
 
         _canSelectTiles = false;
         ClearGrid();
         
-        var grid = gridShape.Grid;
+        var grid = GridShape.Grid;
         
         for (int x = 0; x < grid.Width; x++)
         {
@@ -251,11 +302,11 @@ public class Match3Manager : MonoBehaviour
             }
         }
         
-        StartCoroutine(PopulateGrid(populationDuration, populationDirection));
+        StartCoroutine(PopulateGrid());
     }
     
 
-    [Button]
+
     private void ClearGrid()
     {
         if (_gridPopulationRoutine != null) StopCoroutine(_gridPopulationRoutine);
@@ -331,38 +382,48 @@ public class Match3Manager : MonoBehaviour
         }
     }
     
-    private void SelectTile(Tile tile)
+    private void TrySwapHeldObject(Tile tile)
     {
-        if (!tile || !_canSelectTiles)
+        if (!IsValidTile(tile))
         {
+            ReleaseItem(true);
+            return;
+        } 
+
+        if (tile == selectedTile)
+        {
+            ReleaseItem(false);
             return;
         }
 
-        if (tile == selectedTile || !tile.IsActive)
-        {
-            ReleaseItem();
-            return;
-        }
-
-        if (heldMatchObject)
+        if (IsPositionsTouching(tile.GridPosition, selectedTile.GridPosition))
         {
             StartCoroutine(RunGameLogic(tile.GridPosition, selectedTile.GridPosition));
-            return;
+            movesMade -= 1;
         }
-
+        else
+        {
+            ReleaseItem(true);
+        }
+    }
+    
+    private void SelectObjectInTile(Tile tile)
+    {
+        if (!IsValidTile(tile) || !tile.HasObject) return;
+        
         selectedTile = tile;
         heldMatchObject = selectedTile.CurrentMatchObject;
         heldMatchObject.SetHeld(true);
         mouseIndicator.EnableIndicator(selectedTile);
     }
     
-    private void ReleaseItem()
+    private void ReleaseItem(bool animateReturn)
     {
         selectedTile?.SetSelected(false);
         selectedTile = null;
         heldMatchObject?.SetHeld(false);
         heldMatchObject = null;
-        mouseIndicator.DisableIndicator();
+        mouseIndicator.DisableIndicator(animateReturn);
     }
     
     private IEnumerator RunGameLogic(Vector2Int posA, Vector2Int posB)
@@ -373,9 +434,26 @@ public class Match3Manager : MonoBehaviour
         // Swap items
         yield return StartCoroutine(SwapObjects(posA, posB));
         
-        // Check for matches
+        // Check for matches only in nearby tiles if there is non 
+        List<Tile> matchesWithTile = new List<Tile>();
+        matchesWithTile.AddRange(FindMatchesWithTile(GetTile(posA)));
+        matchesWithTile.AddRange(FindMatchesWithTile(GetTile(posB)));
+        matchesWithTile = matchesWithTile.Distinct().ToList();
+
+        if (matchesWithTile.Count == 0)
+        {
+            yield return StartCoroutine(SwapObjects(posB, posA));
+            CheckMovesLeft();
+            yield return null;
+        }
+        else
+        {
+            yield return StartCoroutine(HandleMatches(matchesWithTile));
+        }
+        
+        // Find matches
         List<Tile> matches = FindMatches();
-        if (matches.Count == 0)  yield return null;
+        if (matches.Count == 0) yield return null;
         
         // Handle matches
         yield return StartCoroutine(HandleMatches(matches));
@@ -385,7 +463,8 @@ public class Match3Manager : MonoBehaviour
         
         
         // Repopulate grid
-        yield return StartCoroutine(PopulateGrid(populationDuration, populationDirection));
+        yield return StartCoroutine(PopulateGrid());
+        CheckMovesLeft();
 
     }
     
@@ -394,7 +473,7 @@ public class Match3Manager : MonoBehaviour
         var tileA = GetTile(posA);
         var tileB = GetTile(posB);
         
-        if (!tileA || !tileB || !tileA.IsActive || !tileB.IsActive) yield return null;
+        if (!IsValidTile(tileA) || !IsValidTile(tileB)) yield return null;
         
         var itemA = tileA.CurrentMatchObject;
         var itemB = tileB.CurrentMatchObject;
@@ -405,8 +484,8 @@ public class Match3Manager : MonoBehaviour
         itemA.SetCurrentTile(tileB);
         itemB.SetCurrentTile(tileA);
 
-        ReleaseItem();
-        yield return new WaitForSeconds(1f);
+        ReleaseItem(false);
+        yield return new WaitForSeconds(0.3f);
     }
     
 
@@ -414,7 +493,7 @@ public class Match3Manager : MonoBehaviour
     {
         foreach (var match in matches)
         {
-            match.CurrentMatchObject.DestroyObject();
+            match.CurrentMatchObject.MatchFound();
             match.SetCurrentItem(null);
             yield return new WaitForSeconds(0.1f);
         }
@@ -422,9 +501,9 @@ public class Match3Manager : MonoBehaviour
 
     private IEnumerator MoveObjects()
     {
-        for (var x = 0; x < gridShape.Grid.Width; x++)
+        for (var x = 0; x < GridShape.Grid.Width; x++)
         {
-            for (var y = gridShape.Grid.Height - 1; y >= 0; y--)
+            for (var y = GridShape.Grid.Height - 1; y >= 0; y--)
             {
                 var tile = GetTile(new Vector2Int(x, y));
                 if (!tile.HasObject && tile.IsActive)
@@ -453,9 +532,9 @@ public class Match3Manager : MonoBehaviour
         HashSet<Tile> matches = new HashSet<Tile>();
 
         // Find horizontal matches in grid
-        for (var y = 0; y < gridShape.Grid.Height; y++)
+        for (var y = 0; y < GridShape.Grid.Height; y++)
         {
-            for (var x = 0; x < gridShape.Grid.Width - 2; x++)
+            for (var x = 0; x < GridShape.Grid.Width - 2; x++)
             {
                 var tile1 = GetTile(new Vector2Int(x, y));
                 var tile2 = GetTile(new Vector2Int(x + 1, y));
@@ -475,9 +554,9 @@ public class Match3Manager : MonoBehaviour
         }
 
         // Find vertical matches in grid
-        for (var x = 0; x < gridShape.Grid.Width; x++)
+        for (var x = 0; x < GridShape.Grid.Width; x++)
         {
-            for (var y = 0; y < gridShape.Grid.Height - 2; y++)
+            for (var y = 0; y < GridShape.Grid.Height - 2; y++)
             {
                 var tile1 = GetTile(new Vector2Int(x, y));
                 var tile2 = GetTile(new Vector2Int(x, y + 1));
@@ -501,6 +580,68 @@ public class Match3Manager : MonoBehaviour
         
         return new List<Tile>(matches);
     }
+    
+    private List<Tile> FindMatchesWithTile(Tile tile)
+    {
+        if (!tile || !tile.HasObject) return new List<Tile>();
+        
+        HashSet<Tile> matches = new HashSet<Tile>();
+        Vector2Int pos = tile.GridPosition;
+        SOItemData itemData = tile.CurrentMatchObject.ItemData;
+        
+        // Check horizontal match (left and right from the tile)
+        List<Tile> horizontalMatches = new List<Tile> { tile };
+        for (int x = pos.x - 1; x >= 0; x--)
+        {
+            var checkTile = GetTile(new Vector2Int(x, pos.y));
+            if (!IsValidTile(checkTile) || !checkTile.HasObject || 
+                checkTile.CurrentMatchObject.ItemData != itemData)
+                break;
+            horizontalMatches.Add(checkTile);
+        }
+        for (int x = pos.x + 1; x < GridShape.Grid.Width; x++)
+        {
+            var checkTile = GetTile(new Vector2Int(x, pos.y));
+            if (!IsValidTile(checkTile) || !checkTile.HasObject || 
+                checkTile.CurrentMatchObject.ItemData != itemData)
+                break;
+            horizontalMatches.Add(checkTile);
+        }
+        
+        if (horizontalMatches.Count >= 3)
+        {
+            foreach (var match in horizontalMatches)
+                matches.Add(match);
+        }
+        
+        // Check vertical match (up and down from the tile)
+        List<Tile> verticalMatches = new List<Tile> { tile };
+        for (int y = pos.y - 1; y >= 0; y--)
+        {
+            var checkTile = GetTile(new Vector2Int(pos.x, y));
+            if (!IsValidTile(checkTile) || !checkTile.HasObject || 
+                checkTile.CurrentMatchObject.ItemData != itemData)
+                break;
+            verticalMatches.Add(checkTile);
+        }
+        for (int y = pos.y + 1; y < GridShape.Grid.Height; y++)
+        {
+            var checkTile = GetTile(new Vector2Int(pos.x, y));
+            if (!IsValidTile(checkTile) || !checkTile.HasObject || 
+                checkTile.CurrentMatchObject.ItemData != itemData)
+                break;
+            verticalMatches.Add(checkTile);
+        }
+        
+        if (verticalMatches.Count >= 3)
+        {
+            foreach (var match in verticalMatches)
+                matches.Add(match);
+        }
+        
+        return new List<Tile>(matches);
+    }
+    
 
     #endregion
 
@@ -516,18 +657,25 @@ public class Match3Manager : MonoBehaviour
     public MatchObject GetItem(Vector2Int position)
     {
         var tile = GetTile(position);
-        return tile != null ? tile.CurrentMatchObject : null;
+        return tile ? tile.CurrentMatchObject : null;
     }
     
-    public bool IsValidPosition(Vector2Int position)
+    public bool IsValidTile(Tile tile)
     {
-        var tile = GetTile(position);
-        return tile != null && tile.IsActive;
+        return tile && tile.IsActive;
+    }
+    
+    public bool IsPositionsTouching(Vector2Int positionA, Vector2Int positionB)
+    {
+        int deltaX = Mathf.Abs(positionA.x - positionB.x);
+        int deltaY = Mathf.Abs(positionA.y - positionB.y);
+        
+        return (deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1);
     }
 
-    public Vector2Int GetGridPosition(Vector3 position)
+    public Vector2Int GetPositionInGird(Vector3 position)
     {
-        var grid = gridShape.Grid;
+        var grid = GridShape.Grid;
         for (int x = 0; x < grid.Width; x++)
         {
             for (int y = 0; y < grid.Height; y++)
@@ -562,9 +710,9 @@ public class Match3Manager : MonoBehaviour
 #if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        if (!gridShape) return;
+        if (!GridShape) return;
     
-        var grid = gridShape.Grid;
+        var grid = GridShape.Grid;
         var labelStyle = new GUIStyle()
         {
 

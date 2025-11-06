@@ -754,8 +754,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 586155248}
-  - component: {fileID: 586155249}
   - component: {fileID: 586155250}
+  - component: {fileID: 586155249}
   m_Layer: 0
   m_Name: Match3Manager
   m_TagString: Untagged
@@ -793,29 +793,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84fc9b39c825b3540ae4a1dbeafc448f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  gridShape: {fileID: 11400000, guid: 3c386d78e38322a448a056f80e2497c0, type: 2}
+  level: {fileID: 11400000, guid: 69ffbccbccefb6f4e91fd3f5f0606330, type: 2}
   gridOffset: {x: -4, y: -4, z: 0}
   tileSize: {x: 1, y: 1}
   tileOffset: {x: 0.1, y: 0.1}
-  populationDirection: 0
-  populationDuration: 1
   tilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
   matchObjectPrefab: {fileID: 1608689241954614118, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}
   matchObjectsParent: {fileID: 76786952}
   tilesParent: {fileID: 556487990}
   mouseIndicator: {fileID: 820176654}
   inputReader: {fileID: 586155250}
-  items:
-    internalItems:
-    - item: {fileID: 11400000, guid: 77f3a0176c25eb544a29ff2d11409f4d, type: 2}
-      chance: 34
-      isLocked: 0
-    - item: {fileID: 11400000, guid: 06fa80ac6d8463442a977ad4d41d493f, type: 2}
-      chance: 33
-      isLocked: 0
-    - item: {fileID: 11400000, guid: 06c7eecdb5f79c542a8465be434742cc, type: 2}
-      chance: 33
-      isLocked: 0
+  defaultGridShape: {fileID: 11400000, guid: 4b006d4db34ba604db69250255ef3754, type: 2}
   hoveredTile: {fileID: 0}
   selectedTile: {fileID: 0}
   heldMatchObject: {fileID: 0}
@@ -978,7 +966,7 @@ GameObject:
   - component: {fileID: 722603883}
   - component: {fileID: 722603882}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Match3Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1164,6 +1152,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &883329263
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 883329264}
+  - component: {fileID: 883329265}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &883329264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883329263}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &883329265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 883329263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91f6c8a0ee730924db6cdae46a13f218, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
 --- !u!1 &1063539252
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,6 +1328,7 @@ SceneRoots:
   - {fileID: 714264658}
   - {fileID: 604789036}
   - {fileID: 446634969}
+  - {fileID: 883329264}
   - {fileID: 1783371857}
   - {fileID: 722603885}
   - {fileID: 586155248}

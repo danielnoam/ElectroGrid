@@ -21,8 +21,6 @@ public class MatchObject : MonoBehaviour
     private bool _beingDestroyed;
     
     public SOItemData ItemData => _itemData;
-    public Tile CurrentTile => _currentTile;
-    public Vector2Int GridPosition => _currentTile ? _currentTile.GridPosition : Vector2Int.zero;
     
 
     public void Initialize(SOItemData data)
@@ -48,10 +46,11 @@ public class MatchObject : MonoBehaviour
         UpdateVisuals();
     }
 
-    public void DestroyObject()
+    public void MatchFound()
     {
         _beingDestroyed = true;
-        Tween.Scale(transform, _baseScale * 0.1f, 0.1f, Ease.OutBack);
+        GameManager.Instance?.AddPopcorn();
+        Tween.Scale(transform, _baseScale * 1.2f, 0.1f, Ease.OutBack);
         Destroy(gameObject, 0.1f);
     }
     

@@ -13,6 +13,7 @@ public class MouseIndicator : MonoBehaviour
     private Tile _tile;
     private Camera _camera;
     private bool _enabled;
+    private Sequence _sequence;
 
 
 
@@ -34,6 +35,8 @@ public class MouseIndicator : MonoBehaviour
     {
         if (!tile) return;
         
+        _sequence.Stop();
+        
         _tile = tile;
         spriteRenderer.sprite = _tile.CurrentMatchObject.ItemData.Sprite;
         Tween.Scale(spriteRenderer.transform, _baseScale, 0.2f, Ease.OutBack);
@@ -41,16 +44,36 @@ public class MouseIndicator : MonoBehaviour
         enabled = true;
     }
     
-    public void DisableIndicator()
+    public void DisableIndicator(bool animateReturn = false)
     {
-        lineRenderer.SetPosition(0, Vector3.zero);
-        lineRenderer.SetPosition(1, Vector3.zero);
-        Tween.Scale(spriteRenderer.transform, Vector3.zero, 0.2f, Ease.OutBack);
-        _tile = null;
-        spriteRenderer.sprite = null;
-        
+        _sequence.Stop();
         
         enabled = false;
+        lineRenderer.SetPosition(0, Vector3.zero);
+        lineRenderer.SetPosition(1, Vector3.zero);
+        
+        if (animateReturn)
+        {
+            var endPosition = _tile ? _tile.transform.position : spriteRenderer.transform.position;
+            endPosition.z = spriteRenderer.transform.position.z;
+            
+            _sequence = Sequence.Create()
+                .Group(Tween.Scale(spriteRenderer.transform, Vector3.zero, 0.3f, Ease.InOutSine))
+                .Group(Tween.Position(spriteRenderer.transform, endPosition, 0.3f, Ease.InOutSine))
+                .OnComplete(() =>
+                {
+
+                    _tile = null;
+                    spriteRenderer.sprite = null;
+                });
+        }
+        else
+        {
+            Tween.Scale(spriteRenderer.transform, Vector3.zero, 0.2f, Ease.OutBack);
+            _tile = null;
+            spriteRenderer.sprite = null;
+        }
+
     }
 
 
