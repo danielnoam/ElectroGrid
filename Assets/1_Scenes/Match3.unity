@@ -801,7 +801,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InputReader
   inputManager: {fileID: 1468544195}
-  swipeThreshold: 0.3
+  swipeThreshold: 55
   swipeDeadzone: 0.3
   mousePosition: {x: 0, y: 0}
   isPressing: 0

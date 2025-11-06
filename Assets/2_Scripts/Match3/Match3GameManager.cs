@@ -101,7 +101,7 @@ public class Match3GameManager : MonoBehaviour
         {
             if (absY > absX * inputReader.SwipeDeadzone)
             {
-                ReleaseObject(false);
+                ReleaseObject(true);
                 return;
             }
             gridDirection = direction.x > 0 ? Vector2Int.left : Vector2Int.right;
@@ -110,7 +110,7 @@ public class Match3GameManager : MonoBehaviour
         {
             if (absX > absY * inputReader.SwipeDeadzone)
             {
-                ReleaseObject(false);
+                ReleaseObject(true);
                 return;
             }
             gridDirection = direction.y > 0 ? Vector2Int.down : Vector2Int.up;
@@ -150,6 +150,7 @@ public class Match3GameManager : MonoBehaviour
         UpdateHoveredTile();
     }
 
+    
 
     #region Game Managemenet
     
@@ -224,24 +225,25 @@ public class Match3GameManager : MonoBehaviour
             }
         }
         
-        // Step 1: Identify positions where we'll force possible matches
+        if (tilesToPopulate.Count == 0)
+        {
+            yield break;
+        }
+        
+        // Step 1: Identify positions where we'll force possible matches (only used during initial setup)
         List<(Vector2Int posA, Vector2Int posB)> guaranteedMatchPairs = CreateGuaranteedMatchPositions(minPossibleMatches);
         
-        // Step 2: Assign random items to tiles, ensuring no immediate matches
-        // BUT respect the guaranteed match pairs
+        // Step 2: Assign random items to tiles
         foreach (var tileItemPair in tilesToPopulate.ToList())
         {
-            // Check if this tile is part of a guaranteed match pair
             SOItemData forcedItem = GetForcedItemForGuaranteedMatch(tileItemPair.Key.GridPosition, guaranteedMatchPairs, tilesToPopulate);
             
             if (forcedItem != null)
             {
-                // This tile is part of a guaranteed match setup
                 tilesToPopulate[tileItemPair.Key] = forcedItem;
             }
             else
             {
-                // Normal random assignment avoiding immediate matches
                 SOItemData selectedItem;
                 int attempts = 0;
 
@@ -268,26 +270,6 @@ public class Match3GameManager : MonoBehaviour
             CreateMatchObject(tileObjectMatch.Value, tileObjectMatch.Key);
             yield return new WaitForSeconds(populationDuration / totalActiveTiles);
         }
-        
-        // Validate
-        var immediateMatchesInGrid = FindImmediateMatches();
-        if (immediateMatchesInGrid.Count > maxImmediateMatches)
-        {
-            Debug.Log($"Too many immediate matches found in grid ({immediateMatchesInGrid.Count})");
-            CreateGird();
-            yield break;
-        }
-        
-        var possibleMatchesInGrid = FindPossibleMatches();
-        if (possibleMatchesInGrid.Count < minPossibleMatches)
-        {
-            Debug.Log($"Failed to create enough possible matches ({possibleMatchesInGrid.Count}/{minPossibleMatches})");
-            CreateGird();
-            yield break;
-        }
-        
-        Debug.Log($"Grid populated successfully with {possibleMatchesInGrid.Count} possible matches");
-        canSelectTiles = true;
     }
     
     private MatchObject CreateMatchObject(SOItemData itemData, Tile tile)
@@ -330,17 +312,16 @@ public class Match3GameManager : MonoBehaviour
     private void CreateGird()
     {
         if (!GridShape || !tilePrefab || !matchObjectPrefab) return;
-        
+    
         canSelectTiles = false;
         DestroyGrid();
-        
+    
         var grid = GridShape.Grid;
-        
+    
         for (int x = 0; x < grid.Width; x++)
         {
             for (int y = 0; y < grid.Height; y++)
             {
-
                 Vector2Int tileGridPosition = new Vector2Int(x, y);
                 Vector3 tileWorldPosition = grid.GetTileWorldPosition(x,y);
                 bool tileState = grid.IsTileActive(x, y);
@@ -349,52 +330,117 @@ public class Match3GameManager : MonoBehaviour
                 _tiles.Add(tileGridPosition, tile);
             }
         }
-        
-        StartCoroutine(PopulateGrid());
+    
+        StartCoroutine(InitialGridSetup());
     }
     
-
+    private IEnumerator InitialGridSetup()
+    {
+        int maxRetries = 10;
+        int retryCount = 0;
+    
+        while (retryCount < maxRetries)
+        {
+            retryCount++;
+        
+            yield return PopulateGrid();
+        
+            // Validate immediate matches
+            var immediateMatchesInGrid = FindImmediateMatches();
+            if (immediateMatchesInGrid.Count > maxImmediateMatches)
+            {
+                Debug.Log($"Too many immediate matches found in grid ({immediateMatchesInGrid.Count}), restarting grid (attempt {retryCount}/{maxRetries})");
+                CreateGird(); // This will restart the whole process
+                yield break;
+            }
+        
+            // Validate possible matches
+            var possibleMatchesInGrid = FindPossibleMatches();
+            if (possibleMatchesInGrid.Count < minPossibleMatches)
+            {
+                Debug.Log($"Failed to create enough possible matches ({possibleMatchesInGrid.Count}/{minPossibleMatches}), restarting grid (attempt {retryCount}/{maxRetries})");
+                CreateGird(); // This will restart the whole process
+                yield break;
+            }
+        
+            // Success! Handle any cascading matches
+            Debug.Log($"Grid populated successfully with {possibleMatchesInGrid.Count} possible matches");
+            yield return HandleMatchesAndRepopulate();
+        
+            canSelectTiles = true;
+            yield break;
+        }
+    
+        Debug.LogError($"Failed to create valid grid after {maxRetries} attempts");
+    }
 
     private void DestroyGrid()
     {
-        foreach (var tile in _tiles.Values)
-        {
-            if (tile != null)
-            {
-#if UNITY_EDITOR
-                DestroyImmediate(tile.gameObject);
-#else
-                Destroy(tile.gameObject);
-#endif
-            }
-        }
-        _tiles.Clear();
-    
-#if UNITY_EDITOR
-        while (matchObjectsParent.childCount > 0)
-        {
-            DestroyImmediate(matchObjectsParent.GetChild(0).gameObject);
-        }
-#else
-        foreach (Transform child in matchObjectsParent)
-        {
-            Destroy(child.gameObject);
-        }
-#endif
-        
-#if UNITY_EDITOR
-        while (tilesParent.childCount > 0)
-        {
-            DestroyImmediate(tilesParent.GetChild(0).gameObject);
-        }
-#else
-        foreach (Transform child in tilesParent)
-        {
-            Destroy(child.gameObject);
-        }
-#endif
+        DestroyObjects();
+        DestroyTiles();
     }
 
+    private void DestroyTiles()
+    {
+        foreach (var tile in _tiles.Values)
+        {
+            if (tile)
+            {
+                if (Application.isEditor)
+                {
+                    DestroyImmediate(tile.gameObject);
+                }
+                else
+                {
+                    Destroy(tile.gameObject);
+                }
+            }
+        }
+        
+        if (Application.isEditor)
+        {
+            while (tilesParent.childCount > 0)
+            {
+                DestroyImmediate(tilesParent.GetChild(0).gameObject);
+            }
+        }
+        else
+        {
+            foreach (Transform child in tilesParent)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        
+        _tiles.Clear();
+    }
+
+    private void DestroyObjects()
+    {
+        foreach (var tile in _tiles.Values)
+        {
+            if (tile)
+            {
+                tile.SetCurrentItem(null);
+            }
+        }
+        
+        if (Application.isEditor)
+        {
+            while (matchObjectsParent.childCount > 0)
+            {
+                DestroyImmediate(matchObjectsParent.GetChild(0).gameObject);
+            }
+        }
+        else
+        {
+            foreach (Transform child in matchObjectsParent)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+    }
 
     #endregion
 
@@ -472,38 +518,6 @@ public class Match3GameManager : MonoBehaviour
         mouseIndicator?.DisableIndicator(animateReturn);
     }
     
-    private IEnumerator RunGameLogic(Vector2Int posA, Vector2Int posB)
-    {
-        canSelectTiles = false;
-        hoveredTile?.SetHovered(false);
-        
-        // Swap items
-        yield return StartCoroutine(SwapObjects(posA, posB));
-        
-        // Check for matches only in nearby tiles of swapped objects
-        List<Tile> matchesWithTile = new List<Tile>();
-        matchesWithTile.AddRange(FindMatchesWithTile(GetTile(posA)));
-        matchesWithTile.AddRange(FindMatchesWithTile(GetTile(posB)));
-        matchesWithTile = matchesWithTile.Distinct().ToList();
-        if (matchesWithTile.Count == 0)
-        {
-            yield return StartCoroutine(SwapObjects(posB, posA));
-            canSelectTiles = true;
-            CheckMovesLeft();
-            yield break;
-        }
-        yield return StartCoroutine(HandleMatches(matchesWithTile));
-        
-        
-        // Make objects fall
-        yield return StartCoroutine(MoveObjects());
-        
-        
-        // Repopulate grid
-        yield return StartCoroutine(PopulateGrid());
-        CheckMovesLeft();
-
-    }
     
     private IEnumerator SwapObjects(Vector2Int posA, Vector2Int posB)
     {
@@ -524,6 +538,50 @@ public class Match3GameManager : MonoBehaviour
         ReleaseObject(false);
         yield return new WaitForSeconds(SwapDuration);
     }
+
+    private IEnumerator RunGameLogic(Vector2Int posA, Vector2Int posB)
+    {
+        canSelectTiles = false;
+        hoveredTile?.SetHovered(false);
+    
+        // Swap items
+        yield return StartCoroutine(SwapObjects(posA, posB));
+    
+        // Check for matches only in nearby tiles of swapped objects
+        List<Tile> matchesWithTile = new List<Tile>();
+        matchesWithTile.AddRange(FindMatchesWithTile(GetTile(posA)));
+        matchesWithTile.AddRange(FindMatchesWithTile(GetTile(posB)));
+        matchesWithTile = matchesWithTile.Distinct().ToList();
+    
+        if (matchesWithTile.Count == 0)
+        {
+            yield return StartCoroutine(SwapObjects(posB, posA));
+            canSelectTiles = true;
+            CheckMovesLeft();
+            yield break;
+        }
+    
+        yield return StartCoroutine(HandleMatches(matchesWithTile));
+    
+        // Make objects fall
+        yield return StartCoroutine(MoveObjects());
+    
+        // Repopulate and handle any cascading matches
+        yield return StartCoroutine(PopulateGrid());
+        yield return StartCoroutine(HandleMatchesAndRepopulate());
+        
+        // Check if there are still possible matches
+        var possibleMatches = FindPossibleMatches();
+        if (possibleMatches.Count < minPossibleMatches)
+        {
+            Debug.Log($"No possible matches left, recreating grid");
+            CreateGird();
+            yield break;
+        }
+    
+        canSelectTiles = true;
+        CheckMovesLeft();
+    }
     
 
     private IEnumerator HandleMatches(List<Tile> matches)
@@ -533,6 +591,30 @@ public class Match3GameManager : MonoBehaviour
             match.CurrentMatchObject.MatchFound();
             match.SetCurrentItem(null);
             yield return new WaitForSeconds(MatchHandleDelay);
+        }
+    }
+    
+    private IEnumerator HandleMatchesAndRepopulate()
+    {
+        while (true)
+        {
+            // Find immediate matches
+            var immediateMatches = FindImmediateMatches();
+        
+            if (immediateMatches.Count == 0)
+            {
+                // No more matches, we're done
+                break;
+            }
+        
+            // Handle the matches
+            yield return HandleMatches(immediateMatches);
+        
+            // Make objects fall
+            yield return MoveObjects();
+        
+            // Repopulate empty spaces
+            yield return PopulateGrid();
         }
     }
 
@@ -966,13 +1048,8 @@ public class Match3GameManager : MonoBehaviour
     #endregion
 
     
-    
-#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         GridShape?.Grid?.DrawGrid();
     }
-
-
-#endif
 }

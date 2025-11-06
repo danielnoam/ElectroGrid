@@ -27,4 +27,4 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 06fa80ac6d8463442a977ad4d41d493f, type: 2}
       chance: 25
       isLocked: 0
-  gridShape: {fileID: 11400000, guid: 4b006d4db34ba604db69250255ef3754, type: 2}
+  gridShape: {fileID: 11400000, guid: 482a21aead086c94bb01116e01788c1c, type: 2}

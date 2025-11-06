@@ -11,7 +11,7 @@ public class Match3InputReader : InputReaderBase
 {
     
     [Header("Settings")]
-    [SerializeField, Range(0,1)] private float swipeThreshold = 0.3f;
+    [SerializeField, Min(0.1f)] private float swipeThreshold = 0.3f;
     [SerializeField, Range(0,1)] private float swipeDeadzone = 0.3f;
     
     [Separator]
