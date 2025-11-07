@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 5184360021706139941}
   - component: {fileID: 339119523681392632}
   m_Layer: 0
-  m_Name: Prefab_Tile
+  m_Name: Prefab_Match3Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 1179882405457458318}
   - component: {fileID: 1608689241954614118}
   m_Layer: 0
-  m_Name: Prefab_MatchObject
+  m_Name: Prefab_Match3Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

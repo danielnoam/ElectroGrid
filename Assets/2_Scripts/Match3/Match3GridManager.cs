@@ -2,29 +2,28 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-
-
-
 public class Match3GridManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Tile tilePrefab;
     [SerializeField] private Transform tilesParent;
     
-    
-    
-    
     private readonly Dictionary<Vector2Int, Tile> _tiles = new Dictionary<Vector2Int, Tile>();
+    private SOGridShape _currentGridShape;
+    
     public IReadOnlyDictionary<Vector2Int, Tile> Tiles => _tiles;
+    public SOGridShape GridShape => _currentGridShape;
 
     
+    #region Grid Setup
     
     public void CreateGrid(SOGridShape gridShape)
     {
         if (!gridShape || !tilePrefab) return;
 
         DestroyGrid();
-
+        
+        _currentGridShape = gridShape;
         var grid = gridShape.Grid;
 
         for (int x = 0; x < grid.Width; x++)
@@ -100,7 +99,7 @@ public class Match3GridManager : MonoBehaviour
         }
     }
 
-
+    #endregion
 
 
     #region Helper Methods
