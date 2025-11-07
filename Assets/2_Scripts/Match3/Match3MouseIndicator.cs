@@ -2,7 +2,7 @@ using System;
 using PrimeTween;
 using UnityEngine;
 
-public class MouseIndicator : MonoBehaviour
+public class Match3MouseIndicator : MonoBehaviour
 {
 
     [SerializeField] private Match3InputReader inputReader;
