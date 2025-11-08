@@ -16,6 +16,6 @@ MonoBehaviour:
   worth: 3
   sprites:
     internalItems:
-    - item: {fileID: 21300000, guid: 7b478149e43db214f9ff927dc217dea5, type: 3}
+    - item: {fileID: 21300000, guid: aea293eefa542cd46b887a5a4fa4c936, type: 3}
       chance: 100
       isLocked: 0
