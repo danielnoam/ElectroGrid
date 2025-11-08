@@ -5,13 +5,13 @@ using UnityEngine;
 public class Match3GridManager : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Tile tilePrefab;
+    [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private Transform tilesParent;
     
-    private readonly Dictionary<Vector2Int, Tile> _tiles = new Dictionary<Vector2Int, Tile>();
+    private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
     private SOGridShape _currentGridShape;
     
-    public IReadOnlyDictionary<Vector2Int, Tile> Tiles => _tiles;
+    public IReadOnlyDictionary<Vector2Int, Match3Tile> Tiles => _tiles;
     public SOGridShape GridShape => _currentGridShape;
 
     
@@ -19,7 +19,7 @@ public class Match3GridManager : MonoBehaviour
     
     public void CreateGrid(SOGridShape gridShape)
     {
-        if (!gridShape || !tilePrefab) return;
+        if (!gridShape || !match3TilePrefab) return;
 
         DestroyGrid();
         
@@ -46,9 +46,9 @@ public class Match3GridManager : MonoBehaviour
         DestroyTiles();
     }
 
-    private Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
+    private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
     {
-        var tile = Instantiate(tilePrefab, position, Quaternion.identity, tilesParent);
+        var tile = Instantiate(match3TilePrefab, position, Quaternion.identity, tilesParent);
         tile.Initialize(gridPos, isActive);
         return tile;
     }
@@ -104,18 +104,18 @@ public class Match3GridManager : MonoBehaviour
 
     #region Helper Methods
 
-    public Tile GetTile(Vector2Int position)
+    public Match3Tile GetTile(Vector2Int position)
     {
-        _tiles.TryGetValue(position, out Tile tile);
+        _tiles.TryGetValue(position, out Match3Tile tile);
         return tile;
     }
 
-    public bool IsValidTile(Tile tile)
+    public bool IsValidTile(Match3Tile match3Tile)
     {
-        return tile && tile.IsActive;
+        return match3Tile && match3Tile.IsActive;
     }
 
-    public Tile GetRandomValidTile()
+    public Match3Tile GetRandomValidTile()
     {
         var validTiles = _tiles.Values.Where(IsValidTile).ToList();
         return validTiles.Count > 0 ? validTiles[UnityEngine.Random.Range(0, validTiles.Count)] : null;

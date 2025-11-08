@@ -15,11 +15,11 @@ public class Match3SelectionIndicator : MonoBehaviour
 
     
     [Separator]
-    [SerializeField, ReadOnly] private Tile hoveredTile;
+    [SerializeField, ReadOnly] private Match3Tile hoveredMatch3Tile;
     
     private bool _enabled;
     private Vector3 _baseSpriteScale;
-    private Tile _pressedTile;
+    private Match3Tile _pressedMatch3Tile;
     private Camera _camera;
     private Sequence _animationSequence;
 
@@ -40,14 +40,14 @@ public class Match3SelectionIndicator : MonoBehaviour
     }
     
 
-    public void EnableIndicator(Tile tile)
+    public void EnableIndicator(Match3Tile match3Tile)
     {
-        if (!tile) return;
+        if (!match3Tile) return;
         
         _animationSequence.Stop();
         
-        _pressedTile = tile;
-        spriteRenderer.sprite = _pressedTile.CurrentMatchObject.ItemData.Sprite;
+        _pressedMatch3Tile = match3Tile;
+        spriteRenderer.sprite = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Sprite;
         if (spriteRenderer.transform.localScale != _baseSpriteScale) Tween.Scale(spriteRenderer.transform, _baseSpriteScale, 0.2f, Ease.OutBack);
         
         _enabled = true;
@@ -65,7 +65,7 @@ public class Match3SelectionIndicator : MonoBehaviour
         
         if (animateReturn)
         {
-            var endPosition = _pressedTile ? _pressedTile.transform.position : spriteRenderer.transform.position;
+            var endPosition = _pressedMatch3Tile ? _pressedMatch3Tile.transform.position : spriteRenderer.transform.position;
             endPosition.z = spriteRenderer.transform.position.z;
             
             _animationSequence = Sequence.Create()
@@ -74,14 +74,14 @@ public class Match3SelectionIndicator : MonoBehaviour
                 .OnComplete(() =>
                 {
 
-                    _pressedTile = null;
+                    _pressedMatch3Tile = null;
                     spriteRenderer.sprite = null;
                 });
         }
         else
         {
             if (spriteRenderer.transform.localScale != Vector3.zero) Tween.Scale(spriteRenderer.transform, Vector3.zero, 0.2f, Ease.OutBack);
-            _pressedTile = null;
+            _pressedMatch3Tile = null;
             spriteRenderer.sprite = null;
         }
 
@@ -89,13 +89,13 @@ public class Match3SelectionIndicator : MonoBehaviour
     
     public void ResetHoveredTile()
     {
-        hoveredTile?.SetHovered(false);
-        hoveredTile = null;
+        hoveredMatch3Tile?.SetHovered(false);
+        hoveredMatch3Tile = null;
     }
     
     private void UpdateIndicatorPosition()
     {
-        if (!_camera || !_enabled || !_pressedTile) return;
+        if (!_camera || !_enabled || !_pressedMatch3Tile) return;
         
         
         Vector3 mousePosition = _camera.ScreenToWorldPoint(inputReader.MousePosition);
@@ -103,7 +103,7 @@ public class Match3SelectionIndicator : MonoBehaviour
         spriteRenderer.transform.position = mousePosition;
             
         lineRenderer.SetPosition(0, mousePosition);
-        lineRenderer.SetPosition(1, _pressedTile.transform.position);
+        lineRenderer.SetPosition(1, _pressedMatch3Tile.transform.position);
     }
     
     private void UpdateHoveredTile()
@@ -115,17 +115,17 @@ public class Match3SelectionIndicator : MonoBehaviour
     
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);
         
-        Tile newHoveredTile = null;
+        Match3Tile newHoveredMatch3Tile = null;
         if (hit.collider)
         {
-            newHoveredTile = hit.collider.GetComponent<Tile>();
+            newHoveredMatch3Tile = hit.collider.GetComponent<Match3Tile>();
         }
 
-        if (newHoveredTile != hoveredTile)
+        if (newHoveredMatch3Tile != hoveredMatch3Tile)
         {
-            hoveredTile?.SetHovered(false);
-            newHoveredTile?.SetHovered(true);
-            hoveredTile = newHoveredTile;
+            hoveredMatch3Tile?.SetHovered(false);
+            newHoveredMatch3Tile?.SetHovered(true);
+            hoveredMatch3Tile = newHoveredMatch3Tile;
         }
     }
     

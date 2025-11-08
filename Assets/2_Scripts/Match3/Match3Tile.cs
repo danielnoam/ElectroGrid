@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Tile : MonoBehaviour
+public class Match3Tile : MonoBehaviour
 {
     [Header("Tile Properties")]
     [SerializeField] private Vector2Int gridPosition;
@@ -14,15 +14,15 @@ public class Tile : MonoBehaviour
     [SerializeField] private Color activeTileColor = new Color(0f, 1f, 0f, 0.1f);
     [SerializeField] private Color inactiveTileColor = new Color(0.1f, 0.1f, 0.1f, 0.1f);
     
-    private MatchObject _currentMatchObject;
+    private Match3Object _currentMatch3Object;
     private bool _isSelected;
     private bool _isHovered;
     
     public Vector2Int GridPosition => gridPosition;
-    public MatchObject CurrentMatchObject => _currentMatchObject;
-    public bool CanSelect => isActive && _currentMatchObject && !_isSelected;
+    public Match3Object CurrentMatch3Object => _currentMatch3Object;
+    public bool CanSelect => isActive && _currentMatch3Object && !_isSelected;
     public bool IsActive => isActive;
-    public bool HasObject => isActive && _currentMatchObject;
+    public bool HasObject => isActive && _currentMatch3Object;
     
 
     public void Initialize(Vector2Int position, bool active)
@@ -35,11 +35,11 @@ public class Tile : MonoBehaviour
         UpdateVisuals();
     }
 
-    public void SetCurrentItem(MatchObject matchObject)
+    public void SetCurrentItem(Match3Object match3Object)
     {
         _isSelected = false;
         _isHovered = false;
-        _currentMatchObject = matchObject;
+        _currentMatch3Object = match3Object;
     }
 
     private void UpdateVisuals()

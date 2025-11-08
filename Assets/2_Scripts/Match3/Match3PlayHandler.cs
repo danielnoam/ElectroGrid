@@ -12,13 +12,13 @@ public class Match3PlayHandler : MonoBehaviour
     [SerializeField] private Match3GridManager gridManager;
     [SerializeField] private Match3SelectionIndicator selectionIndicator;
     [SerializeField] private Match3InputReader inputReader;
-    [SerializeField] private MatchObject matchObjectPrefab;
+    [SerializeField] private Match3Object match3ObjectPrefab;
     [SerializeField] private Transform matchObjectsParent;
 
     [Separator]
     [SerializeField, ReadOnly] private bool canInteract;
-    [SerializeField, ReadOnly] private Tile selectedTile;
-    [SerializeField, ReadOnly] private MatchObject heldMatchObject;
+    [SerializeField, ReadOnly] private Match3Tile selectedMatch3Tile;
+    [SerializeField, ReadOnly] private Match3Object heldMatch3Object;
     private Camera _camera;
     
     private const int MinMatchCount = 3;
@@ -33,8 +33,8 @@ public class Match3PlayHandler : MonoBehaviour
         set => canInteract = value;
     }
     
-    public Tile SelectedTile => selectedTile;
-    public MatchObject HeldMatchObject => heldMatchObject;
+    public Match3Tile SelectedMatch3Tile => selectedMatch3Tile;
+    public Match3Object HeldMatch3Object => heldMatch3Object;
 
     private void Awake()
     {
@@ -58,7 +58,7 @@ public class Match3PlayHandler : MonoBehaviour
 
     private void OnSwipe(Vector2 direction)
     {
-        if (!canInteract || !heldMatchObject) return;
+        if (!canInteract || !heldMatch3Object) return;
 
         Vector2Int gridDirection;
 
@@ -84,7 +84,7 @@ public class Match3PlayHandler : MonoBehaviour
             gridDirection = direction.y > 0 ? Vector2Int.down : Vector2Int.up;
         }
 
-        var newTilePos = selectedTile.GridPosition + gridDirection;
+        var newTilePos = selectedMatch3Tile.GridPosition + gridDirection;
         var newTile = gridManager.GetTile(newTilePos);
 
         TrySwapHeldObject(newTile);
@@ -94,7 +94,7 @@ public class Match3PlayHandler : MonoBehaviour
     {
         if (!canInteract) return;
 
-        if (!heldMatchObject && callbackContext.started)
+        if (!heldMatch3Object && callbackContext.started)
         {
             Vector3 worldPos = _camera.ScreenToWorldPoint(inputReader.MousePosition);
             worldPos.z = 0;
@@ -104,7 +104,7 @@ public class Match3PlayHandler : MonoBehaviour
         
             SelectObjectInTile(tile);
         }            
-        else if (heldMatchObject && callbackContext.canceled)
+        else if (heldMatch3Object && callbackContext.canceled)
         {
             ReleaseObject(false);
         }
@@ -116,43 +116,43 @@ public class Match3PlayHandler : MonoBehaviour
 
     #region Selection & Swapping
 
-    private void SelectObjectInTile(Tile tile)
+    private void SelectObjectInTile(Match3Tile match3Tile)
     {
-        if (!gridManager.IsValidTile(tile) || !tile.HasObject) return;
+        if (!gridManager.IsValidTile(match3Tile) || !match3Tile.HasObject) return;
         
-        selectedTile = tile;
-        heldMatchObject = selectedTile.CurrentMatchObject;
-        heldMatchObject.SetHeld(true);
-        selectionIndicator?.EnableIndicator(selectedTile);
+        selectedMatch3Tile = match3Tile;
+        heldMatch3Object = selectedMatch3Tile.CurrentMatch3Object;
+        heldMatch3Object.SetHeld(true);
+        selectionIndicator?.EnableIndicator(selectedMatch3Tile);
     }
     
     public void ReleaseObject(bool animateReturn)
     {
-        selectedTile?.SetSelected(false);
-        selectedTile = null;
-        heldMatchObject?.SetHeld(false);
-        heldMatchObject = null;
+        selectedMatch3Tile?.SetSelected(false);
+        selectedMatch3Tile = null;
+        heldMatch3Object?.SetHeld(false);
+        heldMatch3Object = null;
         selectionIndicator?.DisableIndicator(animateReturn);
     }
 
-    private void TrySwapHeldObject(Tile tile)
+    private void TrySwapHeldObject(Match3Tile match3Tile)
     {
-        if (!gridManager.IsValidTile(tile))
+        if (!gridManager.IsValidTile(match3Tile))
         {
             ReleaseObject(true);
             return;
         } 
 
-        if (tile == selectedTile)
+        if (match3Tile == selectedMatch3Tile)
         {
             ReleaseObject(false);
             return;
         }
 
-        if (IsPositionsTouching(tile.GridPosition, selectedTile.GridPosition))
+        if (IsPositionsTouching(match3Tile.GridPosition, selectedMatch3Tile.GridPosition))
         {
             Match3GameManager.Instance.StartCoroutine(
-                Match3GameManager.Instance.RunGameLogic(tile.GridPosition, selectedTile.GridPosition));
+                Match3GameManager.Instance.RunGameLogic(match3Tile.GridPosition, selectedMatch3Tile.GridPosition));
         }
         else
         {
@@ -170,8 +170,8 @@ public class Match3PlayHandler : MonoBehaviour
             yield break;
         }
         
-        var itemA = tileA.CurrentMatchObject;
-        var itemB = tileB.CurrentMatchObject;
+        var itemA = tileA.CurrentMatch3Object;
+        var itemB = tileB.CurrentMatch3Object;
         
         tileA.SetCurrentItem(itemB);
         tileB.SetCurrentItem(itemA);
@@ -195,9 +195,9 @@ public class Match3PlayHandler : MonoBehaviour
 
     #region Match Detection
 
-    public List<Tile> FindImmediateMatches(SOGridShape gridShape)
+    public List<Match3Tile> FindImmediateMatches(SOGridShape gridShape)
     {
-        HashSet<Tile> matches = new HashSet<Tile>();
+        HashSet<Match3Tile> matches = new HashSet<Match3Tile>();
 
         // Find horizontal matches in grid
         for (var y = 0; y < gridShape.Grid.Height; y++)
@@ -210,8 +210,8 @@ public class Match3PlayHandler : MonoBehaviour
 
                 if (!tile1 || !tile2 || !tile3 || !tile1.HasObject || !tile2.HasObject || !tile3.HasObject) continue;
 
-                if (tile1.CurrentMatchObject.ItemData == tile2.CurrentMatchObject.ItemData 
-                    && tile2.CurrentMatchObject.ItemData == tile3.CurrentMatchObject.ItemData)
+                if (tile1.CurrentMatch3Object.ItemData == tile2.CurrentMatch3Object.ItemData 
+                    && tile2.CurrentMatch3Object.ItemData == tile3.CurrentMatch3Object.ItemData)
                 {
                     matches.Add(tile1);
                     matches.Add(tile2);
@@ -231,8 +231,8 @@ public class Match3PlayHandler : MonoBehaviour
                 
                 if (!tile1 || !tile2 || !tile3 || !tile1.HasObject || !tile2.HasObject || !tile3.HasObject) continue;
                 
-                if (tile1.CurrentMatchObject.ItemData == tile2.CurrentMatchObject.ItemData 
-                    && tile2.CurrentMatchObject.ItemData == tile3.CurrentMatchObject.ItemData)
+                if (tile1.CurrentMatch3Object.ItemData == tile2.CurrentMatch3Object.ItemData 
+                    && tile2.CurrentMatch3Object.ItemData == tile3.CurrentMatch3Object.ItemData)
                 {
                     matches.Add(tile1);
                     matches.Add(tile2);
@@ -241,24 +241,24 @@ public class Match3PlayHandler : MonoBehaviour
             }
         }
         
-        return new List<Tile>(matches);
+        return new List<Match3Tile>(matches);
     }
 
-    public List<Tile> FindMatchesWithTile(Tile tile, SOGridShape gridShape)
+    public List<Match3Tile> FindMatchesWithTile(Match3Tile match3Tile, SOGridShape gridShape)
     {
-        if (!tile || !tile.HasObject) return new List<Tile>();
+        if (!match3Tile || !match3Tile.HasObject) return new List<Match3Tile>();
         
-        HashSet<Tile> matches = new HashSet<Tile>();
-        Vector2Int pos = tile.GridPosition;
-        SOItemData itemData = tile.CurrentMatchObject.ItemData;
+        HashSet<Match3Tile> matches = new HashSet<Match3Tile>();
+        Vector2Int pos = match3Tile.GridPosition;
+        SOItemData itemData = match3Tile.CurrentMatch3Object.ItemData;
         
         // Check horizontal match
-        List<Tile> horizontalMatches = new List<Tile> { tile };
+        List<Match3Tile> horizontalMatches = new List<Match3Tile> { match3Tile };
         for (int x = pos.x - 1; x >= 0; x--)
         {
             var checkTile = gridManager.GetTile(new Vector2Int(x, pos.y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             horizontalMatches.Add(checkTile);
         }
@@ -266,7 +266,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
             var checkTile = gridManager.GetTile(new Vector2Int(x, pos.y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             horizontalMatches.Add(checkTile);
         }
@@ -278,12 +278,12 @@ public class Match3PlayHandler : MonoBehaviour
         }
         
         // Check vertical match
-        List<Tile> verticalMatches = new List<Tile> { tile };
+        List<Match3Tile> verticalMatches = new List<Match3Tile> { match3Tile };
         for (int y = pos.y - 1; y >= 0; y--)
         {
             var checkTile = gridManager.GetTile(new Vector2Int(pos.x, y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             verticalMatches.Add(checkTile);
         }
@@ -291,7 +291,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
             var checkTile = gridManager.GetTile(new Vector2Int(pos.x, y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             verticalMatches.Add(checkTile);
         }
@@ -302,12 +302,12 @@ public class Match3PlayHandler : MonoBehaviour
                 matches.Add(match);
         }
         
-        return new List<Tile>(matches);
+        return new List<Match3Tile>(matches);
     }
 
-    public List<Tile> FindPossibleMatches(SOGridShape gridShape)
+    public List<Match3Tile> FindPossibleMatches(SOGridShape gridShape)
     {
-        HashSet<Tile> possibleMatchTiles = new HashSet<Tile>();
+        HashSet<Match3Tile> possibleMatchTiles = new HashSet<Match3Tile>();
         HashSet<(Vector2Int, Vector2Int)> checkedPairs = new HashSet<(Vector2Int, Vector2Int)>();
 
         foreach (var tile in gridManager.Tiles.Values)
@@ -329,8 +329,8 @@ public class Match3PlayHandler : MonoBehaviour
             
                 if (!checkedPairs.Add(pair)) continue;
 
-                var currentItemData = tile.CurrentMatchObject.ItemData;
-                var neighborItemData = neighborTile.CurrentMatchObject.ItemData;
+                var currentItemData = tile.CurrentMatch3Object.ItemData;
+                var neighborItemData = neighborTile.CurrentMatch3Object.ItemData;
         
                 if (WouldCreateMatch(neighborPos, currentItemData, gridShape) || 
                     WouldCreateMatch(tile.GridPosition, neighborItemData, gridShape))
@@ -341,7 +341,7 @@ public class Match3PlayHandler : MonoBehaviour
             }
         }
 
-        return new List<Tile>(possibleMatchTiles);
+        return new List<Match3Tile>(possibleMatchTiles);
     }
 
     public bool WouldCreateMatch(Vector2Int position, SOItemData itemData, SOGridShape gridShape)
@@ -351,7 +351,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
             var checkTile = gridManager.GetTile(new Vector2Int(x, position.y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             horizontalCount++;
         }
@@ -359,7 +359,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
             var checkTile = gridManager.GetTile(new Vector2Int(x, position.y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             horizontalCount++;
         }
@@ -371,7 +371,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
             var checkTile = gridManager.GetTile(new Vector2Int(position.x, y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             verticalCount++;
         }
@@ -379,7 +379,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
             var checkTile = gridManager.GetTile(new Vector2Int(position.x, y));
             if (!gridManager.IsValidTile(checkTile) || !checkTile.HasObject || 
-                checkTile.CurrentMatchObject.ItemData != itemData)
+                checkTile.CurrentMatch3Object.ItemData != itemData)
                 break;
             verticalCount++;
         }
@@ -388,7 +388,7 @@ public class Match3PlayHandler : MonoBehaviour
     }
 
     public bool WouldCreateMatchDuringPopulation(Vector2Int position, SOItemData itemData, 
-        Dictionary<Tile, SOItemData> tilesToPopulate, SOGridShape gridShape)
+        Dictionary<Match3Tile, SOItemData> tilesToPopulate, SOGridShape gridShape)
     {
         // Check horizontal
         int horizontalCount = 1;
@@ -399,7 +399,7 @@ public class Match3PlayHandler : MonoBehaviour
             
             SOItemData checkItemData = null;
             if (checkTile.HasObject)
-                checkItemData = checkTile.CurrentMatchObject.ItemData;
+                checkItemData = checkTile.CurrentMatch3Object.ItemData;
             else if (tilesToPopulate.TryGetValue(checkTile, out var value))
                 checkItemData = value;
             
@@ -415,7 +415,7 @@ public class Match3PlayHandler : MonoBehaviour
             
             SOItemData checkItemData = null;
             if (checkTile.HasObject)
-                checkItemData = checkTile.CurrentMatchObject.ItemData;
+                checkItemData = checkTile.CurrentMatch3Object.ItemData;
             else if (tilesToPopulate.TryGetValue(checkTile, out var value))
                 checkItemData = value;
             
@@ -436,7 +436,7 @@ public class Match3PlayHandler : MonoBehaviour
             
             SOItemData checkItemData = null;
             if (checkTile.HasObject)
-                checkItemData = checkTile.CurrentMatchObject.ItemData;
+                checkItemData = checkTile.CurrentMatch3Object.ItemData;
             else if (tilesToPopulate.TryGetValue(checkTile, out var value))
                 checkItemData = value;
             
@@ -452,7 +452,7 @@ public class Match3PlayHandler : MonoBehaviour
             
             SOItemData checkItemData = null;
             if (checkTile.HasObject)
-                checkItemData = checkTile.CurrentMatchObject.ItemData;
+                checkItemData = checkTile.CurrentMatch3Object.ItemData;
             else if (tilesToPopulate.TryGetValue(checkTile, out var value))
                 checkItemData = value;
             
@@ -469,11 +469,11 @@ public class Match3PlayHandler : MonoBehaviour
 
     #region Match Handling
 
-    public IEnumerator HandleMatches(List<Tile> matches)
+    public IEnumerator HandleMatches(List<Match3Tile> matches)
     {
         foreach (var match in matches)
         {
-            match.CurrentMatchObject.MatchFound();
+            match.CurrentMatch3Object.MatchFound();
             match.SetCurrentItem(null);
             yield return new WaitForSeconds(MatchHandleDelay);
         }
@@ -514,7 +514,7 @@ public class Match3PlayHandler : MonoBehaviour
                         var aboveTile = gridManager.GetTile(new Vector2Int(x, i));
                         if (aboveTile.HasObject)
                         {
-                            var matchObject = aboveTile.CurrentMatchObject;
+                            var matchObject = aboveTile.CurrentMatch3Object;
                             aboveTile.SetCurrentItem(null);
                             tile.SetCurrentItem(matchObject);
                             matchObject.SetCurrentTile(tile);
@@ -553,7 +553,7 @@ public class Match3PlayHandler : MonoBehaviour
         int maxX = dimensions.x;
         int maxY = dimensions.y;
         
-        var tilesToPopulate = new Dictionary<Tile, SOItemData>();
+        var tilesToPopulate = new Dictionary<Match3Tile, SOItemData>();
         for (int y = maxY; y >= 0; y--)
         {
             for (int x = 0; x <= maxX; x++)
@@ -612,21 +612,21 @@ public class Match3PlayHandler : MonoBehaviour
         }
     }
 
-    public MatchObject CreateMatchObject(SOItemData itemData, Tile tile)
+    public Match3Object CreateMatchObject(SOItemData itemData, Match3Tile match3Tile)
     {
-        if (!gridManager.IsValidTile(tile)) return null;
+        if (!gridManager.IsValidTile(match3Tile)) return null;
 
-        var topMostTile = gridManager.GetTile(new Vector2Int(tile.GridPosition.x, 0));
+        var topMostTile = gridManager.GetTile(new Vector2Int(match3Tile.GridPosition.x, 0));
         
-        var spawnPosition = new Vector3(tile.transform.position.x,
+        var spawnPosition = new Vector3(match3Tile.transform.position.x,
             topMostTile.transform.position.y + topMostTile.transform.localScale.y,
-            tile.transform.position.z);
+            match3Tile.transform.position.z);
         
-        var item = Instantiate(matchObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
+        var item = Instantiate(match3ObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
         
         item.Initialize(itemData);
-        tile.SetCurrentItem(item);
-        item.SetCurrentTile(tile);
+        match3Tile.SetCurrentItem(item);
+        item.SetCurrentTile(match3Tile);
         
         return item;
     }
@@ -666,7 +666,7 @@ public class Match3PlayHandler : MonoBehaviour
 
     private SOItemData GetForcedItemForGuaranteedMatch(Vector2Int position, 
         List<(Vector2Int posA, Vector2Int posB)> guaranteedPairs, 
-        Dictionary<Tile, SOItemData> tilesToPopulate, 
+        Dictionary<Match3Tile, SOItemData> tilesToPopulate, 
         SOMatch3Level level)
     {
         foreach (var pair in guaranteedPairs)

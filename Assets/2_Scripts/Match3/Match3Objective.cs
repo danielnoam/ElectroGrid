@@ -5,21 +5,17 @@ using UnityEngine;
 [Serializable]
 public abstract class Match3Objective
 {
-    [SerializeField] protected string objectiveName;
     [SerializeField] protected Sprite objectiveSprite;
-    [SerializeField, TextArea] protected string description;
     
     protected bool Completed;
     
-    public string ObjectiveName => objectiveName;
     public Sprite ObjectiveSprite => objectiveSprite;
-    public string Description => description;
     public bool IsCompleted => Completed;
 
     public abstract void SetupObjective();
-    public abstract void OnMatchMade(List<Tile> matchedTiles);
-    public abstract string GetProgressText();
-    public abstract float GetProgress();
+    public abstract void OnMatchMade(List<Match3Tile> matchedTiles);
+    public abstract string GetProgressText(bool includeText);
+    public abstract string GetObjectiveName();
 }
 
 [Serializable]
@@ -35,7 +31,7 @@ public class GetMatches : Match3Objective
         Completed = false;
     }
 
-    public override void OnMatchMade(List<Tile> matchedTiles)
+    public override void OnMatchMade(List<Match3Tile> matchedTiles)
     {
         if (Completed || matchedTiles == null || matchedTiles.Count == 0) return;
 
@@ -47,14 +43,14 @@ public class GetMatches : Match3Objective
         }
     }
 
-    public override string GetProgressText()
+    public override string GetProgressText(bool includeText)
     {
-        return $"{_currentAmount}/{requiredAmount}";
+        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Matches: {_currentAmount}/{requiredAmount}";
     }
 
-    public override float GetProgress()
+    public override string GetObjectiveName()
     {
-        return Mathf.Clamp01((float)_currentAmount / requiredAmount);
+        return "Get Matches";
     }
 }
 
@@ -72,7 +68,7 @@ public class GetSpecificItemMatches : Match3Objective
         Completed = false;
     }
 
-    public override void OnMatchMade(List<Tile> matchedTiles)
+    public override void OnMatchMade(List<Match3Tile> matchedTiles)
     {
         if (Completed || matchedTiles == null || matchedTiles.Count == 0 || !targetItem) return;
 
@@ -80,7 +76,7 @@ public class GetSpecificItemMatches : Match3Objective
         {
             if (!tile.HasObject) continue;
             
-            if (tile.CurrentMatchObject.ItemData == targetItem)
+            if (tile.CurrentMatch3Object.ItemData == targetItem)
             {
                 _currentAmount++;
             }
@@ -92,14 +88,15 @@ public class GetSpecificItemMatches : Match3Objective
         }
     }
 
-    public override string GetProgressText()
+    public override string GetProgressText(bool includeText)
     {
+        if (!includeText) return $"{_currentAmount}/{requiredAmount}";
         string itemName = targetItem ? targetItem.name : "Items";
         return $"{_currentAmount}/{requiredAmount} {itemName}";
     }
 
-    public override float GetProgress()
+    public override string GetObjectiveName()
     {
-        return Mathf.Clamp01((float)_currentAmount / requiredAmount);
+        return $"Get {targetItem.name} Matches";
     }
 }

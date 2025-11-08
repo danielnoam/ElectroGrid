@@ -29,14 +29,18 @@ MonoBehaviour:
       isLocked: 0
   objectives:
   - rid: 190982044644802808
-  loseConditions: []
+  loseConditions:
+  - rid: 190982061879197804
   references:
     version: 2
     RefIds:
     - rid: 190982044644802808
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
-        objectiveName: 
         objectiveSprite: {fileID: 0}
-        description: 
         requiredAmount: 10
+    - rid: 190982061879197804
+      type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
+      data:
+        conditionSprite: {fileID: 0}
+        allowedMoves: 10

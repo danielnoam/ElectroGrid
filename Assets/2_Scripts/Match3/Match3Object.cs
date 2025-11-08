@@ -2,7 +2,7 @@ using PrimeTween;
 using TMPro;
 using UnityEngine;
 
-public class MatchObject : MonoBehaviour
+public class Match3Object : MonoBehaviour
 {
     
     [Header("Settings")]
@@ -15,7 +15,7 @@ public class MatchObject : MonoBehaviour
 
     private Color _baseColor;
     private Vector3 _baseScale;
-    private Tile _currentTile;
+    private Match3Tile _currentMatch3Tile;
     private SOItemData _itemData;
     private bool _held;
     private bool _beingDestroyed;
@@ -32,11 +32,11 @@ public class MatchObject : MonoBehaviour
         UpdateVisuals();
     }
 
-    public void SetCurrentTile(Tile tile)
+    public void SetCurrentTile(Match3Tile match3Tile)
     {
-        _currentTile = tile;
+        _currentMatch3Tile = match3Tile;
         
-        var endPosition = new Vector3(_currentTile.transform.position.x,_currentTile.transform.position.y,transform.position.z);
+        var endPosition = new Vector3(_currentMatch3Tile.transform.position.x,_currentMatch3Tile.transform.position.y,transform.position.z);
         Tween.LocalPosition(transform, endPosition, 0.2f);
     }
     

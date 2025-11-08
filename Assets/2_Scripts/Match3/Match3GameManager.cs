@@ -40,7 +40,11 @@ public class Match3GameManager : MonoBehaviour
     public int MaxAttemptsToRecheckMatches => maxAttemptsToRecheckMatches;
     public float PopulationDuration => populationDuration;
     
+    
+    
+    public event Action<SOMatch3Level, List<Match3Objective>, List<Match3LoseCondition>> LevelStarted;
     public event Action<bool> LevelComplete;
+
     
     
 
@@ -64,7 +68,7 @@ public class Match3GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (levelComplete) return;
+        if (levelComplete || !playHandler.CanInteract) return;
         
         foreach (var condition in _currentLoseConditions)
         {
@@ -94,6 +98,8 @@ public class Match3GameManager : MonoBehaviour
         
         CopyObjectivesAndConditions();
         CreateGrid();
+        
+        LevelStarted?.Invoke(level, _currentObjectives, _currentLoseConditions);
     }
 
     private void CopyObjectivesAndConditions()
@@ -336,7 +342,7 @@ public class Match3GameManager : MonoBehaviour
             
             // Draw text
             UnityEditor.Handles.Label(position + Vector3.up * 0.8f, 
-                $"{objective.ObjectiveName}\n{objective.GetProgressText()}",
+                $"{objective.GetObjectiveName()}\n{objective.GetProgressText(false)}",
                 new GUIStyle() 
                 { 
                     alignment = TextAnchor.MiddleCenter,
@@ -368,7 +374,7 @@ public class Match3GameManager : MonoBehaviour
             
             // Draw text
             UnityEditor.Handles.Label(position + Vector3.down * 0.8f, 
-                $"{condition.ConditionName}\n{condition.GetProgressText()}",
+                $"{condition.GetConditionName()}\n{condition.GetProgressText(false)}",
                 new GUIStyle() 
                 { 
                     alignment = TextAnchor.MiddleCenter,
