@@ -33,7 +33,7 @@ public class GetMatches : Match3Objective
 
     public override void OnMatchMade(List<Match3Tile> matchedTiles)
     {
-        if (Completed || matchedTiles == null || matchedTiles.Count == 0) return;
+        if (matchedTiles == null || matchedTiles.Count == 0) return;
 
         _currentAmount += matchedTiles.Count;
 
@@ -70,7 +70,7 @@ public class GetSpecificItemMatches : Match3Objective
 
     public override void OnMatchMade(List<Match3Tile> matchedTiles)
     {
-        if (Completed || matchedTiles == null || matchedTiles.Count == 0 || !targetItem) return;
+        if (matchedTiles == null || matchedTiles.Count == 0 || !targetItem) return;
 
         foreach (var tile in matchedTiles)
         {
@@ -91,12 +91,12 @@ public class GetSpecificItemMatches : Match3Objective
     public override string GetProgressText(bool includeText)
     {
         if (!includeText) return $"{_currentAmount}/{requiredAmount}";
-        string itemName = targetItem ? targetItem.name : "Items";
-        return $"{_currentAmount}/{requiredAmount} {itemName}";
+        string itemName = targetItem ? targetItem.Label : "Items";
+        return $"{itemName}: {_currentAmount}/{requiredAmount}";
     }
 
     public override string GetObjectiveName()
     {
-        return $"Get {targetItem.name} Matches";
+        return $"Get {targetItem.Label} Matches";
     }
 }

@@ -68,14 +68,17 @@ public class Match3GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (levelComplete || !playHandler.CanInteract) return;
         
-        foreach (var condition in _currentLoseConditions)
+        if (!levelComplete && playHandler.CanInteract)
         {
-            condition?.UpdateCondition(Time.deltaTime);
+            foreach (var condition in _currentLoseConditions)
+            {
+                condition?.UpdateCondition(Time.deltaTime);
+            }
         }
         
         CheckLoseConditions();
+        CheckObjectives();
     }
 
     #region Game Management
@@ -132,8 +135,7 @@ public class Match3GameManager : MonoBehaviour
 
     private void CheckObjectives()
     {
-        if (levelComplete) return;
-
+        
         bool allComplete = true;
         foreach (var objective in _currentObjectives)
         {
@@ -152,15 +154,23 @@ public class Match3GameManager : MonoBehaviour
 
     private void CheckLoseConditions()
     {
-        if (levelComplete) return;
+        if (levelComplete || !playHandler.CanInteract) return;
 
         foreach (var condition in _currentLoseConditions)
         {
-            if (condition != null && condition.IsConditionMet)
+            if (condition is { IsConditionMet: true })
             {
                 OnLevelFailed();
                 return;
             }
+        }
+    }
+    
+    public void NotifyObjectivesAboutMatches(List<Match3Tile> allMatches)
+    {
+        foreach (var objective in _currentObjectives)
+        {
+            objective?.OnMatchMade(allMatches);
         }
     }
 
@@ -237,6 +247,8 @@ public class Match3GameManager : MonoBehaviour
 
     #endregion
 
+    
+    
     #region Game Logic
 
     public IEnumerator RunGameLogic(Vector2Int posA, Vector2Int posB)
@@ -273,10 +285,7 @@ public class Match3GameManager : MonoBehaviour
         
 
         // Notify objectives about the matches
-        foreach (var objective in _currentObjectives)
-        {
-            objective?.OnMatchMade(allMatches);
-        }
+        NotifyObjectivesAboutMatches(allMatches);
     
         // Handle matches
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
@@ -287,12 +296,7 @@ public class Match3GameManager : MonoBehaviour
         // Repopulate and handle cascades
         yield return StartCoroutine(playHandler.PopulateGrid(level, GridShape, minPossibleMatches));
         yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(level, GridShape, minPossibleMatches));
-        
-        // Check objectives after matches
-        CheckObjectives();
 
-        // Check lose conditions
-        CheckLoseConditions();
 
         // If game is still active, check if there are still possible matches
         if (!levelComplete)
@@ -309,81 +313,14 @@ public class Match3GameManager : MonoBehaviour
         }
     }
 
+
+
     #endregion
 
     private void OnDrawGizmos()
     {
         GridShape?.Grid?.DrawGrid();
-        
-        if (!Application.isPlaying) return;
-        
-        DrawObjectivesWorld();
-        DrawLoseConditionsWorld();
     }
-
-    private void DrawObjectivesWorld()
-    {
-        if (_currentObjectives == null || _currentObjectives.Count == 0) return;
-
-        #if UNITY_EDITOR
-        Vector3 basePosition = transform.position + Vector3.up * 8f;
-        
-        for (int i = 0; i < _currentObjectives.Count; i++)
-        {
-            var objective = _currentObjectives[i];
-            if (objective == null) continue;
-            
-            Vector3 position = basePosition + Vector3.right * (i * 3f);
-            
-            // Draw icon/sphere
-            Color iconColor = objective.IsCompleted ? Color.green : Color.cyan;
-            Gizmos.color = iconColor;
-            
-            
-            // Draw text
-            UnityEditor.Handles.Label(position + Vector3.up * 0.8f, 
-                $"{objective.GetObjectiveName()}\n{objective.GetProgressText(false)}",
-                new GUIStyle() 
-                { 
-                    alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = iconColor },
-                    fontSize = 12,
-                    fontStyle = FontStyle.Bold
-                });
-        }
-        #endif
-    }
-
-    private void DrawLoseConditionsWorld()
-    {
-        if (_currentLoseConditions == null || _currentLoseConditions.Count == 0) return;
-
-        #if UNITY_EDITOR
-        Vector3 basePosition = transform.position + Vector3.up * 10f;
-        
-        for (int i = 0; i < _currentLoseConditions.Count; i++)
-        {
-            var condition = _currentLoseConditions[i];
-            if (condition == null) continue;
-            
-            Vector3 position = basePosition + Vector3.right * (i * 3f);
-            
-            // Draw icon/sphere
-            Color iconColor = condition.IsConditionMet ? Color.red : Color.yellow;
-            Gizmos.color = iconColor;
-            
-            // Draw text
-            UnityEditor.Handles.Label(position + Vector3.down * 0.8f, 
-                $"{condition.GetConditionName()}\n{condition.GetProgressText(false)}",
-                new GUIStyle() 
-                { 
-                    alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = iconColor },
-                    fontSize = 12,
-                    fontStyle = FontStyle.Bold
-                });
-        }
-        #endif
-    }
+    
 
 }

@@ -16,7 +16,14 @@ public class Match3UIElement : MonoBehaviour
     {
         if (image)
         {
-            image.sprite = sprite;
+            if (!sprite)
+            {
+                image.gameObject.SetActive(false);
+            }
+            else
+            {
+                image.sprite = sprite;
+            }
         }
 
         if (text)

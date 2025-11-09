@@ -72,7 +72,7 @@ public class Match3PlayHandler : MonoBehaviour
                 ReleaseObject(true);
                 return;
             }
-            gridDirection = direction.x > 0 ? Vector2Int.left : Vector2Int.right;
+            gridDirection = direction.x > 0 ? Vector2Int.right : Vector2Int.left;
         }
         else
         {
@@ -490,6 +490,8 @@ public class Match3PlayHandler : MonoBehaviour
                 break;
             }
         
+            gameManager.NotifyObjectivesAboutMatches(immediateMatches);
+            
             yield return HandleMatches(immediateMatches);
             yield return MoveObjects(gridShape);
             yield return PopulateGrid(level, gridShape, minPossibleMatches);

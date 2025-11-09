@@ -38,7 +38,7 @@ MonoBehaviour:
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
-        requiredAmount: 10
+        requiredAmount: 13
     - rid: 190982061879197804
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
