@@ -3,18 +3,29 @@ using DNExtensions;
 using DNExtensions.Button;
 using UnityEngine;
 
+[DisallowMultipleComponent]
+[DefaultExecutionOrder(-1000)]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("Scenes")]
+    [Header("Main Menu")]
+    [SerializeField] private SceneField mainMenu;
+    
+    [Header("Clicker")]
     [SerializeField] private SceneField clickerScene;
+    
+    [Header("Match3")]
     [SerializeField] private SceneField match3Scene;
+    [SerializeField] private SOMatch3Level[] match3Levels = Array.Empty<SOMatch3Level>();
+    
     
     [Separator]
     [SerializeField, ReadOnly] private int currentPopcorns;
     [SerializeField, ReadOnly] private int totalPopcornsCollected;
     
+    
+    public SOMatch3Level[] Match3Levels => match3Levels;
     public event Action OnPopcornsCollected;
 
 
@@ -36,7 +47,7 @@ public class GameManager : MonoBehaviour
 
         if (Application.platform == RuntimePlatform.Android)
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = 120;
         }
     }
     
@@ -64,5 +75,11 @@ public class GameManager : MonoBehaviour
     {
         clickerScene?.LoadScene();
     }
-    
+
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    public void LoadMainMenuScene()
+    {
+        mainMenu?.LoadScene();
+    }
+
 }

@@ -44,6 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f6c8a0ee730924db6cdae46a13f218, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  mainMenu:
+    sceneAsset: {fileID: 102900000, guid: 0d0435a33b290794194fc4c219f40184, type: 3}
+    sceneName: Main
+    scenePath: Assets/1_Scenes/Main.unity
   clickerScene:
     sceneAsset: {fileID: 102900000, guid: 4a2f152bf31ab53419a2a0496ed24ea2, type: 3}
     sceneName: Clicker
@@ -52,5 +56,10 @@ MonoBehaviour:
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
     sceneName: Match3
     scenePath: Assets/1_Scenes/Match3.unity
+  match3Levels:
+  - {fileID: 11400000, guid: 69ffbccbccefb6f4e91fd3f5f0606330, type: 2}
+  - {fileID: 11400000, guid: 8831c445c9354a048a12ad3c3c3a94a5, type: 2}
+  - {fileID: 11400000, guid: 4bc36922ec010f648bd46e3a11d0a4f2, type: 2}
+  - {fileID: 11400000, guid: 1cb2160bf86022443a7ace8c59073263, type: 2}
   currentPopcorns: 0
   totalPopcornsCollected: 0

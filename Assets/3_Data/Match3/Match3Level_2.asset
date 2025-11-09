@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f1b43a145a04e729c1b4bdcefcab301, type: 3}
   m_Name: Match3Level_2
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
+  levelName: Level 2
   gridShape: {fileID: 11400000, guid: 1de084dc7c72cf549bfc73702b720a2f, type: 2}
   matchObjects:
     internalItems:
@@ -24,7 +25,7 @@ MonoBehaviour:
     - item: {fileID: 11400000, guid: 77f3a0176c25eb544a29ff2d11409f4d, type: 2}
       chance: 25
       isLocked: 0
-    - item: {fileID: 11400000, guid: 06fa80ac6d8463442a977ad4d41d493f, type: 2}
+    - item: {fileID: 11400000, guid: 9fea70a12a1878d4d9aced044654ddc3, type: 2}
       chance: 25
       isLocked: 0
   objectives:
@@ -37,13 +38,10 @@ MonoBehaviour:
     - rid: 190982044644802808
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
-        objectiveName: 
         objectiveSprite: {fileID: 0}
-        description: 
         requiredAmount: 15
     - rid: 190982044644802815
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
-        conditionName: 
         conditionSprite: {fileID: 0}
         allowedMoves: 15

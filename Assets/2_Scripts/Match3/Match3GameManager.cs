@@ -11,37 +11,41 @@ public class Match3GameManager : MonoBehaviour
     public static Match3GameManager Instance { get; private set; }
 
     [Header("Settings")]
+    [Tooltip("Minimum tiles required to form a match")]
+    [SerializeField] private int minMatchCount = 3;
+    [Tooltip("Maximum attempts to create a grid with guaranteed matches")]
+    [SerializeField] private int mxGuaranteedMatchAttempts = 100;
+    [Tooltip("Maximum attempts to recheck matches in grid")]
     [SerializeField] private int maxAttemptsToRecheckMatches = 50;
-    [Tooltip("Max possible matches allowed in grid when populating")]
-    [SerializeField] private int maxImmediateMatches;
     [Tooltip("Minimum possible matches required in grid")]
     [SerializeField] private int minPossibleMatches = 3;
     [Tooltip("Duration taken to populate grid")]
     [SerializeField] private float populationDuration = 1f;
-    [SerializeField] private SOMatch3Level level;
+
 
     
     [Header("References")]
-    [SerializeField] private ChanceList<SOMatch3Level> levelPool;
-    [SerializeField] private Match3GridManager gridManager;
+    [SerializeField] private Match3GridHandler gridHandler;
     [SerializeField] private Match3PlayHandler playHandler;
     [SerializeField] private Match3SelectionIndicator selectionIndicator;
     [SerializeField] private SOGridShape defaultGridShape;
     
     [Separator]
+    [SerializeField, ReadOnly] private SOMatch3Level currentLevel;
     [SerializeField, ReadOnly] private bool levelComplete;
+    [SerializeField, ReadOnly] private bool populatingGrid;
 
     private readonly List<Match3Objective> _currentObjectives = new List<Match3Objective>();
     private readonly List<Match3LoseCondition> _currentLoseConditions = new List<Match3LoseCondition>();
-    private SOGridShape GridShape => level ? level.GridShape : defaultGridShape;
+    private SOGridShape GridShape => currentLevel ? currentLevel.GridShape : defaultGridShape;
     
     
     
+    public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
+    public int MinMatchCount => minMatchCount;
     public int MaxAttemptsToRecheckMatches => maxAttemptsToRecheckMatches;
     public float PopulationDuration => populationDuration;
-    
-    
-    
+    public SOMatch3Level CurrentLevel => currentLevel;
     public event Action<SOMatch3Level, List<Match3Objective>, List<Match3LoseCondition>> LevelStarted;
     public event Action<bool> LevelComplete;
 
@@ -83,26 +87,40 @@ public class Match3GameManager : MonoBehaviour
 
     #region Game Management
     
+    public void SetNextLevel()
+    {
+        var levels = GameManager.Instance.Match3Levels;
+        if (levels != null && levels.Length != 0)
+        {
+            int currentIndex = Array.IndexOf(levels, currentLevel);
+            int nextIndex = (currentIndex + 1) % levels.Length;
+
+            currentLevel = levels[nextIndex];
+            StartNewGame();
+        }
+    }
+    
     [Button(ButtonPlayMode.OnlyWhenPlaying)]
     private void StartNewGame()
     {
-        if (!level)
+        if (!currentLevel)
         {
-            level = levelPool.GetRandomItem();
+            currentLevel = GameManager.Instance.Match3Levels[0];
         }
         
-        if (!level)
+        if (!currentLevel)
         {
             Debug.LogError("No level assigned or found in level pool!");
             return;
         }
 
         levelComplete = false;
+        populatingGrid = false;
         
         CopyObjectivesAndConditions();
         CreateGrid();
         
-        LevelStarted?.Invoke(level, _currentObjectives, _currentLoseConditions);
+        LevelStarted?.Invoke(currentLevel, _currentObjectives, _currentLoseConditions);
     }
 
     private void CopyObjectivesAndConditions()
@@ -110,7 +128,7 @@ public class Match3GameManager : MonoBehaviour
         _currentObjectives.Clear();
         _currentLoseConditions.Clear();
         
-        foreach (var objective in level.Objectives)
+        foreach (var objective in currentLevel.Objectives)
         {
             if (objective != null)
             {
@@ -121,7 +139,7 @@ public class Match3GameManager : MonoBehaviour
             }
         }
         
-        foreach (var condition in level.LoseConditions)
+        foreach (var condition in currentLevel.LoseConditions)
         {
             if (condition != null)
             {
@@ -135,6 +153,7 @@ public class Match3GameManager : MonoBehaviour
 
     private void CheckObjectives()
     {
+        if (levelComplete) return;
         
         bool allComplete = true;
         foreach (var objective in _currentObjectives)
@@ -146,7 +165,7 @@ public class Match3GameManager : MonoBehaviour
             }
         }
 
-        if (allComplete && _currentObjectives.Count > 0)
+        if (allComplete && _currentObjectives.Count > 0 && !populatingGrid)
         {
             OnLevelComplete();
         }
@@ -154,7 +173,7 @@ public class Match3GameManager : MonoBehaviour
 
     private void CheckLoseConditions()
     {
-        if (levelComplete || !playHandler.CanInteract) return;
+        if (levelComplete || populatingGrid) return;
 
         foreach (var condition in _currentLoseConditions)
         {
@@ -192,21 +211,24 @@ public class Match3GameManager : MonoBehaviour
     
     #endregion
 
+    
+    
     #region Grid Setup
 
     private void CreateGrid()
     {
-        if (!GridShape || !level) return;
+        if (!GridShape || !currentLevel) return;
     
+        
         playHandler.CanInteract = false;
-        playHandler.DestroyAllObjects();
-        gridManager.CreateGrid(GridShape);
+        gridHandler.CreateGrid(GridShape);
     
         StartCoroutine(InitialGridSetup());
     }
     
     private IEnumerator InitialGridSetup()
     {
+        populatingGrid = true;
         int maxRetries = 10;
         int retryCount = 0;
     
@@ -214,31 +236,35 @@ public class Match3GameManager : MonoBehaviour
         {
             retryCount++;
         
-            yield return playHandler.PopulateGrid(level, GridShape, minPossibleMatches);
-        
-            // Validate immediate matches
-            var immediateMatchesInGrid = playHandler.FindImmediateMatches(GridShape);
-            if (immediateMatchesInGrid.Count > maxImmediateMatches)
+            // Generate the grid layout (data only, no spawning yet)
+            var gridLayout = playHandler.GenerateGridLayout(currentLevel, GridShape, minPossibleMatches);
+            
+            if (gridLayout == null || gridLayout.Count == 0)
             {
-                Debug.Log($"Too many immediate matches found in grid ({immediateMatchesInGrid.Count}), restarting grid (attempt {retryCount}/{maxRetries})");
-                CreateGrid();
+                Debug.LogError("Failed to generate grid layout");
                 yield break;
             }
-        
-            // Validate possible matches
-            var possibleMatchesInGrid = playHandler.FindPossibleMatches(GridShape);
-            if (possibleMatchesInGrid.Count < minPossibleMatches)
+            
+            // Validate the layout before spawning
+            var validationResult = playHandler.ValidateGridLayout(gridLayout, GridShape, minPossibleMatches, checkImmediateMatches: true);
+            
+            if (!validationResult.isValid)
             {
-                Debug.Log($"Failed to create enough possible matches ({possibleMatchesInGrid.Count}/{minPossibleMatches}), restarting grid (attempt {retryCount}/{maxRetries})");
-                CreateGrid();
-                yield break;
+                if (validationResult.immediateMatches > 0)
+                {
+                    Debug.Log($"Too many immediate matches found in grid ({validationResult.immediateMatches}), retrying (attempt {retryCount}/{maxRetries})");
+                }
+                else if (validationResult.possibleMatches < minPossibleMatches)
+                {
+                    Debug.Log($"Not enough possible matches ({validationResult.possibleMatches}/{minPossibleMatches}), retrying (attempt {retryCount}/{maxRetries})");
+                }
+                continue; 
             }
-        
-            // Success! Handle any cascading matches
-            Debug.Log($"Grid populated successfully with {possibleMatchesInGrid.Count} possible matches");
-            yield return playHandler.HandleMatchesAndRepopulate(level, GridShape, minPossibleMatches);
-        
+            
+            Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
+            yield return playHandler.SpawnGridLayout(gridLayout, false);
             playHandler.CanInteract = true;
+            populatingGrid = false;
             yield break;
         }
     
@@ -246,7 +272,6 @@ public class Match3GameManager : MonoBehaviour
     }
 
     #endregion
-
     
     
     #region Game Logic
@@ -259,6 +284,7 @@ public class Match3GameManager : MonoBehaviour
         }
 
         playHandler.CanInteract = false;
+        populatingGrid = true;
         selectionIndicator.ResetHoveredTile();
     
         // Swap items
@@ -271,8 +297,8 @@ public class Match3GameManager : MonoBehaviour
         }
     
         // Check for matches
-        var matchesWithTileA = playHandler.FindMatchesWithTile(gridManager.GetTile(posA), GridShape);
-        var matchesWithTileB = playHandler.FindMatchesWithTile(gridManager.GetTile(posB), GridShape);
+        var matchesWithTileA = playHandler.FindMatchesWithTile(gridHandler.GetTile(posA), GridShape);
+        var matchesWithTileB = playHandler.FindMatchesWithTile(gridHandler.GetTile(posB), GridShape);
         var allMatches = matchesWithTileA.Concat(matchesWithTileB).Distinct().ToList();
     
         if (allMatches.Count == 0)
@@ -280,6 +306,7 @@ public class Match3GameManager : MonoBehaviour
             // No match - swap back
             yield return StartCoroutine(playHandler.SwapObjects(posB, posA));
             playHandler.CanInteract = true;
+            populatingGrid = false;
             yield break;
         }
         
@@ -294,8 +321,8 @@ public class Match3GameManager : MonoBehaviour
         yield return StartCoroutine(playHandler.MoveObjects(GridShape));
     
         // Repopulate and handle cascades
-        yield return StartCoroutine(playHandler.PopulateGrid(level, GridShape, minPossibleMatches));
-        yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(level, GridShape, minPossibleMatches));
+        yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, GridShape, minPossibleMatches, true));
+        yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, GridShape, minPossibleMatches));
 
 
         // If game is still active, check if there are still possible matches
@@ -310,6 +337,7 @@ public class Match3GameManager : MonoBehaviour
             }
         
             playHandler.CanInteract = true;
+            populatingGrid = false;
         }
     }
 
@@ -317,6 +345,15 @@ public class Match3GameManager : MonoBehaviour
 
     #endregion
 
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    private void ForceCompleteLevel()
+    {
+        if (levelComplete || populatingGrid) return;
+        
+        OnLevelComplete();
+    }
+    
+    
     private void OnDrawGizmos()
     {
         GridShape?.Grid?.DrawGrid();

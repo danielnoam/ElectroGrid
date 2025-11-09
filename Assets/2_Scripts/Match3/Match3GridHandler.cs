@@ -2,11 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Match3GridManager : MonoBehaviour
+public class Match3GridHandler : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private Transform tilesParent;
+    [SerializeField] private Match3Object match3ObjectPrefab;
+    [SerializeField] private Transform matchObjectsParent;
     
     private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
     private SOGridShape _currentGridShape;
@@ -15,7 +17,6 @@ public class Match3GridManager : MonoBehaviour
     public SOGridShape GridShape => _currentGridShape;
 
     
-    #region Grid Setup
     
     public void CreateGrid(SOGridShape gridShape)
     {
@@ -39,20 +40,42 @@ public class Match3GridManager : MonoBehaviour
             }
         }
     }
-
-    public void DestroyGrid()
-    {
-        ClearAllTileObjects();
-        DestroyTiles();
-    }
-
+    
     private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
     {
         var tile = Instantiate(match3TilePrefab, position, Quaternion.identity, tilesParent);
         tile.Initialize(gridPos, isActive);
         return tile;
     }
+    
+    
+    public Match3Object CreateMatchObject(SOItemData itemData, Match3Tile match3Tile)
+    {
+        if (!IsValidTile(match3Tile)) return null;
 
+        var topMostTile = GetTile(new Vector2Int(match3Tile.GridPosition.x, 0));
+        
+        var spawnPosition = new Vector3(match3Tile.transform.position.x,
+            topMostTile.transform.position.y + topMostTile.transform.localScale.y,
+            match3Tile.transform.position.z);
+        
+        var item = Instantiate(match3ObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
+        
+        item.Initialize(itemData);
+        match3Tile.SetCurrentItem(item);
+        item.SetCurrentTile(match3Tile);
+        
+        return item;
+    }
+    
+
+    public void DestroyGrid()
+    {
+        DestroyAllObjects();
+        DestroyTiles();
+    }
+
+    
     private void DestroyTiles()
     {
         foreach (var tile in _tiles.Values)
@@ -87,8 +110,8 @@ public class Match3GridManager : MonoBehaviour
 
         _tiles.Clear();
     }
-
-    private void ClearAllTileObjects()
+    
+    public void DestroyAllObjects()
     {
         foreach (var tile in _tiles.Values)
         {
@@ -97,10 +120,27 @@ public class Match3GridManager : MonoBehaviour
                 tile.SetCurrentItem(null);
             }
         }
+        
+        if (Application.isEditor)
+        {
+            while (matchObjectsParent.childCount > 0)
+            {
+                DestroyImmediate(matchObjectsParent.GetChild(0).gameObject);
+            }
+        }
+        else
+        {
+            foreach (Transform child in matchObjectsParent)
+            {
+                Destroy(child.gameObject);
+            }
+        }
     }
 
-    #endregion
+    
 
+    
+    
 
     #region Helper Methods
 
