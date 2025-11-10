@@ -10,8 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 5544082587813058189}
   - component: {fileID: 165623797317302940}
+  - component: {fileID: 8890823435884068750}
   - component: {fileID: 2091689956105089853}
   - component: {fileID: 3208736288784191921}
+  - component: {fileID: 8657510666483211056}
   m_Layer: 5
   m_Name: Prefab_Button
   m_TagString: Untagged
@@ -47,6 +49,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5302415877516245720}
   m_CullTransparentMesh: 1
+--- !u!114 &8890823435884068750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5302415877516245720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventTrigger
+  m_Delegates: []
 --- !u!114 &2091689956105089853
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,7 +82,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: -8111322212487550922, guid: 4edd415ab2cd6784ea5e7905122a703d, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -121,6 +136,69 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8657510666483211056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5302415877516245720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c641a4da1748fa866e29dd0aa259af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableAnimator
+  mouseSelectsSelectable: 1
+  selectSfx: {fileID: 0}
+  submitSfx: {fileID: 0}
+  positionEffectType: 0
+  positionOffset: {x: 0, y: 10, z: 0}
+  positionDuration: 0.15
+  positionEase: 31
+  shakeOnDeselect: 0
+  shakeStrength: {x: 3, y: 3, z: 0}
+  shakeFrequency: 10
+  shakeDuration: 0.5
+  shakeEase: 0
+  animateRotation: 0
+  rotationOffset: {x: 0, y: 0, z: 15}
+  rotationDuration: 0.15
+  rotationEase: 31
+  animateScale: 1
+  scaleMultiplier: 1.1
+  scaleDuration: 0.15
+  scaleEase: 31
+  animateAlpha: 0
+  selectedAlpha: 1
+  alphaDuration: 0.5
+  alphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  audioSource: {fileID: 0}
+  selectable: {fileID: 3208736288784191921}
+  eventTrigger: {fileID: 8890823435884068750}
+  rectTransform: {fileID: 5544082587813058189}
 --- !u!1 &5343275625798819389
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,6 +210,7 @@ GameObject:
   - component: {fileID: 4426503580546431240}
   - component: {fileID: 4081415070904116350}
   - component: {fileID: 3982775019398211998}
+  - component: {fileID: 2574926336027384700}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -180,7 +259,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -195,8 +274,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4281479730
-  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+    rgba: 4278190080
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -213,7 +292,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 65.8
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -257,3 +336,39 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &2574926336027384700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5343275625798819389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f2231885b2944be90dc6fb3775af10c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableTextAnimator
+  selectableAnimator: {fileID: 8657510666483211056}
+  positionEffectType: 0
+  positionOffset: {x: 0, y: 10, z: 0}
+  positionDuration: 0.15
+  positionEase: 31
+  shakeOnDeselect: 0
+  shakeStrength: {x: 3, y: 3, z: 0}
+  shakeFrequency: 10
+  shakeDuration: 0.5
+  shakeEase: 0
+  animateRotation: 0
+  rotationOffset: {x: 0, y: 0, z: 15}
+  rotationDuration: 0.15
+  rotationEase: 31
+  animateScale: 1
+  scaleMultiplier: 1.1
+  scaleDuration: 0.15
+  scaleEase: 31
+  animateColor: 1
+  selectedColor: {r: 0.95686275, g: 0.7019608, b: 0.25490198, a: 1}
+  colorDuration: 0.15
+  colorEase: 7
+  textMeshPro: {fileID: 3982775019398211998}
+  rectTransform: {fileID: 4426503580546431240}

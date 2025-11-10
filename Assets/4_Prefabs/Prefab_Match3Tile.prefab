@@ -138,8 +138,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Tile
   tileRenderer: {fileID: 2548959169750997435}
   selectedTileColor: {r: 0, g: 1, b: 0, a: 1}
-  hoverTileColor: {r: 0, g: 1, b: 0, a: 0.5}
-  activeTileColor: {r: 0, g: 1, b: 0, a: 0.5019608}
+  hoverTileColor: {r: 1, g: 0.6919855, b: 0, a: 0.5}
+  activeTileColor: {r: 1, g: 0.6901961, b: 0, a: 0.5019608}
   inactiveTileColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.29411766}
   gridPosition: {x: 0, y: 0}
   isActive: 0

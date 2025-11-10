@@ -23,6 +23,10 @@ public class Mach3UIManager : MonoBehaviour
     [SerializeField] private Button quitButton;
     [SerializeField] private TweenSettings levelCompleteTweenSettings;
     
+    [Header("Bottom Bar")]
+    [SerializeField] private RectTransform bottomBar;
+    [SerializeField] private Button bottomBarQuitButton;
+    [SerializeField] private TweenSettings bottomBarTweenSettings;
     
     [Header("References")]
     [SerializeField] private Match3GameManager match3Manager;
@@ -34,8 +38,10 @@ public class Mach3UIManager : MonoBehaviour
     
     private RectTransform _levelCompleteWindowRectTransform;
     private float _levelNameDefaultPositionY;
+    private float _bottomBarDefaultYPosition;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
+    private Sequence _bottomBarSequence;
     private Sequence _levelCompleteSequence;
     
 
@@ -49,8 +55,11 @@ public class Mach3UIManager : MonoBehaviour
         _topBarDefaultSize = topBar.sizeDelta;
         topBar.sizeDelta = new Vector2(_topBarDefaultSize.x, 0f);
         
+        _bottomBarDefaultYPosition = bottomBar.anchoredPosition.y;
+        bottomBar.anchoredPosition = new Vector2(bottomBar.anchoredPosition.x, -bottomBar.sizeDelta.y);
+        
         _levelNameDefaultPositionY = levelName.anchoredPosition.y;
-        levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, 0f);
+        levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x,0f);
     }
 
     private void OnEnable()
@@ -61,6 +70,12 @@ public class Mach3UIManager : MonoBehaviour
         
         quitButton.onClick.RemoveAllListeners();
         quitButton.onClick.AddListener(() =>
+        {
+            GameManager.Instance?.LoadMainMenuScene();
+        });
+        
+        bottomBarQuitButton.onClick.RemoveAllListeners();
+        bottomBarQuitButton.onClick.AddListener(() =>
         {
             GameManager.Instance?.LoadMainMenuScene();
         });
@@ -92,6 +107,7 @@ public class Mach3UIManager : MonoBehaviour
         levelCompleteTitle.text = $"{levelData.Level.LevelName} Complete!";
         
         AnimateTopBar(false);
+        AnimateBottomBar(false);
         AnimateLevelCompleteWindow(true);
         
 
@@ -107,6 +123,7 @@ public class Mach3UIManager : MonoBehaviour
         levelCompleteTitle.text = $"{levelData.Level.LevelName} Failed!";
         
         AnimateTopBar(false);
+        AnimateBottomBar(false);
         AnimateLevelCompleteWindow(true);
     }
     
@@ -117,6 +134,7 @@ public class Mach3UIManager : MonoBehaviour
         levelNameText.text = levelData.Level.LevelName;
         SetupUIElements(levelData.CurrentObjectives, levelData.CurrentLoseConditions);
         AnimateTopBar(true);
+        AnimateBottomBar(true);
         AnimateLevelCompleteWindow(false);
     }
     
@@ -196,6 +214,16 @@ public class Mach3UIManager : MonoBehaviour
             _topBarSequence.Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, topbarTweenSettings));
             _topBarSequence.Group(Tween.UISizeDelta(topBar, barEndSize, startDelay: topbarTweenSettings.duration/2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
         }
+    }
+    
+    private void AnimateBottomBar(bool show)
+    {
+        if (!bottomBar) return;
+
+        _bottomBarSequence.Stop();
+        var endYPosition = show ? _bottomBarDefaultYPosition : -bottomBar.sizeDelta.y;
+        _bottomBarSequence = Sequence.Create()
+            .Group(Tween.UIAnchoredPositionY(bottomBar, endYPosition, bottomBarTweenSettings));
     }
     
     
