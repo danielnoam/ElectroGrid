@@ -142,16 +142,14 @@ public class Match3GameManager : MonoBehaviour
 
     }
     
-    public void NotifyObjectivesAboutMatches(List<Match3Tile> allMatches)
+    public void NotifyMatchesWhereMade(List<Match3Tile> matches)
     {
-        if (_currentLevelData == null) return;
-        
-        _currentLevelData.MatchesMade += allMatches.Count;
-        
-        foreach (var objective in _currentLevelData.CurrentObjectives)
-        {
-            objective?.OnMatchMade(allMatches);
-        }
+        _currentLevelData?.OnMatchesMade(matches);
+    }
+    
+    private void NotifyAMoveWasMade()
+    {
+        _currentLevelData?.OnMoveMade();
     }
     
     private void UpdateLoseConditions()
@@ -194,10 +192,7 @@ public class Match3GameManager : MonoBehaviour
         yield return StartCoroutine(playHandler.SwapObjects(posA, posB));
         
         // Notify lose conditions that a move was made
-        foreach (var condition in _currentLevelData.CurrentLoseConditions)
-        {
-            condition?.OnMoveMade();
-        }
+        NotifyAMoveWasMade();
     
         // Check for matches
         var matchesWithTileA = playHandler.FindMatchesWithTile(gridHandler.GetTile(posA), GridShape);
@@ -215,7 +210,7 @@ public class Match3GameManager : MonoBehaviour
         
 
         // Notify objectives about the matches
-        NotifyObjectivesAboutMatches(allMatches);
+        NotifyMatchesWhereMade(allMatches);
     
         // Handle matches
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
@@ -243,7 +238,19 @@ public class Match3GameManager : MonoBehaviour
             populatingGrid = false;
         }
     }
-    
+        
+            
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    private void ForceCompleteLevel()
+    {
+        if (levelComplete || populatingGrid) return;
+        
+        CompleteLevel();
+    }
+
+
+        
+
     #endregion
 
     
@@ -310,21 +317,6 @@ public class Match3GameManager : MonoBehaviour
 
 
 
-#if UNITY_EDITOR
-    [Button(ButtonPlayMode.OnlyWhenPlaying)]
-    private void ForceCompleteLevel()
-    {
-        if (levelComplete || populatingGrid) return;
-        
-        CompleteLevel();
-    }
-    
-    
-    private void OnDrawGizmos()
-    {
-        GridShape?.Grid?.DrawGrid();
-    }
-#endif
 
     
 

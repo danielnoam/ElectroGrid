@@ -49,19 +49,27 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         if (property.managedReferenceValue != null && _foldoutStates[propertyPath]) 
         {
             EditorGUI.indentLevel++;
-            
+    
             var iterator = property.Copy();
             var endProperty = iterator.GetEndProperty();
-            iterator.NextVisible(true);
-            
-            while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty))
+    
+            // Enter children on first call
+            if (iterator.NextVisible(true))
             {
-                var propHeight = EditorGUI.GetPropertyHeight(iterator, true);
-                var propRect = new Rect(contentRect.x, contentRect.y, contentRect.width, propHeight);
-                EditorGUI.PropertyField(propRect, iterator, true);
-                contentRect.y += propHeight + EditorGUIUtility.standardVerticalSpacing;
+                do
+                {
+                    // Skip drawing the property if it's the script field
+                    if (iterator.propertyPath.EndsWith(".m_Script"))
+                        continue;
+                
+                    var propHeight = EditorGUI.GetPropertyHeight(iterator, true);
+                    var propRect = new Rect(contentRect.x, contentRect.y, contentRect.width, propHeight);
+                    EditorGUI.PropertyField(propRect, iterator, true);
+                    contentRect.y += propHeight + EditorGUIUtility.standardVerticalSpacing;
+                }
+                while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty));
             }
-            
+    
             EditorGUI.indentLevel--;
         }
     
@@ -71,7 +79,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) 
     {
         float height = EditorGUIUtility.singleLineHeight; // Type dropdown
-        
+    
         if (property.managedReferenceValue != null)
         {
             var propertyPath = property.propertyPath;
@@ -79,15 +87,22 @@ public class Match3ObjectiveDrawer : PropertyDrawer
             {
                 var iterator = property.Copy();
                 var endProperty = iterator.GetEndProperty();
-                iterator.NextVisible(true);
-                
-                while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty))
+            
+                if (iterator.NextVisible(true))
                 {
-                    height += EditorGUI.GetPropertyHeight(iterator, true) + EditorGUIUtility.standardVerticalSpacing;
+                    do
+                    {
+                        // Skip the m_Script field
+                        if (iterator.propertyPath.EndsWith(".m_Script"))
+                            continue;
+                        
+                        height += EditorGUI.GetPropertyHeight(iterator, true) + EditorGUIUtility.standardVerticalSpacing;
+                    }
+                    while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty));
                 }
             }
         }
-        
+    
         return height;
     }
 

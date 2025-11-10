@@ -40,7 +40,7 @@ public class Match3Object : MonoBehaviour
     {
         _currentMatch3Tile = match3Tile;
         
-        var endPosition = new Vector3(_currentMatch3Tile.transform.position.x,_currentMatch3Tile.transform.position.y,transform.position.z);
+        var endPosition = new Vector3(_currentMatch3Tile.transform.localPosition.x,_currentMatch3Tile.transform.localPosition.y,transform.localPosition.z);
         Tween.LocalPosition(transform, endPosition, swapDuration);
     }
     

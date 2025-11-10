@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f1b43a145a04e729c1b4bdcefcab301, type: 3}
+  m_Name: Match3Level_6
+  m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
+  levelName: Level 6
+  gridShape: {fileID: 11400000, guid: 35a7e5d1954754f48b71205b6dbd7d4c, type: 2}
+  matchObjects:
+    internalItems:
+    - item: {fileID: 11400000, guid: 06c7eecdb5f79c542a8465be434742cc, type: 2}
+      chance: 25
+      isLocked: 0
+    - item: {fileID: 11400000, guid: 722fd8be5dc57954fa27ae90745cf7fb, type: 2}
+      chance: 25
+      isLocked: 0
+    - item: {fileID: 11400000, guid: 77f3a0176c25eb544a29ff2d11409f4d, type: 2}
+      chance: 25
+      isLocked: 0
+    - item: {fileID: 11400000, guid: 9fea70a12a1878d4d9aced044654ddc3, type: 2}
+      chance: 25
+      isLocked: 0
+  objectives:
+  - rid: 190982044644802808
+  loseConditions:
+  - rid: 190982044644802816
+  - rid: 190982061879197805
+  references:
+    version: 2
+    RefIds:
+    - rid: 190982044644802808
+      type: {class: GetMatches, ns: , asm: Assembly-CSharp}
+      data:
+        objectiveSprite: {fileID: 0}
+        requiredAmount: 36
+    - rid: 190982044644802816
+      type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
+      data:
+        conditionSprite: {fileID: 0}
+        allowedMoves: 10
+    - rid: 190982061879197805
+      type: {class: TimeLimit, ns: , asm: Assembly-CSharp}
+      data:
+        conditionSprite: {fileID: 0}
+        allowedTime: 30

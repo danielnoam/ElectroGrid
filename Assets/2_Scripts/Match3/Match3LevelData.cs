@@ -43,6 +43,26 @@ public class Match3LevelData
         }
     }
     
+    public void OnMoveMade()
+    {
+        MovesMade++;
+        
+        foreach (var condition in CurrentLoseConditions)
+        {
+            condition?.OnMoveMade();
+        }
+    }
+    
+    public void OnMatchesMade(List<Match3Tile> allMatches)
+    {
+        MatchesMade += allMatches.Count;
+        
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnMatchMade(allMatches);
+        }
+    }
+    
     
     public bool IsObjectivesComplete()
     {

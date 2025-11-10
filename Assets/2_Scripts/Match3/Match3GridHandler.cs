@@ -55,9 +55,9 @@ public class Match3GridHandler : MonoBehaviour
 
         var topMostTile = GetTile(new Vector2Int(match3Tile.GridPosition.x, 0));
         
-        var spawnPosition = new Vector3(match3Tile.transform.position.x,
-            topMostTile.transform.position.y + topMostTile.transform.localScale.y,
-            match3Tile.transform.position.z);
+        var spawnPosition = new Vector3(match3Tile.transform.localPosition.x,
+            topMostTile.transform.localPosition.y + topMostTile.transform.localScale.y,
+            match3Tile.transform.localPosition.z);
         
         var item = Instantiate(match3ObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
         
@@ -140,9 +140,6 @@ public class Match3GridHandler : MonoBehaviour
     
 
     
-    
-
-    #region Helper Methods
 
     public Match3Tile GetTile(Vector2Int position)
     {
@@ -158,7 +155,7 @@ public class Match3GridHandler : MonoBehaviour
     public Match3Tile GetRandomValidTile()
     {
         var validTiles = _tiles.Values.Where(IsValidTile).ToList();
-        return validTiles.Count > 0 ? validTiles[UnityEngine.Random.Range(0, validTiles.Count)] : null;
+        return validTiles.Count > 0 ? validTiles[Random.Range(0, validTiles.Count)] : null;
     }
 
     public int GetActiveTileCount()
@@ -180,5 +177,11 @@ public class Match3GridHandler : MonoBehaviour
         return new Vector2Int(maxX, maxY);
     }
 
-    #endregion
+
+    
+    
+    private void OnDrawGizmos()
+    {
+        GridShape?.Grid?.DrawGrid();
+    }
 }

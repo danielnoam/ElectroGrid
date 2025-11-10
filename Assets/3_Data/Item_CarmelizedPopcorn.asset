@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8746a70e6d2e4c5db1df0f1bae221269, type: 3}
   m_Name: Item_CarmelizedPopcorn
   m_EditorClassIdentifier: Assembly-CSharp::SOItemData
-  label: Carmelized Popcorn
+  label: Carmel Popcorn
   worth: 3
   sprites:
     internalItems:

@@ -7,10 +7,14 @@ using UnityEngine.InputSystem;
 
 public class Match3PlayHandler : MonoBehaviour
 {
+    [Header("Settings")]
     [Tooltip("Duration taken to populate grid")]
     [SerializeField, Min(0)] private float populationDuration = 1f;
+    [Tooltip("Duration taken to swap two objects")]
     [SerializeField, Min(0)] private float objectSwapDuration = 0.3f;
+    [Tooltip("Delay between popping matched objects")]
     [SerializeField, Min(0)] private float delayBetweenMatchPops = 0.075f;
+    [Tooltip("Delay between moving objects downwards")]
     [SerializeField, Min(0)] private float delayBetweenObjectMovement = 0.1f;
     
     
@@ -150,8 +154,7 @@ public class Match3PlayHandler : MonoBehaviour
 
         if (IsPositionsTouching(match3Tile.GridPosition, selectedMatch3Tile.GridPosition))
         {
-            Match3GameManager.Instance.StartCoroutine(
-                Match3GameManager.Instance.RunGameLogic(match3Tile.GridPosition, selectedMatch3Tile.GridPosition));
+            gameManager.StartCoroutine(gameManager.RunGameLogic(match3Tile.GridPosition, selectedMatch3Tile.GridPosition));
         }
         else
         {
@@ -495,7 +498,7 @@ public class Match3PlayHandler : MonoBehaviour
                 break;
             }
         
-            gameManager.NotifyObjectivesAboutMatches(immediateMatches);
+            gameManager.NotifyMatchesWhereMade(immediateMatches);
             
             yield return HandleMatches(immediateMatches);
             yield return MoveObjects(gridShape);
