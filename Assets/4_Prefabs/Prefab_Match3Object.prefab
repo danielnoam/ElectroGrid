@@ -144,6 +144,10 @@ MonoBehaviour:
   heldColor: {r: 1, g: 1, b: 1, a: 0.5882353}
   itemLabel: {fileID: 5563766885536322422}
   itemRenderer: {fileID: 4412200537256300565}
+  popSfx: {fileID: 11400000, guid: a749e14bb4e3fba4b819496db0e8aec9, type: 2}
+  swapSfx: {fileID: 11400000, guid: da65ab78c0f11a34789506a89eeb58cb, type: 2}
+  spawnSfx: {fileID: 11400000, guid: ec1798503e56cf94886c358078f8a94c, type: 2}
+  popParticle: {fileID: 243077210646262330, guid: bd6be652d7731c147860297377f1cad4, type: 3}
 --- !u!1 &5705993970405892740
 GameObject:
   m_ObjectHideFlags: 0

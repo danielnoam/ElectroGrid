@@ -5,6 +5,7 @@ using UnityEngine;
 public class Match3Tile : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] private AudioSource audioSource;
     [SerializeField] private SpriteRenderer tileRenderer;
     [SerializeField] private Color selectedTileColor = new Color(0f, 1f, 0f, 1f);
     [SerializeField] private Color hoverTileColor = new Color(0f, 1f, 0f, 0.5f);
@@ -19,8 +20,11 @@ public class Match3Tile : MonoBehaviour
     private bool _isSelected;
     private bool _isHovered;
     
+    
+    
     public Vector2Int GridPosition => gridPosition;
     public Match3Object CurrentMatch3Object => _currentMatch3Object;
+    public AudioSource AudioSource => audioSource;
     public bool CanSelect => isActive && _currentMatch3Object && !_isSelected;
     public bool IsActive => isActive;
     public bool HasObject => isActive && _currentMatch3Object;

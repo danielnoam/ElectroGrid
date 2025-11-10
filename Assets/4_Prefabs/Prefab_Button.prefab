@@ -149,8 +149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableAnimator
   mouseSelectsSelectable: 1
-  selectSfx: {fileID: 0}
-  submitSfx: {fileID: 0}
+  selectSfx: {fileID: 11400000, guid: 5cc75ba5af4069240917685cc9975553, type: 2}
+  submitSfx: {fileID: 11400000, guid: 4110f1894f6f21a45950420380c1f305, type: 2}
   positionEffectType: 0
   positionOffset: {x: 0, y: 10, z: 0}
   positionDuration: 0.15
@@ -292,7 +292,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 65.8
+  m_fontSize: 72
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

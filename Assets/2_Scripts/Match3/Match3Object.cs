@@ -1,3 +1,4 @@
+using DNExtensions;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -16,6 +17,10 @@ public class Match3Object : MonoBehaviour
     [Header("References")]
     [SerializeField] private TextMeshPro itemLabel;
     [SerializeField] private SpriteRenderer itemRenderer;
+    [SerializeField] private SOAudioEvent popSfx;
+    [SerializeField] private SOAudioEvent swapSfx;
+    [SerializeField] private SOAudioEvent spawnSfx;
+    [SerializeField] private OneShotParticle popParticle;
 
     private Color _baseColor;
     private Vector3 _baseScale;
@@ -38,10 +43,23 @@ public class Match3Object : MonoBehaviour
 
     public void SetCurrentTile(Match3Tile match3Tile)
     {
+        bool spawning = !_currentMatch3Tile;
         _currentMatch3Tile = match3Tile;
         
+        
         var endPosition = new Vector3(_currentMatch3Tile.transform.localPosition.x,_currentMatch3Tile.transform.localPosition.y,transform.localPosition.z);
-        Tween.LocalPosition(transform, endPosition, swapDuration);
+        Tween.LocalPosition(transform, endPosition, swapDuration)
+            .OnComplete((() =>
+            {
+                if (spawning)
+                {
+                    spawnSfx.Play(_currentMatch3Tile.AudioSource);
+                }
+                else
+                {
+                    swapSfx.Play(_currentMatch3Tile.AudioSource);
+                }
+            }));
     }
     
     public void SetHeld(bool held)
@@ -54,6 +72,9 @@ public class Match3Object : MonoBehaviour
     {
         _beingDestroyed = true;
         MobileHaptics.Vibrate(50);
+        popSfx.Play(_currentMatch3Tile.AudioSource);
+        var particle = Instantiate(popParticle, transform.position, Quaternion.identity);
+        particle.Play(transform.position);
         Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack);
         Destroy(gameObject, destroyDuration);
     }
