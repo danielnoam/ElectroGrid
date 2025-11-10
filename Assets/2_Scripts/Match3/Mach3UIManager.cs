@@ -7,22 +7,25 @@ using UnityEngine.UI;
 public class Mach3UIManager : MonoBehaviour
 {
 
-    [Header("Settings")]
+    [Header("Top Bar")]
+    [SerializeField] private Transform objectivesUIParent;
+    [SerializeField] private Transform loseConditionsUIParent;
+    [SerializeField] private RectTransform topBar;
+    [SerializeField] private RectTransform levelName;
+    [SerializeField] private TextMeshProUGUI levelNameText;
     [SerializeField] private TweenSettings topbarTweenSettings;
-    [SerializeField] private TweenSettings levelCompleteTweenSettings;
     
+    [Header("Level Complete Window")]
+    [SerializeField] private Transform levelCompleteStatsParent;
+    [SerializeField] private CanvasGroup levelCompleteWindow;
+    [SerializeField] private TextMeshProUGUI levelCompleteTitle;
+    [SerializeField] private Button levelButton;
+    [SerializeField] private Button quitButton;
+    [SerializeField] private TweenSettings levelCompleteTweenSettings;
     
     
     [Header("References")]
     [SerializeField] private Match3GameManager match3Manager;
-    [SerializeField] private RectTransform topBar;
-    [SerializeField] private RectTransform levelName;
-    [SerializeField] private TextMeshProUGUI levelNameText;
-    [SerializeField] private CanvasGroup levelCompleteWindow;
-    [SerializeField] private Button levelButton;
-    [SerializeField] private Button quitButton;
-    [SerializeField] private Transform objectivesUIParent;
-    [SerializeField] private Transform loseConditionsUIParent;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
 
     
@@ -54,13 +57,9 @@ public class Mach3UIManager : MonoBehaviour
     {
         match3Manager.LevelStarted += OnLevelStarted;
         match3Manager.LevelComplete += OnLevelComplete;
+        match3Manager.LevelFailed += OnLevelFailed;
         
-        levelButton.onClick.RemoveAllListeners();
-        levelButton.onClick.AddListener(() =>
-        {
-            match3Manager.SetNextLevel();
-        });
-        
+        quitButton.onClick.RemoveAllListeners();
         quitButton.onClick.AddListener(() =>
         {
             GameManager.Instance?.LoadMainMenuScene();
@@ -73,41 +72,56 @@ public class Mach3UIManager : MonoBehaviour
     {
         match3Manager.LevelStarted -= OnLevelStarted;
         match3Manager.LevelComplete -= OnLevelComplete;
+        match3Manager.LevelFailed -= OnLevelFailed;
     }
 
-    
+
+
+
     private void Update()
     {
         UpdateUIElements();
     }
     
-    private void OnLevelComplete(bool won)
+    private void OnLevelComplete(Match3LevelData levelData)
     {
+        if (levelData == null) return;
+        
+        UpdateLevelButton(true);
+        UpdateLevelCompleteStats(levelData);
+        levelCompleteTitle.text = $"{levelData.Level.LevelName} Complete!";
+        
+        AnimateTopBar(false);
+        AnimateLevelCompleteWindow(true);
+        
+
+    }
+    
+    private void OnLevelFailed(Match3LevelData levelData)
+    {
+        if (levelData == null) return;
+        
+        
+        UpdateLevelButton(false);
+        UpdateLevelCompleteStats(levelData);
+        levelCompleteTitle.text = $"{levelData.Level.LevelName} Failed!";
+        
         AnimateTopBar(false);
         AnimateLevelCompleteWindow(true);
     }
     
-    private void OnLevelStarted(SOMatch3Level level, List<Match3Objective> objectives, List<Match3LoseCondition> loseConditions)
+    private void OnLevelStarted(Match3LevelData levelData)
     {
-        levelNameText.text = level.LevelName;
-        SetupUIElements(objectives, loseConditions);
+        if (levelData == null) return;
+        
+        levelNameText.text = levelData.Level.LevelName;
+        SetupUIElements(levelData.CurrentObjectives, levelData.CurrentLoseConditions);
         AnimateTopBar(true);
         AnimateLevelCompleteWindow(false);
     }
     
 
-    private void UpdateUIElements()
-    {
-        foreach (var objectivePair in _currentObjectives)
-        {
-            objectivePair.Value.UpdateProgress(objectivePair.Key.GetProgressText(!objectivePair.Key.ObjectiveSprite));
-        }
 
-        foreach (var loseConditionPair in _currentLoseConditions)
-        {
-            loseConditionPair.Value.UpdateProgress(loseConditionPair.Key.GetProgressText(!loseConditionPair.Key.ConditionSprite));
-        }
-    }
 
     private void SetupUIElements(List<Match3Objective> objectives, List<Match3LoseCondition> loseConditions)
     {
@@ -129,6 +143,19 @@ public class Mach3UIManager : MonoBehaviour
             uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetProgressText(!loseCondition.ConditionSprite));
             uiElement.gameObject.name = loseCondition.GetConditionName();
             _currentLoseConditions.Add(loseCondition, uiElement);
+        }
+    }
+    
+    private void UpdateUIElements()
+    {
+        foreach (var objectivePair in _currentObjectives)
+        {
+            objectivePair.Value.UpdateProgress(objectivePair.Key.GetProgressText(!objectivePair.Key.ObjectiveSprite));
+        }
+
+        foreach (var loseConditionPair in _currentLoseConditions)
+        {
+            loseConditionPair.Value.UpdateProgress(loseConditionPair.Key.GetProgressText(!loseConditionPair.Key.ConditionSprite));
         }
     }
     
@@ -174,9 +201,8 @@ public class Mach3UIManager : MonoBehaviour
     
     private void AnimateLevelCompleteWindow(bool show)
     {
+        if (_levelCompleteSequence.isAlive) return;
         if (!levelCompleteWindow || !_levelCompleteWindowRectTransform) return;
-        
-        _levelCompleteSequence.Stop();
         
         var startSize = show ? 0: 1;
         var endSize = show ? 1 : 0;
@@ -186,11 +212,65 @@ public class Mach3UIManager : MonoBehaviour
         
         _levelCompleteSequence = Sequence.Create()
             .Group(Tween.ScaleY(_levelCompleteWindowRectTransform, endSize, levelCompleteTweenSettings))
-            .OnComplete(() => {
+            .ChainCallback(() => 
+            { 
                 levelCompleteWindow.alpha = show ? 1f : 0f;
-            levelCompleteWindow.interactable = show;
-            levelCompleteWindow.blocksRaycasts = show; 
-        });
+                levelCompleteWindow.interactable = show;
+                levelCompleteWindow.blocksRaycasts = show; 
+            });
+
+    }
+    
+    private void UpdateLevelCompleteStats(Match3LevelData levelData)
+    {
+        if (!levelCompleteStatsParent) return;
+
+        foreach (Transform child in levelCompleteStatsParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        var matchedMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
+        matchedMadeElement.Setup(null, $"Matches Made: {levelData.MatchesMade}");
+        matchedMadeElement.gameObject.name = "MatchesMade";
+        
+        var movesMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
+        movesMadeElement.Setup(null, $"Moves Made: {levelData.MovesMade}");
+        movesMadeElement.gameObject.name = "MovesMade";
+    }
+
+    private void UpdateLevelButton(bool won)
+    {
+        if (!levelButton) return;
+        
+        levelButton.onClick.RemoveAllListeners();
+        var levelButtonText = levelButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (won)
+        {
+            levelButtonText.text = "Next Level";
+            
+            levelButton.onClick.AddListener(() =>
+            {
+                AnimateLevelCompleteWindow(false);
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.5f, () =>
+                {
+                    match3Manager.SetNextLevel();
+                });
+            });
+        }
+        else
+        {
+            levelButtonText.text = "Try Again";
+            
+            levelButton.onClick.AddListener(() =>
+            {
+                AnimateLevelCompleteWindow(false);
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.5f, () =>
+                {
+                    match3Manager.RestartLevel();
+                });
+            });
+        }
     }
 }
 

@@ -136,13 +136,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2df95fb5df7b47f5a8e13d7c73881b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  gridPosition: {x: 0, y: 0}
-  isActive: 0
   tileRenderer: {fileID: 2548959169750997435}
   selectedTileColor: {r: 0, g: 1, b: 0, a: 1}
   hoverTileColor: {r: 0, g: 1, b: 0, a: 0.5}
-  activeTileColor: {r: 0, g: 1, b: 0, a: 0.19607843}
-  inactiveTileColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.19607843}
+  activeTileColor: {r: 0, g: 1, b: 0, a: 0.5019608}
+  inactiveTileColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.29411766}
+  gridPosition: {x: 0, y: 0}
+  isActive: 0
 --- !u!61 &339119523681392632
 BoxCollider2D:
   m_ObjectHideFlags: 0

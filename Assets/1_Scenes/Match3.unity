@@ -438,7 +438,6 @@ GameObject:
   m_Component:
   - component: {fileID: 219113970}
   - component: {fileID: 219113972}
-  - component: {fileID: 219113971}
   - component: {fileID: 219113973}
   m_Layer: 5
   m_Name: LevelCompleteWindow
@@ -470,20 +469,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -200, y: -800}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &219113971
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 219113969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
-  m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 20, y: 20}
 --- !u!222 &219113972
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -656,7 +641,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -20}
+  m_SizeDelta: {x: -30, y: -30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &441509746
 MonoBehaviour:
@@ -797,11 +782,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 586155248}
-  - component: {fileID: 586155250}
   - component: {fileID: 586155249}
-  - component: {fileID: 586155251}
   - component: {fileID: 586155253}
   - component: {fileID: 586155252}
+  - component: {fileID: 586155251}
+  - component: {fileID: 586155250}
   m_Layer: 0
   m_Name: Match3Manager
   m_TagString: Untagged
@@ -843,7 +828,6 @@ MonoBehaviour:
   mxGuaranteedMatchAttempts: 100
   maxAttemptsToRecheckMatches: 50
   minPossibleMatches: 3
-  populationDuration: 1
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
   selectionIndicator: {fileID: 586155252}
@@ -866,6 +850,7 @@ MonoBehaviour:
   inputManager: {fileID: 1468544195}
   swipeThreshold: 55
   swipeDeadzone: 0.3
+  gyroRotation: {x: 0, y: 0, z: 0}
   mousePosition: {x: 0, y: 0}
   isPressing: 0
   pressStartPosition: {x: 0, y: 0}
@@ -916,6 +901,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 467f28b3276e43b89820b6efc242e22a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Match3PlayHandler
+  populationDuration: 1
+  objectSwapDuration: 0.3
+  delayBetweenMatchPops: 0.03
+  delayBetweenObjectMovement: 0.1
   gameManager: {fileID: 586155249}
   gridHandler: {fileID: 586155251}
   selectionIndicator: {fileID: 586155252}
@@ -1060,7 +1049,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: -150}
-  m_SizeDelta: {x: -600, y: 150}
+  m_SizeDelta: {x: -800, y: 150}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!222 &683716158
 CanvasRenderer:
@@ -1186,6 +1175,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fed17fd03ad9c8408fcf3eee38e6442, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Mach3UIManager
+  objectivesUIParent: {fileID: 1474292870}
+  loseConditionsUIParent: {fileID: 229920321}
+  topBar: {fileID: 1971832039}
+  levelName: {fileID: 683716156}
+  levelNameText: {fileID: 441509746}
   topbarTweenSettings:
     duration: 1
     ease: 27
@@ -1202,6 +1196,11 @@ MonoBehaviour:
     useUnscaledTime: 0
     _useFixedUpdate: 0
     _updateType: 0
+  levelCompleteStatsParent: {fileID: 1145269571}
+  levelCompleteWindow: {fileID: 219113973}
+  levelCompleteTitle: {fileID: 1623427230}
+  levelButton: {fileID: 2128778916}
+  quitButton: {fileID: 1991576429}
   levelCompleteTweenSettings:
     duration: 0.5
     ease: 6
@@ -1219,14 +1218,6 @@ MonoBehaviour:
     _useFixedUpdate: 0
     _updateType: 0
   match3Manager: {fileID: 586155249}
-  topBar: {fileID: 1971832039}
-  levelName: {fileID: 683716156}
-  levelNameText: {fileID: 441509746}
-  levelCompleteWindow: {fileID: 219113973}
-  levelButton: {fileID: 2128778916}
-  quitButton: {fileID: 1991576429}
-  objectivesUIParent: {fileID: 1474292870}
-  loseConditionsUIParent: {fileID: 229920321}
   match3UIElementPrefab: {fileID: 2074164471178117848, guid: f946419640c3cc44aaafb207336f556c, type: 3}
 --- !u!1 &750709011
 GameObject:
@@ -1471,8 +1462,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1480,7 +1471,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.5
 --- !u!222 &980465615
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1647,8 +1638,10 @@ GameObject:
   - component: {fileID: 1145269571}
   - component: {fileID: 1145269573}
   - component: {fileID: 1145269572}
+  - component: {fileID: 1145269575}
+  - component: {fileID: 1145269576}
   m_Layer: 5
-  m_Name: ScoreBoard
+  m_Name: LevelStats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1670,8 +1663,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -200, y: -600}
+  m_AnchoredPosition: {x: 0, y: 49.99994}
+  m_SizeDelta: {x: -200, y: -499.99988}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1145269572
 MonoBehaviour:
@@ -1711,6 +1704,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1145269570}
   m_CullTransparentMesh: 1
+--- !u!114 &1145269575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145269570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
+  m_ShowMaskGraphic: 1
+--- !u!114 &1145269576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1145269570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
+  m_Padding:
+    m_Left: 50
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 3
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 1
+  m_ReverseArrangement: 0
 --- !u!1 &1247257376
 GameObject:
   m_ObjectHideFlags: 0
@@ -1771,8 +1803,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1780,7 +1812,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.5
 --- !u!222 &1247257379
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2101,8 +2133,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -2.5}
-  m_SizeDelta: {x: -10, y: -5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1722580018
 MonoBehaviour:
@@ -2124,8 +2156,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2133,7 +2165,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.5
 --- !u!222 &1722580019
 CanvasRenderer:
   m_ObjectHideFlags: 0

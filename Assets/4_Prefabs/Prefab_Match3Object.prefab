@@ -136,8 +136,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e2efd97c2736424b96878fb30ba6616, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  heldColor: {r: 1, g: 1, b: 1, a: 0.5882353}
+  swapDuration: 0.2
+  destroyDuration: 0.1
+  destroyScaleMultiplier: 1.2
+  heldDuration: 0.2
   heldScaleMultiplier: 0.8
+  heldColor: {r: 1, g: 1, b: 1, a: 0.5882353}
   itemLabel: {fileID: 5563766885536322422}
   itemRenderer: {fileID: 4412200537256300565}
 --- !u!1 &5705993970405892740

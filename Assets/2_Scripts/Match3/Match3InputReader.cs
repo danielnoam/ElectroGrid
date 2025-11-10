@@ -5,6 +5,7 @@ using DNExtensions.Button;
 using DNExtensions.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Gyroscope = UnityEngine.InputSystem.Gyroscope;
 
 
 public class Match3InputReader : InputReaderBase
@@ -15,6 +16,7 @@ public class Match3InputReader : InputReaderBase
     [SerializeField, Range(0,1)] private float swipeDeadzone = 0.3f;
     
     [Separator]
+    [SerializeField, ReadOnly] private Vector3 gyroRotation;
     [SerializeField, ReadOnly] private Vector2 mousePosition;
     [SerializeField, ReadOnly] private bool isPressing;
     [SerializeField, ReadOnly] private Vector2 pressStartPosition;
@@ -25,10 +27,10 @@ public class Match3InputReader : InputReaderBase
     private InputAction _selectAction;
     private InputAction _mousePositionAction;
 
-    
-    
 
-    
+
+
+    public Vector3 GyroRotation => gyroRotation;
     public Vector2 MousePosition => mousePosition;
     public float SwipeDeadzone => swipeDeadzone;
     
@@ -58,6 +60,10 @@ public class Match3InputReader : InputReaderBase
         UnsubscribeFromAction(_mousePositionAction, OnMousePositionAction);
     }
 
+    private void Update()
+    {
+        UpdateGyroRotation();
+    }
 
     private void OnSelectAction(InputAction.CallbackContext callbackContext)
     {
@@ -90,6 +96,12 @@ public class Match3InputReader : InputReaderBase
             }
         }
 
+    }
+
+    private void UpdateGyroRotation()
+    {
+        if (!IsCurrentDeviceTouchscreen || !IsCurrentDeviceMobile) return;
+        gyroRotation = Gyroscope.current.angularVelocity.value;
     }
     
     

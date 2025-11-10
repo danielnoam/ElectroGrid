@@ -1,18 +1,19 @@
 using System;
+using DNExtensions;
 using UnityEngine;
 
 public class Match3Tile : MonoBehaviour
 {
-    [Header("Tile Properties")]
-    [SerializeField] private Vector2Int gridPosition;
-    [SerializeField] private bool isActive;
-    
     [Header("References")]
     [SerializeField] private SpriteRenderer tileRenderer;
     [SerializeField] private Color selectedTileColor = new Color(0f, 1f, 0f, 1f);
     [SerializeField] private Color hoverTileColor = new Color(0f, 1f, 0f, 0.5f);
     [SerializeField] private Color activeTileColor = new Color(0f, 1f, 0f, 0.1f);
     [SerializeField] private Color inactiveTileColor = new Color(0.1f, 0.1f, 0.1f, 0.1f);
+    
+    [Separator]
+    [SerializeField, ReadOnly] private Vector2Int gridPosition;
+    [SerializeField, ReadOnly] private bool isActive;
     
     private Match3Object _currentMatch3Object;
     private bool _isSelected;

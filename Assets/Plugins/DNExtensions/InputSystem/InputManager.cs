@@ -26,9 +26,11 @@ namespace DNExtensions.InputSystem
         [Separator]
         [SerializeField, ReadOnly] private bool isCurrentDeviceGamepad;
         [SerializeField, ReadOnly] private bool isCurrentDeviceTouchscreen;
+        [SerializeField, ReadOnly] private bool isCurrentDeviceMobile;
 
         public bool IsCurrentDeviceGamepad => isCurrentDeviceGamepad;
         public bool IsCurrentDeviceTouchscreen => isCurrentDeviceTouchscreen;
+        public bool IsCurrentDeviceMobile => isCurrentDeviceMobile;
         
 
         public PlayerInput PlayerInput => playerInput;
@@ -68,6 +70,7 @@ namespace DNExtensions.InputSystem
             
 
             SetCursorVisibility(!hideCursor);
+            isCurrentDeviceMobile = Application.isMobilePlatform;
         }
 
         private void OnEnable()

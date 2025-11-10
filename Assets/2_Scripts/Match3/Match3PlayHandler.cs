@@ -7,6 +7,13 @@ using UnityEngine.InputSystem;
 
 public class Match3PlayHandler : MonoBehaviour
 {
+    [Tooltip("Duration taken to populate grid")]
+    [SerializeField, Min(0)] private float populationDuration = 1f;
+    [SerializeField, Min(0)] private float objectSwapDuration = 0.3f;
+    [SerializeField, Min(0)] private float delayBetweenMatchPops = 0.075f;
+    [SerializeField, Min(0)] private float delayBetweenObjectMovement = 0.1f;
+    
+    
     [Header("References")]
     [SerializeField] private Match3GameManager gameManager;
     [SerializeField] private Match3GridHandler gridHandler;
@@ -18,11 +25,6 @@ public class Match3PlayHandler : MonoBehaviour
     [SerializeField, ReadOnly] private Match3Tile selectedMatch3Tile;
     [SerializeField, ReadOnly] private Match3Object heldMatch3Object;
     private Camera _camera;
-    
-
-    private const float ObjectSwapDuration = 0.3f;
-    private const float DelayBetweenMatchPops = 0.075f;
-    private const float DelayBetweenObjectMovement = 0.1f;
 
 
     public bool CanInteract
@@ -177,7 +179,7 @@ public class Match3PlayHandler : MonoBehaviour
         itemB.SetCurrentTile(tileA);
 
         ReleaseObject(false);
-        yield return new WaitForSeconds(ObjectSwapDuration);
+        yield return new WaitForSeconds(objectSwapDuration);
     }
 
     private bool IsPositionsTouching(Vector2Int positionA, Vector2Int positionB)
@@ -476,7 +478,7 @@ public class Match3PlayHandler : MonoBehaviour
             {
                 match.CurrentMatch3Object.MatchFound();
                 match.SetCurrentItem(null);
-                yield return new WaitForSeconds(DelayBetweenMatchPops);
+                yield return new WaitForSeconds(delayBetweenMatchPops);
             }
         }
     }
@@ -551,7 +553,7 @@ public class Match3PlayHandler : MonoBehaviour
             // Only wait if objects actually moved
             if (objectsMoved)
             {
-                yield return new WaitForSeconds(DelayBetweenObjectMovement);
+                yield return new WaitForSeconds(delayBetweenObjectMovement);
             }
             
         } while (objectsMoved);
@@ -563,9 +565,7 @@ public class Match3PlayHandler : MonoBehaviour
     
     #region Population
 
-    /// <summary>
-    /// Generates tile-to-item assignments without spawning objects
-    /// </summary>
+
     public Dictionary<Match3Tile, SOItemData> GenerateGridLayout(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches)
     {
         if (!level)
@@ -640,10 +640,7 @@ public class Match3PlayHandler : MonoBehaviour
         return tilesToPopulate;
     }
 
-    /// <summary>
-    /// Validates a generated grid layout by temporarily spawning objects, checking validity, then destroying them
-    /// </summary>
-    /// <param name="checkImmediateMatches">If true, fails validation if immediate matches exist. Set to false during repopulation.</param>
+
     public (bool isValid, int immediateMatches, int possibleMatches) ValidateGridLayout(
         Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape, int minPossibleMatches, bool checkImmediateMatches = true)
     {
@@ -713,7 +710,7 @@ public class Match3PlayHandler : MonoBehaviour
                 }
             
                 // Wait before spawning the next row
-                yield return new WaitForSeconds(gameManager.PopulationDuration / totalRows);
+                yield return new WaitForSeconds(populationDuration / totalRows);
             }
         }
         else
@@ -721,7 +718,7 @@ public class Match3PlayHandler : MonoBehaviour
             foreach (var tileObjectMatch in layout)
             {
                 gridHandler.CreateMatchObject(tileObjectMatch.Value, tileObjectMatch.Key);
-                yield return new WaitForSeconds(gameManager.PopulationDuration / totalActiveTiles);
+                yield return new WaitForSeconds(populationDuration / totalActiveTiles);
             }
         }
     }

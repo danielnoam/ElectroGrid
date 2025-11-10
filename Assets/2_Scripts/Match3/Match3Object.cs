@@ -6,8 +6,12 @@ public class Match3Object : MonoBehaviour
 {
     
     [Header("Settings")]
-    [SerializeField] private Color heldColor;
+    [SerializeField] private float swapDuration = 0.2f;
+    [SerializeField] private float destroyDuration = 0.2f;
+    [SerializeField] private float destroyScaleMultiplier = 1.2f;
+    [SerializeField] private float heldDuration = 0.2f;
     [SerializeField] private float heldScaleMultiplier = 0.8f;
+    [SerializeField] private Color heldColor;
     
     [Header("References")]
     [SerializeField] private TextMeshPro itemLabel;
@@ -37,7 +41,7 @@ public class Match3Object : MonoBehaviour
         _currentMatch3Tile = match3Tile;
         
         var endPosition = new Vector3(_currentMatch3Tile.transform.position.x,_currentMatch3Tile.transform.position.y,transform.position.z);
-        Tween.LocalPosition(transform, endPosition, 0.2f);
+        Tween.LocalPosition(transform, endPosition, swapDuration);
     }
     
     public void SetHeld(bool held)
@@ -49,9 +53,9 @@ public class Match3Object : MonoBehaviour
     public void MatchFound()
     {
         _beingDestroyed = true;
-        GameManager.Instance?.AddPopcorn();
-        Tween.Scale(transform, _baseScale * 1.2f, 0.1f, Ease.OutBack);
-        Destroy(gameObject, 0.1f);
+        MobileHaptics.Vibrate(50);
+        Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack);
+        Destroy(gameObject, destroyDuration);
     }
     
     
@@ -65,6 +69,6 @@ public class Match3Object : MonoBehaviour
         gameObject.name = _itemData ? $"Item ({_itemData.Label})" : "Item (Empty)";
         
         var endScale = _held ? _baseScale * heldScaleMultiplier : _baseScale;
-        if (transform.localScale != endScale) Tween.Scale(transform, endScale, 0.2f, Ease.OutBack);
+        if (transform.localScale != endScale) Tween.Scale(transform, endScale, heldDuration, Ease.OutBack);
     }
 }

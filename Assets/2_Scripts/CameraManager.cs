@@ -65,16 +65,17 @@ public class CameraManager : MonoBehaviour
 
 
 
-    private void OnLevelStarted(SOMatch3Level level, List<Match3Objective> arg2, List<Match3LoseCondition> arg3)
+    private void OnLevelStarted(Match3LevelData level)
     {
-        if (!level) return;
-        var gridSize = new Vector2Int(level.GridShape.Grid.Width, level.GridShape.Grid.Height);
-        UpdateGridSize(gridSize);
+        if (level == null) return;
+        var gridShape = level.Level.GridShape;
+        var size = new Vector2Int(gridShape.Grid.Width, gridShape.Grid.Height);
+        UpdateGridSize(size);
     }
 
-    private void UpdateGridSize(Vector2Int gridSize)
+    private void UpdateGridSize(Vector2Int size)
     {
-        this.gridSize = gridSize;
+        gridSize = size;
         FitCameraToGrid();
     }
 

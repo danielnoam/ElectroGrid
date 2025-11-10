@@ -16,6 +16,7 @@ namespace DNExtensions.InputSystem
     
         public bool IsCurrentDeviceGamepad => inputManager?.IsCurrentDeviceGamepad ?? false;
         public bool IsCurrentDeviceTouchscreen => inputManager?.IsCurrentDeviceTouchscreen ?? false;
+        public bool IsCurrentDeviceMobile => inputManager?.IsCurrentDeviceMobile ?? false;
         
         protected PlayerInput PlayerInput => inputManager?.PlayerInput;
         
