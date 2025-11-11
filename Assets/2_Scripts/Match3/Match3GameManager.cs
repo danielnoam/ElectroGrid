@@ -216,7 +216,7 @@ public class Match3GameManager : MonoBehaviour
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
     
         // Make objects fall
-        yield return StartCoroutine(playHandler.MoveObjects(GridShape));
+        yield return StartCoroutine(playHandler.MoveObjectsDown(GridShape));
     
         // Repopulate and handle cascades
         yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, GridShape, minPossibleMatches, true));
@@ -271,10 +271,9 @@ public class Match3GameManager : MonoBehaviour
     private IEnumerator InitialGridSetup()
     {
         populatingGrid = true;
-        int maxRetries = 10;
         int retryCount = 0;
     
-        while (retryCount < maxRetries)
+        while (retryCount < maxAttemptsToRecheckMatches)
         {
             retryCount++;
         
@@ -294,11 +293,11 @@ public class Match3GameManager : MonoBehaviour
             {
                 if (validationResult.immediateMatches > 0)
                 {
-                    Debug.Log($"Too many immediate matches found in grid ({validationResult.immediateMatches}), retrying (attempt {retryCount}/{maxRetries})");
+                    Debug.Log($"Too many immediate matches found in grid ({validationResult.immediateMatches}), retrying (attempt {retryCount}/{maxAttemptsToRecheckMatches})");
                 }
                 else if (validationResult.possibleMatches < minPossibleMatches)
                 {
-                    Debug.Log($"Not enough possible matches ({validationResult.possibleMatches}/{minPossibleMatches}), retrying (attempt {retryCount}/{maxRetries})");
+                    Debug.Log($"Not enough possible matches ({validationResult.possibleMatches}/{minPossibleMatches}), retrying (attempt {retryCount}/{maxAttemptsToRecheckMatches})");
                 }
                 continue; 
             }
@@ -310,7 +309,7 @@ public class Match3GameManager : MonoBehaviour
             yield break;
         }
     
-        Debug.LogError($"Failed to create valid grid after {maxRetries} attempts");
+        Debug.LogError($"Failed to create valid grid after {maxAttemptsToRecheckMatches} attempts");
     }
 
     #endregion

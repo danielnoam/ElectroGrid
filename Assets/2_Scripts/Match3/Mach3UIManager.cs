@@ -39,7 +39,9 @@ public class Mach3UIManager : MonoBehaviour
     private RectTransform _levelCompleteWindowRectTransform;
     private float _levelNameDefaultPositionY;
     private float _bottomBarDefaultYPosition;
+    private Vector2 _levelNameDefaultSize;
     private Vector2 _topBarDefaultSize;
+    private Vector2 _levelCompleteWindowDefaultSize;
     private Sequence _topBarSequence;
     private Sequence _bottomBarSequence;
     private Sequence _levelCompleteSequence;
@@ -48,6 +50,8 @@ public class Mach3UIManager : MonoBehaviour
     private void Awake()
     {
         _levelCompleteWindowRectTransform = levelCompleteWindow.GetComponent<RectTransform>();
+        _levelCompleteWindowDefaultSize = _levelCompleteWindowRectTransform.sizeDelta;
+        _levelCompleteWindowRectTransform.sizeDelta = new Vector2(_levelCompleteWindowDefaultSize.x, 0);
         levelCompleteWindow.alpha = 0f;
         levelCompleteWindow.interactable = false;
         levelCompleteWindow.blocksRaycasts = false; 
@@ -59,6 +63,8 @@ public class Mach3UIManager : MonoBehaviour
         bottomBar.anchoredPosition = new Vector2(bottomBar.anchoredPosition.x, -bottomBar.sizeDelta.y);
         
         _levelNameDefaultPositionY = levelName.anchoredPosition.y;
+        _levelNameDefaultSize = levelName.sizeDelta;
+        levelName.sizeDelta = Vector2.zero;
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x,0f);
     }
 
@@ -201,19 +207,13 @@ public class Mach3UIManager : MonoBehaviour
         
         var barEndSize = show ? _topBarDefaultSize : new Vector2(_topBarDefaultSize.x, 0f);
         var nameEndPosition = show ? _levelNameDefaultPositionY : 0f;
+        var nameEndSize = show ? _levelNameDefaultSize : Vector2.zero;
         
-        _topBarSequence = Sequence.Create();
+        _topBarSequence = Sequence.Create()
+            .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))
+            .Group(Tween.UISizeDelta(levelName, nameEndSize, startDelay: topbarTweenSettings.duration/2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
+            .Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration/2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
 
-        if (show)
-        {
-            _topBarSequence.Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings));
-            _topBarSequence.Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration/2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
-        }
-        else
-        {
-            _topBarSequence.Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, topbarTweenSettings));
-            _topBarSequence.Group(Tween.UISizeDelta(topBar, barEndSize, startDelay: topbarTweenSettings.duration/2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
-        }
     }
     
     private void AnimateBottomBar(bool show)
@@ -232,14 +232,15 @@ public class Mach3UIManager : MonoBehaviour
         if (_levelCompleteSequence.isAlive) return;
         if (!levelCompleteWindow || !_levelCompleteWindowRectTransform) return;
         
-        var startSize = show ? 0: 1;
-        var endSize = show ? 1 : 0;
+
+        var startSize = show ? new Vector2(_levelCompleteWindowRectTransform.sizeDelta.x, 0f) : _levelCompleteWindowDefaultSize;
+        var endSize = show ? _levelCompleteWindowDefaultSize : new Vector2(_levelCompleteWindowRectTransform.sizeDelta.x, 0f);
         
         if (show) levelCompleteWindow.alpha =  1f;
-        _levelCompleteWindowRectTransform.localScale = new Vector3(_levelCompleteWindowRectTransform.localScale.x, startSize);
+        _levelCompleteWindowRectTransform.sizeDelta = startSize;
         
         _levelCompleteSequence = Sequence.Create()
-            .Group(Tween.ScaleY(_levelCompleteWindowRectTransform, endSize, levelCompleteTweenSettings))
+            .Group(Tween.UISizeDelta(_levelCompleteWindowRectTransform, endSize, levelCompleteTweenSettings))
             .ChainCallback(() => 
             { 
                 levelCompleteWindow.alpha = show ? 1f : 0f;

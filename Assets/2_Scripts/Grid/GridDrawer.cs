@@ -47,7 +47,8 @@ public class GridDrawer : PropertyDrawer
                            cellSpacingHeight + Spacing + 
                            EditorGUIUtility.singleLineHeight + Spacing + 
                            gridHeight + Spacing + 
-                           ButtonHeight; 
+                           ButtonHeight + Spacing +
+                           ButtonHeight;  
 
         return totalHeight;
     }
@@ -130,9 +131,22 @@ public class GridDrawer : PropertyDrawer
         }
 
         buttonRect.x += currentRect.width / 3 + 5;
-        if (GUI.Button(buttonRect, "Invert"))
+        if (GUI.Button(buttonRect, "Invert Cells"))
         {
             InvertGrid(cellsProp);
+        }
+        
+        buttonRect.x = currentRect.x;
+        buttonRect.y += ButtonHeight + Spacing;
+        if (GUI.Button(buttonRect, "Flip Vertically"))
+        {
+            FlipGridVertically(cellsProp, width, height);
+        }
+        
+        buttonRect.x += currentRect.width / 3 + 5;
+        if (GUI.Button(buttonRect, "Flip Horizontally"))
+        {
+            FlipGridHorizontally(cellsProp, width, height);
         }
 
         EditorGUI.EndProperty();
@@ -147,7 +161,8 @@ public class GridDrawer : PropertyDrawer
         if (e.type == EventType.MouseDown && gridRect.Contains(e.mousePosition))
         {
             int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
-            int y = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
+            int visualY = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
+            int y = height - 1 - visualY; // Flip Y: top of editor = bottom of grid
 
             if (x >= 0 && x < width && y >= 0 && y < height)
             {
@@ -163,7 +178,8 @@ public class GridDrawer : PropertyDrawer
         else if (e.type == EventType.MouseDrag && _isDragging && gridRect.Contains(e.mousePosition))
         {
             int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
-            int y = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
+            int visualY = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
+            int y = height - 1 - visualY; // Flip Y
 
             if (x >= 0 && x < width && y >= 0 && y < height)
             {
@@ -179,7 +195,7 @@ public class GridDrawer : PropertyDrawer
             _isDragging = false;
         }
 
-        // Draw cells
+        // Draw cells - flip Y when drawing
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -189,9 +205,10 @@ public class GridDrawer : PropertyDrawer
 
                 bool isActive = cellsProp.GetArrayElementAtIndex(index).boolValue;
 
+                int visualY = height - 1 - y;
                 Rect cellRect = new Rect(
                     gridRect.x + x * CellSize,
-                    gridRect.y + y * CellSize,
+                    gridRect.y + visualY * CellSize,
                     CellSize - CellBorder,
                     CellSize - CellBorder
                 );
@@ -205,8 +222,7 @@ public class GridDrawer : PropertyDrawer
                 }
             }
         }
-
-        // Draw grid lines
+        
         Handles.color = GridLineColor;
         for (int x = 0; x <= width; x++)
         {
@@ -219,7 +235,6 @@ public class GridDrawer : PropertyDrawer
             Handles.DrawLine(new Vector3(gridRect.x, yPos), new Vector3(gridRect.x + gridRect.width, yPos));
         }
 
-        // Request repaint if mouse is over the grid to show hover effect
         if (gridRect.Contains(Event.current.mousePosition))
         {
             HandleUtility.Repaint();
@@ -289,6 +304,58 @@ public class GridDrawer : PropertyDrawer
             SerializedProperty element = cellsProp.GetArrayElementAtIndex(i);
             element.boolValue = !element.boolValue;
         }
+        cellsProp.serializedObject.ApplyModifiedProperties();
+        GUI.changed = true;
+    }
+    
+    private void FlipGridVertically(SerializedProperty cellsProp, int width, int height)
+    {
+        bool[] newCells = new bool[width * height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int oldIndex = y * width + x;
+                int newIndex = (height - 1 - y) * width + x;
+                if (oldIndex < cellsProp.arraySize)
+                {
+                    newCells[newIndex] = cellsProp.GetArrayElementAtIndex(oldIndex).boolValue;
+                }
+            }
+        }
+
+        for (int i = 0; i < newCells.Length; i++)
+        {
+            cellsProp.GetArrayElementAtIndex(i).boolValue = newCells[i];
+        }
+
+        cellsProp.serializedObject.ApplyModifiedProperties();
+        GUI.changed = true;
+    }
+    
+    private void FlipGridHorizontally(SerializedProperty cellsProp, int width, int height)
+    {
+        bool[] newCells = new bool[width * height];
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                int oldIndex = y * width + x;
+                int newIndex = y * width + (width - 1 - x);
+                if (oldIndex < cellsProp.arraySize)
+                {
+                    newCells[newIndex] = cellsProp.GetArrayElementAtIndex(oldIndex).boolValue;
+                }
+            }
+        }
+
+        for (int i = 0; i < newCells.Length; i++)
+        {
+            cellsProp.GetArrayElementAtIndex(i).boolValue = newCells[i];
+        }
+
         cellsProp.serializedObject.ApplyModifiedProperties();
         GUI.changed = true;
     }

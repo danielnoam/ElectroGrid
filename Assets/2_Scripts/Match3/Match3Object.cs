@@ -1,3 +1,4 @@
+using System;
 using DNExtensions;
 using PrimeTween;
 using TMPro;
@@ -28,9 +29,15 @@ public class Match3Object : MonoBehaviour
     private SOItemData _itemData;
     private bool _held;
     private bool _beingDestroyed;
+    private Sequence _movementSequence;
     
     public SOItemData ItemData => _itemData;
-    
+
+
+    private void OnDestroy()
+    {
+        _movementSequence.Stop();
+    }
 
     public void Initialize(SOItemData data)
     {
@@ -46,9 +53,11 @@ public class Match3Object : MonoBehaviour
         bool spawning = !_currentMatch3Tile;
         _currentMatch3Tile = match3Tile;
         
+        _movementSequence.Stop();
         
-        var endPosition = new Vector3(_currentMatch3Tile.transform.localPosition.x,_currentMatch3Tile.transform.localPosition.y,transform.localPosition.z);
-        Sequence.Create()
+        var endPosition = new Vector3(_currentMatch3Tile.transform.localPosition.x, _currentMatch3Tile.transform.localPosition.y, transform.localPosition.z);
+        
+        _movementSequence = Sequence.Create()
             .Group(Tween.LocalPosition(transform, endPosition, swapDuration)
             .OnComplete(() =>
             {

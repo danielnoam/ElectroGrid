@@ -50,20 +50,14 @@ public class Match3GridHandler : MonoBehaviour
     public Match3Object CreateMatchObject(SOItemData itemData, Match3Tile match3Tile)
     {
         if (!IsValidTile(match3Tile)) return null;
-
-        var topPositionInGrid = new Vector2Int(match3Tile.GridPosition.x, Grid.Height - 1);
-        var topMostTile = GetTile(topPositionInGrid);
-
-        var spawnPosition = new Vector3(match3Tile.transform.localPosition.x,
-            topMostTile.transform.localPosition.y + topMostTile.transform.localScale.y,
-            match3Tile.transform.localPosition.z);
-    
+        
+        var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
         var item = Instantiate(match3ObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
-    
+        
         item.Initialize(itemData);
         match3Tile.SetCurrentItem(item);
         item.SetCurrentTile(match3Tile);
-    
+
         return item;
     }
     
@@ -161,23 +155,6 @@ public class Match3GridHandler : MonoBehaviour
     {
         return _tiles.Values.Count(tile => tile.IsActive);
     }
-
-    public Vector2Int GetGridDimensions()
-    {
-        if (_tiles.Count == 0) return Vector2Int.zero;
-
-        int maxX = 0, maxY = 0;
-        foreach (var pos in _tiles.Keys)
-        {
-            if (pos.x > maxX) maxX = pos.x;
-            if (pos.y > maxY) maxY = pos.y;
-        }
-
-        return new Vector2Int(maxX, maxY);
-    }
-
-
-    
     
     private void OnDrawGizmos()
     {

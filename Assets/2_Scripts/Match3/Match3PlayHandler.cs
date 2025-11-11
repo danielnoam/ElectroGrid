@@ -83,7 +83,7 @@ public class Match3PlayHandler : MonoBehaviour
                 ReleaseObject(true);
                 return;
             }
-            gridDirection = direction.y > 0 ? Vector2Int.down : Vector2Int.up;
+            gridDirection = direction.y > 0 ? Vector2Int.up : Vector2Int.down;
         }
 
         var newTilePos = selectedMatch3Tile.GridPosition + gridDirection;
@@ -501,7 +501,7 @@ public class Match3PlayHandler : MonoBehaviour
             gameManager.NotifyMatchesWhereMade(immediateMatches);
             
             yield return HandleMatches(immediateMatches);
-            yield return MoveObjects(gridShape);
+            yield return MoveObjectsDown(gridShape);
             yield return PopulateGrid(level, gridShape, minPossibleMatches, true);
         }
     }
@@ -511,7 +511,7 @@ public class Match3PlayHandler : MonoBehaviour
     
     #region Movement
 
-    public IEnumerator MoveObjects(SOGridShape gridShape)
+    public IEnumerator MoveObjectsDown(SOGridShape gridShape)
     {
         bool objectsMoved;
         
@@ -521,16 +521,16 @@ public class Match3PlayHandler : MonoBehaviour
             List<(Match3Object obj, Match3Tile fromTile, Match3Tile toTile)> movesThisWave = new List<(Match3Object, Match3Tile, Match3Tile)>();
             HashSet<Match3Tile> tilesAlreadyMoving = new HashSet<Match3Tile>();
             
-            // Scan from bottom to top to find all moves that can happen in this iteration
-            for (var y = gridShape.Grid.Height - 1; y >= 0; y--)
+            // Scan from top to bottom (high Y to low Y)
+            for (var y = 0; y < gridShape.Grid.Height; y++)
             {
                 for (var x = 0; x < gridShape.Grid.Width; x++)
                 {
                     var tile = gridHandler.GetTile(new Vector2Int(x, y));
                     if (!tile.HasObject && tile.IsActive)
                     {
-                        // Find the nearest object above this empty tile
-                        for (var i = y - 1; i >= 0; i--)
+                        // Find the nearest object ABOVE this empty tile (higher Y values)
+                        for (var i = y + 1; i < gridShape.Grid.Height; i++)  // Look upward (increasing Y)
                         {
                             var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
                             if (aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile))
@@ -584,17 +584,16 @@ public class Match3PlayHandler : MonoBehaviour
             return null;
         }
 
-        Vector2Int dimensions = gridHandler.GetGridDimensions();
-        int maxX = dimensions.x;
-        int maxY = dimensions.y;
+        int maxX = gridHandler.Grid.Width - 1;
+        int maxY = gridHandler.Grid.Height - 1;
         
         var tilesToPopulate = new Dictionary<Match3Tile, SOItemData>();
-        for (int y = maxY; y >= 0; y--)
+        for (int y = 0; y <= maxY; y++)
         {
             for (int x = 0; x <= maxX; x++)
             {
                 var tile = gridHandler.GetTile(new Vector2Int(x, y));
-                if (tile != null && !tile.HasObject)
+                if (tile && !tile.HasObject)
                 {
                     tilesToPopulate.Add(tile, null);
                 }
@@ -606,15 +605,14 @@ public class Match3PlayHandler : MonoBehaviour
             return tilesToPopulate;
         }
         
-        List<(Vector2Int posA, Vector2Int posB)> guaranteedMatchPairs = 
-            CreateGuaranteedMatchPositions(minPossibleMatches);
+        List<(Vector2Int posA, Vector2Int posB)> guaranteedMatchPairs = CreateGuaranteedMatchPositions(minPossibleMatches);
         
         foreach (var tileItemPair in tilesToPopulate.ToList())
         {
             SOItemData forcedItem = GetForcedItemForGuaranteedMatch(
                 tileItemPair.Key.GridPosition, guaranteedMatchPairs, tilesToPopulate, level);
             
-            if (forcedItem != null)
+            if (forcedItem)
             {
                 tilesToPopulate[tileItemPair.Key] = forcedItem;
             }
@@ -647,37 +645,19 @@ public class Match3PlayHandler : MonoBehaviour
     public (bool isValid, int immediateMatches, int possibleMatches) ValidateGridLayout(
         Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape, int minPossibleMatches, bool checkImmediateMatches = true)
     {
-        // Temporarily spawn objects to validate
-        foreach (var pair in layout)
-        {
-            gridHandler.CreateMatchObject(pair.Value, pair.Key);
-        }
-
         // Check for immediate matches (only if we care about them)
         int immediateMatchCount = 0;
         if (checkImmediateMatches)
         {
-            var immediateMatchesInGrid = FindImmediateMatches(gridShape);
-            immediateMatchCount = immediateMatchesInGrid.Count;
+            immediateMatchCount = FindImmediateMatchesInLayout(layout, gridShape);
         }
 
         // Check for possible matches
-        var possibleMatchesInGrid = FindPossibleMatches(gridShape);
-        int possibleMatchCount = possibleMatchesInGrid.Count;
-
-        // Destroy all spawned objects
-        foreach (var pair in layout)
-        {
-            if (pair.Key.HasObject)
-            {
-                Destroy(pair.Key.CurrentMatch3Object.gameObject);
-                pair.Key.SetCurrentItem(null);
-            }
-        }
+        int possibleMatchCount = FindPossibleMatchesInLayout(layout, gridShape);
 
         // Validate
         bool isValid = (!checkImmediateMatches || immediateMatchCount == 0) && possibleMatchCount >= minPossibleMatches;
-        
+    
         return (isValid, immediateMatchCount, possibleMatchCount);
     }
 
@@ -700,7 +680,7 @@ public class Match3PlayHandler : MonoBehaviour
             // Group tiles by row (y position)
             var tilesByRow = layout
                 .GroupBy(kvp => kvp.Key.GridPosition.y)
-                .OrderByDescending(g => g.Key); // Start from top row (highest y) going down
+                .OrderBy(g => g.Key); // Start from bottom row (Y=0) going up to top
         
             int totalRows = tilesByRow.Count();
         
@@ -821,6 +801,146 @@ public class Match3PlayHandler : MonoBehaviour
         return null;
     }
     
+    private int FindImmediateMatchesInLayout(Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape)
+    {
+        HashSet<Match3Tile> matches = new HashSet<Match3Tile>();
+
+        // Find horizontal matches
+        for (var y = 0; y < gridShape.Grid.Height; y++)
+        {
+            for (var x = 0; x < gridShape.Grid.Width - 2; x++)
+            {
+                var tile1 = gridHandler.GetTile(new Vector2Int(x, y));
+                var tile2 = gridHandler.GetTile(new Vector2Int(x + 1, y));
+                var tile3 = gridHandler.GetTile(new Vector2Int(x + 2, y));
+
+                if (!tile1 || !tile2 || !tile3) continue;
+                if (!layout.TryGetValue(tile1, out var item1)) continue;
+                if (!layout.TryGetValue(tile2, out var item2)) continue;
+                if (!layout.TryGetValue(tile3, out var item3)) continue;
+
+                if (item1 == item2 && item2 == item3)
+                {
+                    matches.Add(tile1);
+                    matches.Add(tile2);
+                    matches.Add(tile3);
+                }
+            }
+        }
+
+        // Find vertical matches
+        for (var x = 0; x < gridShape.Grid.Width; x++)
+        {
+            for (var y = 0; y < gridShape.Grid.Height - 2; y++)
+            {
+                var tile1 = gridHandler.GetTile(new Vector2Int(x, y));
+                var tile2 = gridHandler.GetTile(new Vector2Int(x, y + 1));
+                var tile3 = gridHandler.GetTile(new Vector2Int(x, y + 2));
+                
+                if (!tile1 || !tile2 || !tile3) continue;
+                if (!layout.TryGetValue(tile1, out var item1)) continue;
+                if (!layout.TryGetValue(tile2, out var item2)) continue;
+                if (!layout.TryGetValue(tile3, out var item3)) continue;
+                
+                if (item1 == item2 && item2 == item3)
+                {
+                    matches.Add(tile1);
+                    matches.Add(tile2);
+                    matches.Add(tile3);
+                }
+            }
+        }
+        
+        return matches.Count;
+    }
+
+    private int FindPossibleMatchesInLayout(Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape)
+    {
+        HashSet<Match3Tile> possibleMatchTiles = new HashSet<Match3Tile>();
+        HashSet<(Vector2Int, Vector2Int)> checkedPairs = new HashSet<(Vector2Int, Vector2Int)>();
+
+        foreach (var tileItemPair in layout)
+        {
+            var tile = tileItemPair.Key;
+            if (!gridHandler.IsValidTile(tile)) continue;
+
+            Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+            foreach (var direction in directions)
+            {
+                var neighborPos = tile.GridPosition + direction;
+                var neighborTile = gridHandler.GetTile(neighborPos);
+        
+                if (!gridHandler.IsValidTile(neighborTile)) continue;
+                if (!layout.ContainsKey(neighborTile)) continue;
+        
+                var pair = tile.GridPosition.x < neighborPos.x || (tile.GridPosition.x == neighborPos.x && tile.GridPosition.y < neighborPos.y)
+                    ? (tile.GridPosition, neighborPos)
+                    : (neighborPos, tile.GridPosition);
+            
+                if (!checkedPairs.Add(pair)) continue;
+
+                var currentItemData = layout[tile];
+                var neighborItemData = layout[neighborTile];
+        
+                if (WouldCreateMatchInLayout(neighborPos, currentItemData, layout, gridShape) || 
+                    WouldCreateMatchInLayout(tile.GridPosition, neighborItemData, layout, gridShape))
+                {
+                    possibleMatchTiles.Add(tile);
+                    possibleMatchTiles.Add(neighborTile);
+                }
+            }
+        }
+
+        return possibleMatchTiles.Count;
+    }
+
+    private bool WouldCreateMatchInLayout(Vector2Int position, SOItemData itemData, 
+        Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape)
+    {
+        // Check horizontal
+        int horizontalCount = 1;
+        for (int x = position.x - 1; x >= 0; x--)
+        {
+            var checkTile = gridHandler.GetTile(new Vector2Int(x, position.y));
+            if (!gridHandler.IsValidTile(checkTile)) break;
+            if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
+            if (checkItemData != itemData) break;
+            horizontalCount++;
+        }
+        for (int x = position.x + 1; x < gridShape.Grid.Width; x++)
+        {
+            var checkTile = gridHandler.GetTile(new Vector2Int(x, position.y));
+            if (!gridHandler.IsValidTile(checkTile)) break;
+            if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
+            if (checkItemData != itemData) break;
+            horizontalCount++;
+        }
+        
+        if (horizontalCount >= gameManager.MinMatchCount) return true;
+        
+        // Check vertical
+        int verticalCount = 1;
+        for (int y = position.y - 1; y >= 0; y--)
+        {
+            var checkTile = gridHandler.GetTile(new Vector2Int(position.x, y));
+            if (!gridHandler.IsValidTile(checkTile)) break;
+            if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
+            if (checkItemData != itemData) break;
+            verticalCount++;
+        }
+        for (int y = position.y + 1; y < gridShape.Grid.Height; y++)
+        {
+            var checkTile = gridHandler.GetTile(new Vector2Int(position.x, y));
+            if (!gridHandler.IsValidTile(checkTile)) break;
+            if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
+            if (checkItemData != itemData) break;
+            verticalCount++;
+        }
+        
+        return verticalCount >= gameManager.MinMatchCount;
+    }
+        
     
     #endregion
 }

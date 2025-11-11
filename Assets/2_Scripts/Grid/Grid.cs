@@ -7,20 +7,16 @@ using UnityEditor;
 [System.Serializable]
 public class Grid
 {
-    [SerializeField] private Vector2Int size;
-    [SerializeField] private Vector3 origin;
-    [SerializeField] private Vector3 cellSize;
-    [SerializeField] private Vector3 cellSpacing;
-    [SerializeField] private bool[] cells;
+    public Vector2Int size;
+    public Vector3 origin;
+    public Vector3 cellSize;
+    public Vector3 cellSpacing;
+    public bool[] cells;
 
     private GridCoordinateConverter _coordinateConverter;
-
-    public bool[] Cells => cells;
+    
     public int Width => size.x;
     public int Height => size.y;
-    public Vector3 CellSize => cellSize;
-    public Vector3 CellSpacing => cellSpacing;
-    public Vector3 Origin => origin;
     public int TotalCellCount => Width * Height;
     public int ActiveCellCount
     {
@@ -181,9 +177,13 @@ public class Grid
     
     public Vector3 GetCellWorldPosition(int x, int y)
     {
-        if (x < 0 || x >= Width || y < 0 || y >= Height) return Vector3.zero;
-
-        return _coordinateConverter.GridToWorldCenter(new Vector2Int(x, y), size, cellSize, cellSpacing, origin);
+        return _coordinateConverter.GridToWorldCenter(
+            new Vector2Int(x, y), 
+            size, 
+            cellSize, 
+            cellSpacing, 
+            origin
+        );
     }
     
     public Vector2Int GetNeighboringCell(Vector2Int tile, Vector2Int direction)
