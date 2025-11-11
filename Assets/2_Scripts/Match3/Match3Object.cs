@@ -48,8 +48,9 @@ public class Match3Object : MonoBehaviour
         
         
         var endPosition = new Vector3(_currentMatch3Tile.transform.localPosition.x,_currentMatch3Tile.transform.localPosition.y,transform.localPosition.z);
-        Tween.LocalPosition(transform, endPosition, swapDuration)
-            .OnComplete((() =>
+        Sequence.Create()
+            .Group(Tween.LocalPosition(transform, endPosition, swapDuration)
+            .OnComplete(() =>
             {
                 if (spawning)
                 {

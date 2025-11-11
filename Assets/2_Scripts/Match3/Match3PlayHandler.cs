@@ -101,7 +101,7 @@ public class Match3PlayHandler : MonoBehaviour
             Vector3 worldPos = _camera.ScreenToWorldPoint(inputReader.MousePosition);
             worldPos.z = 0;
     
-            var gridPos = gridHandler.GridShape.Grid.GetPositionInGird(worldPos);
+            var gridPos = gridHandler.GridShape.Grid.GetCell(worldPos);
             var tile = gridHandler.GetTile(gridPos);
         
             SelectObjectInTile(tile);

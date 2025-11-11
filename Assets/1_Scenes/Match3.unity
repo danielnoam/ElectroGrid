@@ -852,6 +852,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69f1919c33a74eb2a258285c9e0a4f43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Match3GridManager
+  match3GameManager: {fileID: 586155249}
   match3TilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
   tilesParent: {fileID: 556487990}
   match3ObjectPrefab: {fileID: 1608689241954614118, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}

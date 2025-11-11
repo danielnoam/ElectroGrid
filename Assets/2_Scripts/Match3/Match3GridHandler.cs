@@ -5,17 +5,17 @@ using UnityEngine;
 public class Match3GridHandler : MonoBehaviour
 {
     [Header("References")]
+    [SerializeField] private Match3GameManager match3GameManager;
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private Transform tilesParent;
     [SerializeField] private Match3Object match3ObjectPrefab;
     [SerializeField] private Transform matchObjectsParent;
     
     private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
-    private SOGridShape _currentGridShape;
     
     public IReadOnlyDictionary<Vector2Int, Match3Tile> Tiles => _tiles;
-    public SOGridShape GridShape => _currentGridShape;
-
+    public SOGridShape GridShape => match3GameManager.GridShape;
+    public Grid Grid => GridShape.Grid;
     
     
     public void CreateGrid(SOGridShape gridShape)
@@ -24,16 +24,14 @@ public class Match3GridHandler : MonoBehaviour
 
         DestroyGrid();
         
-        _currentGridShape = gridShape;
-        var grid = gridShape.Grid;
 
-        for (int x = 0; x < grid.Width; x++)
+        for (int x = 0; x < Grid.Width; x++)
         {
-            for (int y = 0; y < grid.Height; y++)
+            for (int y = 0; y < Grid.Height; y++)
             {
                 Vector2Int tileGridPosition = new Vector2Int(x, y);
-                Vector3 tileWorldPosition = grid.GetTileWorldPosition(x, y);
-                bool tileState = grid.IsTileActive(x, y);
+                Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
+                bool tileState = Grid.IsCellActive(x, y);
 
                 var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState);
                 _tiles.Add(tileGridPosition, tile);
@@ -53,18 +51,19 @@ public class Match3GridHandler : MonoBehaviour
     {
         if (!IsValidTile(match3Tile)) return null;
 
-        var topMostTile = GetTile(new Vector2Int(match3Tile.GridPosition.x, 0));
-        
+        var topPositionInGrid = new Vector2Int(match3Tile.GridPosition.x, Grid.Height - 1);
+        var topMostTile = GetTile(topPositionInGrid);
+
         var spawnPosition = new Vector3(match3Tile.transform.localPosition.x,
             topMostTile.transform.localPosition.y + topMostTile.transform.localScale.y,
             match3Tile.transform.localPosition.z);
-        
+    
         var item = Instantiate(match3ObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
-        
+    
         item.Initialize(itemData);
         match3Tile.SetCurrentItem(item);
         item.SetCurrentTile(match3Tile);
-        
+    
         return item;
     }
     
@@ -182,6 +181,6 @@ public class Match3GridHandler : MonoBehaviour
     
     private void OnDrawGizmos()
     {
-        GridShape?.Grid?.DrawGrid();
+        Grid?.DrawGrid();
     }
 }

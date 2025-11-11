@@ -36,7 +36,7 @@ public class Match3GameManager : MonoBehaviour
 
 
     private Match3LevelData _currentLevelData;
-    private SOGridShape GridShape => currentLevel ? currentLevel.GridShape : defaultGridShape;
+    public SOGridShape GridShape => currentLevel ? currentLevel.GridShape : defaultGridShape;
     
     
     public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
