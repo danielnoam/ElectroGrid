@@ -30,10 +30,9 @@ MonoBehaviour:
       isLocked: 0
   objectives:
   - rid: 190982044644802808
+  - rid: 3019431838296047849
   loseConditions:
   - rid: 190982044644802816
-  - rid: 190982061879197805
-  tiles: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
   references:
     version: 2
     RefIds:
@@ -41,14 +40,16 @@ MonoBehaviour:
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: 35a7e5d1954754f48b71205b6dbd7d4c, type: 2}
         requiredAmount: 36
     - rid: 190982044644802816
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
         conditionSprite: {fileID: 0}
         allowedMoves: 10
-    - rid: 190982061879197805
-      type: {class: TimeLimit, ns: , asm: Assembly-CSharp}
+    - rid: 3019431838296047849
+      type: {class: ClearLayersObjective, ns: , asm: Assembly-CSharp}
       data:
-        conditionSprite: {fileID: 0}
-        allowedTime: 30
+        objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: 35a7e5d1954754f48b71205b6dbd7d4c, type: 2}
+        layeredTiles: 00000000000000000000000000000000000000010100000000000001010000000000000101000000000000010100000000000000000000000000000000000000

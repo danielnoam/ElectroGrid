@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 1975226441154984523}
   - component: {fileID: 8124075788320772976}
   m_Layer: 0
-  m_Name: BreakableLayer
+  m_Name: Layer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -117,8 +117,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.63761, y: 0.63761, z: 0.63761}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1179882405457458318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -169,8 +169,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 4
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 5248415023898783801, guid: cbf58c37249d82a4e97598dfc07d9058, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -371,15 +371,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2df95fb5df7b47f5a8e13d7c73881b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  audioSource: {fileID: 5248791974110374006}
-  tileRenderer: {fileID: 2548959169750997435}
-  breakableRenderer: {fileID: 8124075788320772976}
-  breakableParticle: {fileID: 243077210646262330, guid: 7a920621b3da9ca4996700dd6cf6a4e6, type: 3}
-  breakableSfx: {fileID: 0}
   selectedTileColor: {r: 0, g: 1, b: 0, a: 1}
   hoverTileColor: {r: 1, g: 0.6919855, b: 0, a: 0.5}
   activeTileColor: {r: 1, g: 0.6901961, b: 0, a: 0.5019608}
   inactiveTileColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.29411766}
+  audioSource: {fileID: 5248791974110374006}
+  tileRenderer: {fileID: 2548959169750997435}
+  layerRenderer: {fileID: 8124075788320772976}
+  layerClearedParticle: {fileID: 243077210646262330, guid: 7a920621b3da9ca4996700dd6cf6a4e6, type: 3}
+  layerClearedSfx: {fileID: 11400000, guid: f23b058e590be8e47996e9eac03ef3cb, type: 2}
   gridPosition: {x: 0, y: 0}
   isActive: 0
-  breakableLayerHealth: 0
+  layerHealth: 0

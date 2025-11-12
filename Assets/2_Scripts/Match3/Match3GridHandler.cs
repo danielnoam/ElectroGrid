@@ -40,7 +40,20 @@ public class Match3GridHandler : MonoBehaviour
         }
         _tiles.Clear();
         GridDestroyed?.Invoke();
-        
+
+        // Find BreakTilesObjective if it exists
+        ClearLayersObjective breakTilesObjective = null;
+        if (level.Objectives != null)
+        {
+            foreach (var objective in level.Objectives)
+            {
+                if (objective is ClearLayersObjective breakObj)
+                {
+                    breakTilesObjective = breakObj;
+                    break;
+                }
+            }
+        }
 
         // Create tiles
         for (int x = 0; x < Grid.Width; x++)
@@ -50,7 +63,7 @@ public class Match3GridHandler : MonoBehaviour
                 Vector2Int tileGridPosition = new Vector2Int(x, y);
                 Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
                 bool tileState = Grid.IsCellActive(x, y);
-                bool breakableLayer = level.TileHasBreakableLayer(x, y);
+                bool breakableLayer = breakTilesObjective != null && breakTilesObjective.TileHasLayer(x, y);
 
                 var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState, breakableLayer ? 1 : 0);
                 _tiles.Add(tileGridPosition, tile);
@@ -98,7 +111,7 @@ public class Match3GridHandler : MonoBehaviour
     
     public bool CanSelectTile(Match3Tile match3Tile)
     {
-        return IsValidTile(match3Tile) && !match3Tile.HasBreakableLayer && match3Tile.HasObject;
+        return IsValidTile(match3Tile) && !match3Tile.HasLayer && match3Tile.HasObject;
     }
 
     public Match3Tile GetRandomValidTile()

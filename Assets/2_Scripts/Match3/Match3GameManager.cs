@@ -43,6 +43,7 @@ public class Match3GameManager : MonoBehaviour
     public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
     public int MinMatchCount => minMatchCount;
     public int MaxAttemptsToRecheckMatches => maxAttemptsToRecheckMatches;
+    
     public event Action<Match3LevelData> LevelStarted;
     public event Action<Match3LevelData> LevelComplete;
     public event Action<Match3LevelData> LevelFailed;
@@ -151,6 +152,11 @@ public class Match3GameManager : MonoBehaviour
     {
         _currentLevelData?.OnMoveMade();
     }
+
+    public void NotifyLayerBroke(Match3Tile tile)
+    {
+        _currentLevelData?.OnLayerBreak(tile);
+    }
     
     private void UpdateLoseConditions()
     {
@@ -208,12 +214,12 @@ public class Match3GameManager : MonoBehaviour
             yield break;
         }
         
-
-        // Notify objectives about the matches
-        NotifyMatchesWhereMade(allMatches);
-    
+        
         // Handle matches
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
+        
+        // Notify objectives about the matches
+        NotifyMatchesWhereMade(allMatches);
     
         // Make objects fall
         yield return StartCoroutine(playHandler.MoveObjectsDown(gridHandler.GridShape));

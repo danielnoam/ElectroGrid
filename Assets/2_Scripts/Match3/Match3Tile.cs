@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using DNExtensions;
 using DNExtensions.ObjectPooling;
+using PrimeTween;
 using UnityEngine;
 
 public class Match3Tile : MonoBehaviour, IPooledObject
@@ -15,34 +17,40 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     [Header("References")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SpriteRenderer tileRenderer;
-    [SerializeField] private SpriteRenderer breakableRenderer;
-    [SerializeField] private OneShotParticle breakableParticle;
-    [SerializeField] private SOAudioEvent breakableSfx;
+    [SerializeField] private SpriteRenderer layerRenderer;
+    [SerializeField] private OneShotParticle layerClearedParticle;
+    [SerializeField] private SOAudioEvent layerClearedSfx;
 
     
     [Separator]
     [SerializeField, ReadOnly] private Vector2Int gridPosition;
     [SerializeField, ReadOnly] private bool isActive;
-    [SerializeField, ReadOnly] private int breakableLayerHealth;
+    [SerializeField, ReadOnly] private int layerHealth;
     
     private Match3GameManager _match3GameManager;
     private Match3GridHandler _match3GridHandler;
     private Match3Object _currentMatch3Object;
     private bool _isSelected;
     private bool _isHovered;
+    private Vector3 _baseLayerScale;
     
     
     
     public Vector2Int GridPosition => gridPosition;
     public Match3Object CurrentMatch3Object => _currentMatch3Object;
     public AudioSource AudioSource => audioSource;
-    public bool CanSelect => isActive && _currentMatch3Object && !_isSelected && !HasBreakableLayer;
+    public bool CanSelect => isActive && _currentMatch3Object && !_isSelected && !HasLayer;
     public bool IsActive => isActive;
     public bool HasObject => isActive && _currentMatch3Object;
-    public bool HasBreakableLayer => breakableLayerHealth > 0;
-    
+    public bool HasLayer => layerHealth > 0;
 
-    public void Initialize(Match3GameManager match3GameManager, Vector2Int position, bool active, int breakableLayerHealth)
+
+    private void Awake()
+    {
+        _baseLayerScale = layerRenderer.transform.localScale;
+    }
+
+    public void Initialize(Match3GameManager match3GameManager, Vector2Int position, bool active, int layerHealth)
     {
 
         _match3GameManager = match3GameManager;
@@ -54,10 +62,17 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _match3GridHandler.GridDestroyed += OnGridDestroyed;
         
         gameObject.name = $"Tile ({position.x},{position.y})";
+        layerRenderer.transform.localScale = Vector3.zero;
+        this.layerHealth = layerHealth;
+        gridPosition = position;
         _isSelected = false;
         _isHovered = false;
-        this.breakableLayerHealth = breakableLayerHealth;
-        gridPosition = position;
+        
+        if (HasLayer)
+        {
+            Tween.Scale(layerRenderer.transform, _baseLayerScale, 0.5f, Ease.OutBack, startDelay:0.5f);
+        }
+        
         isActive = active;
         UpdateVisuals();
     }
@@ -98,8 +113,6 @@ public class Match3Tile : MonoBehaviour, IPooledObject
 
             tileRenderer.color = inactiveTileColor;
         }
-        
-        breakableRenderer.gameObject.SetActive(breakableLayerHealth > 0);
     }
     
     
@@ -120,29 +133,35 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     }
 
 
-    private void LowerBreakableLayerHealth()
+    private void LowerLayerHealth()
     {
-        if (!HasBreakableLayer) return;
+        if (!HasLayer) return;
         
-        breakableLayerHealth--;
-        if (breakableLayerHealth <= 0)
+        layerHealth--;
+        if (layerHealth <= 0)
         {
-            var breakableParticleGo = ObjectPooler.GetObjectFromPool(breakableParticle.gameObject, transform.position);
-            breakableParticleGo.GetComponent<OneShotParticle>().Play();
-            breakableSfx?.Play(audioSource);
+            var effectSequence = Sequence.Create()
+                .Group(Tween.Scale(layerRenderer.transform, _baseLayerScale,_baseLayerScale * 1.3f, 0.1f, Ease.OutBack))
+                .ChainCallback(() =>
+                {
+                    var breakableParticleGo = ObjectPooler.GetObjectFromPool(layerClearedParticle.gameObject, transform.position);
+                    breakableParticleGo.GetComponent<OneShotParticle>().Play();
+                    layerClearedSfx?.Play(audioSource);
+                    layerRenderer.transform.localScale = Vector3.zero;
+                    _match3GameManager?.NotifyLayerBroke(this);
+                });
         }
-        UpdateVisuals();
     }
     
     private void OnMatchesMade(List<Match3Tile> matches)
     {
-        if (!HasBreakableLayer || !IsActive || !HasObject) return;
+        if (!HasLayer || !IsActive || !HasObject) return;
         
         foreach (var match in matches)
         {
             if (_match3GridHandler.AreTilesNeighbours(match, this))
             {
-               LowerBreakableLayerHealth();
+               LowerLayerHealth();
             }
         }
     }

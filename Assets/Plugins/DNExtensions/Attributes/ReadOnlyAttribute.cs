@@ -1,5 +1,6 @@
 
-#if UNITY_EDITOR
+
+
 using UnityEngine;
 using UnityEditor;
 
@@ -22,7 +23,8 @@ namespace DNExtensions
     {
     }
 
-
+#if UNITY_EDITOR
+    
     /// <summary>
     /// Custom property drawer that renders read-only fields with disabled GUI in the Unity Inspector.
     /// Supports both single properties and arrays/lists with proper height calculation.
@@ -64,8 +66,9 @@ namespace DNExtensions
             GUI.enabled = true;
         }
     }
+    
+#endif
 
 }
 
 
-#endif

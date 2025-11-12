@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DNExtensions;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -21,6 +22,8 @@ public class Mach3UIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelCompleteTitle;
     [SerializeField] private Button levelButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private SOAudioEvent levelCompleteWinSfx;
+    [SerializeField] private SOAudioEvent levelCompleteFailSfx;
     [SerializeField] private TweenSettings levelCompleteTweenSettings;
     
     [Header("Bottom Bar")]
@@ -29,6 +32,7 @@ public class Mach3UIManager : MonoBehaviour
     [SerializeField] private TweenSettings bottomBarTweenSettings;
     
     [Header("References")]
+    [SerializeField] private AudioSource audioSource;
     [SerializeField] private Match3GameManager match3Manager;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
 
@@ -108,6 +112,8 @@ public class Mach3UIManager : MonoBehaviour
     {
         if (levelData == null) return;
         
+        levelCompleteWinSfx.Play(audioSource);
+        
         UpdateLevelButton(true);
         UpdateLevelCompleteStats(levelData);
         levelCompleteTitle.text = $"{levelData.Level.LevelName} Complete!";
@@ -123,6 +129,7 @@ public class Mach3UIManager : MonoBehaviour
     {
         if (levelData == null) return;
         
+        levelCompleteFailSfx.Play(audioSource);
         
         UpdateLevelButton(false);
         UpdateLevelCompleteStats(levelData);
@@ -247,6 +254,8 @@ public class Mach3UIManager : MonoBehaviour
                 levelCompleteWindow.interactable = show;
                 levelCompleteWindow.blocksRaycasts = show; 
             });
+        
+        
 
     }
     

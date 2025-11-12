@@ -527,13 +527,13 @@ public class Match3PlayHandler : MonoBehaviour
                 for (var x = 0; x < gridShape.Grid.Width; x++)
                 {
                     var tile = gridHandler.GetTile(new Vector2Int(x, y));
-                    if (!tile.HasObject && tile.IsActive && !tile.HasBreakableLayer)
+                    if (!tile.HasObject && tile.IsActive && !tile.HasLayer)
                     {
                         // Find the nearest object ABOVE this empty tile (higher Y values)
                         for (var i = y + 1; i < gridShape.Grid.Height; i++)  // Look upward (increasing Y)
                         {
                             var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
-                            if (aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile) && !aboveTile.HasBreakableLayer)
+                            if (aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile) && !aboveTile.HasLayer)
                             {
                                 movesThisWave.Add((aboveTile.CurrentMatch3Object, aboveTile, tile));
                                 tilesAlreadyMoving.Add(aboveTile);

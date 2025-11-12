@@ -13,6 +13,7 @@ public class SOMatch3Level : ScriptableObject
     [SerializeReference] private List<Match3Objective> objectives = new List<Match3Objective>();
     [SerializeReference] private List<Match3LoseCondition> loseConditions = new List<Match3LoseCondition>();
 
+    
     public string LevelName => levelName;
     public SOGridShape GridShape => gridShape;
     public ChanceList<SOItemData> MatchObjects => matchObjects;
@@ -20,20 +21,13 @@ public class SOMatch3Level : ScriptableObject
     public List<Match3LoseCondition> LoseConditions => loseConditions;
     
     
-    [SerializeField] public bool[] tiles;
-    
-    
-    public bool TileHasBreakableLayer(int x, int y)
+    private void OnValidate()
     {
-        if (!gridShape || gridShape.Grid == null || objectives.Count <= 0) return false;
-            
-        int width = gridShape.Grid.Width;
-        int height = gridShape.Grid.Height;
-        
-        if (x < 0 || x >= width || y < 0 || y >= height) return false;
-        if (tiles == null || tiles.Length != width * height) return false;
-        
-        int index = y * width + x;
-        return tiles[index];
+        if (objectives == null) return;
+    
+        foreach (var objective in objectives)
+        {
+            objective?.SetGridShape(gridShape);
+        }
     }
 }

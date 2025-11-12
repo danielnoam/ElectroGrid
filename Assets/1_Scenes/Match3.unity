@@ -1065,8 +1065,8 @@ GameObject:
   - component: {fileID: 722603884}
   - component: {fileID: 722603883}
   - component: {fileID: 722603882}
-  - component: {fileID: 722603886}
   - component: {fileID: 722603887}
+  - component: {fileID: 722603886}
   m_Layer: 5
   m_Name: Match3Canvas
   m_TagString: Untagged
@@ -1197,6 +1197,8 @@ MonoBehaviour:
   levelCompleteTitle: {fileID: 1623427230}
   levelButton: {fileID: 2128778916}
   quitButton: {fileID: 1991576429}
+  levelCompleteWinSfx: {fileID: 11400000, guid: 1805f0cc8b13eb143b1d22ab9761ff95, type: 2}
+  levelCompleteFailSfx: {fileID: 11400000, guid: f5226ab54d7198245a5b05ae885c897e, type: 2}
   levelCompleteTweenSettings:
     duration: 0.5
     ease: 6
@@ -1231,6 +1233,7 @@ MonoBehaviour:
     useUnscaledTime: 0
     _useFixedUpdate: 0
     _updateType: 0
+  audioSource: {fileID: 722603887}
   match3Manager: {fileID: 586155249}
   match3UIElementPrefab: {fileID: 2074164471178117848, guid: f946419640c3cc44aaafb207336f556c, type: 3}
 --- !u!82 &722603887

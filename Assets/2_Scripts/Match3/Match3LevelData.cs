@@ -11,12 +11,15 @@ public class Match3LevelData
     public readonly List<Match3LoseCondition> CurrentLoseConditions = new List<Match3LoseCondition>();
     public int MovesMade;
     public int MatchesMade;
+    public int LayersBroken;
     
     public Match3LevelData(SOMatch3Level level)
     {
         Level = level;
         MovesMade = 0;
         MatchesMade = 0;
+        LayersBroken = 0;
+        
         CurrentObjectives.Clear();
         CurrentLoseConditions.Clear();
         
@@ -60,6 +63,16 @@ public class Match3LevelData
         foreach (var objective in CurrentObjectives)
         {
             objective?.OnMatchMade(allMatches);
+        }
+    }
+    
+    public void OnLayerBreak(Match3Tile tile)
+    {
+        LayersBroken++;
+        
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnLayerBreak(tile);
         }
     }
     

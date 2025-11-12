@@ -17,10 +17,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 80721227073f0cf4497b42ead9687c56, type: 3}
   mixerGroup: {fileID: 0}
   volume:
-    minValue: 1
-    maxValue: 1
+    minValue: 0.7
+    maxValue: 0.7
   pitch:
-    minValue: 0.9
+    minValue: 0.8
     maxValue: 1.1
   stereoPan: 0
   spatialBlend: 0
