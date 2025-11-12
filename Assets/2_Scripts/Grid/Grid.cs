@@ -198,6 +198,17 @@ public class Grid
         return neighboringTile;
     }
     
+    public bool AreCellsNeighbors(Vector2Int tile1, Vector2Int tile2)
+    {
+        Vector2Int difference = tile1 - tile2;
+
+        if (Mathf.Abs(difference.x) <= 1 && Mathf.Abs(difference.y) <= 1)
+        {
+            return true;
+        }
+        return false;
+    }
+    
     
     public bool IsCellActive(int x, int y)
     {
@@ -211,7 +222,6 @@ public class Grid
     
     public void DrawGrid()
     {
-        // Safety check
         coordinateConverter ??= new VerticalConvertor();
         
         var labelStyle = new GUIStyle()

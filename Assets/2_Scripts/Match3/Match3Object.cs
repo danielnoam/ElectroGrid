@@ -27,7 +27,7 @@ public class Match3Object : MonoBehaviour, IPooledObject
 
     private Color _baseColor;
     private Vector3 _baseScale;
-    private Match3Tile _currentMatch3Tile;
+    private Match3Tile _currentTile;
     private SOItemData _itemData;
     private bool _held;
     private bool _beingDestroyed;
@@ -35,6 +35,7 @@ public class Match3Object : MonoBehaviour, IPooledObject
     private Match3GridHandler _gridHandler;
     
     public SOItemData ItemData => _itemData;
+    public Match3Tile CurrentTile => _currentTile;
 
 
     private void OnDestroy()
@@ -64,6 +65,7 @@ public class Match3Object : MonoBehaviour, IPooledObject
         _held = false;
         _beingDestroyed = false;
         _itemData = data;
+        _currentTile = null;
 
         itemLabel.text = _itemData.Label;
         itemRenderer.sprite = _itemData.Sprite;
@@ -76,26 +78,26 @@ public class Match3Object : MonoBehaviour, IPooledObject
 
     public void SetCurrentTile(Match3Tile match3Tile)
     {
-        bool spawning = !_currentMatch3Tile;
-        _currentMatch3Tile = match3Tile;
+        bool spawning = !_currentTile;
+        _currentTile = match3Tile;
         
         _movementSequence.Stop();
         
-        var endPosition = new Vector3(_currentMatch3Tile.transform.localPosition.x, _currentMatch3Tile.transform.localPosition.y, transform.localPosition.z);
+        var endPosition = new Vector3(_currentTile.transform.localPosition.x, _currentTile.transform.localPosition.y, transform.localPosition.z);
         
-        _movementSequence = Sequence.Create()
-            .Group(Tween.LocalPosition(transform, endPosition, swapDuration)
-            .OnComplete(() =>
+        _movementSequence = Sequence.Create();
+        _movementSequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration));
+        _movementSequence.ChainCallback(() =>
             {
                 if (spawning)
                 {
-                    spawnSfx.Play(_currentMatch3Tile.AudioSource);
+                    spawnSfx.Play(_currentTile.AudioSource);
                 }
                 else
                 {
-                    swapSfx.Play(_currentMatch3Tile.AudioSource);
+                    swapSfx.Play(_currentTile.AudioSource);
                 }
-            }));
+            });
     }
     
     public void SetHeld(bool held)
@@ -110,7 +112,7 @@ public class Match3Object : MonoBehaviour, IPooledObject
     {
         _beingDestroyed = true;
         MobileHaptics.Vibrate(50);
-        popSfx.Play(_currentMatch3Tile.AudioSource);
+        popSfx.Play(_currentTile.AudioSource);
         var particleGo = ObjectPooler.GetObjectFromPool(popParticle.gameObject, transform.position, Quaternion.identity);
         var particle = particleGo.GetComponent<OneShotParticle>();
         particle.Play(transform.position);
@@ -144,7 +146,7 @@ public class Match3Object : MonoBehaviour, IPooledObject
         _movementSequence.Stop();
         _beingDestroyed = true;
         transform.localScale = _baseScale;
-        _currentMatch3Tile = null;
+        _currentTile = null;
     }
 
     public void OnPoolRecycle()

@@ -12,24 +12,37 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private Transform tilesParent;
     [SerializeField] private Match3Object match3ObjectPrefab;
+    [SerializeField] private SOGridShape defaultGridShape;
     
     private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
+    private SOGridShape _gridShape;
     
     public IReadOnlyDictionary<Vector2Int, Match3Tile> Tiles => _tiles;
-    public SOGridShape GridShape => match3GameManager.GridShape;
     public Grid Grid => GridShape.Grid;
-    
+    public SOGridShape GridShape => _gridShape ? _gridShape : defaultGridShape;
     
     public event Action GridDestroyed;
     
     
-    public void CreateGrid(SOGridShape gridShape)
+    public void CreateGrid(SOMatch3Level level)
     {
-        if (!gridShape || !match3TilePrefab) return;
+        if (!level || !match3TilePrefab) return;
+        
+        _gridShape = level.GridShape;
 
-        DestroyGrid();
+        // Clear previous grid
+        foreach (var tile in _tiles.Values)
+        {
+            if (tile)
+            {
+                tile.SetCurrentItem(null);
+            }
+        }
+        _tiles.Clear();
+        GridDestroyed?.Invoke();
         
 
+        // Create tiles
         for (int x = 0; x < Grid.Width; x++)
         {
             for (int y = 0; y < Grid.Height; y++)
@@ -37,17 +50,20 @@ public class Match3GridHandler : MonoBehaviour
                 Vector2Int tileGridPosition = new Vector2Int(x, y);
                 Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
                 bool tileState = Grid.IsCellActive(x, y);
+                bool breakableLayer = level.TileHasBreakableLayer(x, y);
 
-                var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState);
+                var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState, breakableLayer ? 1 : 0);
                 _tiles.Add(tileGridPosition, tile);
             }
         }
     }
     
-    private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
+    private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive, int breakableLayerHealth)
     {
-        var tile = Instantiate(match3TilePrefab, position, Quaternion.identity, tilesParent);
-        tile.Initialize(gridPos, isActive);
+        var tileGo = ObjectPooler.GetObjectFromPool(match3TilePrefab.gameObject, position, Quaternion.identity);
+        var tile = tileGo.GetComponent<Match3Tile>();
+        tile.Initialize(match3GameManager, gridPos, isActive, breakableLayerHealth);
+        
         return tile;
     }
     
@@ -66,53 +82,6 @@ public class Match3GridHandler : MonoBehaviour
 
         return item;
     }
-    
-
-    private void DestroyGrid()
-    {
-        GridDestroyed?.Invoke();
-        
-        foreach (var tile in _tiles.Values)
-        {
-            if (tile)
-            {
-                tile.SetCurrentItem(null);
-            }
-        }
-        
-        foreach (var tile in _tiles.Values)
-        {
-            if (tile)
-            {
-                if (Application.isEditor)
-                {
-                    DestroyImmediate(tile.gameObject);
-                }
-                else
-                {
-                    Destroy(tile.gameObject);
-                }
-            }
-        }
-
-        if (Application.isEditor)
-        {
-            while (tilesParent.childCount > 0)
-            {
-                DestroyImmediate(tilesParent.GetChild(0).gameObject);
-            }
-        }
-        else
-        {
-            foreach (Transform child in tilesParent)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-
-        _tiles.Clear();
-    }
-    
 
     
 
@@ -126,12 +95,23 @@ public class Match3GridHandler : MonoBehaviour
     {
         return match3Tile && match3Tile.IsActive;
     }
+    
+    public bool CanSelectTile(Match3Tile match3Tile)
+    {
+        return IsValidTile(match3Tile) && !match3Tile.HasBreakableLayer && match3Tile.HasObject;
+    }
 
     public Match3Tile GetRandomValidTile()
     {
         var validTiles = _tiles.Values.Where(IsValidTile).ToList();
         return validTiles.Count > 0 ? validTiles[Random.Range(0, validTiles.Count)] : null;
     }
+    
+    public bool AreTilesNeighbours(Match3Tile tile1, Match3Tile tile2)
+    {
+        return Grid.AreCellsNeighbors(tile1.GridPosition, tile2.GridPosition);
+    }
+    
 
     public int GetActiveTileCount()
     {

@@ -121,7 +121,7 @@ public class Match3PlayHandler : MonoBehaviour
 
     private void SelectObjectInTile(Match3Tile match3Tile)
     {
-        if (!gridHandler.IsValidTile(match3Tile) || !match3Tile.HasObject) return;
+        if (!gridHandler.CanSelectTile(match3Tile)) return;
         
         selectedMatch3Tile = match3Tile;
         heldMatch3Object = selectedMatch3Tile.CurrentMatch3Object;
@@ -140,7 +140,7 @@ public class Match3PlayHandler : MonoBehaviour
 
     private void TrySwapHeldObject(Match3Tile match3Tile)
     {
-        if (!gridHandler.IsValidTile(match3Tile))
+        if (!gridHandler.CanSelectTile(match3Tile))
         {
             ReleaseObject(true);
             return;
@@ -211,7 +211,7 @@ public class Match3PlayHandler : MonoBehaviour
                 var tile2 = gridHandler.GetTile(new Vector2Int(x + 1, y));
                 var tile3 = gridHandler.GetTile(new Vector2Int(x + 2, y));
 
-                if (!tile1 || !tile2 || !tile3 || !tile1.HasObject || !tile2.HasObject || !tile3.HasObject) continue;
+                if (!gridHandler.CanSelectTile(tile1) || !gridHandler.CanSelectTile(tile3) || !gridHandler.CanSelectTile(tile2)) continue;
 
                 if (tile1.CurrentMatch3Object.ItemData == tile2.CurrentMatch3Object.ItemData 
                     && tile2.CurrentMatch3Object.ItemData == tile3.CurrentMatch3Object.ItemData)
@@ -232,7 +232,7 @@ public class Match3PlayHandler : MonoBehaviour
                 var tile2 = gridHandler.GetTile(new Vector2Int(x, y + 1));
                 var tile3 = gridHandler.GetTile(new Vector2Int(x, y + 2));
                 
-                if (!tile1 || !tile2 || !tile3 || !tile1.HasObject || !tile2.HasObject || !tile3.HasObject) continue;
+                if (!gridHandler.CanSelectTile(tile1) || !gridHandler.CanSelectTile(tile3) || !gridHandler.CanSelectTile(tile2)) continue;
                 
                 if (tile1.CurrentMatch3Object.ItemData == tile2.CurrentMatch3Object.ItemData 
                     && tile2.CurrentMatch3Object.ItemData == tile3.CurrentMatch3Object.ItemData)
@@ -527,13 +527,13 @@ public class Match3PlayHandler : MonoBehaviour
                 for (var x = 0; x < gridShape.Grid.Width; x++)
                 {
                     var tile = gridHandler.GetTile(new Vector2Int(x, y));
-                    if (!tile.HasObject && tile.IsActive)
+                    if (!tile.HasObject && tile.IsActive && !tile.HasBreakableLayer)
                     {
                         // Find the nearest object ABOVE this empty tile (higher Y values)
                         for (var i = y + 1; i < gridShape.Grid.Height; i++)  // Look upward (increasing Y)
                         {
                             var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
-                            if (aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile))
+                            if (aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile) && !aboveTile.HasBreakableLayer)
                             {
                                 movesThisWave.Add((aboveTile.CurrentMatch3Object, aboveTile, tile));
                                 tilesAlreadyMoving.Add(aboveTile);

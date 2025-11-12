@@ -18,4 +18,22 @@ public class SOMatch3Level : ScriptableObject
     public ChanceList<SOItemData> MatchObjects => matchObjects;
     public List<Match3Objective> Objectives => objectives;
     public List<Match3LoseCondition> LoseConditions => loseConditions;
+    
+    
+    [SerializeField] public bool[] tiles;
+    
+    
+    public bool TileHasBreakableLayer(int x, int y)
+    {
+        if (!gridShape || gridShape.Grid == null || objectives.Count <= 0) return false;
+            
+        int width = gridShape.Grid.Width;
+        int height = gridShape.Grid.Height;
+        
+        if (x < 0 || x >= width || y < 0 || y >= height) return false;
+        if (tiles == null || tiles.Length != width * height) return false;
+        
+        int index = y * width + x;
+        return tiles[index];
+    }
 }
