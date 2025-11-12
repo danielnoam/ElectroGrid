@@ -12,8 +12,8 @@ public class Grid
     public Vector3 cellSize;
     public Vector3 cellSpacing;
     public bool[] cells;
+    [SerializeReference] public CoordinateConverter coordinateConverter;
 
-    private GridCoordinateConverter _coordinateConverter;
     
     public int Width => size.x;
     public int Height => size.y;
@@ -41,18 +41,18 @@ public class Grid
         origin =  Vector3.zero;
         cellSize = new Vector3(1f, 1f, 0);
         cellSpacing = new Vector3(0.1f, 0.1f, 0);
-        _coordinateConverter = new VerticalConvertor();
+        coordinateConverter = new VerticalConvertor();
         
         InitializeCells();
     }
     
-    public Grid(int width, int height, Vector3 origin, Vector3 cellSize, Vector3 cellSpacing, GridCoordinateConverter coordinateConverter)
+    public Grid(int width, int height, Vector3 origin, Vector3 cellSize, Vector3 cellSpacing, CoordinateConverter coordinateConverter)
     {
         size = new Vector2Int(width, height);
         this.origin = origin;
         this.cellSize = cellSize;
         this.cellSpacing = cellSpacing;
-        _coordinateConverter = coordinateConverter ?? new VerticalConvertor();
+        this.coordinateConverter = coordinateConverter ?? new VerticalConvertor();
         InitializeCells();
     }
 
@@ -165,7 +165,7 @@ public class Grid
     
     public Vector2Int GetCell(Vector3 position)
     {
-        Vector2Int gridPos = _coordinateConverter.WorldToGrid(position, size, cellSize, cellSpacing, origin);
+        Vector2Int gridPos = coordinateConverter.WorldToGrid(position, size, cellSize, cellSpacing, origin);
         
         if (gridPos.x < 0 || gridPos.x >= Width || gridPos.y < 0 || gridPos.y >= Height)
         {
@@ -177,7 +177,7 @@ public class Grid
     
     public Vector3 GetCellWorldPosition(int x, int y)
     {
-        return _coordinateConverter.GridToWorldCenter(
+        return coordinateConverter.GridToWorldCenter(
             new Vector2Int(x, y), 
             size, 
             cellSize, 
@@ -211,9 +211,11 @@ public class Grid
     
     public void DrawGrid()
     {
+        // Safety check
+        coordinateConverter ??= new VerticalConvertor();
+        
         var labelStyle = new GUIStyle()
         {
-
             fontSize = 12,
             normal = { textColor = Color.white },
             alignment = TextAnchor.MiddleCenter
@@ -225,15 +227,17 @@ public class Grid
             {
                 var tileState = IsCellActive(x, y);
                 var tilePosition = GetCellWorldPosition(x, y);
-                
+            
                 Gizmos.color = tileState ? Color.green : Color.white;
-                Gizmos.DrawWireCube(tilePosition, cellSize);
                 
+                Gizmos.matrix = Matrix4x4.TRS(tilePosition, Quaternion.LookRotation(coordinateConverter.Forward), Vector3.one);
+                Gizmos.DrawWireCube(Vector3.zero, cellSize);
+                Gizmos.matrix = Matrix4x4.identity;
+            
                 #if UNITY_EDITOR
                 Handles.Label(tilePosition, $"{x},{y}", labelStyle);
                 #endif
             }
         }
     }
-    
 }

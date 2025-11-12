@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public abstract class GridCoordinateConverter
+
+public abstract class CoordinateConverter
 {
 	/// <summary>
 	/// Converts a grid cell position to its world position at the bottom-left corner of the cell.
@@ -43,7 +44,7 @@ public abstract class GridCoordinateConverter
 	public abstract Vector3 Forward { get;}
 }
 
-public class VerticalConvertor : GridCoordinateConverter
+public class VerticalConvertor : CoordinateConverter
 {
 	public override Vector3 GridToWorld(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
 	{
@@ -112,33 +113,70 @@ public class VerticalConvertor : GridCoordinateConverter
 	public override Vector3 Forward => Vector3.forward;
 }
 
-public class HorizontalConvertor : GridCoordinateConverter
+public class HorizontalConvertor : CoordinateConverter
 {
 	public override Vector3 GridToWorld(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
 	{
+		// Calculate the total size of the grid including spacing
+		float totalGridWidth = (gridSize.x * cellSize.x) + ((gridSize.x - 1) * cellSpacing.x);
+		float totalGridDepth = (gridSize.y * cellSize.z) + ((gridSize.y - 1) * cellSpacing.z);
+		
+		// Calculate offset to center the grid at the origin
+		float sizeOffsetX = -totalGridWidth / 2f;
+		float sizeOffsetZ = -totalGridDepth / 2f;
+		
+		// Calculate cell position with spacing (y becomes z for horizontal)
+		float posX = cellPosition.x * (cellSize.x + cellSpacing.x);
+		float posZ = cellPosition.y * (cellSize.z + cellSpacing.z);
+		
 		return new Vector3(
-			origin.x + cellPosition.x * (cellSize.x + cellSpacing.x),
-			origin.y + cellPosition.y * (cellSize.y + cellSpacing.y),
-			0
+			origin.x + posX + sizeOffsetX,
+			origin.y,
+			origin.z + posZ + sizeOffsetZ
 		);
 	}
 
 	public override Vector3 GridToWorldCenter(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
 	{
-
+		// Calculate the total size of the grid including spacing
+		float totalGridWidth = (gridSize.x * cellSize.x) + ((gridSize.x - 1) * cellSpacing.x);
+		float totalGridDepth = (gridSize.y * cellSize.z) + ((gridSize.y - 1) * cellSpacing.z);
+		
+		// Calculate offset to center the grid at the origin
+		float sizeOffsetX = -totalGridWidth / 2f + cellSize.x * 0.5f;
+		float sizeOffsetZ = -totalGridDepth / 2f + cellSize.z * 0.5f;
+		
+		// Calculate cell position with spacing
+		float posX = cellPosition.x * (cellSize.x + cellSpacing.x);
+		float posZ = cellPosition.y * (cellSize.z + cellSpacing.z);
+		
 		return new Vector3(
-			origin.x + cellPosition.x * (cellSize.x + cellSpacing.x) + cellSize.x * 0.5f,
-			origin.y + cellPosition.y * (cellSize.y + cellSpacing.y) + cellSize.y * 0.5f,
-			0
+			origin.x + posX + sizeOffsetX,
+			origin.y,
+			origin.z + posZ + sizeOffsetZ
 		);
 	}
 
 	public override Vector2Int WorldToGrid(Vector3 worldPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
 	{
-		return new Vector2Int(
-			Mathf.FloorToInt((worldPosition.x - origin.x) / (cellSize.x + cellSpacing.x)),
-			Mathf.FloorToInt((worldPosition.y - origin.y) / (cellSize.y + cellSpacing.y))
-		);
+		// Remove origin offset
+		worldPosition -= origin;
+		
+		// Calculate the centering offset that was applied in GridToWorld
+		float totalGridWidth = (gridSize.x * cellSize.x) + ((gridSize.x - 1) * cellSpacing.x);
+		float totalGridDepth = (gridSize.y * cellSize.z) + ((gridSize.y - 1) * cellSpacing.z);
+		float sizeOffsetX = -totalGridWidth / 2f;
+		float sizeOffsetZ = -totalGridDepth / 2f;
+		
+		// Remove the centering offset to get back to grid-relative coordinates
+		worldPosition.x -= sizeOffsetX;
+		worldPosition.z -= sizeOffsetZ;
+		
+		// Convert to grid coordinates (using x and z)
+		int x = Mathf.FloorToInt(worldPosition.x / (cellSize.x + cellSpacing.x));
+		int y = Mathf.FloorToInt(worldPosition.z / (cellSize.z + cellSpacing.z));
+		
+		return new Vector2Int(x, y);
 	}
 
 	public override Vector3 Forward => -Vector3.up;
