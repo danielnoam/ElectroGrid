@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 
 namespace DNExtensions.ObjectPooling
@@ -24,8 +25,11 @@ namespace DNExtensions.ObjectPooling
 
         [Header("Pre Warm")] 
         [Tooltip("Pre populate the pool")]
-        public bool preWarmPool = true;
+        public bool preWarmPool;
+        [Tooltip("If pre warm pool, how many objects to pre warm")]
         public int preWarmPoolSize = 5;
+        [Tooltip("If there are scenes, only pre warm pool if its in the selected scenes")]
+        public SceneField[] scenesToPreWarm = Array.Empty<SceneField>();
 
         [Header("Debug")]
         [SerializeField] private int poolSize;
@@ -205,17 +209,17 @@ namespace DNExtensions.ObjectPooling
                 Object.Destroy(obj);
             }
 
-            _activePool.Clear();
-            _activePoolSet.Clear();
-
             while (_inactivePool.Count > 0)
             {
                 var obj = _inactivePool.Dequeue();
                 if (obj) Object.Destroy(obj);
             }
 
+            _activePool.Clear();
+            _activePoolSet.Clear();
             _objectsBeingReturned.Clear();
             _pooledObjects.Clear();
+            _inactivePool.Clear();
 
             if (_poolHolder) Object.Destroy(_poolHolder.gameObject);
             _isInitialized = false;
@@ -232,11 +236,9 @@ namespace DNExtensions.ObjectPooling
 
         private void UpdateDebugFields()
         {
-#if UNITY_EDITOR || DEBUG
             activePoolCount = _activePool.Count;
             inactivePoolCount = _inactivePool.Count;
             poolSize = activePoolCount + inactivePoolCount;
-#endif
         }
 
         /// <summary>
@@ -246,12 +248,29 @@ namespace DNExtensions.ObjectPooling
         {
             if (_isInitialized) return;
 
-            for (int i = 0; i < preWarmPoolSize; i++)
+            if (scenesToPreWarm.Length <= 0)
             {
-                var obj = InstantiatePoolObject();
-                _inactivePool.Enqueue(obj);
+                for (int i = 0; i < preWarmPoolSize; i++)
+                {
+                    var obj = InstantiatePoolObject();
+                    _inactivePool.Enqueue(obj);
+                }
+            }
+            else
+            {
+                
+                var currentScene = SceneManager.GetActiveScene();
+                if (scenesToPreWarm.Any(scene => scene.SceneName == currentScene.name))
+                {
+                    for (int i = 0; i < preWarmPoolSize; i++)
+                    {
+                        var obj = InstantiatePoolObject();
+                        _inactivePool.Enqueue(obj);
+                    }
+                }
             }
 
+            
             UpdateDebugFields();
         }
 

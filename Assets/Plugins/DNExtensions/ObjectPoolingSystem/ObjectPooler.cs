@@ -220,5 +220,37 @@ namespace DNExtensions.ObjectPooling
             if (Instance.showDebugMessages) Debug.LogError($"Can't return object, No object pooler in scene");
             Destroy(obj);
         }
+        
+        
+        public void AddPool(ObjectPool pool)
+        {
+            if (pools == null) pools = new List<ObjectPool>();
+            pools.Add(pool);
+            
+            if (_dontDestroyOnLoadParent || _destroyOnLoadParent)
+            {
+                Transform parent = pool.dontDestroyOnLoad ? _dontDestroyOnLoadParent : _destroyOnLoadParent;
+                if (!parent)
+                {
+                    if (pool.dontDestroyOnLoad)
+                    {
+                        _dontDestroyOnLoadParent = new GameObject() { name = "ObjectPools - Dont Destroy On Load" }.transform;
+                        DontDestroyOnLoad(_dontDestroyOnLoadParent.gameObject);
+                        parent = _dontDestroyOnLoadParent;
+                    }
+                    else
+                    {
+                        _destroyOnLoadParent = new GameObject() { name = "ObjectPools - Destroy On Load" }.transform;
+                        parent = _destroyOnLoadParent;
+                    }
+                }
+        
+                var poolHolder = new GameObject() { name = $"{pool.poolName} Holder" };
+                poolHolder.transform.SetParent(parent);
+                pool.SetUpPool(poolHolder.transform);
+            }
+        }
     }
+    
+    
 }

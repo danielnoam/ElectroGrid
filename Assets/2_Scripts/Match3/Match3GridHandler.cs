@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using DNExtensions.ObjectPooling;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Match3GridHandler : MonoBehaviour
 {
@@ -9,13 +12,15 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private Transform tilesParent;
     [SerializeField] private Match3Object match3ObjectPrefab;
-    [SerializeField] private Transform matchObjectsParent;
     
     private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
     
     public IReadOnlyDictionary<Vector2Int, Match3Tile> Tiles => _tiles;
     public SOGridShape GridShape => match3GameManager.GridShape;
     public Grid Grid => GridShape.Grid;
+    
+    
+    public event Action GridDestroyed;
     
     
     public void CreateGrid(SOGridShape gridShape)
@@ -52,9 +57,10 @@ public class Match3GridHandler : MonoBehaviour
         if (!IsValidTile(match3Tile)) return null;
         
         var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
-        var item = Instantiate(match3ObjectPrefab, spawnPosition, Quaternion.identity, matchObjectsParent);
+        var itemGo = ObjectPooler.GetObjectFromPool(match3ObjectPrefab.gameObject, spawnPosition, Quaternion.identity);
+        var item = itemGo.GetComponent<Match3Object>();
         
-        item.Initialize(itemData);
+        item.Initialize(itemData, this);
         match3Tile.SetCurrentItem(item);
         item.SetCurrentTile(match3Tile);
 
@@ -62,15 +68,18 @@ public class Match3GridHandler : MonoBehaviour
     }
     
 
-    public void DestroyGrid()
+    private void DestroyGrid()
     {
-        DestroyAllObjects();
-        DestroyTiles();
-    }
-
-    
-    private void DestroyTiles()
-    {
+        GridDestroyed?.Invoke();
+        
+        foreach (var tile in _tiles.Values)
+        {
+            if (tile)
+            {
+                tile.SetCurrentItem(null);
+            }
+        }
+        
         foreach (var tile in _tiles.Values)
         {
             if (tile)
@@ -103,33 +112,6 @@ public class Match3GridHandler : MonoBehaviour
 
         _tiles.Clear();
     }
-    
-    public void DestroyAllObjects()
-    {
-        foreach (var tile in _tiles.Values)
-        {
-            if (tile)
-            {
-                tile.SetCurrentItem(null);
-            }
-        }
-        
-        if (Application.isEditor)
-        {
-            while (matchObjectsParent.childCount > 0)
-            {
-                DestroyImmediate(matchObjectsParent.GetChild(0).gameObject);
-            }
-        }
-        else
-        {
-            foreach (Transform child in matchObjectsParent)
-            {
-                Destroy(child.gameObject);
-            }
-        }
-    }
-
     
 
     

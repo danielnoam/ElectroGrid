@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: VFX Sequence Fade In
   m_EditorClassIdentifier: 
   sequenceDuration: 1
-  sequenceIsAdditive: 0
-  resetEffectsOnComplete: 1
   effects:
   - rid: 4047855796212465664
   references:

@@ -111,3 +111,35 @@ public class VerticalConvertor : GridCoordinateConverter
 
 	public override Vector3 Forward => Vector3.forward;
 }
+
+public class HorizontalConvertor : GridCoordinateConverter
+{
+	public override Vector3 GridToWorld(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
+	{
+		return new Vector3(
+			origin.x + cellPosition.x * (cellSize.x + cellSpacing.x),
+			origin.y + cellPosition.y * (cellSize.y + cellSpacing.y),
+			0
+		);
+	}
+
+	public override Vector3 GridToWorldCenter(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
+	{
+
+		return new Vector3(
+			origin.x + cellPosition.x * (cellSize.x + cellSpacing.x) + cellSize.x * 0.5f,
+			origin.y + cellPosition.y * (cellSize.y + cellSpacing.y) + cellSize.y * 0.5f,
+			0
+		);
+	}
+
+	public override Vector2Int WorldToGrid(Vector3 worldPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
+	{
+		return new Vector2Int(
+			Mathf.FloorToInt((worldPosition.x - origin.x) / (cellSize.x + cellSpacing.x)),
+			Mathf.FloorToInt((worldPosition.y - origin.y) / (cellSize.y + cellSpacing.y))
+		);
+	}
+
+	public override Vector3 Forward => -Vector3.up;
+}

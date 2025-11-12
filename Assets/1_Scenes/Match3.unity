@@ -460,7 +460,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 980465613}
-  - {fileID: 1623427229}
   - {fileID: 1145269571}
   - {fileID: 750709012}
   m_Father: {fileID: 722603885}
@@ -641,7 +640,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -30, y: -30}
+  m_SizeDelta: {x: -50, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &441509746
 MonoBehaviour:
@@ -690,12 +689,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 65.8
+  m_fontSize: 80
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 80
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -871,7 +870,6 @@ MonoBehaviour:
   match3TilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
   tilesParent: {fileID: 556487990}
   match3ObjectPrefab: {fileID: 1608689241954614118, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}
-  matchObjectsParent: {fileID: 76786952}
 --- !u!114 &586155252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1625,7 +1623,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.87502, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1623427229}
   m_Father: {fileID: 219113970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2212,16 +2211,16 @@ RectTransform:
   m_GameObject: {fileID: 1623427228}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.87502, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 219113970}
+  m_Father: {fileID: 980465613}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -100}
-  m_SizeDelta: {x: -30, y: 100}
-  m_Pivot: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: 262.5}
+  m_SizeDelta: {x: -20, y: -719}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1623427230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2389,7 +2388,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 0.5
+  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1722580019
 CanvasRenderer:
   m_ObjectHideFlags: 0

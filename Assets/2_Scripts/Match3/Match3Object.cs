@@ -1,10 +1,12 @@
 using System;
 using DNExtensions;
+using DNExtensions.ObjectPooling;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
+using Object = System.Object;
 
-public class Match3Object : MonoBehaviour
+public class Match3Object : MonoBehaviour, IPooledObject
 {
     
     [Header("Settings")]
@@ -30,6 +32,7 @@ public class Match3Object : MonoBehaviour
     private bool _held;
     private bool _beingDestroyed;
     private Sequence _movementSequence;
+    private Match3GridHandler _gridHandler;
     
     public SOItemData ItemData => _itemData;
 
@@ -39,14 +42,37 @@ public class Match3Object : MonoBehaviour
         _movementSequence.Stop();
     }
 
-    public void Initialize(SOItemData data)
+    private void Awake()
     {
-        _held = false;
-        _itemData = data;
         _baseScale = transform.localScale;
         _baseColor = itemRenderer.color;
+    }
+    
+    private void OnGridDestroyed()
+    {
+        if (_beingDestroyed) return;
+        ObjectPooler.ReturnObjectToPool(gameObject);
+    }
+
+
+    public void Initialize(SOItemData data, Match3GridHandler gridHandler)
+    {
+        _gridHandler = gridHandler;
+        _gridHandler.GridDestroyed -= OnGridDestroyed;
+        _gridHandler.GridDestroyed += OnGridDestroyed;
+        
+        _held = false;
+        _beingDestroyed = false;
+        _itemData = data;
+
+        itemLabel.text = _itemData.Label;
+        itemRenderer.sprite = _itemData.Sprite;
+        transform.localScale = _baseScale;
+        gameObject.name = _itemData ? $"Item ({_itemData.Label})" : "Item (Empty)";
+        
         UpdateVisuals();
     }
+
 
     public void SetCurrentTile(Match3Tile match3Tile)
     {
@@ -74,6 +100,8 @@ public class Match3Object : MonoBehaviour
     
     public void SetHeld(bool held)
     {
+        if (_beingDestroyed) return;
+        
         _held = held;
         UpdateVisuals();
     }
@@ -83,10 +111,14 @@ public class Match3Object : MonoBehaviour
         _beingDestroyed = true;
         MobileHaptics.Vibrate(50);
         popSfx.Play(_currentMatch3Tile.AudioSource);
-        var particle = Instantiate(popParticle, transform.position, Quaternion.identity);
+        var particleGo = ObjectPooler.GetObjectFromPool(popParticle.gameObject, transform.position, Quaternion.identity);
+        var particle = particleGo.GetComponent<OneShotParticle>();
         particle.Play(transform.position);
-        Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack);
-        Destroy(gameObject, destroyDuration);
+        
+        
+        var popSequence = Sequence.Create();
+        popSequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
+        popSequence.ChainCallback(() => ObjectPooler.ReturnObjectToPool(gameObject));
     }
     
     
@@ -94,12 +126,29 @@ public class Match3Object : MonoBehaviour
     {
         if (_beingDestroyed) return;
         
-        itemLabel.text = _itemData.Label;
-        itemRenderer.sprite = _itemData.Sprite;
         itemRenderer.color = _held ? heldColor : _baseColor;
-        gameObject.name = _itemData ? $"Item ({_itemData.Label})" : "Item (Empty)";
-        
         var endScale = _held ? _baseScale * heldScaleMultiplier : _baseScale;
         if (transform.localScale != endScale) Tween.Scale(transform, endScale, heldDuration, Ease.OutBack);
+    }
+    
+    
+
+    public void OnPoolGet()
+    {
+
+    }
+
+    public void OnPoolReturn()
+    {
+        if (_gridHandler) _gridHandler.GridDestroyed -= OnGridDestroyed;
+        _movementSequence.Stop();
+        _beingDestroyed = true;
+        transform.localScale = _baseScale;
+        _currentMatch3Tile = null;
+    }
+
+    public void OnPoolRecycle()
+    {
+
     }
 }
