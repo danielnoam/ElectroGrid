@@ -76,17 +76,17 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         _beingDestroyed = true;
         
         if (destroySfx) destroySfx.Play(audioSource);
-        if (destroyParticle)
-        {
-            var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-            var particle = particleGo.GetComponent<OneShotParticle>();
-            particle.Play(transform.position);
-        }
         
         var destroySequence = Sequence.Create();
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
         destroySequence.ChainCallback(() =>
         {
+            if (destroyParticle)
+            {
+                var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
+                var particle = particleGo.GetComponent<OneShotParticle>();
+                particle.Play(transform.position);
+            }
             ObjectPooler.ReturnObjectToPool(gameObject);
         });
     }

@@ -1,3 +1,4 @@
+using DNExtensions.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
@@ -36,6 +37,29 @@ public class Match3BottomObject : Match3Object
             }
             
             CheckIfReachedBottom();
+        });
+    }
+    
+    protected override void DestroyWithAnimation()
+    {
+        _beingDestroyed = true;
+        
+        if (destroySfx) destroySfx.Play(audioSource);
+        if (destroyParticle)
+        {
+            var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
+            var particle = particleGo.GetComponent<OneShotParticle>();
+            particle.Play(transform.position);
+        }
+
+        var bellowCellPosition = _gridHandler.Grid.GetCellWorldPosition(_currentTile.GridPosition.x, -1);
+        var endPosition = new Vector3(bellowCellPosition.x, bellowCellPosition.y, transform.localPosition.z);
+        
+        var destroySequence = Sequence.Create();
+        destroySequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, Ease.OutQuart));
+        destroySequence.ChainCallback(() =>
+        {
+            ObjectPooler.ReturnObjectToPool(gameObject);
         });
     }
 

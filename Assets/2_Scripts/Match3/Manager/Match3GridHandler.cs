@@ -40,6 +40,8 @@ public class Match3GridHandler : MonoBehaviour
         _tiles.Clear();
         GridDestroyed?.Invoke();
 
+        List<int> rowsWithBottomObjects = new List<int>();
+
         for (int x = 0; x < Grid.Width; x++)
         {
             for (int y = 0; y < Grid.Height; y++)
@@ -58,8 +60,19 @@ public class Match3GridHandler : MonoBehaviour
                 else if (level.TileHasObjectType(x, y, Match3TileObjectType.Bottom))
                 {
                     CreateBottomObject(tile);
+                    rowsWithBottomObjects.Add(x);
                 }
             }
+        }
+
+        // Clear duplicates
+        rowsWithBottomObjects = rowsWithBottomObjects.Distinct().ToList();
+        foreach (var row in rowsWithBottomObjects)
+        {
+            Vector2Int tileGridPosition = new Vector2Int(row, -1);
+            Vector3 tileWorldPosition = Grid.GetCellWorldPosition(row, -1);
+            var tile = CreateTileAsTrash(tileWorldPosition, tileGridPosition);
+            _tiles.Add(tileGridPosition, tile);
         }
     }
     
@@ -68,6 +81,15 @@ public class Match3GridHandler : MonoBehaviour
         var tileGo = ObjectPooler.GetObjectFromPool(match3TilePrefab.gameObject, position, Quaternion.identity);
         var tile = tileGo.GetComponent<Match3Tile>();
         tile.Initialize(match3GameManager, gridPos, isActive);
+        
+        return tile;
+    }
+    
+    private Match3Tile CreateTileAsTrash(Vector3 position, Vector2Int gridPos)
+    {
+        var tileGo = ObjectPooler.GetObjectFromPool(match3TilePrefab.gameObject, position, Quaternion.identity);
+        var tile = tileGo.GetComponent<Match3Tile>();
+        tile.InitializeAsTrash(match3GameManager, gridPos);
         
         return tile;
     }

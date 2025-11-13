@@ -63,5 +63,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 1cb2160bf86022443a7ace8c59073263, type: 2}
   - {fileID: 11400000, guid: a564e7de9d60db64a930f83407b4d8ed, type: 2}
   - {fileID: 11400000, guid: 880210a7f1536d04db8efa4c9ddee947, type: 2}
+  - {fileID: 11400000, guid: 17f510d760fc7ad4b8e0afe91292f941, type: 2}
+  - {fileID: 11400000, guid: 49ee0b48ada61d24294a7e1bdbb8b8c2, type: 2}
   currentPopcorns: 0
   totalPopcornsCollected: 0

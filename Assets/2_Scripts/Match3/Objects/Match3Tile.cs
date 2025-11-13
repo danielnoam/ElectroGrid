@@ -12,7 +12,8 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     
     [Header("References")]
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private SpriteRenderer tileRenderer;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private SpriteRenderer trashSpriteRenderer;
 
     [Separator]
     [SerializeField, ReadOnly] private Vector2Int gridPosition;
@@ -42,6 +43,24 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _isSelected = false;
         _isHovered = false;
         isActive = active;
+        trashSpriteRenderer.gameObject.SetActive(false);
+        
+        UpdateVisuals();
+    }
+    
+    public void InitializeAsTrash(Match3GameManager match3GameManager, Vector2Int position)
+    {
+        _match3GameManager = match3GameManager;
+        _match3GridHandler = _match3GameManager.GridHandler;
+        _match3GridHandler.GridDestroyed -= OnGridDestroyed;
+        _match3GridHandler.GridDestroyed += OnGridDestroyed;
+        
+        gameObject.name = $"Tile ({position.x},{position.y})";
+        gridPosition = position;
+        _isSelected = false;
+        _isHovered = false;
+        isActive = false;
+        trashSpriteRenderer.gameObject.SetActive(true);
         
         UpdateVisuals();
     }
@@ -60,26 +79,26 @@ public class Match3Tile : MonoBehaviour, IPooledObject
 
     private void UpdateVisuals()
     {
-        if (!tileRenderer) return;
+        if (!spriteRenderer) return;
 
         if (isActive)
         {
             if (_isSelected)
             {
-                tileRenderer.color = selectedTileColor;
+                spriteRenderer.color = selectedTileColor;
             }
             else if (_isHovered)
             {
-                tileRenderer.color = hoverTileColor;
+                spriteRenderer.color = hoverTileColor;
             }
             else
             {
-                tileRenderer.color = activeTileColor;
+                spriteRenderer.color = activeTileColor;
             }
         }
         else
         {
-            tileRenderer.color = inactiveTileColor;
+            spriteRenderer.color = inactiveTileColor;
         }
     }
     

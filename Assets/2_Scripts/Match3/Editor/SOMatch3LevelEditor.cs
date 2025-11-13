@@ -5,7 +5,7 @@ using UnityEditor;
 [CustomEditor(typeof(SOMatch3Level))]
 public class SOMatch3LevelEditor : UnityEditor.Editor
 {
-    private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Matchable;
+    private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
     private bool _isDragging;
     
     private const float CellSize = 20f;
@@ -119,13 +119,13 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
         GUI.backgroundColor = _currentPaintMode == Match3TileObjectType.Obstacle ? Color.yellow : Color.white;
         if (GUILayout.Button("Obstacles", GUILayout.Height(30)))
         {
-            _currentPaintMode = Match3TileObjectType.Obstacle;
+            _currentPaintMode = _currentPaintMode == Match3TileObjectType.Obstacle ? Match3TileObjectType.Matchable : Match3TileObjectType.Obstacle;
         }
         
         GUI.backgroundColor = _currentPaintMode == Match3TileObjectType.Bottom ? Color.yellow : Color.white;
         if (GUILayout.Button("Bottom", GUILayout.Height(30)))
         {
-            _currentPaintMode = Match3TileObjectType.Bottom;
+            _currentPaintMode = _currentPaintMode == Match3TileObjectType.Bottom ? Match3TileObjectType.Matchable : Match3TileObjectType.Bottom;
         }
         
         GUI.backgroundColor = Color.white;
