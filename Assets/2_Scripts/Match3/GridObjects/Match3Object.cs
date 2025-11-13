@@ -26,6 +26,7 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
     
     public SOItemData ItemData => _itemData;
     public Match3Tile CurrentTile => _currentTile;
+    
     public abstract bool IsSwappable { get; }
     public abstract bool IsMatchable { get; }
     public abstract bool IsMovable { get; }
@@ -67,42 +68,20 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
 
     public virtual void SetCurrentTile(Match3Tile match3Tile)
     {
-        bool spawning = !_currentTile;
         _currentTile = match3Tile;
-        
-        _movementSequence.Stop();
-        
-        var endPosition = new Vector3(_currentTile.transform.localPosition.x, _currentTile.transform.localPosition.y, transform.localPosition.z);
-        var ease = spawning ? Ease.OutQuad : Ease.Linear;
-        
-        _movementSequence = Sequence.Create();
-        _movementSequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, ease));
-        _movementSequence.ChainCallback(() =>
-        {
-            if (spawning && spawnSfx)
-            {
-                spawnSfx.Play(audioSource);
-            }
-        });
     }
-
-    protected virtual void PlayDestroyEffects()
+    
+    protected virtual void DestroyWithAnimation()
     {
-        if (destroySfx) destroySfx.Play(audioSource);
+        _beingDestroyed = true;
         
+        if (destroySfx) destroySfx.Play(audioSource);
         if (destroyParticle)
         {
             var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
             var particle = particleGo.GetComponent<OneShotParticle>();
             particle.Play(transform.position);
         }
-    }
-
-    protected virtual void DestroyWithAnimation()
-    {
-        _beingDestroyed = true;
-        
-        PlayDestroyEffects();
         
         var destroySequence = Sequence.Create();
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));

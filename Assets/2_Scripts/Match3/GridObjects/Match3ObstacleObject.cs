@@ -14,6 +14,8 @@ public class Match3ObstacleObject : Match3Object
     public override bool IsMatchable => false;
     public override bool IsMovable => false;
     public int CurrentHealth => _currentHealth;
+    
+    
 
     public override void Initialize(SOItemData data, Match3GridHandler gridHandler)
     {
@@ -29,10 +31,32 @@ public class Match3ObstacleObject : Match3Object
         }
         
         transform.localScale = Vector3.zero;
-        Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f);
     }
 
-    public void TakeDamage(int damage = 1)
+    public override void SetCurrentTile(Match3Tile match3Tile)
+    {
+        bool spawning = !_currentTile;
+        _currentTile = match3Tile;
+        
+        _movementSequence.Stop();
+        _movementSequence = Sequence.Create();
+        
+        if (spawning)
+        {
+            _movementSequence.Group(Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f));
+            _movementSequence.ChainCallback(() => { spawnSfx?.Play(audioSource); });
+        }
+        else
+        {
+            var endPosition = new Vector3(_currentTile.transform.localPosition.x, _currentTile.transform.localPosition.y, transform.localPosition.z);
+            
+            _movementSequence.Group(Tween.Scale(transform, Vector3.zero, swapDuration/2, Ease.OutBack, startDelay: 0.5f));
+            _movementSequence.ChainCallback(() => { transform.localPosition = endPosition; });
+            _movementSequence.Group(Tween.Scale(transform,_baseScale, swapDuration/2, Ease.OutBack, startDelay: 0.5f));
+        }
+    }
+
+    private void TakeDamage(int damage = 1)
     {
         if (_beingDestroyed) return;
         

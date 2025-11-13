@@ -177,12 +177,12 @@ public class ClearObstaclesObjective : Match3Objective
 
     public override string GetProgressText(bool includeText)
     {
-        return !includeText ? $"{_currentAmount}/{_requiredAmount}" : $"Cleared Obstacles: {_currentAmount}/{_requiredAmount}";
+        return !includeText ? $"{_currentAmount}/{_requiredAmount}" : $"Kernels: {_currentAmount}/{_requiredAmount}";
     }
 
     public override string GetObjectiveName()
     {
-        return "Clear Obstacles";
+        return "Pop Kernels";
     }
 
     public bool TileHasObstacle(int x, int y)
