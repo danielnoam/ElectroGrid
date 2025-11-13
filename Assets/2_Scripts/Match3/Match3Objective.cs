@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
@@ -14,14 +15,13 @@ public abstract class Match3Objective
     public SOGridShape GridShape => gridShape;
     public bool IsCompleted => Completed;
     
-    
+    public abstract bool AllowOnlyOneObjectiveOfThisType { get; }
 
     public abstract void SetupObjective();
     public abstract void OnMatchMade(List<Match3Tile> matchedTiles);
-    public abstract void OnLayerBreak(Match3Tile tile);
+    public abstract void OnObstacleBreak(Match3ObstacleObject obstacle);
     public abstract string GetProgressText(bool includeText);
     public abstract string GetObjectiveName();
-    
     
     public void SetGridShape(SOGridShape shape)
     {
@@ -35,6 +35,7 @@ public class GetMatches : Match3Objective
     [SerializeField, Min(1)] private int requiredAmount = 9;
     private int _currentAmount;
     
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
 
     public override void SetupObjective()
     {
@@ -54,9 +55,8 @@ public class GetMatches : Match3Objective
         }
     }
 
-    public override void OnLayerBreak(Match3Tile tile)
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
     {
-        // This objective doesn't care about tile breaks
     }
 
     public override string GetProgressText(bool includeText)
@@ -76,7 +76,8 @@ public class GetSpecificItemMatches : Match3Objective
     [SerializeField] private SOItemData targetItem;
     [SerializeField, Min(1)] private int requiredAmount  = 9;
     private int _currentAmount;
-    
+
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
 
     public override void SetupObjective()
     {
@@ -92,7 +93,7 @@ public class GetSpecificItemMatches : Match3Objective
         {
             if (!tile.HasObject) continue;
             
-            if (tile.CurrentMatch3Object.ItemData == targetItem)
+            if (tile.CurrentMatch3Object is Match3MatchableObject matchable && matchable.ItemData == targetItem)
             {
                 _currentAmount++;
             }
@@ -104,9 +105,8 @@ public class GetSpecificItemMatches : Match3Objective
         }
     }
 
-    public override void OnLayerBreak(Match3Tile tile)
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
     {
-        // This objective doesn't care about tile breaks
     }
 
     public override string GetProgressText(bool includeText)
@@ -123,25 +123,27 @@ public class GetSpecificItemMatches : Match3Objective
 }
 
 [Serializable]
-public class ClearLayersObjective : Match3Objective
+public class ClearObstaclesObjective : Match3Objective
 {
-    [SerializeField, HideInInspector] private bool[] layeredTiles;
+    [SerializeField, HideInInspector] private bool[] obstacleTiles;
     private int _requiredAmount;
     private int _currentAmount;
+    
 
-    public bool[] LayeredTiles => layeredTiles;
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
+    public bool[] ObstacleTiles => obstacleTiles;
 
     public override void SetupObjective()
     {
         _currentAmount = 0;
         Completed = false;
         
-        if (layeredTiles != null)
+        if (obstacleTiles != null)
         {
             _requiredAmount = 0;
-            foreach (bool isBreakable in layeredTiles)
+            foreach (bool hasObstacle in obstacleTiles)
             {
-                if (isBreakable) _requiredAmount++;
+                if (hasObstacle) _requiredAmount++;
             }
         }
     }
@@ -150,18 +152,18 @@ public class ClearLayersObjective : Match3Objective
     {
     }
 
-    public override void OnLayerBreak(Match3Tile tile)
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
     {
-        if (!gridShape || gridShape.Grid == null) return;
+        if (!gridShape || gridShape.Grid == null || !obstacle || !obstacle.CurrentTile) return;
         
         int width = gridShape.Grid.Width;
-        int x = tile.GridPosition.x;
-        int y = tile.GridPosition.y;
+        int x = obstacle.CurrentTile.GridPosition.x;
+        int y = obstacle.CurrentTile.GridPosition.y;
         int index = y * width + x;
 
-        if (layeredTiles != null && index >= 0 && index < layeredTiles.Length)
+        if (obstacleTiles != null && index >= 0 && index < obstacleTiles.Length)
         {
-            if (layeredTiles[index])
+            if (obstacleTiles[index])
             {
                 _currentAmount++;
 
@@ -175,15 +177,15 @@ public class ClearLayersObjective : Match3Objective
 
     public override string GetProgressText(bool includeText)
     {
-        return !includeText ? $"{_currentAmount}/{_requiredAmount}" : $"Cleared Layers: {_currentAmount}/{_requiredAmount}";
+        return !includeText ? $"{_currentAmount}/{_requiredAmount}" : $"Cleared Obstacles: {_currentAmount}/{_requiredAmount}";
     }
 
     public override string GetObjectiveName()
     {
-        return "Clear Layers";
+        return "Clear Obstacles";
     }
 
-    public bool TileHasLayer(int x, int y)
+    public bool TileHasObstacle(int x, int y)
     {
         if (!gridShape || gridShape.Grid == null) return false;
         
@@ -191,9 +193,12 @@ public class ClearLayersObjective : Match3Objective
         int height = gridShape.Grid.Height;
         
         if (x < 0 || x >= width || y < 0 || y >= height) return false;
-        if (layeredTiles == null || layeredTiles.Length != width * height) return false;
+        if (obstacleTiles == null || obstacleTiles.Length != width * height) return false;
         
         int index = y * width + x;
-        return layeredTiles[index];
+        return obstacleTiles[index];
     }
+
+
+
 }

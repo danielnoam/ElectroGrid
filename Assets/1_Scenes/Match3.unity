@@ -761,7 +761,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   minMatchCount: 3
   mxGuaranteedMatchAttempts: 100
-  maxAttemptsToRecheckMatches: 50
+  maxAttemptsToRecheckMatches: 150
   minPossibleMatches: 3
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
@@ -802,8 +802,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Match3GridManager
   match3GameManager: {fileID: 586155249}
+  match3MatchableObjectPrefab: {fileID: 5958041342160215586, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}
+  match3ObstacleObjectPrefab: {fileID: 4526459059392952050, guid: b53958aaeafcd6544a5101fb91a33485, type: 3}
   match3TilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
-  match3ObjectPrefab: {fileID: 1608689241954614118, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}
   defaultGridShape: {fileID: 11400000, guid: 4d4e698909a0cfd41882b043169c7594, type: 2}
 --- !u!114 &586155252
 MonoBehaviour:

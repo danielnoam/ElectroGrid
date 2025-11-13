@@ -18,7 +18,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
     private static readonly Color BackgroundColor = new Color(0.2f, 0.2f, 0.2f);
     private static readonly Color ActiveTileColor = new Color(0.3f, 0.7f, 0.3f);
     private static readonly Color InactiveTileColor = new Color(0.4f, 0.4f, 0.4f);
-    private static readonly Color BreakableTileColor = new Color(0.8f, 0.3f, 0.3f);
+    private static readonly Color ObstacleTileColor = new Color(0.8f, 0.3f, 0.3f);
     private static readonly Color GridLineColor = new Color(0.1f, 0.1f, 0.1f);
     private static readonly Color HoverColor = new Color(1f, 1f, 1f, 0.3f);
 
@@ -38,27 +38,22 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         var displayName = GetShortTypeName(typeName);
         var propertyPath = property.propertyPath;
 
-        // Get or create foldout state
         FoldoutStates.TryAdd(propertyPath, true);
 
-        // Foldout arrow and type dropdown rects
         var foldoutRect = new Rect(typeRect.x, typeRect.y, 15, typeRect.height);
         var dropdownRect = new Rect(typeRect.x + 15, typeRect.y, typeRect.width - 15, typeRect.height);
 
-        // Draw foldout arrow only if we have an objective selected
         if (property.managedReferenceValue != null)
         {
             FoldoutStates[propertyPath] = EditorGUI.Foldout(foldoutRect, FoldoutStates[propertyPath], GUIContent.none);
         }
 
-        // Draw the type selection dropdown
         var dropdownContent = new GUIContent(displayName ?? "Select Objective Type");
         if (EditorGUI.DropdownButton(dropdownRect, dropdownContent, FocusType.Keyboard)) 
         {
             ShowTypeMenu(property, typeName);
         }
 
-        // Draw the properties if foldout is expanded
         if (property.managedReferenceValue != null && FoldoutStates[propertyPath]) 
         {
             EditorGUI.indentLevel++;
@@ -66,18 +61,15 @@ public class Match3ObjectiveDrawer : PropertyDrawer
             var iterator = property.Copy();
             var endProperty = iterator.GetEndProperty();
     
-            // Enter children on first call
             if (iterator.NextVisible(true))
             {
                 do
                 {
-                    // Skip drawing the property if it's the script field
                     if (iterator.propertyPath.EndsWith(".m_Script"))
                         continue;
                     
-                    // Skip drawing breakableTiles array for BreakTilesObjective (we'll draw it custom)
-                    if (property.managedReferenceValue is ClearLayersObjective && 
-                        iterator.propertyPath.EndsWith(".breakableTiles"))
+                    if (property.managedReferenceValue is ClearObstaclesObjective && 
+                        iterator.propertyPath.EndsWith(".obstacleTiles"))
                         continue;
                 
                     var propHeight = EditorGUI.GetPropertyHeight(iterator, true);
@@ -88,11 +80,10 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                 while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty));
             }
 
-            // Draw custom grid editor for BreakTilesObjective
-            if (property.managedReferenceValue is ClearLayersObjective)
+            if (property.managedReferenceValue is ClearObstaclesObjective)
             {
                 contentRect.y += GridSpacing;
-                DrawBreakableLayersGrid(property, ref contentRect);
+                DrawObstacleGrid(property, ref contentRect);
             }
     
             EditorGUI.indentLevel--;
@@ -103,7 +94,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) 
     {
-        float height = EditorGUIUtility.singleLineHeight; // Type dropdown
+        float height = EditorGUIUtility.singleLineHeight;
     
         if (property.managedReferenceValue != null)
         {
@@ -117,13 +108,11 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                 {
                     do
                     {
-                        // Skip the m_Script field
                         if (iterator.propertyPath.EndsWith(".m_Script"))
                             continue;
                         
-                        // Skip breakableTiles array height (we calculate custom height)
-                        if (property.managedReferenceValue is ClearLayersObjective && 
-                            iterator.propertyPath.EndsWith(".breakableTiles"))
+                        if (property.managedReferenceValue is ClearObstaclesObjective && 
+                            iterator.propertyPath.EndsWith(".obstacleTiles"))
                             continue;
                         
                         height += EditorGUI.GetPropertyHeight(iterator, true) + EditorGUIUtility.standardVerticalSpacing;
@@ -131,21 +120,20 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                     while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty));
                 }
 
-                // Add height for grid editor if this is BreakTilesObjective
-                if (property.managedReferenceValue is ClearLayersObjective)
+                if (property.managedReferenceValue is ClearObstaclesObjective)
                 {
                     var gridShapeProp = property.FindPropertyRelative("gridShape");
                     if (gridShapeProp.objectReferenceValue is SOGridShape { Grid: not null } gridShape)
                     {
                         height += GridSpacing;
-                        height += EditorGUIUtility.singleLineHeight + 5; // Count display
-                        height += gridShape.Grid.Height * CellSize + 5; // Grid
-                        height += EditorGUIUtility.singleLineHeight + 5; // Buttons
+                        height += EditorGUIUtility.singleLineHeight + 5;
+                        height += gridShape.Grid.Height * CellSize + 5;
+                        height += EditorGUIUtility.singleLineHeight + 5;
                     }
                     else
                     {
                         height += GridSpacing;
-                        height += EditorGUIUtility.singleLineHeight + 5; // Help box
+                        height += EditorGUIUtility.singleLineHeight + 5;
                     }
                 }
             }
@@ -154,15 +142,15 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         return height;
     }
 
-    private void DrawBreakableLayersGrid(SerializedProperty property, ref Rect contentRect)
+    private void DrawObstacleGrid(SerializedProperty property, ref Rect contentRect)
     {
         var gridShapeProp = property.FindPropertyRelative("gridShape");
-        var tilesProp = property.FindPropertyRelative("layeredTiles");
+        var tilesProp = property.FindPropertyRelative("obstacleTiles");
 
         if (gridShapeProp.objectReferenceValue == null)
         {
             var helpBoxRect = new Rect(contentRect.x, contentRect.y, contentRect.width, EditorGUIUtility.singleLineHeight);
-            EditorGUI.HelpBox(helpBoxRect, "Assign a Grid Shape to edit layered tiles.", MessageType.Info);
+            EditorGUI.HelpBox(helpBoxRect, "Assign a Grid Shape to edit obstacle tiles.", MessageType.Info);
             contentRect.y += EditorGUIUtility.singleLineHeight + 5;
             return;
         }
@@ -182,21 +170,17 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         int height = grid.Height;
         int requiredSize = width * height;
 
-        // Initialize tiles array if needed
         if (tilesProp.arraySize != requiredSize)
         {
             tilesProp.arraySize = requiredSize;
             property.serializedObject.ApplyModifiedProperties();
         }
-        
 
-        // Count display
-        int breakableCount = GetBreakableCount(tilesProp);
+        int obstacleCount = GetObstacleCount(tilesProp);
         var countRect = new Rect(contentRect.x, contentRect.y, contentRect.width, EditorGUIUtility.singleLineHeight);
-        EditorGUI.LabelField(countRect, $"Layered Tiles: {breakableCount} / {grid.ActiveCellCount}");
+        EditorGUI.LabelField(countRect, $"Obstacle Tiles: {obstacleCount} / {grid.ActiveCellCount}");
         contentRect.y += EditorGUIUtility.singleLineHeight + 5;
 
-        // Grid
         float gridWidth = width * CellSize;
         float gridHeight = height * CellSize;
         var gridRect = new Rect(
@@ -209,17 +193,16 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         DrawGrid(gridRect, grid, tilesProp);
         contentRect.y += gridHeight + 5;
 
-        // Buttons
         var buttonRect = new Rect(contentRect.x, contentRect.y, contentRect.width / 2 - 2, EditorGUIUtility.singleLineHeight);
-        if (GUI.Button(buttonRect, "None Breakable"))
+        if (GUI.Button(buttonRect, "Clear All"))
         {
-            SetAllBreakable(tilesProp, grid, false);
+            SetAllObstacles(tilesProp, grid, false);
         }
 
         buttonRect.x += contentRect.width / 2 + 2;
-        if (GUI.Button(buttonRect, "Invert Breakable"))
+        if (GUI.Button(buttonRect, "Invert"))
         {
-            InvertBreakable(tilesProp, grid);
+            InvertObstacles(tilesProp, grid);
         }
 
         contentRect.y += EditorGUIUtility.singleLineHeight + 5;
@@ -233,7 +216,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
 
         EditorGUI.DrawRect(gridRect, BackgroundColor);
 
-        // Handle mouse input
         if (e.type == EventType.MouseDown && gridRect.Contains(e.mousePosition))
         {
             int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
@@ -271,7 +253,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
             _isDragging = false;
         }
 
-        // Draw cells
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
@@ -280,7 +261,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                 if (index >= tilesProp.arraySize) continue;
 
                 bool isActive = grid.IsCellActive(x, y);
-                bool isBreakable = tilesProp.GetArrayElementAtIndex(index).boolValue;
+                bool hasObstacle = tilesProp.GetArrayElementAtIndex(index).boolValue;
 
                 int visualY = height - 1 - y;
                 Rect cellRect = new Rect(
@@ -295,9 +276,9 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                 {
                     cellColor = InactiveTileColor;
                 }
-                else if (isBreakable)
+                else if (hasObstacle)
                 {
-                    cellColor = BreakableTileColor;
+                    cellColor = ObstacleTileColor;
                 }
                 else
                 {
@@ -313,7 +294,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
             }
         }
 
-        // Draw grid lines
         Handles.color = GridLineColor;
         for (int x = 0; x <= width; x++)
         {
@@ -332,7 +312,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         }
     }
 
-    private void SetAllBreakable(SerializedProperty tilesProp, Grid grid, bool value)
+    private void SetAllObstacles(SerializedProperty tilesProp, Grid grid, bool value)
     {
         for (int y = 0; y < grid.Height; y++)
         {
@@ -349,7 +329,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         GUI.changed = true;
     }
 
-    private void InvertBreakable(SerializedProperty tilesProp, Grid grid)
+    private void InvertObstacles(SerializedProperty tilesProp, Grid grid)
     {
         for (int y = 0; y < grid.Height; y++)
         {
@@ -367,7 +347,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
         GUI.changed = true;
     }
     
-    private int GetBreakableCount(SerializedProperty tilesProp)
+    private int GetObstacleCount(SerializedProperty tilesProp)
     {
         int count = 0;
         for (int i = 0; i < tilesProp.arraySize; i++)
@@ -382,7 +362,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
     {
         var menu = new GenericMenu();
         
-        // Add "None" option
         menu.AddItem(new GUIContent("None"), string.IsNullOrEmpty(currentTypeName), () => {
             property.managedReferenceValue = null;
             property.serializedObject.ApplyModifiedProperties();
@@ -420,7 +399,7 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                 catch { return Type.EmptyTypes; }
             })
             .Where(t => !t.IsAbstract && baseType.IsAssignableFrom(t) && t != baseType)
-            .ToDictionary(t => GetNiceName(t), t => t);
+            .ToDictionary(GetNiceName, t => t);
     }
 
     private static string GetShortTypeName(string fullTypeName) 
@@ -438,7 +417,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
     
     private static string GetNiceName(string typeName)
     {
-        // Remove "Match3Objective" or "Objective" suffix if present
         if (typeName.EndsWith("Objective"))
             typeName = typeName.Substring(0, typeName.Length - 9);
         

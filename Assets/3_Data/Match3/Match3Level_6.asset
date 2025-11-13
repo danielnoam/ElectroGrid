@@ -29,7 +29,7 @@ MonoBehaviour:
       chance: 25
       isLocked: 0
   objectives:
-  - rid: 3019431838296047849
+  - rid: 190982177052688496
   loseConditions:
   - rid: 190982044644802816
   references:
@@ -39,10 +39,10 @@ MonoBehaviour:
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
         conditionSprite: {fileID: 0}
-        allowedMoves: 10
-    - rid: 3019431838296047849
-      type: {class: ClearLayersObjective, ns: , asm: Assembly-CSharp}
+        allowedMoves: 13
+    - rid: 190982177052688496
+      type: {class: ClearObstaclesObjective, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
         gridShape: {fileID: 11400000, guid: 35a7e5d1954754f48b71205b6dbd7d4c, type: 2}
-        layeredTiles: 00000000000000000000000000000000000000010100000000000101010100000000010101010000000000010100000000000000000000000000000000000000
+        obstacleTiles: 00000000000000000000000000000000000001000001000000000001010000000000000101000000000001000001000000000000000000000000000000000000
