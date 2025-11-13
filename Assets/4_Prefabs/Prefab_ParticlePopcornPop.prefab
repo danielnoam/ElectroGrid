@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3520846649434023677}
   - component: {fileID: 243077210646262330}
   m_Layer: 0
-  m_Name: Prefab_PopcornPopParticle
+  m_Name: Prefab_ParticlePopcornPop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
