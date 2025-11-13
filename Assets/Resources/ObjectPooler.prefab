@@ -46,11 +46,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[3].poolName
-      value: PopParticle
+      value: PopcornParticle
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[4].poolName
-      value: BreakableParticle
+      value: KernelParticle
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[0].maxPoolSize
