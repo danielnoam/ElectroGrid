@@ -804,6 +804,7 @@ MonoBehaviour:
   match3GameManager: {fileID: 586155249}
   match3MatchableObjectPrefab: {fileID: 5958041342160215586, guid: 68830f1e0895a7a49a951c440cbdc768, type: 3}
   match3ObstacleObjectPrefab: {fileID: 4526459059392952050, guid: b53958aaeafcd6544a5101fb91a33485, type: 3}
+  match3BottomObjectPrefab: {fileID: 8633085351261850407, guid: ad24fda91db101f47b3137a71c48e67a, type: 3}
   match3TilePrefab: {fileID: 5184360021706139941, guid: e3a36ddcdd07a6a4493f1213ffbc27e3, type: 3}
   defaultGridShape: {fileID: 11400000, guid: 4d4e698909a0cfd41882b043169c7594, type: 2}
 --- !u!114 &586155252

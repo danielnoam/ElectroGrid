@@ -11,6 +11,7 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Match3GameManager match3GameManager;
     [SerializeField] private Match3MatchableObject match3MatchableObjectPrefab;
     [SerializeField] private Match3ObstacleObject match3ObstacleObjectPrefab;
+    [SerializeField] private Match3BottomObject match3BottomObjectPrefab;
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private SOGridShape defaultGridShape;
     
@@ -39,19 +40,6 @@ public class Match3GridHandler : MonoBehaviour
         _tiles.Clear();
         GridDestroyed?.Invoke();
 
-        ClearObstaclesObjective obstaclesObjective = null;
-        if (level.Objectives != null)
-        {
-            foreach (var objective in level.Objectives)
-            {
-                if (objective is ClearObstaclesObjective obstacleObj)
-                {
-                    obstaclesObjective = obstacleObj;
-                    break;
-                }
-            }
-        }
-
         for (int x = 0; x < Grid.Width; x++)
         {
             for (int y = 0; y < Grid.Height; y++)
@@ -63,9 +51,13 @@ public class Match3GridHandler : MonoBehaviour
                 var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState);
                 _tiles.Add(tileGridPosition, tile);
                 
-                if (obstaclesObjective != null && obstaclesObjective.TileHasObstacle(x, y))
+                if (level.TileHasObjectType(x, y, Match3TileObjectType.Obstacle))
                 {
                     CreateObstacleObject(tile);
+                }
+                else if (level.TileHasObjectType(x, y, Match3TileObjectType.Bottom))
+                {
+                    CreateBottomObject(tile);
                 }
             }
         }
@@ -107,6 +99,21 @@ public class Match3GridHandler : MonoBehaviour
         obstacle.SetCurrentTile(match3Tile);
 
         return obstacle;
+    }
+
+    public Match3BottomObject CreateBottomObject(Match3Tile match3Tile)
+    {
+        if (!IsValidTile(match3Tile)) return null;
+        
+        var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
+        var bottomObjGo = ObjectPooler.GetObjectFromPool(match3BottomObjectPrefab.gameObject, spawnPosition, Quaternion.identity);
+        var bottomObj = bottomObjGo.GetComponent<Match3BottomObject>();
+        
+        bottomObj.Initialize(null, this);
+        match3Tile.SetCurrentItem(bottomObj);
+        bottomObj.SetCurrentTile(match3Tile);
+
+        return bottomObj;
     }
 
     public Match3Tile GetTile(Vector2Int position)

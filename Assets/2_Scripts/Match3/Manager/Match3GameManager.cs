@@ -144,6 +144,11 @@ public class Match3GameManager : MonoBehaviour
         _currentLevelData?.OnObstacleBreak(obstacle);
     }
     
+    public void NotifyBottomObjectReached(Match3BottomObject bottomObject)
+    {
+        _currentLevelData?.OnBottomObjectReached(bottomObject);
+    }
+    
     private void UpdateLoseConditions()
     {
         if (levelComplete || !playHandler.CanInteract || _currentLevelData == null) return;

@@ -11,20 +11,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
     private static Dictionary<string, Type> _typeMap;
     private static readonly Dictionary<string, bool> FoldoutStates = new Dictionary<string, bool>();
 
-    private const float CellSize = 16f;
-    private const float CellBorder = 1f;
-    private const float GridSpacing = 10f;
-    
-    private static readonly Color BackgroundColor = new Color(0.2f, 0.2f, 0.2f);
-    private static readonly Color ActiveTileColor = new Color(0.3f, 0.7f, 0.3f);
-    private static readonly Color InactiveTileColor = new Color(0.4f, 0.4f, 0.4f);
-    private static readonly Color ObstacleTileColor = new Color(0.8f, 0.3f, 0.3f);
-    private static readonly Color GridLineColor = new Color(0.1f, 0.1f, 0.1f);
-    private static readonly Color HoverColor = new Color(1f, 1f, 1f, 0.3f);
-
-    private bool _isDragging;
-    private bool _dragState;
-
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) 
     {
         if (_typeMap == null) BuildTypeMap();
@@ -67,10 +53,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                 {
                     if (iterator.propertyPath.EndsWith(".m_Script"))
                         continue;
-                    
-                    if (property.managedReferenceValue is ClearObstaclesObjective && 
-                        iterator.propertyPath.EndsWith(".obstacleTiles"))
-                        continue;
                 
                     var propHeight = EditorGUI.GetPropertyHeight(iterator, true);
                     var propRect = new Rect(contentRect.x, contentRect.y, contentRect.width, propHeight);
@@ -78,12 +60,6 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                     contentRect.y += propHeight + EditorGUIUtility.standardVerticalSpacing;
                 }
                 while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty));
-            }
-
-            if (property.managedReferenceValue is ClearObstaclesObjective)
-            {
-                contentRect.y += GridSpacing;
-                DrawObstacleGrid(property, ref contentRect);
             }
     
             EditorGUI.indentLevel--;
@@ -111,251 +87,14 @@ public class Match3ObjectiveDrawer : PropertyDrawer
                         if (iterator.propertyPath.EndsWith(".m_Script"))
                             continue;
                         
-                        if (property.managedReferenceValue is ClearObstaclesObjective && 
-                            iterator.propertyPath.EndsWith(".obstacleTiles"))
-                            continue;
-                        
                         height += EditorGUI.GetPropertyHeight(iterator, true) + EditorGUIUtility.standardVerticalSpacing;
                     }
                     while (iterator.NextVisible(false) && !SerializedProperty.EqualContents(iterator, endProperty));
-                }
-
-                if (property.managedReferenceValue is ClearObstaclesObjective)
-                {
-                    var gridShapeProp = property.FindPropertyRelative("gridShape");
-                    if (gridShapeProp.objectReferenceValue is SOGridShape { Grid: not null } gridShape)
-                    {
-                        height += GridSpacing;
-                        height += EditorGUIUtility.singleLineHeight + 5;
-                        height += gridShape.Grid.Height * CellSize + 5;
-                        height += EditorGUIUtility.singleLineHeight + 5;
-                    }
-                    else
-                    {
-                        height += GridSpacing;
-                        height += EditorGUIUtility.singleLineHeight + 5;
-                    }
                 }
             }
         }
     
         return height;
-    }
-
-    private void DrawObstacleGrid(SerializedProperty property, ref Rect contentRect)
-    {
-        var gridShapeProp = property.FindPropertyRelative("gridShape");
-        var tilesProp = property.FindPropertyRelative("obstacleTiles");
-
-        if (gridShapeProp.objectReferenceValue == null)
-        {
-            var helpBoxRect = new Rect(contentRect.x, contentRect.y, contentRect.width, EditorGUIUtility.singleLineHeight);
-            EditorGUI.HelpBox(helpBoxRect, "Assign a Grid Shape to edit obstacle tiles.", MessageType.Info);
-            contentRect.y += EditorGUIUtility.singleLineHeight + 5;
-            return;
-        }
-
-        SOGridShape gridShape = (SOGridShape)gridShapeProp.objectReferenceValue;
-        Grid grid = gridShape.Grid;
-
-        if (grid == null)
-        {
-            var helpBoxRect = new Rect(contentRect.x, contentRect.y, contentRect.width, EditorGUIUtility.singleLineHeight);
-            EditorGUI.HelpBox(helpBoxRect, "Grid Shape has no valid grid.", MessageType.Warning);
-            contentRect.y += EditorGUIUtility.singleLineHeight + 5;
-            return;
-        }
-
-        int width = grid.Width;
-        int height = grid.Height;
-        int requiredSize = width * height;
-
-        if (tilesProp.arraySize != requiredSize)
-        {
-            tilesProp.arraySize = requiredSize;
-            property.serializedObject.ApplyModifiedProperties();
-        }
-
-        int obstacleCount = GetObstacleCount(tilesProp);
-        var countRect = new Rect(contentRect.x, contentRect.y, contentRect.width, EditorGUIUtility.singleLineHeight);
-        EditorGUI.LabelField(countRect, $"Obstacle Tiles: {obstacleCount} / {grid.ActiveCellCount}");
-        contentRect.y += EditorGUIUtility.singleLineHeight + 5;
-
-        float gridWidth = width * CellSize;
-        float gridHeight = height * CellSize;
-        var gridRect = new Rect(
-            contentRect.x + (contentRect.width - gridWidth) / 2,
-            contentRect.y,
-            gridWidth,
-            gridHeight
-        );
-
-        DrawGrid(gridRect, grid, tilesProp);
-        contentRect.y += gridHeight + 5;
-
-        var buttonRect = new Rect(contentRect.x, contentRect.y, contentRect.width / 2 - 2, EditorGUIUtility.singleLineHeight);
-        if (GUI.Button(buttonRect, "Clear All"))
-        {
-            SetAllObstacles(tilesProp, grid, false);
-        }
-
-        buttonRect.x += contentRect.width / 2 + 2;
-        if (GUI.Button(buttonRect, "Invert"))
-        {
-            InvertObstacles(tilesProp, grid);
-        }
-
-        contentRect.y += EditorGUIUtility.singleLineHeight + 5;
-    }
-
-    private void DrawGrid(Rect gridRect, Grid grid, SerializedProperty tilesProp)
-    {
-        Event e = Event.current;
-        int width = grid.Width;
-        int height = grid.Height;
-
-        EditorGUI.DrawRect(gridRect, BackgroundColor);
-
-        if (e.type == EventType.MouseDown && gridRect.Contains(e.mousePosition))
-        {
-            int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
-            int visualY = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
-            int y = height - 1 - visualY;
-
-            if (x >= 0 && x < width && y >= 0 && y < height && grid.IsCellActive(x, y))
-            {
-                _isDragging = true;
-                int index = y * width + x;
-                _dragState = !tilesProp.GetArrayElementAtIndex(index).boolValue;
-                tilesProp.GetArrayElementAtIndex(index).boolValue = _dragState;
-                tilesProp.serializedObject.ApplyModifiedProperties();
-                GUI.changed = true;
-                e.Use();
-            }
-        }
-        else if (e.type == EventType.MouseDrag && _isDragging && gridRect.Contains(e.mousePosition))
-        {
-            int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
-            int visualY = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
-            int y = height - 1 - visualY;
-
-            if (x >= 0 && x < width && y >= 0 && y < height && grid.IsCellActive(x, y))
-            {
-                int index = y * width + x;
-                tilesProp.GetArrayElementAtIndex(index).boolValue = _dragState;
-                tilesProp.serializedObject.ApplyModifiedProperties();
-                GUI.changed = true;
-                e.Use();
-            }
-        }
-        else if (e.type == EventType.MouseUp)
-        {
-            _isDragging = false;
-        }
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                int index = y * width + x;
-                if (index >= tilesProp.arraySize) continue;
-
-                bool isActive = grid.IsCellActive(x, y);
-                bool hasObstacle = tilesProp.GetArrayElementAtIndex(index).boolValue;
-
-                int visualY = height - 1 - y;
-                Rect cellRect = new Rect(
-                    gridRect.x + x * CellSize,
-                    gridRect.y + visualY * CellSize,
-                    CellSize - CellBorder,
-                    CellSize - CellBorder
-                );
-
-                Color cellColor;
-                if (!isActive)
-                {
-                    cellColor = InactiveTileColor;
-                }
-                else if (hasObstacle)
-                {
-                    cellColor = ObstacleTileColor;
-                }
-                else
-                {
-                    cellColor = ActiveTileColor;
-                }
-
-                EditorGUI.DrawRect(cellRect, cellColor);
-
-                if (cellRect.Contains(Event.current.mousePosition))
-                {
-                    EditorGUI.DrawRect(cellRect, HoverColor);
-                }
-            }
-        }
-
-        Handles.color = GridLineColor;
-        for (int x = 0; x <= width; x++)
-        {
-            float xPos = gridRect.x + x * CellSize;
-            Handles.DrawLine(new Vector3(xPos, gridRect.y), new Vector3(xPos, gridRect.y + gridRect.height));
-        }
-        for (int y = 0; y <= height; y++)
-        {
-            float yPos = gridRect.y + y * CellSize;
-            Handles.DrawLine(new Vector3(gridRect.x, yPos), new Vector3(gridRect.x + gridRect.width, yPos));
-        }
-
-        if (gridRect.Contains(Event.current.mousePosition))
-        {
-            HandleUtility.Repaint();
-        }
-    }
-
-    private void SetAllObstacles(SerializedProperty tilesProp, Grid grid, bool value)
-    {
-        for (int y = 0; y < grid.Height; y++)
-        {
-            for (int x = 0; x < grid.Width; x++)
-            {
-                if (grid.IsCellActive(x, y))
-                {
-                    int index = y * grid.Width + x;
-                    tilesProp.GetArrayElementAtIndex(index).boolValue = value;
-                }
-            }
-        }
-        tilesProp.serializedObject.ApplyModifiedProperties();
-        GUI.changed = true;
-    }
-
-    private void InvertObstacles(SerializedProperty tilesProp, Grid grid)
-    {
-        for (int y = 0; y < grid.Height; y++)
-        {
-            for (int x = 0; x < grid.Width; x++)
-            {
-                if (grid.IsCellActive(x, y))
-                {
-                    int index = y * grid.Width + x;
-                    SerializedProperty element = tilesProp.GetArrayElementAtIndex(index);
-                    element.boolValue = !element.boolValue;
-                }
-            }
-        }
-        tilesProp.serializedObject.ApplyModifiedProperties();
-        GUI.changed = true;
-    }
-    
-    private int GetObstacleCount(SerializedProperty tilesProp)
-    {
-        int count = 0;
-        for (int i = 0; i < tilesProp.arraySize; i++)
-        {
-            if (tilesProp.GetArrayElementAtIndex(i).boolValue)
-                count++;
-        }
-        return count;
     }
 
     private void ShowTypeMenu(SerializedProperty property, string currentTypeName)

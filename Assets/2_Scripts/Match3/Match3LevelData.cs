@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +11,7 @@ public class Match3LevelData
     public int MovesMade;
     public int MatchesMade;
     public int ObstaclesBroken;
+    public int BottomObjectsReached;
     
     public Match3LevelData(SOMatch3Level level)
     {
@@ -19,6 +19,7 @@ public class Match3LevelData
         MovesMade = 0;
         MatchesMade = 0;
         ObstaclesBroken = 0;
+        BottomObjectsReached = 0;
         
         CurrentObjectives.Clear();
         CurrentLoseConditions.Clear();
@@ -73,6 +74,16 @@ public class Match3LevelData
         foreach (var objective in CurrentObjectives)
         {
             objective?.OnObstacleBreak(obstacleObject);
+        }
+    }
+    
+    public void OnBottomObjectReached(Match3BottomObject bottomObject)
+    {
+        BottomObjectsReached++;
+        
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnBottomObjectReached(bottomObject);
         }
     }
     
