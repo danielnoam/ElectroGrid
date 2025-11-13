@@ -374,7 +374,7 @@ MonoBehaviour:
   selectedTileColor: {r: 1, g: 1, b: 1, a: 1}
   hoverTileColor: {r: 0, g: 0, b: 0, a: 0.5882353}
   activeTileColor: {r: 0, g: 0, b: 0, a: 0.49019608}
-  inactiveTileColor: {r: 0, g: 0, b: 0, a: 0.29411766}
+  inactiveTileColor: {r: 0, g: 0, b: 0, a: 0.13725491}
   audioSource: {fileID: 5248791974110374006}
   tileRenderer: {fileID: 2548959169750997435}
   layerRenderer: {fileID: 8124075788320772976}
