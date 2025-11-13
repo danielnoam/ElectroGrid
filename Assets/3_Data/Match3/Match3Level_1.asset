@@ -30,8 +30,7 @@ MonoBehaviour:
       isLocked: 0
   objectives:
   - rid: 190982044644802808
-  loseConditions:
-  - rid: 190982061879197804
+  loseConditions: []
   references:
     version: 2
     RefIds:
@@ -41,8 +40,3 @@ MonoBehaviour:
         objectiveSprite: {fileID: 0}
         gridShape: {fileID: 11400000, guid: 4d4e698909a0cfd41882b043169c7594, type: 2}
         requiredAmount: 13
-    - rid: 190982061879197804
-      type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
-      data:
-        conditionSprite: {fileID: 0}
-        allowedMoves: 10

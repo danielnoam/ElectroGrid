@@ -14,7 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SOGridShape
   grid:
     size: {x: 8, y: 8}
-    origin: {x: 0, y: 0, z: 0}
+    origin: {x: 0, y: -1, z: 0}
     cellSize: {x: 1, y: 1, z: 0}
     cellSpacing: {x: 0.1, y: 0.1, z: 0}
     cells: 00000001010000000000010101010000000101010101010001010101010101010101010101010101010101010101010101010101010101010001010000010100
+    coordinateConverter:
+      rid: 3019431853672366085
+  references:
+    version: 2
+    RefIds:
+    - rid: 3019431853672366085
+      type: {class: VerticalConvertor, ns: , asm: Assembly-CSharp}
+      data: 

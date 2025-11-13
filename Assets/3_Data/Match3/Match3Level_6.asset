@@ -29,19 +29,12 @@ MonoBehaviour:
       chance: 25
       isLocked: 0
   objectives:
-  - rid: 190982044644802808
   - rid: 3019431838296047849
   loseConditions:
   - rid: 190982044644802816
   references:
     version: 2
     RefIds:
-    - rid: 190982044644802808
-      type: {class: GetMatches, ns: , asm: Assembly-CSharp}
-      data:
-        objectiveSprite: {fileID: 0}
-        gridShape: {fileID: 11400000, guid: 35a7e5d1954754f48b71205b6dbd7d4c, type: 2}
-        requiredAmount: 36
     - rid: 190982044644802816
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
@@ -52,4 +45,4 @@ MonoBehaviour:
       data:
         objectiveSprite: {fileID: 0}
         gridShape: {fileID: 11400000, guid: 35a7e5d1954754f48b71205b6dbd7d4c, type: 2}
-        layeredTiles: 00000000000000000000000000000000000000010100000000000001010000000000000101000000000000010100000000000000000000000000000000000000
+        layeredTiles: 00000000000000000000000000000000000000010100000000000101010100000000010101010000000000010100000000000000000000000000000000000000

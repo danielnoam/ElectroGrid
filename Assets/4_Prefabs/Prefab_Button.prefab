@@ -165,7 +165,7 @@ MonoBehaviour:
   rotationDuration: 0.15
   rotationEase: 31
   animateScale: 1
-  scaleMultiplier: 1.1
+  scaleMultiplier: 0.9
   scaleDuration: 0.15
   scaleEase: 31
   animateAlpha: 0
@@ -292,7 +292,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
+  m_fontSize: 65.8
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -349,23 +349,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableTextAnimator
   selectableAnimator: {fileID: 8657510666483211056}
-  positionEffectType: 0
+  positionEffectType: 2
   positionOffset: {x: 0, y: 10, z: 0}
   positionDuration: 0.15
   positionEase: 31
   shakeOnDeselect: 0
-  shakeStrength: {x: 3, y: 3, z: 0}
-  shakeFrequency: 10
+  shakeStrength: {x: 10, y: 10, z: 10}
+  shakeFrequency: 5
   shakeDuration: 0.5
   shakeEase: 0
   animateRotation: 0
   rotationOffset: {x: 0, y: 0, z: 15}
   rotationDuration: 0.15
   rotationEase: 31
-  animateScale: 1
-  scaleMultiplier: 1.1
+  animateScale: 0
+  scaleMultiplier: 1.15
   scaleDuration: 0.15
-  scaleEase: 31
+  scaleEase: 25
   animateColor: 1
   selectedColor: {r: 0.95686275, g: 0.7019608, b: 0.25490198, a: 1}
   colorDuration: 0.15

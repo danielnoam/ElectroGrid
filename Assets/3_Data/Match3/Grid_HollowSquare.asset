@@ -13,8 +13,16 @@ MonoBehaviour:
   m_Name: Grid_HollowSquare
   m_EditorClassIdentifier: Assembly-CSharp::SOGridShape
   grid:
-    size: {x: 9, y: 9}
-    origin: {x: 0, y: 0, z: 0}
+    size: {x: 8, y: 8}
+    origin: {x: 0, y: -1, z: 0}
     cellSize: {x: 1, y: 1, z: 0}
     cellSpacing: {x: 0.1, y: 0.1, z: 0}
-    cells: 010101010101010101010101010101010101010101010101010101010101000000010101010101000000010101010101000000010101010101010101010101010101010101010101010101010101010101
+    cells: 01010101010101010101010101010101010101010101010101010100000101010101010000010101010101010101010101010101010101010101010101010101
+    coordinateConverter:
+      rid: 3019431853672366083
+  references:
+    version: 2
+    RefIds:
+    - rid: 3019431853672366083
+      type: {class: VerticalConvertor, ns: , asm: Assembly-CSharp}
+      data: 

@@ -160,6 +160,7 @@ public class Mach3UIManager : MonoBehaviour
         
         ClearUIElements();
         
+        objectivesUIParent.gameObject.SetActive(objectives.Count > 0);
         foreach (var objective in objectives)
         {
             var uiElement = Instantiate(match3UIElementPrefab, objectivesUIParent);
@@ -168,6 +169,7 @@ public class Mach3UIManager : MonoBehaviour
             _currentObjectives.Add(objective, uiElement);
         }
 
+        loseConditionsUIParent.gameObject.SetActive(loseConditions.Count > 0);
         foreach (var loseCondition in loseConditions)
         {
             var uiElement = Instantiate(match3UIElementPrefab, loseConditionsUIParent);
@@ -212,7 +214,8 @@ public class Mach3UIManager : MonoBehaviour
         
         _topBarSequence.Stop();
         
-        var barEndSize = show ? _topBarDefaultSize : new Vector2(_topBarDefaultSize.x, 0f);
+        var barSizeMultiplier = objectivesUIParent.gameObject.activeSelf && loseConditionsUIParent.gameObject.activeSelf ? 1f : 0.6f;
+        var barEndSize = show ? _topBarDefaultSize * barSizeMultiplier : new Vector2(_topBarDefaultSize.x, 0f);
         var nameEndPosition = show ? _levelNameDefaultPositionY : 0f;
         var nameEndSize = show ? _levelNameDefaultSize : Vector2.zero;
         

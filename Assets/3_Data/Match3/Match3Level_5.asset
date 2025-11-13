@@ -39,9 +39,10 @@ MonoBehaviour:
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: 4b006d4db34ba604db69250255ef3754, type: 2}
         requiredAmount: 46
     - rid: 190982044644802816
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
         conditionSprite: {fileID: 0}
-        allowedMoves: 17
+        allowedMoves: 15

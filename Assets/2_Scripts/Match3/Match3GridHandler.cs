@@ -10,7 +10,6 @@ public class Match3GridHandler : MonoBehaviour
     [Header("References")]
     [SerializeField] private Match3GameManager match3GameManager;
     [SerializeField] private Match3Tile match3TilePrefab;
-    [SerializeField] private Transform tilesParent;
     [SerializeField] private Match3Object match3ObjectPrefab;
     [SerializeField] private SOGridShape defaultGridShape;
     
@@ -71,6 +70,7 @@ public class Match3GridHandler : MonoBehaviour
         }
     }
     
+    
     private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive, int breakableLayerHealth)
     {
         var tileGo = ObjectPooler.GetObjectFromPool(match3TilePrefab.gameObject, position, Quaternion.identity);
@@ -79,7 +79,6 @@ public class Match3GridHandler : MonoBehaviour
         
         return tile;
     }
-    
     
     public Match3Object CreateMatchObject(SOItemData itemData, Match3Tile match3Tile)
     {

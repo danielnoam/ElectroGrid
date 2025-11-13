@@ -76,8 +76,8 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1707604167
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -166,9 +166,9 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingLayerID: 875009103
+  m_SortingLayer: 2
+  m_SortingOrder: 2
   m_Sprite: {fileID: 5248415023898783801, guid: cbf58c37249d82a4e97598dfc07d9058, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -371,10 +371,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2df95fb5df7b47f5a8e13d7c73881b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
-  selectedTileColor: {r: 0, g: 1, b: 0, a: 1}
-  hoverTileColor: {r: 1, g: 0.6919855, b: 0, a: 0.5}
-  activeTileColor: {r: 1, g: 0.6901961, b: 0, a: 0.5019608}
-  inactiveTileColor: {r: 0.1, g: 0.1, b: 0.1, a: 0.29411766}
+  selectedTileColor: {r: 1, g: 1, b: 1, a: 1}
+  hoverTileColor: {r: 0, g: 0, b: 0, a: 0.5882353}
+  activeTileColor: {r: 0, g: 0, b: 0, a: 0.49019608}
+  inactiveTileColor: {r: 0, g: 0, b: 0, a: 0.29411766}
   audioSource: {fileID: 5248791974110374006}
   tileRenderer: {fileID: 2548959169750997435}
   layerRenderer: {fileID: 8124075788320772976}

@@ -40,6 +40,7 @@ MonoBehaviour:
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: 3c386d78e38322a448a056f80e2497c0, type: 2}
         requiredAmount: 26
     - rid: 190982044644802816
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
@@ -50,4 +51,4 @@ MonoBehaviour:
       type: {class: TimeLimit, ns: , asm: Assembly-CSharp}
       data:
         conditionSprite: {fileID: 0}
-        allowedTime: 50
+        allowedTime: 45
