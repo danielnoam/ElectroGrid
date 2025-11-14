@@ -30,7 +30,7 @@ public class Match3LevelData
             {
                 string json = JsonUtility.ToJson(objective);
                 Match3Objective copy = (Match3Objective)JsonUtility.FromJson(json, objective.GetType());
-                copy.SetupObjective();
+                copy.Setup();
                 CurrentObjectives.Add(copy);
             }
         }
@@ -41,7 +41,7 @@ public class Match3LevelData
             {
                 string json = JsonUtility.ToJson(condition);
                 Match3LoseCondition copy = (Match3LoseCondition)JsonUtility.FromJson(json, condition.GetType());
-                copy.SetupCondition();
+                copy.Setup();
                 CurrentLoseConditions.Add(copy);
             }
         }

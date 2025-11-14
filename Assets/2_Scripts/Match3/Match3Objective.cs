@@ -16,13 +16,13 @@ public abstract class Match3Objective
     public bool IsCompleted => Completed;
     
     public abstract bool AllowOnlyOneObjectiveOfThisType { get; }
-
-    public abstract void SetupObjective();
+    public abstract void Setup();
     public abstract void OnMatchMade(List<Match3Tile> matchedTiles);
     public abstract void OnObstacleBreak(Match3ObstacleObject obstacle);
     public abstract void OnBottomObjectReached(Match3BottomObject bottomObject);
     public abstract string GetProgressText(bool includeText);
-    public abstract string GetObjectiveName();
+    public abstract string GetName();
+    public abstract string GetDescription();
     
     public void SetGridShape(SOGridShape shape)
     {
@@ -38,7 +38,7 @@ public class GetMatches : Match3Objective
     
     public override bool AllowOnlyOneObjectiveOfThisType => true;
 
-    public override void SetupObjective()
+    public override void Setup()
     {
         _currentAmount = 0;
         Completed = false;
@@ -69,9 +69,14 @@ public class GetMatches : Match3Objective
         return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Matches: {_currentAmount}/{requiredAmount}";
     }
 
-    public override string GetObjectiveName()
+    public override string GetName()
     {
         return "Get Matches";
+    }
+
+    public override string GetDescription()
+    {
+        return $"Get {requiredAmount} Matches";
     }
 }
 
@@ -84,7 +89,7 @@ public class GetSpecificItemMatches : Match3Objective
 
     public override bool AllowOnlyOneObjectiveOfThisType => true;
 
-    public override void SetupObjective()
+    public override void Setup()
     {
         _currentAmount = 0;
         Completed = false;
@@ -125,9 +130,14 @@ public class GetSpecificItemMatches : Match3Objective
         return $"{itemName}: {_currentAmount}/{requiredAmount}";
     }
 
-    public override string GetObjectiveName()
+    public override string GetName()
     {
         return $"Get {targetItem.Label} Matches";
+    }
+    
+    public override string GetDescription()
+    {
+        return $"Get {requiredAmount} Matches of {targetItem.Label}";
     }
 }
 
@@ -140,7 +150,7 @@ public class ClearObstaclesObjective : Match3Objective
     public int RequiredAmount => requiredAmount;
     public override bool AllowOnlyOneObjectiveOfThisType => true;
 
-    public override void SetupObjective()
+    public override void Setup()
     {
         _currentAmount = 0;
         Completed = false;
@@ -171,9 +181,14 @@ public class ClearObstaclesObjective : Match3Objective
         return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Kernels: {_currentAmount}/{requiredAmount}";
     }
 
-    public override string GetObjectiveName()
+    public override string GetName()
     {
         return "Pop Kernels";
+    }
+    
+    public override string GetDescription()
+    {
+        return $"Pop {requiredAmount} Kernels";
     }
 }
 
@@ -186,7 +201,7 @@ public class ReachBottomObjective : Match3Objective
     public int RequiredAmount => requiredAmount;
     public override bool AllowOnlyOneObjectiveOfThisType => true;
 
-    public override void SetupObjective()
+    public override void Setup()
     {
         _currentAmount = 0;
         Completed = false;
@@ -214,11 +229,16 @@ public class ReachBottomObjective : Match3Objective
 
     public override string GetProgressText(bool includeText)
     {
-        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Bottom: {_currentAmount}/{requiredAmount}";
+        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Burned Popcorns: {_currentAmount}/{requiredAmount}";
     }
 
-    public override string GetObjectiveName()
+    public override string GetName()
     {
         return "Reach Bottom";
+    }
+    
+    public override string GetDescription()
+    {
+        return $"Get {requiredAmount} Burned Popcorns to the Bottom";
     }
 }

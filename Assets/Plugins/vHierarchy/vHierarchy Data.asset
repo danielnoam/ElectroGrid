@@ -18,5 +18,6 @@ MonoBehaviour:
   bookmarks: []
   bookmarkedScenePaths:
   - Assets/1_Scenes/Main.unity
-  - Assets/1_Scenes/Match3.unity
   - Assets/1_Scenes/Clicker.unity
+  - Assets/1_Scenes/Match3.unity
+  - Assets/1_Scenes/Match3LevelSelection.unity

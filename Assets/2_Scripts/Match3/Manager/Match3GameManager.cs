@@ -90,7 +90,14 @@ public class Match3GameManager : MonoBehaviour
     {
         if (!currentLevel)
         {
-            currentLevel = GameManager.Instance.Match3Levels[0];
+            if (GameManager.Instance && GameManager.Instance.SelectedMatch3Level)
+            {
+                currentLevel = GameManager.Instance.SelectedMatch3Level;
+            }
+            else if (GameManager.Instance && GameManager.Instance.Match3Levels.Length > 0)
+            {
+                currentLevel = GameManager.Instance.Match3Levels[0];
+            }
         }
         
         if (!currentLevel)
@@ -155,7 +162,7 @@ public class Match3GameManager : MonoBehaviour
         
         foreach (var condition in _currentLevelData.CurrentLoseConditions)
         {
-            condition?.UpdateCondition(Time.deltaTime);
+            condition?.Update(Time.deltaTime);
         }
     }
 

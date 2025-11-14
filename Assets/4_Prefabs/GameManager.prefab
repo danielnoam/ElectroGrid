@@ -56,6 +56,10 @@ MonoBehaviour:
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
     sceneName: Match3
     scenePath: Assets/1_Scenes/Match3.unity
+  match3LevelsScene:
+    sceneAsset: {fileID: 102900000, guid: bbff813d392b7a34989ff1d94da637da, type: 3}
+    sceneName: Match3LevelSelection
+    scenePath: Assets/1_Scenes/Match3LevelSelection.unity
   match3Levels:
   - {fileID: 11400000, guid: 69ffbccbccefb6f4e91fd3f5f0606330, type: 2}
   - {fileID: 11400000, guid: 8831c445c9354a048a12ad3c3c3a94a5, type: 2}
@@ -67,3 +71,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 49ee0b48ada61d24294a7e1bdbb8b8c2, type: 2}
   currentPopcorns: 0
   totalPopcornsCollected: 0
+  selectedMatch3Level: {fileID: 0}

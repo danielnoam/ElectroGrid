@@ -17,15 +17,18 @@ public class GameManager : MonoBehaviour
     
     [Header("Match3")]
     [SerializeField] private SceneField match3Scene;
+    [SerializeField] private SceneField match3LevelsScene;
     [SerializeField] private SOMatch3Level[] match3Levels = Array.Empty<SOMatch3Level>();
     
     
     [Separator]
     [SerializeField, ReadOnly] private int currentPopcorns;
     [SerializeField, ReadOnly] private int totalPopcornsCollected;
+    [SerializeField, ReadOnly] private SOMatch3Level selectedMatch3Level;
     
     
     public SOMatch3Level[] Match3Levels => match3Levels;
+    public SOMatch3Level SelectedMatch3Level => selectedMatch3Level;
     public event Action OnPopcornsCollected;
 
 
@@ -64,10 +67,21 @@ public class GameManager : MonoBehaviour
         OnPopcornsCollected?.Invoke();
     }
     
+    public void SelectMatch3Level(SOMatch3Level level)
+    {
+        selectedMatch3Level = level;
+    }
+    
     [Button(ButtonPlayMode.OnlyWhenPlaying)]
     public void LoadMatch3Scene()
     {
         match3Scene?.LoadScene();
+    }
+    
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    public void LoadMatch3LevelsScene()
+    {
+        match3LevelsScene?.LoadScene();
     }
     
     [Button(ButtonPlayMode.OnlyWhenPlaying)]

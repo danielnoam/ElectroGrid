@@ -165,7 +165,7 @@ public class Mach3UIManager : MonoBehaviour
         {
             var uiElement = Instantiate(match3UIElementPrefab, objectivesUIParent);
             uiElement.Setup(objective.ObjectiveSprite, objective.GetProgressText(!objective.ObjectiveSprite));
-            uiElement.gameObject.name = objective.GetObjectiveName();
+            uiElement.gameObject.name = objective.GetName();
             _currentObjectives.Add(objective, uiElement);
         }
 
@@ -174,7 +174,7 @@ public class Mach3UIManager : MonoBehaviour
         {
             var uiElement = Instantiate(match3UIElementPrefab, loseConditionsUIParent);
             uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetProgressText(!loseCondition.ConditionSprite));
-            uiElement.gameObject.name = loseCondition.GetConditionName();
+            uiElement.gameObject.name = loseCondition.GetName();
             _currentLoseConditions.Add(loseCondition, uiElement);
         }
     }

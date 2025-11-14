@@ -22,7 +22,7 @@ public class MainMenuManager : MonoBehaviour
         match3Button.onClick.RemoveAllListeners();
         match3Button.onClick.AddListener(() =>
         {
-            GameManager.Instance?.LoadMatch3Scene();
+            GameManager.Instance?.LoadMatch3LevelsScene();
         });
         
         quitButton.onClick.RemoveAllListeners();

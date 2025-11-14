@@ -10,11 +10,12 @@ public abstract class Match3LoseCondition
     public Sprite ConditionSprite => conditionSprite;
     public bool IsConditionMet => ConditionMet;
 
-    public abstract void SetupCondition();
-    public abstract void UpdateCondition(float deltaTime);
+    public abstract void Setup();
+    public abstract void Update(float deltaTime);
     public abstract void OnMoveMade();
     public abstract string GetProgressText(bool includeText);
-    public abstract string GetConditionName();
+    public abstract string GetName();
+    public abstract string GetDescription();
 }
 
 [Serializable]
@@ -26,13 +27,13 @@ public class MoveLimit : Match3LoseCondition
     public int AllowedMoves => allowedMoves;
     public int MovesRemaining => _movesRemaining;
 
-    public override void SetupCondition()
+    public override void Setup()
     {
         _movesRemaining = allowedMoves;
         ConditionMet = false;
     }
 
-    public override void UpdateCondition(float deltaTime)
+    public override void Update(float deltaTime)
     {
     }
 
@@ -53,9 +54,14 @@ public class MoveLimit : Match3LoseCondition
         return !includeText ? $"{_movesRemaining}" : $"Moves Left: {_movesRemaining}";
     }
 
-    public override string GetConditionName()
+    public override string GetName()
     {
         return "Moves Limit";
+    }
+    
+    public override string GetDescription()
+    {
+        return $"{allowedMoves} Moves allowed";
     }
 }
 
@@ -68,13 +74,13 @@ public class TimeLimit : Match3LoseCondition
     public float AllowedTime => allowedTime;
     public float TimeRemaining => _timeRemaining;
 
-    public override void SetupCondition()
+    public override void Setup()
     {
         _timeRemaining = allowedTime;
         ConditionMet = false;
     }
 
-    public override void UpdateCondition(float deltaTime)
+    public override void Update(float deltaTime)
     {
         if (ConditionMet) return;
 
@@ -99,8 +105,16 @@ public class TimeLimit : Match3LoseCondition
         return !includeText ? $"{minutes:00}:{seconds:00}" : $"Time Left: {minutes:00}:{seconds:00}";
     }
 
-    public override string GetConditionName()
+    public override string GetName()
     {
         return "Time Limit";
+    }
+    
+    public override string GetDescription()
+    {
+        int minutes = Mathf.FloorToInt(allowedTime / 60f);
+        int seconds = Mathf.FloorToInt(allowedTime % 60f);
+        
+        return $"Allotted Time: {minutes:00}:{seconds:00}";
     }
 }

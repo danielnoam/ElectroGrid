@@ -16,7 +16,6 @@ public class ClickerManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
     }
     
 }

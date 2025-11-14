@@ -9,11 +9,14 @@ EditorBuildSettings:
     path: Assets/1_Scenes/Main.unity
     guid: 0d0435a33b290794194fc4c219f40184
   - enabled: 1
-    path: Assets/1_Scenes/Clicker.unity
-    guid: 4a2f152bf31ab53419a2a0496ed24ea2
+    path: Assets/1_Scenes/Match3LevelSelection.unity
+    guid: bbff813d392b7a34989ff1d94da637da
   - enabled: 1
     path: Assets/1_Scenes/Match3.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/1_Scenes/Clicker.unity
+    guid: 4a2f152bf31ab53419a2a0496ed24ea2
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
