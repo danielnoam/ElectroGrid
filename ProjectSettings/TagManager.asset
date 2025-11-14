@@ -41,7 +41,7 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Grid
+  - name: Tile
     uniqueID: 2587363129
     locked: 0
   - name: Object

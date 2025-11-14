@@ -240,4 +240,4 @@ MonoBehaviour:
   itemRenderer: {fileID: 4412200537256300565}
   spawnSfx: {fileID: 0}
   destroySfx: {fileID: 0}
-  destroyParticle: {fileID: 0}
+  destroyParticle: {fileID: 243077210646262330, guid: 2834ac8ef1684fc498d229bf30b9cb28, type: 3}

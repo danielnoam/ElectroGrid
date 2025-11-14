@@ -1,7 +1,9 @@
+using DNExtensions.Button;
 using DNExtensions.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
+[SelectionBase]
 public class Match3BottomObject : Match3Object
 {
     private Match3GameManager _gameManager;
@@ -25,42 +27,42 @@ public class Match3BottomObject : Match3Object
         _movementSequence.Stop();
         
         var endPosition = new Vector3(_currentTile.transform.localPosition.x, _currentTile.transform.localPosition.y, transform.localPosition.z);
-        var ease = spawning ? Ease.OutQuad : Ease.Linear;
         
         _movementSequence = Sequence.Create();
-        _movementSequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, ease));
-        _movementSequence.ChainCallback(() =>
-        {
-            if (spawning)
-            {
-                if (spawnSfx) spawnSfx.Play(audioSource);
-            }
-            
-            CheckIfReachedBottom();
-        });
+        _movementSequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, Ease.OutQuad));
+        if (spawning) _movementSequence.ChainCallback(() => { spawnSfx?.Play(audioSource); });
+
+        CheckIfReachedBottom();
     }
     
     protected override void DestroyWithAnimation()
     {
         _beingDestroyed = true;
         
-        if (destroySfx) destroySfx.Play(audioSource);
-        if (destroyParticle)
-        {
-            var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-            var particle = particleGo.GetComponent<OneShotParticle>();
-            particle.Play(transform.position);
-        }
+
 
         var bellowCellPosition = _gridHandler.Grid.GetCellWorldPosition(_currentTile.GridPosition.x, -1);
         var endPosition = new Vector3(bellowCellPosition.x, bellowCellPosition.y, transform.localPosition.z);
+        if (destroySfx) destroySfx.Play(audioSource);
         
-        var destroySequence = Sequence.Create();
-        destroySequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, Ease.OutQuart));
-        destroySequence.ChainCallback(() =>
-        {
-            ObjectPooler.ReturnObjectToPool(gameObject);
+        _movementSequence.Stop();
+        _movementSequence = Sequence.Create();
+        var duration = swapDuration * 3f;
+        
+        _movementSequence.Group(Tween.LocalPosition(transform, endPosition, duration, Ease.OutQuart));
+        _movementSequence.Group(Tween.Scale(transform, _baseScale * 0.75f, duration/1.75f, Ease.OutQuart, startDelay: duration/3));
+        _movementSequence.InsertCallback(duration * 0.5f, () => {
+            
+            MobileHaptics.Vibrate(50);
+            if (destroyParticle)
+            {
+                var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
+                var particle = particleGo.GetComponent<OneShotParticle>();
+                particle.Play(transform.position);
+            }
         });
+
+        _movementSequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
     }
 
     private void CheckIfReachedBottom()
@@ -71,6 +73,7 @@ public class Match3BottomObject : Match3Object
         }
     }
 
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
     private void ReachedBottom()
     {
         _currentTile?.SetCurrentItem(null);

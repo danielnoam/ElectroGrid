@@ -81,6 +81,8 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
         destroySequence.ChainCallback(() =>
         {
+            MobileHaptics.Vibrate(50);
+            
             if (destroyParticle)
             {
                 var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);

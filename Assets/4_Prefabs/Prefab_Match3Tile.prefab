@@ -168,7 +168,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 875009103
   m_SortingLayer: 2
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: 052159d1c77e52d45b40f3a70e5d01c2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -377,7 +377,7 @@ MonoBehaviour:
   inactiveTileColor: {r: 0, g: 0, b: 0, a: 0.13725491}
   audioSource: {fileID: 5248791974110374006}
   spriteRenderer: {fileID: 2548959169750997435}
-  trashSpriteRenderer: {fileID: 7977203322199207856}
+  trashObject: {fileID: 7613948976637631390}
   gridPosition: {x: 0, y: 0}
   isActive: 0
 --- !u!1 &5999282191292311393
@@ -458,7 +458,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 875009103
   m_SortingLayer: 2
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: cb7b23a684f9c854ca7f468c302df83a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

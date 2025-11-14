@@ -2,6 +2,7 @@ using DNExtensions;
 using PrimeTween;
 using UnityEngine;
 
+[SelectionBase]
 public class Match3MatchableObject : Match3Object
 {
     [Header("Matchable Settings")]

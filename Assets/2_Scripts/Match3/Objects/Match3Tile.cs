@@ -2,6 +2,7 @@ using DNExtensions;
 using DNExtensions.ObjectPooling;
 using UnityEngine;
 
+[SelectionBase]
 public class Match3Tile : MonoBehaviour, IPooledObject
 {
     [Header("Settings")]
@@ -13,7 +14,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     [Header("References")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private SpriteRenderer trashSpriteRenderer;
+    [SerializeField] private GameObject trashObject;
 
     [Separator]
     [SerializeField, ReadOnly] private Vector2Int gridPosition;
@@ -43,7 +44,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _isSelected = false;
         _isHovered = false;
         isActive = active;
-        trashSpriteRenderer.gameObject.SetActive(false);
+        trashObject.SetActive(false);
         
         UpdateVisuals();
     }
@@ -60,7 +61,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _isSelected = false;
         _isHovered = false;
         isActive = false;
-        trashSpriteRenderer.gameObject.SetActive(true);
+        trashObject.SetActive(true);
         
         UpdateVisuals();
     }

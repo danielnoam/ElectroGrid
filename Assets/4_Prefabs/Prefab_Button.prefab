@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8890823435884068750}
   - component: {fileID: 2091689956105089853}
   - component: {fileID: 3208736288784191921}
+  - component: {fileID: 7826607267302580638}
   - component: {fileID: 8657510666483211056}
   m_Layer: 5
   m_Name: Prefab_Button
@@ -136,6 +137,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7826607267302580638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5302415877516245720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 349b029ec1f8477992370d5bcadad6ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableHaptics
+  duration: 25
+  playOnSubmit: 1
+  playOnSelect: 0
+  playOnDeselect: 0
+  selectableAnimator: {fileID: 8657510666483211056}
 --- !u!114 &8657510666483211056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,7 +310,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 65.8
+  m_fontSize: 72
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1

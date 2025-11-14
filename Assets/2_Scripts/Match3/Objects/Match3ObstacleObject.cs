@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using PrimeTween;
 using UnityEngine;
 
+
+[SelectionBase]
 public class Match3ObstacleObject : Match3Object
 {
     [Header("Obstacle Settings")]
