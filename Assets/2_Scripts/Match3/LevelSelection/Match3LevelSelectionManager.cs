@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using DNExtensions.MenuSystem;
 using TMPro;
@@ -11,10 +12,17 @@ public class Match3LevelSelectionManager : MonoBehaviour
     [SerializeField] private Button levelButtonPrefab;
     
     [Header("Level Info Window")]
-    [SerializeField] private GameObject tilePrefab;
+    [SerializeField] private RectTransform gridContainer;
+    [SerializeField] private Image gridCellPrefab;
+    [SerializeField] private float cellSize = 20f;
+    [SerializeField] private float cellSpacing = 2f;
     [SerializeField] private TextMeshProUGUI levelTitleText;
     [SerializeField] private TextMeshProUGUI levelInfoText;
     [SerializeField] private Button levelStartButton;
+    
+    [Header("Grid Colors")]
+    [SerializeField] private Color activeCellColor = new Color(0.3f, 0.7f, 0.3f);
+    [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
     
     [Header("References")]
     [SerializeField] private Button backButton;
@@ -54,7 +62,6 @@ public class Match3LevelSelectionManager : MonoBehaviour
         {
             GameManager.Instance?.LoadMainMenuScene();
         });
-        
     }
 
     private void OnStartButtonClicked()
@@ -101,12 +108,13 @@ public class Match3LevelSelectionManager : MonoBehaviour
     private void OnLevelButtonClicked(SOMatch3Level level)
     {
         _selectedLevel = _selectedLevel == level ? null : level;
-
         UpdateLevelInfo();
     }
     
     private void UpdateLevelInfo()
     {
+        ClearGrid();
+        
         if (!_selectedLevel)
         {
             if (levelTitleText) levelTitleText.text = "Select a Level";
@@ -118,14 +126,14 @@ public class Match3LevelSelectionManager : MonoBehaviour
         if (levelTitleText) levelTitleText.text = _selectedLevel.LevelName;
         if (levelInfoText) levelInfoText.text = GenerateLevelInfo(_selectedLevel);
         if (levelStartButton) levelStartButton.interactable = true;
+        
+        DrawGrid(_selectedLevel.GridShape.Grid);
     }
 
     private string GenerateLevelInfo(SOMatch3Level level)
     {
         StringBuilder info = new StringBuilder();
-
-        info.AppendLine($"Grid: {level.GridShape.Grid.Width}x{level.GridShape.Grid.Height}");
-        info.AppendLine();
+        
 
         if (level.Objectives is { Count: > 0 })
         {
@@ -153,5 +161,53 @@ public class Match3LevelSelectionManager : MonoBehaviour
         }
 
         return info.ToString();
+    }
+
+    private void DrawGrid(Grid grid)
+    {
+        if (!gridContainer || !gridCellPrefab || grid == null) return;
+
+        int width = grid.Width;
+        int height = grid.Height;
+
+        float totalWidth = (width * cellSize) + ((width - 1) * cellSpacing);
+        float totalHeight = (height * cellSize) + ((height - 1) * cellSpacing);
+
+        gridContainer.sizeDelta = new Vector2(totalWidth, totalHeight);
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                CreateCell(x, y, grid);
+            }
+        }
+    }
+
+    private void CreateCell(int x, int y, Grid grid)
+    {
+        Image cell = Instantiate(gridCellPrefab, gridContainer);
+        cell.name = $"Cell ({x},{y})";
+    
+        RectTransform cellRect = cell.rectTransform;
+        cellRect.sizeDelta = new Vector2(cellSize, cellSize);
+
+        float posX = (x * (cellSize + cellSpacing)) - (gridContainer.sizeDelta.x / 2f) + (cellSize / 2f);
+        float posY = (y * (cellSize + cellSpacing)) - (gridContainer.sizeDelta.y / 2f) + (cellSize / 2f);
+    
+        cellRect.anchoredPosition = new Vector2(posX, posY);
+
+        bool isActive = grid.IsCellActive(x, y);
+        cell.color = isActive ? activeCellColor : inactiveCellColor;
+    }
+
+    private void ClearGrid()
+    {
+        if (!gridContainer) return;
+
+        foreach (Transform child in gridContainer)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }
