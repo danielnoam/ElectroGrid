@@ -13,9 +13,9 @@ public class Match3PlayHandler : MonoBehaviour
     [Tooltip("Duration taken to swap two objects")]
     [SerializeField, Min(0)] private float objectSwapDuration = 0.3f;
     [Tooltip("Delay between popping matched objects")]
-    [SerializeField, Min(0)] private float delayBetweenMatchPops = 0.075f;
+    [SerializeField, Min(0)] private float delayBetweenMatchPops = 0.05f;
     [Tooltip("Delay between moving objects downwards")]
-    [SerializeField, Min(0)] private float delayBetweenObjectMovement = 0.1f;
+    [SerializeField, Min(0)] private float delayBetweenObjectMovement = 0.15f;
     
     [Header("References")]
     [SerializeField] private Match3GameManager gameManager;
@@ -52,8 +52,10 @@ public class Match3PlayHandler : MonoBehaviour
         inputReader.OnSwipe -= OnSwipe;
     }
 
-    #region Input Handling
 
+    
+    #region Selection & Swapping
+    
     private void OnSwipe(Vector2 direction)
     {
         if (!canInteract || !heldMatch3Object) return;
@@ -108,10 +110,6 @@ public class Match3PlayHandler : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region Selection & Swapping
-
     private void SelectObjectInTile(Match3Tile match3Tile)
     {
         if (!gridHandler.CanSelectTile(match3Tile)) return;
@@ -127,7 +125,7 @@ public class Match3PlayHandler : MonoBehaviour
         selectionIndicator?.EnableIndicator(selectedMatch3Tile);
     }
     
-    public void ReleaseObject(bool animateReturn)
+    private void ReleaseObject(bool animateReturn)
     {
         selectedMatch3Tile?.SetSelected(false);
         selectedMatch3Tile = null;
@@ -155,7 +153,7 @@ public class Match3PlayHandler : MonoBehaviour
             return;
         }
 
-        if (IsPositionsTouching(match3Tile.GridPosition, selectedMatch3Tile.GridPosition))
+        if (gridHandler.Grid.AreCellsNeighbors(match3Tile.GridPosition, selectedMatch3Tile.GridPosition))
         {
             gameManager.StartCoroutine(gameManager.RunGameLogic(match3Tile.GridPosition, selectedMatch3Tile.GridPosition));
         }
@@ -187,17 +185,11 @@ public class Match3PlayHandler : MonoBehaviour
         ReleaseObject(false);
         yield return new WaitForSeconds(objectSwapDuration);
     }
-
-    private bool IsPositionsTouching(Vector2Int positionA, Vector2Int positionB)
-    {
-        int deltaX = Mathf.Abs(positionA.x - positionB.x);
-        int deltaY = Mathf.Abs(positionA.y - positionB.y);
-        
-        return (deltaX == 1 && deltaY == 0) || (deltaX == 0 && deltaY == 1);
-    }
+    
 
     #endregion
 
+    
     #region Match Detection
 
     public List<Match3Tile> FindImmediateMatches(SOGridShape gridShape)
@@ -485,20 +477,10 @@ public class Match3PlayHandler : MonoBehaviour
 
     #endregion
 
+    
     #region Match Handling
 
-    public IEnumerator HandleMatches(List<Match3Tile> tilesWithMatches)
-    {
-        foreach (var tile in tilesWithMatches)
-        {
-            if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
-            {
-                matchable.MatchFound();
-                yield return new WaitForSeconds(delayBetweenMatchPops);
-            }
-        }
-    }
-
+    
     public IEnumerator HandleMatchesAndRepopulate(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches)
     {
         while (true)
@@ -517,11 +499,20 @@ public class Match3PlayHandler : MonoBehaviour
             yield return PopulateGrid(level, gridShape, minPossibleMatches, true);
         }
     }
-
-    #endregion
-
-    #region Movement
-
+    
+    public IEnumerator HandleMatches(List<Match3Tile> tilesWithMatches)
+    {
+        foreach (var tile in tilesWithMatches)
+        {
+            if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
+            {
+                matchable.MatchFound();
+                yield return new WaitForSeconds(delayBetweenMatchPops);
+            }
+        }
+    }
+    
+    
     public IEnumerator MoveObjectsDown(SOGridShape gridShape)
     {
         bool objectsMoved;
@@ -572,8 +563,10 @@ public class Match3PlayHandler : MonoBehaviour
         } while (objectsMoved);
     }
 
-    #endregion
 
+    #endregion
+    
+    
     #region Population
 
     public Dictionary<Match3Tile, SOItemData> GenerateGridLayout(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches)
