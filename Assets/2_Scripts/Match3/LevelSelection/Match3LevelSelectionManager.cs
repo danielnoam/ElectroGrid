@@ -11,6 +11,7 @@ public class Match3LevelSelectionManager : MonoBehaviour
     [SerializeField] private Button levelButtonPrefab;
     
     [Header("Level Info Window")]
+    [SerializeField] private GameObject tilePrefab;
     [SerializeField] private TextMeshProUGUI levelTitleText;
     [SerializeField] private TextMeshProUGUI levelInfoText;
     [SerializeField] private Button levelStartButton;
@@ -109,7 +110,7 @@ public class Match3LevelSelectionManager : MonoBehaviour
         if (!_selectedLevel)
         {
             if (levelTitleText) levelTitleText.text = "Select a Level";
-            if (levelInfoText) levelInfoText.text = "Press a button to select a level";
+            if (levelInfoText) levelInfoText.text = "Press any of the buttons bellow to select a level";
             if (levelStartButton) levelStartButton.interactable = false;
             return;
         }

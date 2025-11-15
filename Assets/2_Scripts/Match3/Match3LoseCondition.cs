@@ -61,7 +61,7 @@ public class MoveLimit : Match3LoseCondition
     
     public override string GetDescription()
     {
-        return $"{allowedMoves} Moves allowed";
+        return $"Moves allowed: {allowedMoves}";
     }
 }
 
