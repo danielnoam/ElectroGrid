@@ -24,6 +24,7 @@ public class Match3GameManager : MonoBehaviour
     [SerializeField] private Match3GridHandler gridHandler;
     [SerializeField] private Match3PlayHandler playHandler;
     [SerializeField] private Match3SelectionIndicator selectionIndicator;
+    [SerializeField] private SOMatch3Level overrideLevel;
 
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level currentLevel;
@@ -90,7 +91,11 @@ public class Match3GameManager : MonoBehaviour
     {
         if (!currentLevel)
         {
-            if (GameManager.Instance && GameManager.Instance.SelectedMatch3Level)
+            if (overrideLevel)
+            {
+                currentLevel = overrideLevel;
+            }
+            else if (GameManager.Instance && GameManager.Instance.SelectedMatch3Level)
             {
                 currentLevel = GameManager.Instance.SelectedMatch3Level;
             }
