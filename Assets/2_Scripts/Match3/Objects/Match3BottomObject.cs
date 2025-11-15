@@ -25,13 +25,22 @@ public class Match3BottomObject : Match3Object
         _currentTile = match3Tile;
         
         _movementSequence.Stop();
+        _movementSequence = Sequence.Create();
         
         var endPosition = new Vector3(_currentTile.transform.localPosition.x, _currentTile.transform.localPosition.y, transform.localPosition.z);
         
-        _movementSequence = Sequence.Create();
-        _movementSequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, Ease.OutQuad));
-        if (spawning) _movementSequence.ChainCallback(() => { spawnSfx?.Play(audioSource); });
-
+        if (spawning)
+        {
+            transform.localPosition = endPosition;
+            transform.localScale = Vector3.zero;
+            _movementSequence.Group(Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f));
+            _movementSequence.ChainCallback(() => { spawnSfx?.Play(audioSource); });
+        }
+        else
+        {
+            _movementSequence.Group(Tween.LocalPosition(transform, endPosition, swapDuration, Ease.OutQuad));
+        }
+        
         CheckIfReachedBottom();
     }
     
