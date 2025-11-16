@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -196,6 +197,50 @@ public class Grid
         }
 
         return neighboringTile;
+    }
+    
+    public bool IsTouchingEdge(Vector2Int tile, out List<Vector2Int> directions)
+    {
+        directions = new List<Vector2Int>();
+
+        // Main directions
+        if (tile.x == 0)
+        {
+            directions.Add(Vector2Int.left);
+        }
+        if (tile.x == Width - 1)
+        {
+            directions.Add(Vector2Int.right);
+        }
+        if (tile.y == 0)
+        {
+            directions.Add(Vector2Int.down);
+        }
+        if (tile.y == Height - 1)
+        {
+            directions.Add(Vector2Int.up);
+        }
+        
+        // Diagonals
+        if (tile.x == Width - 1 && tile.y == Height - 1)
+        {
+            directions.Add(new Vector2Int(1,1));
+        }
+        if (tile.x == Width - 1 && tile.y == 0)
+        {
+            directions.Add(new Vector2Int(1, -1));
+        }
+        if (tile.x == 0 && tile.y == Height - 1)
+        {
+            directions.Add(new Vector2Int(-1, 1));
+        }
+        if (tile is { x: 0, y: 0 })
+        {
+            directions.Add(new Vector2Int(-1, -1));
+        }
+
+        return directions.Count > 0;
+
     }
     
     public bool AreCellsNeighbors(Vector2Int tile1, Vector2Int tile2)

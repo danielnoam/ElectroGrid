@@ -123,8 +123,21 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         }
         else
         {
-            spriteRenderer.color = inactiveTileColor;
             spriteRenderer.sprite = inactiveSprite;
+            
+
+            Vector2 center = new Vector2(
+                (_match3GridHandler.Grid.Width - 1) / 2f,
+                (_match3GridHandler.Grid.Height - 1) / 2f
+            );
+            
+            float maxDistance = Vector2.Distance(center, Vector2.zero);
+            float distanceFromCenter = Vector2.Distance(gridPosition, center);
+            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / maxDistance);
+            
+            Color color = inactiveTileColor;
+            color.a = Mathf.Lerp(1f, 0.05f, normalizedDistance);
+            spriteRenderer.color = color;
         }
     }
     
