@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6756617360464747664}
   - component: {fileID: 3520846649434023677}
   - component: {fileID: 243077210646262330}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Prefab_ParticleBurnedPopcornTrashed
   m_TagString: Untagged
   m_Icon: {fileID: 0}

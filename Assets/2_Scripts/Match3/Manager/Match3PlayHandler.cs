@@ -106,7 +106,7 @@ public class Match3PlayHandler : MonoBehaviour
         }            
         else if (heldMatch3Object && callbackContext.canceled)
         {
-            ReleaseObject(false);
+            ReleaseObject(true);
         }
     }
 

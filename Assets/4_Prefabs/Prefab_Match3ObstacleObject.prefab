@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7497906691377126023}
   - component: {fileID: 4412200537256300565}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 1179882405457458318}
   - component: {fileID: 6258589931594102740}
   - component: {fileID: 4526459059392952050}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Prefab_Match3ObstacleObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}

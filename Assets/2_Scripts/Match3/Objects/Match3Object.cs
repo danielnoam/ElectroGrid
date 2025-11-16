@@ -62,7 +62,7 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         _gridHandler.GridDestroyed += OnGridDestroyed;
 
         transform.localScale = _baseScale;
-        if (itemRenderer && _itemData) itemRenderer.sprite = _itemData.Sprite;
+        if (itemRenderer && _itemData) itemRenderer.sprite = _itemData.Sprite; itemRenderer.color = _itemData.Color;
         gameObject.name = _itemData ? $"{GetType().Name} ({_itemData.Label})" : GetType().Name;
     }
 
@@ -79,7 +79,7 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         
         var destroySequence = Sequence.Create();
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
-        destroySequence.ChainCallback(() =>
+        destroySequence.InsertCallback(destroyDuration * 0.5f, () =>
         {
             MobileHaptics.Vibrate(50);
             
@@ -89,11 +89,11 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
                 var particle = particleGo.GetComponent<OneShotParticle>();
                 particle.Play(transform.position);
             }
-            ObjectPooler.ReturnObjectToPool(gameObject);
         });
+        destroySequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
     }
 
-    public bool IsTouchingEndOfGrid()
+    protected bool IsTouchingEndOfGrid()
     {
         if (!_currentTile) return false;
 

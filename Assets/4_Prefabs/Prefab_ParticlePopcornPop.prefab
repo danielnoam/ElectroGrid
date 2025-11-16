@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6756617360464747664}
   - component: {fileID: 3520846649434023677}
   - component: {fileID: 243077210646262330}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Prefab_ParticlePopcornPop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -288,8 +288,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 1
-      minScalar: 0.5
+      scalar: 0.3
+      minScalar: 0.1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -1555,9 +1555,7 @@ ParticleSystem:
     uvChannelMask: -1
     rowMode: 1
     sprites:
-    - sprite: {fileID: 21300000, guid: 3b396d2a8922a654584a97ac560c3f49, type: 3}
-    - sprite: {fileID: 21300000, guid: d3813722ee375674bbe02b27a951ee22, type: 3}
-    - sprite: {fileID: 21300000, guid: d3813722ee375674bbe02b27a951ee22, type: 3}
+    - sprite: {fileID: 4211293783942383924, guid: a64f98d7a00501442ae40845562f1c20, type: 3}
     flipU: 0
     flipV: 0
   VelocityModule:
