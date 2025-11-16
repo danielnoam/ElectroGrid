@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2999230414988037010}
   - component: {fileID: 2548959169750997435}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1179882405457458318}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -57,7 +57,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: fcdbf513f027ff041ac7ca63a31f393c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingLayerID: -1707604167
   m_SortingLayer: 1
   m_SortingOrder: 1
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d972ed0f4dd9be7489951ee890952f5b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -100,7 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3468420803924056621}
   - component: {fileID: 4160268189910311655}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TrashSpriteBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -192,7 +192,7 @@ GameObject:
   - component: {fileID: 5248791974110374006}
   - component: {fileID: 339119523681392632}
   - component: {fileID: 5184360021706139941}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Prefab_Match3Tile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -372,9 +372,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
   selectedTileColor: {r: 1, g: 1, b: 1, a: 1}
-  hoverTileColor: {r: 0, g: 0, b: 0, a: 0.5882353}
-  activeTileColor: {r: 0, g: 0, b: 0, a: 0.49019608}
-  inactiveTileColor: {r: 0, g: 0, b: 0, a: 0.13725491}
+  hoverTileColor: {r: 0.57861626, g: 0, b: 0.5355038, a: 1}
+  activeTileColor: {r: 0.7168293, g: 0, b: 1, a: 1}
+  inactiveTileColor: {r: 0, g: 0.1947934, b: 0.5647059, a: 0.64705884}
+  activeSprite: {fileID: 21300000, guid: d972ed0f4dd9be7489951ee890952f5b, type: 3}
+  inactiveSprite: {fileID: 21300000, guid: f4579f688b18fa847b51a5cddaca9fda, type: 3}
   audioSource: {fileID: 5248791974110374006}
   spriteRenderer: {fileID: 2548959169750997435}
   trashObject: {fileID: 7613948976637631390}
@@ -390,7 +392,7 @@ GameObject:
   m_Component:
   - component: {fileID: 650899135581486627}
   - component: {fileID: 7977203322199207856}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TrashSpriteTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -479,13 +481,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 122912901557194919}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Trash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &122912901557194919
 Transform:
   m_ObjectHideFlags: 0

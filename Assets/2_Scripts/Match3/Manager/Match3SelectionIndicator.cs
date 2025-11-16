@@ -48,6 +48,7 @@ public class Match3SelectionIndicator : MonoBehaviour
         
         _pressedMatch3Tile = match3Tile;
         spriteRenderer.sprite = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Sprite;
+            spriteRenderer.color = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Color;
         if (spriteRenderer.transform.localScale != _baseSpriteScale) Tween.Scale(spriteRenderer.transform, _baseSpriteScale, 0.2f, Ease.OutBack);
         
         _enabled = true;

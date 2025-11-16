@@ -5,6 +5,8 @@ using UnityEngine;
 [SelectionBase]
 public class Match3MatchableObject : Match3Object
 {
+    private static readonly int EmissionMask = Shader.PropertyToID("_Emission_Mask");
+
     [Header("Matchable Settings")]
     [SerializeField] private float heldDuration = 0.2f;
     [SerializeField] private float heldScaleMultiplier = 0.8f;
@@ -17,6 +19,9 @@ public class Match3MatchableObject : Match3Object
     public override bool IsSwappable => true;
     public override bool IsMatchable => true;
     public override bool IsMovable => true;
+    
+    
+    
 
     protected override void Awake()
     {
@@ -28,8 +33,12 @@ public class Match3MatchableObject : Match3Object
     {
         base.Initialize(data, gridHandler);
         
+        if (data)
+        {
+            _baseColor = data.Color;
+            UpdateEmissionMask(data.EmissionMask);
+        }
         _held = false;
-        
         UpdateVisuals();
     }
 
@@ -68,6 +77,7 @@ public class Match3MatchableObject : Match3Object
 
     public void MatchFound()
     {
+        _currentTile?.PulseTile();
         _currentTile?.SetCurrentItem(null);
         DestroyWithAnimation();
     }
@@ -79,5 +89,11 @@ public class Match3MatchableObject : Match3Object
         itemRenderer.color = _held ? heldColor : _baseColor;
         var endScale = _held ? _baseScale * heldScaleMultiplier : _baseScale;
         if (transform.localScale != endScale) Tween.Scale(transform, endScale, heldDuration, Ease.OutBack);
+    }
+
+    private void UpdateEmissionMask(Texture2D emissionMask)
+    {
+        itemRenderer.material.SetTexture(EmissionMask, emissionMask);
+        
     }
 }
