@@ -29,6 +29,7 @@ public class Match3GameManager : MonoBehaviour
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level currentLevel;
     [SerializeField, ReadOnly] private bool levelComplete;
+    [SerializeField, ReadOnly] private bool finishedObjectives;
     [SerializeField, ReadOnly] private bool populatingGrid;
 
     private Match3LevelData _currentLevelData;
@@ -112,6 +113,7 @@ public class Match3GameManager : MonoBehaviour
         }
 
         levelComplete = false;
+        finishedObjectives = false;
         populatingGrid = false;
         
         _currentLevelData = new Match3LevelData(currentLevel);
@@ -122,21 +124,22 @@ public class Match3GameManager : MonoBehaviour
 
     private void CheckObjectives()
     {
-        if (levelComplete || populatingGrid || _currentLevelData == null) return;
+        if (levelComplete || populatingGrid || _currentLevelData == null || finishedObjectives) return;
 
         if (_currentLevelData.IsObjectivesComplete())
         {
-            CompleteLevel();
+            finishedObjectives = true;
+            StartCoroutine(CompleteLevel());
         }
     }
 
     private void CheckLoseConditions()
     {
-        if (levelComplete || populatingGrid || _currentLevelData == null) return;
+        if (levelComplete || populatingGrid || _currentLevelData == null || finishedObjectives) return;
         
         if (_currentLevelData.IsLostCondition())
         {
-            FailLevel();
+            StartCoroutine(FailLevel());
         }
     }
     
@@ -171,17 +174,31 @@ public class Match3GameManager : MonoBehaviour
         }
     }
 
-    private void CompleteLevel()
+    private IEnumerator CompleteLevel()
     {
         levelComplete = true;
         playHandler.CanInteract = false;
+        
+        yield return new WaitForSeconds(0.1f);
+        
+        yield return StartCoroutine(playHandler.ClearObjects());
+        
+        yield return new WaitForSeconds(0.2f);
+        
         LevelComplete?.Invoke(_currentLevelData);
     }
 
-    private void FailLevel()
+    private IEnumerator FailLevel()
     {
         levelComplete = true;
         playHandler.CanInteract = false;
+        
+        yield return new WaitForSeconds(0.1f);
+        
+        yield return StartCoroutine(playHandler.ClearObjects());
+        
+        yield return new WaitForSeconds(0.2f);
+
         LevelFailed?.Invoke(_currentLevelData);
     }
     
@@ -287,6 +304,6 @@ public class Match3GameManager : MonoBehaviour
     {
         if (levelComplete || populatingGrid) return;
         
-        CompleteLevel();
+        StartCoroutine(CompleteLevel());
     }
 }

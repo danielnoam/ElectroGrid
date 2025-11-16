@@ -44,11 +44,9 @@ public class Match3BottomObject : Match3Object
         CheckIfReachedBottom();
     }
     
-    protected override void DestroyWithAnimation()
+    public override void DestroyWithAnimation()
     {
         _beingDestroyed = true;
-        
-
 
         var bellowCellPosition = _gridHandler.Grid.GetCellWorldPosition(_currentTile.GridPosition.x, -1);
         var endPosition = new Vector3(bellowCellPosition.x, bellowCellPosition.y, transform.localPosition.z);

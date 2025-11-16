@@ -562,6 +562,19 @@ public class Match3PlayHandler : MonoBehaviour
             
         } while (objectsMoved);
     }
+    
+    public IEnumerator ClearObjects()
+    {
+        // Get all objects in grid
+        var tiles = gridHandler.Tiles.Values.Where(t => t.HasObject).ToList();
+        
+        // Destroy each one with a dealy
+        foreach (var tileObjectMatch in tiles)
+        {
+            tileObjectMatch.CurrentMatch3Object.DestroyWithAnimation();
+            yield return new WaitForSeconds(populationDuration / tiles.Count);
+        }
+    }
 
 
     #endregion
@@ -923,4 +936,6 @@ public class Match3PlayHandler : MonoBehaviour
     }
         
     #endregion
+
+
 }

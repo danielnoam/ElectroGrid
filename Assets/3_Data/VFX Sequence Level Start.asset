@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de20f28ea40c22c43978f33a09f060b4, type: 3}
+  m_Name: VFX Sequence Level Start
+  m_EditorClassIdentifier: 
+  sequenceDuration: 2
+  sequenceIsAdditive: 0
+  resetEffectsOnComplete: 0
+  effects:
+  - rid: 4047855796283506688
+  - rid: 190982246133661780
+  - rid: 190982246133661782
+  - rid: 190982246133661783
+  references:
+    version: 2
+    RefIds:
+    - rid: 190982246133661780
+      type: {class: SetLensDistortionDynamic, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0
+          maxValue: 1
+        useDefaultIntensity: 0
+        startIntensity: 0.5
+        endIntensity: 0.1
+        intensityEase: 12
+        useAdvancedAnimation: 0
+        createPulseEffect: 0
+        peakIntensity: 0.8
+        pulseCount: 1
+        usePresets: 1
+        distortionType: 6
+    - rid: 190982246133661782
+      type: {class: SetFullscreenScale, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0
+          maxValue: 0.5
+        useDefaultScale: 0
+        startScale: {x: 1, y: 1, z: 1}
+        endScale: {x: 0, y: 1, z: 0}
+        ease: 10
+    - rid: 190982246133661783
+      type: {class: SetVignette, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0
+          maxValue: 0.3
+        useDefaultIntensity: 0
+        startIntensity: 0
+        endIntensity: 0.25
+        intensityEase: 4
+        animateSmoothness: 1
+        useDefaultSmoothness: 0
+        startSmoothness: 0.2
+        endSmoothness: 1
+        smoothnessEase: 1
+        animateCenter: 0
+        useDefaultCenter: 0
+        startCenter: {x: 0.5, y: 0.5}
+        endCenter: {x: 0.5, y: 0.5}
+        centerEase: 1
+        useDefaultRoundness: 0
+        setRounded: 0
+    - rid: 4047855796283506688
+      type: {class: SetFullscreenColor, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0
+          maxValue: 0.5
+        type: 0
+        startColor: {r: 0, g: 0, b: 0, a: 1}
+        endColor: {r: 0, g: 0, b: 0, a: 0}
+        ease: 1
