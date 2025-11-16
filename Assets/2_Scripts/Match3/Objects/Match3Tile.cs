@@ -126,17 +126,19 @@ public class Match3Tile : MonoBehaviour, IPooledObject
             spriteRenderer.sprite = inactiveSprite;
             
 
-            Vector2 center = new Vector2(
-                (_match3GridHandler.Grid.Width - 1) / 2f,
-                (_match3GridHandler.Grid.Height - 1) / 2f
+            Vector2 closestPointOnGrid = new Vector2(
+                Mathf.Clamp(gridPosition.x, 0, _match3GridHandler.Grid.Width - 1),
+                Mathf.Clamp(gridPosition.y, 0, _match3GridHandler.Grid.Height - 1)
             );
             
-            float maxDistance = Vector2.Distance(center, Vector2.zero);
-            float distanceFromCenter = Vector2.Distance(gridPosition, center);
-            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / maxDistance);
+            float distanceFromGrid = Vector2.Distance(gridPosition, closestPointOnGrid);
             
+            float maxFadeDistance = 5;
+            float normalizedDistance = Mathf.Clamp01(distanceFromGrid / maxFadeDistance);
+            normalizedDistance = Mathf.Pow(normalizedDistance, 0.25f);
+
             Color color = inactiveTileColor;
-            color.a = Mathf.Lerp(1f, 0.05f, normalizedDistance);
+            color.a = Mathf.Lerp(inactiveTileColor.a, 0f, normalizedDistance);
             spriteRenderer.color = color;
         }
     }
@@ -160,7 +162,6 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     {
         if (!isActive) return;
         
-        var duration = 0.15f;
         _pulseSequence = Sequence.Create();
         _pulseSequence.Group(Tween.Scale(transform, _baseScale * squashScaleAmount, squashDuration * 0.3f, Ease.Linear));
         _pulseSequence.Chain(Tween.Scale(transform, _baseScale, squashDuration * 0.7f, Ease.OutSine));

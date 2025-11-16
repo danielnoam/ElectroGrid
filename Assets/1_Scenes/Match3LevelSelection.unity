@@ -1629,8 +1629,8 @@ Canvas:
   m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: -69269427
+  m_SortingOrder: 2
   m_TargetDisplay: 0
 --- !u!224 &532955898
 RectTransform:
@@ -1672,7 +1672,7 @@ MonoBehaviour:
   gridContainer: {fileID: 366104674}
   gridCellPrefab: {fileID: 6725453058231453612, guid: acdfb062e70f7ea4b97cf97139c4b45b, type: 3}
   cellSize: 35
-  cellSpacing: 2
+  cellSpacing: 2.5
   levelTitleText: {fileID: 1687281889}
   levelInfoText: {fileID: 56144073}
   levelStartButton: {fileID: 87819275}

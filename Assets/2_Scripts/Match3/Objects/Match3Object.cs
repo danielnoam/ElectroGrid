@@ -75,10 +75,9 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         _currentTile = match3Tile;
     }
     
-    protected virtual void DestroyWithAnimation()
+    public virtual void DestroyWithAnimation()
     {
         _beingDestroyed = true;
-        
         
         var destroySequence = Sequence.Create();
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
@@ -100,7 +99,7 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         });
         destroySequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
     }
-
+    
     protected bool IsTouchingEndOfGrid()
     {
         if (!_currentTile) return false;
@@ -120,4 +119,5 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
     public virtual void OnPoolRecycle()
     {
     }
+    
 }

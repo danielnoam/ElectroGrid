@@ -186,6 +186,18 @@ public class Grid
             origin
         );
     }
+
+    public Vector3 GetCellWorldPosition(Vector2Int position)
+    {
+        
+        return coordinateConverter.GridToWorldCenter(
+            position, 
+            size, 
+            cellSize, 
+            cellSpacing, 
+            origin
+        );
+    }
     
     public Vector2Int GetNeighboringCell(Vector2Int tile, Vector2Int direction)
     {

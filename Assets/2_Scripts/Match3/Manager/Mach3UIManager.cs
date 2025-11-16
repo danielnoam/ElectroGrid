@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DNExtensions;
+using DNExtensions.VFXManager;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -34,6 +35,7 @@ public class Mach3UIManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private Match3GameManager match3Manager;
+    [SerializeField] private Match3EffectManager match3EffectManager;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
 
     
@@ -81,13 +83,28 @@ public class Mach3UIManager : MonoBehaviour
         quitButton.onClick.RemoveAllListeners();
         quitButton.onClick.AddListener(() =>
         {
-            GameManager.Instance?.LoadMainMenuScene();
+            AnimateLevelCompleteWindow(false);
+            _levelCompleteSequence.ChainCallback(() =>
+            {
+                GameManager.Instance?.LoadMainMenuScene();
+            });
         });
         
         bottomBarQuitButton.onClick.RemoveAllListeners();
         bottomBarQuitButton.onClick.AddListener(() =>
         {
-            GameManager.Instance?.LoadMainMenuScene();
+            if (VFXManager.Instance)
+            {
+                AnimateBottomBar(false);
+                AnimateTopBar(false);
+                var quitSequence = Sequence.Create();
+                quitSequence.ChainDelay(VFXManager.Instance.PlayVFX(match3EffectManager.EndLevelSequence));
+                quitSequence.ChainCallback(() => GameManager.Instance?.LoadMainMenuScene());
+            }
+            else
+            {
+                GameManager.Instance?.LoadMainMenuScene();
+            }
         });
     }
 
@@ -293,7 +310,7 @@ public class Mach3UIManager : MonoBehaviour
             levelButton.onClick.AddListener(() =>
             {
                 AnimateLevelCompleteWindow(false);
-                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.5f, () =>
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.75f, () =>
                 {
                     match3Manager.SetNextLevel();
                 });
@@ -306,7 +323,7 @@ public class Mach3UIManager : MonoBehaviour
             levelButton.onClick.AddListener(() =>
             {
                 AnimateLevelCompleteWindow(false);
-                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.5f, () =>
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.75f, () =>
                 {
                     match3Manager.RestartLevel();
                 });

@@ -19,12 +19,14 @@ namespace DNExtensions.VFXManager
         [Header("Settings")]
         [Tooltip("If true, the post-processing effects will be automatically set up on Awake.")]
         [SerializeField] private bool autoSetupPostProcessing = true;
+        [SerializeField] private bool autoSetCameraIfUsingCameraOverlay;
         
         [Header("References")]
         [SerializeField] private Volume postProcessingVolume;
         [SerializeField] private Camera mainCamera;
         [SerializeField] private Image iconImage;
         [SerializeField] private Image fullScreenImage;
+        [SerializeField] private Canvas fullscreenCanvas;
         [SerializeField] private SOVFEffectsSequence[] effectsSequences;
     
 
@@ -126,6 +128,11 @@ namespace DNExtensions.VFXManager
             if (!mainCamera) mainCamera = Camera.main;
             if (mainCamera) DefaultCameraFOV = mainCamera.fieldOfView;
             
+            if (fullscreenCanvas && autoSetCameraIfUsingCameraOverlay && mainCamera)
+            {
+                fullscreenCanvas.worldCamera = mainCamera;
+            }
+            
             SetupPostProcessingVolume();
         }
 
@@ -141,6 +148,14 @@ namespace DNExtensions.VFXManager
 
         private void OnActiveSceneChanged(Scene currentScene, Scene nextScene)
         {
+            if (!mainCamera) mainCamera = Camera.main;
+            if (mainCamera) DefaultCameraFOV = mainCamera.fieldOfView;
+            
+            if (fullscreenCanvas && autoSetCameraIfUsingCameraOverlay && mainCamera)
+            {
+                fullscreenCanvas.worldCamera = mainCamera;
+            }
+            
             SetupPostProcessingVolume();
         }
         
