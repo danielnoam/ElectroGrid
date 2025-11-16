@@ -62,7 +62,11 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         _gridHandler.GridDestroyed += OnGridDestroyed;
 
         transform.localScale = _baseScale;
-        if (itemRenderer && _itemData) itemRenderer.sprite = _itemData.Sprite; itemRenderer.color = _itemData.Color;
+        if (itemRenderer && _itemData)
+        {
+            itemRenderer.sprite = _itemData.Sprite;
+            itemRenderer.color = _itemData.Color;
+        }
         gameObject.name = _itemData ? $"{GetType().Name} ({_itemData.Label})" : GetType().Name;
     }
 
@@ -75,19 +79,23 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
     {
         _beingDestroyed = true;
         
-        if (destroySfx) destroySfx.Play(audioSource);
         
         var destroySequence = Sequence.Create();
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
         destroySequence.InsertCallback(destroyDuration * 0.5f, () =>
         {
             MobileHaptics.Vibrate(50);
+            destroySfx?.PlayAtPoint(transform.position);
             
             if (destroyParticle)
             {
                 var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-                var particle = particleGo.GetComponent<OneShotParticle>();
-                particle.Play(transform.position);
+                var oneShotParticle = particleGo.GetComponent<OneShotParticle>();
+                var mainModule = oneShotParticle.particle.main;
+                var textureSheetModule = oneShotParticle.particle.textureSheetAnimation;
+                mainModule.startColor = itemRenderer.color;
+                textureSheetModule.SetSprite(0, itemRenderer.sprite);
+                oneShotParticle.Play(transform.position);
             }
         });
         destroySequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });

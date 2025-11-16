@@ -81,6 +81,7 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
         int matchableCount = level.GridShape.Grid.ActiveCellCount - obstacleCount - bottomObjectCount;
         int obstacleNeeded = 0;
         int bottomObjectNeeded = 0;
+        
 
         foreach (var objective in level.Objectives)
         {
@@ -93,8 +94,24 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
                 bottomObjectNeeded += reachBottomObjective.RequiredAmount;
             }
         }
+
+        string obstacleText = $"Obstacles: {obstacleCount} / {obstacleNeeded}";
+        if (obstacleNeeded > 0)
+        {
+             obstacleText = obstacleCount >= obstacleNeeded 
+                ? $"<color=green>Obstacles: {obstacleCount} / {obstacleNeeded}</color>" 
+                : $"<color=red>Obstacles: {obstacleCount} / {obstacleNeeded}</color>";
+        }
         
-        EditorGUILayout.LabelField($"Matchable: {matchableCount} | Obstacles: {obstacleCount} / {obstacleNeeded} | Bottom Objects: {bottomObjectCount} / {bottomObjectNeeded}");
+        string bottomText = $"Bottom: {bottomObjectCount} / {bottomObjectNeeded}";
+        if (bottomObjectNeeded > 0)
+        {
+            bottomText = bottomObjectCount >= bottomObjectNeeded 
+                ? $"<color=green>Bottom: {bottomObjectCount} / {bottomObjectNeeded}</color>" 
+                : $"<color=red>Bottom: {bottomObjectCount} / {bottomObjectNeeded}</color>";
+        }
+
+        EditorGUILayout.LabelField($"Matchable: {matchableCount} | {obstacleText} | {bottomText}", new GUIStyle(EditorStyles.label) { richText = true });
         
         EditorGUILayout.Space(5);
         

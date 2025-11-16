@@ -6,6 +6,8 @@ using UnityEngine;
 public class Match3SelectionIndicator : MonoBehaviour
 {
 
+    private static readonly int EmissionMask = Shader.PropertyToID("_Emission_Mask");
+    
     [Header("References")]
     [SerializeField] private Match3PlayHandler match3PlayHandler;
     [SerializeField] private Match3GameManager match3GameManager;
@@ -48,7 +50,8 @@ public class Match3SelectionIndicator : MonoBehaviour
         
         _pressedMatch3Tile = match3Tile;
         spriteRenderer.sprite = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Sprite;
-            spriteRenderer.color = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Color;
+        spriteRenderer.color = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Color;
+        UpdateEmissionMask(_pressedMatch3Tile.CurrentMatch3Object.ItemData.EmissionMask);
         if (spriteRenderer.transform.localScale != _baseSpriteScale) Tween.Scale(spriteRenderer.transform, _baseSpriteScale, 0.2f, Ease.OutBack);
         
         _enabled = true;
@@ -128,6 +131,11 @@ public class Match3SelectionIndicator : MonoBehaviour
             newHoveredMatch3Tile?.SetHovered(true);
             hoveredMatch3Tile = newHoveredMatch3Tile;
         }
+    }
+    
+    private void UpdateEmissionMask(Texture2D emissionMask)
+    {
+        spriteRenderer.material.SetTexture(EmissionMask, emissionMask);
     }
     
 

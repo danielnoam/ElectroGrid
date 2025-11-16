@@ -59,13 +59,20 @@ public class Match3MatchableObject : Match3Object
             if (spawning)
             {
                 if (spawnSfx) spawnSfx.Play(audioSource);
+                _currentTile?.SquashTile();
             }
             else
             {
                 if (swapSfx) swapSfx.Play(audioSource);
             }
         });
+        
+        var duration = 0.15f;
+        _movementSequence.Group(Tween.Scale(transform, _baseScale * 0.7f, duration * 0.3f, Ease.Linear));
+        _movementSequence.Chain(Tween.Scale(transform, _baseScale, duration * 0.7f, Ease.OutSine));
+
     }
+    
     
     public void SetHeld(bool held)
     {
@@ -77,7 +84,7 @@ public class Match3MatchableObject : Match3Object
 
     public void MatchFound()
     {
-        _currentTile?.PulseTile();
+        _currentTile?.PunchTile();
         _currentTile?.SetCurrentItem(null);
         DestroyWithAnimation();
     }

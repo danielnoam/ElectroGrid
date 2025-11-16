@@ -49,9 +49,9 @@ MonoBehaviour:
     sceneName: Main
     scenePath: Assets/1_Scenes/Main.unity
   clickerScene:
-    sceneAsset: {fileID: 102900000, guid: 4a2f152bf31ab53419a2a0496ed24ea2, type: 3}
-    sceneName: Clicker
-    scenePath: Assets/1_Scenes/Clicker.unity
+    sceneAsset: {fileID: 0}
+    sceneName: 
+    scenePath: 
   match3Scene:
     sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
     sceneName: Match3

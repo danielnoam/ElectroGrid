@@ -58,11 +58,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[4].poolName
-      value: PopcornParticle
+      value: ShapePopParticle
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[5].poolName
-      value: KernelParticle
+      value: ObstacleBreakParticle
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[6].poolName
@@ -94,7 +94,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[3].maxPoolSize
-      value: 150
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[3].preWarmPool
@@ -138,7 +138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[3].preWarmPoolSize
-      value: 50
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1102822903493287057, guid: 124ac3e8886e5b843bc502385749ae0b, type: 3}
       propertyPath: pools.Array.data[4].preWarmPoolSize

@@ -15,9 +15,13 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     [SerializeField] private Sprite activeSprite;
     [SerializeField] private Sprite inactiveSprite;
     
-    [Header("Pulse Settings")]
-    [SerializeField] private float pulseScaleAmount = 1.1f;
-    [SerializeField] private float pulseDuration = 0.2f;
+    [Header("Punch Settings")]
+    [SerializeField] private float punchScaleAmount = 1.1f;
+    [SerializeField] private float punchDuration = 0.2f;
+    
+    [Header("Squash Settings")]
+    [SerializeField] private float squashScaleAmount = 0.7f;
+    [SerializeField] private float squashDuration = 0.15f;
     
     [Header("References")]
     [SerializeField] private AudioSource audioSource;
@@ -139,13 +143,23 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         UpdateVisuals();
     }
     
-    public void PulseTile()
+    public void SquashTile()
     {
         if (!isActive) return;
         
-        Sequence pulseSequence = Sequence.Create();
-        pulseSequence.Group(Tween.Scale(transform, _baseScale * pulseScaleAmount, pulseDuration/2, Ease.OutElastic));
-        pulseSequence.Chain(Tween.Scale(transform, _baseScale, pulseDuration/2, Ease.InQuad));
+        var duration = 0.15f;
+        _pulseSequence = Sequence.Create();
+        _pulseSequence.Group(Tween.Scale(transform, _baseScale * squashScaleAmount, squashDuration * 0.3f, Ease.Linear));
+        _pulseSequence.Chain(Tween.Scale(transform, _baseScale, squashDuration * 0.7f, Ease.OutSine));
+    }
+    
+    public void PunchTile()
+    {
+        if (!isActive) return;
+        
+        _pulseSequence = Sequence.Create();
+        _pulseSequence.Group(Tween.Scale(transform, _baseScale * punchScaleAmount, punchDuration/2, Ease.OutElastic));
+        _pulseSequence.Chain(Tween.Scale(transform, _baseScale, punchDuration/2, Ease.InQuad));
     }
 
     public void OnPoolGet()

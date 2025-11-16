@@ -15,4 +15,4 @@ MonoBehaviour:
   label: Triangle
   color: {r: 0, g: 1, b: 0.32886362, a: 1}
   sprite: {fileID: 21300000, guid: 6ad651ee7a0eede42a4562d7740c75bd, type: 3}
-  emissionMask: {fileID: 2800000, guid: 6ad651ee7a0eede42a4562d7740c75bd, type: 3}
+  emissionMask: {fileID: 2800000, guid: 695a1eb26fbde4b45b86a3a19917e83f, type: 3}
