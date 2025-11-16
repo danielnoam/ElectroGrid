@@ -83,7 +83,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -8111322212487550922, guid: 4edd415ab2cd6784ea5e7905122a703d, type: 3}
+  m_Sprite: {fileID: 4211293783942383924, guid: a64f98d7a00501442ae40845562f1c20, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -385,7 +385,7 @@ MonoBehaviour:
   scaleDuration: 0.15
   scaleEase: 25
   animateColor: 1
-  selectedColor: {r: 0.95686275, g: 0.7019608, b: 0.25490198, a: 1}
+  selectedColor: {r: 1, g: 0.13521993, b: 0.86211616, a: 1}
   colorDuration: 0.15
   colorEase: 7
   textMeshPro: {fileID: 3982775019398211998}

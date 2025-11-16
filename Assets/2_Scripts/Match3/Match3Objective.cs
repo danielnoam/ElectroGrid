@@ -178,17 +178,17 @@ public class ClearObstaclesObjective : Match3Objective
 
     public override string GetProgressText(bool includeText)
     {
-        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Kernels: {_currentAmount}/{requiredAmount}";
+        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Double Stars: {_currentAmount}/{requiredAmount}";
     }
 
     public override string GetName()
     {
-        return "Pop Kernels";
+        return "Pop Double Stars";
     }
     
     public override string GetDescription()
     {
-        return $"Pop {requiredAmount} Kernels";
+        return $"Pop {requiredAmount} Double Stars";
     }
 }
 
@@ -229,7 +229,7 @@ public class ReachBottomObjective : Match3Objective
 
     public override string GetProgressText(bool includeText)
     {
-        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Burned Popcorns: {_currentAmount}/{requiredAmount}";
+        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Square Star: {_currentAmount}/{requiredAmount}";
     }
 
     public override string GetName()
@@ -239,6 +239,6 @@ public class ReachBottomObjective : Match3Objective
     
     public override string GetDescription()
     {
-        return $"Get {requiredAmount} Burned Popcorns to the Bottom";
+        return $"Get {requiredAmount} Square Stars to the Bottom";
     }
 }

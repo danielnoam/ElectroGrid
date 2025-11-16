@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: Match3ObjectSwap
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
   clips:
-  - {fileID: 8300000, guid: 2cc437f27661d664eb4c4d828ac20257, type: 3}
+  - {fileID: 8300000, guid: 1e6d76858bad34edb9eb15b988002366, type: 3}
+  - {fileID: 8300000, guid: e112b3993e3e04e55b7b119f97e3ff37, type: 3}
   mixerGroup: {fileID: 0}
   volume:
-    minValue: 1
-    maxValue: 1
+    minValue: 0.3
+    maxValue: 0.3
   pitch:
     minValue: 0.9
     maxValue: 1.1

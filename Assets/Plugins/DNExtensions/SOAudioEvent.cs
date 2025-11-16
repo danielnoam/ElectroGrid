@@ -88,16 +88,7 @@ namespace DNExtensions
             }
 
 
-            if (!useObjectPooler)
-            {
-                AudioSource source = new GameObject("OneShotAudioEvent").AddComponent<AudioSource>();
-
-                source.transform.position = position;
-                SetAudioSourceSettings(source);
-                source.Play();
-                Destroy(source.gameObject, source.clip.length);
-            }
-            else
+            if (useObjectPooler && oneShotPrefab)
             {
                 GameObject oneShotObject = ObjectPooler.GetObjectFromPool(oneShotPrefab, position, Quaternion.identity);
                 if (oneShotObject.TryGetComponent(out AudioSource source))
@@ -110,6 +101,15 @@ namespace DNExtensions
                         returnToPool.Initialize(source.clip.length);
                     }
                 }
+            }
+            else
+            {
+                AudioSource source = new GameObject("OneShotAudioEvent").AddComponent<AudioSource>();
+
+                source.transform.position = position;
+                SetAudioSourceSettings(source);
+                source.Play();
+                Destroy(source.gameObject, source.clip.length);
             }
         }
 
