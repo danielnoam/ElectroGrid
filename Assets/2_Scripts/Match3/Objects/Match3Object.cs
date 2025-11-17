@@ -84,6 +84,7 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
         destroySequence.InsertCallback(destroyDuration * 0.5f, () =>
         {
             MobileHaptics.Vibrate(50);
+            CameraManager.Instance?.ShakeCamera(0.2f);
             destroySfx?.PlayAtPoint(transform.position);
             
             if (destroyParticle)
