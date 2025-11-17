@@ -4,10 +4,9 @@ using UnityEngine;
 public class Match3LevelData
 {
     public readonly SOMatch3Level Level;
-    
-    
     public readonly List<Match3Objective> CurrentObjectives = new List<Match3Objective>();
     public readonly List<Match3LoseCondition> CurrentLoseConditions = new List<Match3LoseCondition>();
+    
     public int MovesMade;
     public int MatchesMade;
     public int ObstaclesBroken;

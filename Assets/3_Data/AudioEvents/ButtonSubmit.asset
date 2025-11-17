@@ -13,9 +13,7 @@ MonoBehaviour:
   m_Name: ButtonSubmit
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
   clips:
-  - {fileID: 8300000, guid: 6b211cd82de849e4b9a82e8f93c20a55, type: 3}
-  - {fileID: 8300000, guid: 61bace84eaeefcf4db300094c520bc3b, type: 3}
-  - {fileID: 8300000, guid: 8bde8c35aa998064d8cfa60ee7137eba, type: 3}
+  - {fileID: 8300000, guid: 1a504153e74cd6a469888466f1920156, type: 3}
   mixerGroup: {fileID: 0}
   volume:
     minValue: 1

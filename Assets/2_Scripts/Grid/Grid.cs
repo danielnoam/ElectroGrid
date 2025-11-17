@@ -14,7 +14,7 @@ public class Grid
     public Vector3 cellSpacing;
     public bool[] cells;
     [SerializeReference] public CoordinateConverter coordinateConverter;
-
+    [SerializeField, HideInInspector] private bool editorFoldout = true;
     
     public int Width => size.x;
     public int Height => size.y;

@@ -1,4 +1,3 @@
-using System;
 using DNExtensions;
 using PrimeTween;
 using UnityEngine;
@@ -11,7 +10,6 @@ public class Match3SelectionIndicator : MonoBehaviour
     [Header("References")]
     [SerializeField] private Match3PlayHandler match3PlayHandler;
     [SerializeField] private Match3GameManager match3GameManager;
-    [SerializeField] private Match3InputReader inputReader;
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
@@ -21,6 +19,7 @@ public class Match3SelectionIndicator : MonoBehaviour
     
     private bool _enabled;
     private Vector3 _baseSpriteScale;
+    private TouchInputReader _inputReader;
     private Match3Tile _pressedMatch3Tile;
     private Camera _camera;
     private Sequence _animationSequence;
@@ -33,6 +32,14 @@ public class Match3SelectionIndicator : MonoBehaviour
         _baseSpriteScale = spriteRenderer.transform.localScale;
         spriteRenderer.transform.localScale = Vector3.zero;
         lineRenderer.positionCount = 2;
+    }
+    
+    private void Start()
+    {
+        if (!_inputReader)
+        {
+            _inputReader = TouchInputReader.Instance;
+        }
     }
     
     private void Update()
@@ -102,7 +109,7 @@ public class Match3SelectionIndicator : MonoBehaviour
         if (!_camera || !_enabled || !_pressedMatch3Tile) return;
         
         
-        Vector3 mousePosition = _camera.ScreenToWorldPoint(inputReader.MousePosition);
+        Vector3 mousePosition = _camera.ScreenToWorldPoint(_inputReader.MousePosition);
         mousePosition.z = spriteRenderer.transform.position.z;
         spriteRenderer.transform.position = mousePosition;
             
@@ -112,9 +119,9 @@ public class Match3SelectionIndicator : MonoBehaviour
     
     private void UpdateHoveredTile()
     {
-        if (!_camera || !match3PlayHandler.CanInteract || inputReader.IsCurrentDeviceTouchscreen) return;
+        if (!_camera || !match3PlayHandler.CanInteract || !_inputReader || _inputReader.IsCurrentDeviceTouchscreen) return;
         
-        Vector2 mousePos = inputReader.MousePosition;
+        Vector2 mousePos = _inputReader.MousePosition;
         Vector2 worldPos = _camera.ScreenToWorldPoint(mousePos);
     
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero);

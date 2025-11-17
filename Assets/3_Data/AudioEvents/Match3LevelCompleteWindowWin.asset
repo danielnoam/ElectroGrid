@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Match3LevelCompleteWindowWin
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
   clips:
-  - {fileID: 8300000, guid: 156d7be9d63eef644933d64e63ed8216, type: 3}
+  - {fileID: 8300000, guid: 01d5cf5f121a0ee46b8ec01121c56cc4, type: 3}
   mixerGroup: {fileID: 0}
   volume:
     minValue: 1

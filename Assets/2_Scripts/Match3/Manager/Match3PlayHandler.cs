@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DNExtensions;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 public class Match3PlayHandler : MonoBehaviour
 {
@@ -21,13 +23,14 @@ public class Match3PlayHandler : MonoBehaviour
     [SerializeField] private Match3GameManager gameManager;
     [SerializeField] private Match3GridHandler gridHandler;
     [SerializeField] private Match3SelectionIndicator selectionIndicator;
-    [SerializeField] private Match3InputReader inputReader;
+
 
     [Separator]
     [SerializeField, ReadOnly] private bool canInteract;
     [SerializeField, ReadOnly] private Match3Tile selectedMatch3Tile;
     [SerializeField, ReadOnly] private Match3Object heldMatch3Object;
     private Camera _camera;
+    private TouchInputReader _inputReader;
 
     public bool CanInteract
     {
@@ -40,16 +43,42 @@ public class Match3PlayHandler : MonoBehaviour
         _camera = Camera.main;
     }
 
+    private void Start()
+    {
+        if (!_inputReader)
+        {
+            _inputReader = TouchInputReader.Instance;
+        }
+        
+        if (_inputReader)
+        {
+            _inputReader.OnSelect -= OnSelect;
+            _inputReader.OnSwipe -= OnSwipe;
+            _inputReader.OnSelect += OnSelect;
+            _inputReader.OnSwipe += OnSwipe;
+        }
+    }
+
     private void OnEnable()
     {
-        inputReader.OnSelect += OnSelect;
-        inputReader.OnSwipe += OnSwipe;
+        if (!_inputReader)
+        {
+            _inputReader = TouchInputReader.Instance;
+        }
+        
+        if (_inputReader)
+        {
+            _inputReader.OnSelect -= OnSelect;
+            _inputReader.OnSwipe -= OnSwipe;
+            _inputReader.OnSelect += OnSelect;
+            _inputReader.OnSwipe += OnSwipe;
+        }
     }
     
     private void OnDisable()
     {
-        inputReader.OnSelect -= OnSelect;
-        inputReader.OnSwipe -= OnSwipe;
+        _inputReader.OnSelect -= OnSelect;
+        _inputReader.OnSwipe -= OnSwipe;
     }
 
 
@@ -67,7 +96,7 @@ public class Match3PlayHandler : MonoBehaviour
 
         if (absX > absY)
         {
-            if (absY > absX * inputReader.SwipeDeadzone)
+            if (absY > absX * _inputReader.SwipeDeadzone)
             {
                 ReleaseObject(true);
                 return;
@@ -76,7 +105,7 @@ public class Match3PlayHandler : MonoBehaviour
         }
         else
         {
-            if (absX > absY * inputReader.SwipeDeadzone)
+            if (absX > absY * _inputReader.SwipeDeadzone)
             {
                 ReleaseObject(true);
                 return;
@@ -96,7 +125,7 @@ public class Match3PlayHandler : MonoBehaviour
 
         if (!heldMatch3Object && callbackContext.started)
         {
-            Vector3 worldPos = _camera.ScreenToWorldPoint(inputReader.MousePosition);
+            Vector3 worldPos = _camera.ScreenToWorldPoint(_inputReader.MousePosition);
             worldPos.z = 0;
     
             var gridPos = gridHandler.GridShape.Grid.GetCell(worldPos);

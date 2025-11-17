@@ -1,21 +1,47 @@
 using System;
+using System.Collections.Generic;
+using DNExtensions.ObjectPooling;
 using DNExtensions.VFXManager;
 using UnityEngine;
 
 public class Match3EffectManager : MonoBehaviour
 {
-    
     [Header("Settings")]
     [SerializeField] private SOVFEffectsSequence startLevelSequence;
     [SerializeField] private SOVFEffectsSequence endLevelSequence;
+    
+    [Header("Mouse Interaction")]
+    [SerializeField] private float maxScaleMultiplier = 1f;
+    [SerializeField] private float minScaleMultiplier = 0.8f;
+    [SerializeField] private float effectRadius = 3f;
+    [SerializeField] private AnimationCurve zOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     [Header("References")]
     [SerializeField] private Match3GameManager gameManager;
     [SerializeField] private Match3GridHandler gridHandler;
     [SerializeField] private Match3PlayHandler playHandler;
+    [SerializeField] private Match3BackgroundTile backgroundTilePrefab;
 
+    private Camera _camera;
+    private TouchInputReader _inputReader;
+    private readonly Dictionary<Vector2Int, Match3BackgroundTile> _backgroundTiles = new Dictionary<Vector2Int, Match3BackgroundTile>();
+    
     public SOVFEffectsSequence StartLevelSequence => startLevelSequence;
     public SOVFEffectsSequence EndLevelSequence => endLevelSequence;
+
+
+    private void Start()
+    {
+        if (!_camera)
+        {
+            _camera = Camera.main;
+        }
+
+        if (!_inputReader)
+        {
+            _inputReader = TouchInputReader.Instance;
+        }
+    }
 
     private void OnEnable()
     {
@@ -24,6 +50,12 @@ public class Match3EffectManager : MonoBehaviour
             gameManager.LevelStarted += OnLevelStarted;
             gameManager.LevelFailed += OnLevelEnded;
             gameManager.LevelComplete += OnLevelEnded;
+        }
+        
+        if (gridHandler)
+        {
+            gridHandler.GridCreated += OnGridCreated;
+            gridHandler.GridDestroyed += OnGridDestroyed;
         }
     }
 
@@ -35,18 +67,168 @@ public class Match3EffectManager : MonoBehaviour
             gameManager.LevelFailed -= OnLevelEnded;
             gameManager.LevelComplete -= OnLevelEnded;
         }
+        
+        if (gridHandler)
+        {
+            gridHandler.GridCreated -= OnGridCreated;
+            gridHandler.GridDestroyed -= OnGridDestroyed;
+        }
     }
 
+    private void OnGridDestroyed()
+    {
+        var tilesToClear = new List<Match3BackgroundTile>(_backgroundTiles.Values);
+    
+        foreach (Match3BackgroundTile tile in tilesToClear)
+        {
+            if (!tile) continue;
+        
+            if (Application.isPlaying)
+            {
+                Destroy(tile.gameObject);
+            }
+            else
+            {
+                DestroyImmediate(tile.gameObject);
+            }
+        }
+    
+        _backgroundTiles.Clear();
+    }
+
+    private void OnGridCreated(Grid grid)
+    {
+        if (!gridHandler) return;
+        
+        var mainTiles = gridHandler.Tiles;
+        
+        // Create around each boundary tile another disabled tile
+        foreach (var kvp in mainTiles)
+        {
+            var gridPosition = kvp.Key;
+            
+            if (grid.IsTouchingEdge(gridPosition, out var directions))
+            {
+                foreach (var direction in directions)
+                {
+                    var edgePosition = gridPosition + direction;
+                    if (!mainTiles.ContainsKey(edgePosition) && !_backgroundTiles.ContainsKey(edgePosition))
+                    {
+                        var tileWorldPosition = grid.GetCellWorldPosition(edgePosition.x, edgePosition.y);
+                        var tile = CreateBackgroundTile(tileWorldPosition);
+                        _backgroundTiles.Add(edgePosition, tile);
+                    }
+                }
+            }
+        }
+        
+        // Create extra tiles above and below the grid
+        for (int x = -1; x < grid.Width + 1; x++)
+        {
+            // Above the grid
+            for (int y = grid.Height; y < grid.Height + 4; y++)
+            {
+                Vector2Int tileGridPosition = new Vector2Int(x, y);
+                if (mainTiles.ContainsKey(tileGridPosition) || _backgroundTiles.ContainsKey(tileGridPosition)) 
+                    continue;
+                
+                Vector3 tileWorldPosition = grid.GetCellWorldPosition(x, y);
+                var tile = CreateBackgroundTile(tileWorldPosition);
+                _backgroundTiles.Add(tileGridPosition, tile);
+            }
+            
+            // Below the grid
+            for (int y = -4; y < 0; y++)
+            {
+                Vector2Int tileGridPosition = new Vector2Int(x, y);
+                if (mainTiles.ContainsKey(tileGridPosition) || _backgroundTiles.ContainsKey(tileGridPosition)) 
+                    continue;
+                
+                Vector3 tileWorldPosition = grid.GetCellWorldPosition(x, y);
+                var tile = CreateBackgroundTile(tileWorldPosition);
+                _backgroundTiles.Add(tileGridPosition, tile);
+            }
+        }
+        
+        
+        // Set the color of the tiles
+        foreach (var backgroundTile in _backgroundTiles)
+        {
+            var gridPosition = backgroundTile.Key;
+            var tile = backgroundTile.Value;
+            
+            Vector2 closestPointOnGrid = new Vector2(
+                Mathf.Clamp(gridPosition.x, 0, grid.Width - 1),
+                Mathf.Clamp(gridPosition.y, 0, grid.Height - 1)
+            );
+            
+            float distanceFromGrid = Vector2.Distance(gridPosition, closestPointOnGrid);
+            
+            float maxFadeDistance = 5;
+            float normalizedDistance = Mathf.Clamp01(distanceFromGrid / maxFadeDistance);
+            normalizedDistance = Mathf.Pow(normalizedDistance, 0.25f);
+
+            Color color = tile.InactiveTileColor;
+            color.a = Mathf.Lerp(tile.InactiveTileColor.a, 0f, normalizedDistance);
+            tile.SpriteRenderer.color = color;
+        }
+    }
     
     private void OnLevelStarted(Match3LevelData levelData)
     {
         VFXManager.Instance?.PlayVFX(startLevelSequence);
-
     }
+    
     private void OnLevelEnded(Match3LevelData levelData)
     {
         VFXManager.Instance?.PlayVFX(endLevelSequence);
     }
+    
+    
+    private void Update()
+    {
+        UpdateTiles();
+    }
 
+    private void UpdateTiles()
+    {
+        if (!_camera || !_inputReader || _backgroundTiles.Count == 0) return;
+    
+        Vector2 mousePos = _inputReader.MousePosition;
+        Vector3 mouseWorldPos = _camera.ScreenToWorldPoint(mousePos);
+        mouseWorldPos.z = 0;
+
+        foreach (var kvp in _backgroundTiles)
+        {
+            var tile = kvp.Value;
+            if (!tile) continue;
+
+            Vector3 tilePos = tile.transform.position;
+            float distance = Vector2.Distance(new Vector2(mouseWorldPos.x, mouseWorldPos.y), new Vector2(tilePos.x, tilePos.y));
+        
+            float scaleMultiplier = CalculateScaleMultiplier(distance);
+            tile.transform.localScale = Vector3.one * scaleMultiplier;
+        }
+    }
+    
+    private float CalculateScaleMultiplier(float distance)
+    {
+        if (distance > effectRadius)
+        {
+            return 1f;
+        }
+
+        float normalizedDistance = distance / effectRadius;
+        float curveValue = zOffsetCurve.Evaluate(normalizedDistance);
+        return Mathf.Lerp( minScaleMultiplier, maxScaleMultiplier, curveValue);
+    }
+    
+    private Match3BackgroundTile CreateBackgroundTile(Vector3 position)
+    {
+        var tileGo = ObjectPooler.GetObjectFromPool(backgroundTilePrefab.gameObject, position, Quaternion.identity);
+        var tile = tileGo.GetComponent<Match3BackgroundTile>();
+        
+        return tile;
+    }
 
 }

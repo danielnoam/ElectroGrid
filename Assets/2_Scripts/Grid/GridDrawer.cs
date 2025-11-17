@@ -25,6 +25,14 @@ public class GridDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
+        SerializedProperty foldoutProp = property.FindPropertyRelative("editorFoldout");
+        bool isFoldedOut = foldoutProp != null ? foldoutProp.boolValue : true;
+        
+        if (!isFoldedOut)
+        {
+            return EditorGUIUtility.singleLineHeight;
+        }
+        
         SerializedProperty sizeProp = property.FindPropertyRelative("size");
         SerializedProperty cellSizeProp = property.FindPropertyRelative("cellSize");
         SerializedProperty originProp = property.FindPropertyRelative("origin");
@@ -34,7 +42,6 @@ public class GridDrawer : PropertyDrawer
 
         float gridHeight = height * CellSize;
         
-
         float cellSizeHeight = EditorGUI.GetPropertyHeight(cellSizeProp);
         float cellSpacingHeight = EditorGUI.GetPropertyHeight(cellSpacingProp);
         float originHeight = EditorGUI.GetPropertyHeight(originProp);
@@ -58,21 +65,39 @@ public class GridDrawer : PropertyDrawer
     {
         EditorGUI.BeginProperty(position, label, property);
 
+        SerializedProperty foldoutProp = property.FindPropertyRelative("editorFoldout");
         SerializedProperty sizeProp = property.FindPropertyRelative("size");
+        SerializedProperty cellsProp = property.FindPropertyRelative("cells");
+        
+        Vector2Int size = sizeProp.vector2IntValue;
+        int activeCount = GetActiveCount(cellsProp);
+        
+        Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+
+        // Foldout with summary
+        string summaryText = $"{label.text} ({size.x}x{size.y}, {activeCount} active)";
+        bool isFoldedOut = EditorGUI.Foldout(currentRect, foldoutProp.boolValue, summaryText, true);
+        
+        if (isFoldedOut != foldoutProp.boolValue)
+        {
+            foldoutProp.boolValue = isFoldedOut;
+            property.serializedObject.ApplyModifiedProperties();
+        }
+        
+        if (!isFoldedOut)
+        {
+            EditorGUI.EndProperty();
+            return;
+        }
+        
+        currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
+
         SerializedProperty originProp = property.FindPropertyRelative("origin");
         SerializedProperty cellSizeProp = property.FindPropertyRelative("cellSize");
         SerializedProperty cellSpacingProp = property.FindPropertyRelative("cellSpacing");
-        SerializedProperty cellsProp = property.FindPropertyRelative("cells");
 
-        Vector2Int size = sizeProp.vector2IntValue;
         int width = size.x;
         int height = size.y;
-
-        Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-
-        // Label
-        EditorGUI.LabelField(currentRect, label, EditorStyles.boldLabel);
-        currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
 
         // Grid Width Slider
         EditorGUI.BeginChangeCheck();
@@ -109,7 +134,6 @@ public class GridDrawer : PropertyDrawer
         currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
         
         // Active Cell Count
-        int activeCount = GetActiveCount(cellsProp);
         EditorGUI.LabelField(currentRect, $"Active Cell: {activeCount} / {width * height}");
         currentRect.y += EditorGUIUtility.singleLineHeight + Spacing;
 
@@ -403,6 +427,5 @@ public class GridDrawer : PropertyDrawer
         return count;
     }
 }
-
 
 #endif
