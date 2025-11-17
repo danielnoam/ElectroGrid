@@ -1,12 +1,20 @@
 using System;
 using System.Text;
 using DNExtensions.MenuSystem;
+using DNExtensions.VFXManager;
+using PrimeTween;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Match3LevelSelectionManager : MonoBehaviour
+public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
 {
+    [Header("Animation")]
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private RectTransform contentContainer;
+    [SerializeField] private TweenSettings showTweenSettings;
+    [SerializeField] private TweenSettings hideTweenSettings;
+    
     [Header("Level Buttons")]
     [SerializeField] private Transform buttonsHolder;
     [SerializeField] private Button levelButtonPrefab;
@@ -14,8 +22,8 @@ public class Match3LevelSelectionManager : MonoBehaviour
     [Header("Level Info Window")]
     [SerializeField] private RectTransform gridContainer;
     [SerializeField] private Image gridCellPrefab;
-    [SerializeField] private float cellSize = 20f;
-    [SerializeField] private float cellSpacing = 2f;
+    [SerializeField] private float cellSize = 35f;
+    [SerializeField] private float cellSpacing = 2.5f;
     [SerializeField] private TextMeshProUGUI levelTitleText;
     [SerializeField] private TextMeshProUGUI levelInfoText;
     [SerializeField] private Button levelStartButton;
@@ -25,43 +33,129 @@ public class Match3LevelSelectionManager : MonoBehaviour
     [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
     
     [Header("References")]
+    [SerializeField] private MenuManager menuManager;
     [SerializeField] private Button backButton;
     [SerializeField] private AudioSource audioSource;
     
+
     private SOMatch3Level _selectedLevel;
+    private Vector3 _contentOriginalPosition;
+    private Vector3 _contentOriginalScale;
+    private Sequence _animationSequence;
+
+    private void Awake()
+    {
+        if (contentContainer)
+        {
+            _contentOriginalScale = contentContainer.localScale;
+            _contentOriginalPosition = contentContainer.anchoredPosition3D;
+        }
+    }
 
     private void Start()
     {
         GameManager.Instance?.SelectMatch3Level(null);
         CreateLevelButtons();
         UpdateLevelInfo();
-        SetupStartButton();
-        SetupBackButton();
+        SetupButtons();
     }
 
-    private void SetupStartButton()
+    public void Show(bool animated = true, Action onComplete = null)
     {
-        if (!levelStartButton) return;
+        gameObject.SetActive(true);
         
-        SelectableAnimator selectableAnimator = levelStartButton.GetComponent<SelectableAnimator>();
-        selectableAnimator.audioSource = audioSource;
-        
-        levelStartButton.onClick.RemoveAllListeners();
-        levelStartButton.onClick.AddListener(OnStartButtonClicked);
-    }
-
-    private void SetupBackButton()
-    {
-        if (!backButton) return;
-        
-        SelectableAnimator selectableAnimator = backButton.GetComponent<SelectableAnimator>();
-        selectableAnimator.audioSource = audioSource;
-        
-        backButton.onClick.RemoveAllListeners();
-        backButton.onClick.AddListener(() =>
+        if (!animated)
         {
-            GameManager.Instance?.LoadMainMenuScene();
-        });
+            if (canvasGroup)
+            {
+                canvasGroup.alpha = 1f;
+                canvasGroup.interactable = true;
+                canvasGroup.blocksRaycasts = true;
+            }
+
+            if (contentContainer)
+            {
+                contentContainer.localScale = _contentOriginalScale;
+                contentContainer.anchoredPosition3D = _contentOriginalPosition;
+            }
+            
+            onComplete?.Invoke();
+            return;
+        }
+
+        _animationSequence.Stop();
+        
+        if (canvasGroup) canvasGroup.alpha = 0f;
+        
+        _animationSequence = Sequence.Create()
+            .Group(Tween.Alpha(canvasGroup, 1f, showTweenSettings))
+            .Group(Tween.UIAnchoredPosition(contentContainer,_contentOriginalPosition - (Vector3.right * 1000f),_contentOriginalPosition, showTweenSettings))
+            .ChainCallback(() =>
+            {
+                if (canvasGroup)
+                {
+                    canvasGroup.interactable = true;
+                    canvasGroup.blocksRaycasts = true;
+                }
+                onComplete?.Invoke();
+            });
+    }
+
+    public void Hide(bool animated = true, Action onComplete = null)
+    {
+        if (canvasGroup)
+        {
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
+
+        if (!animated)
+        {
+            if (canvasGroup) canvasGroup.alpha = 0f;
+            gameObject.SetActive(false);
+            onComplete?.Invoke();
+            return;
+        }
+
+        _animationSequence.Stop();
+        
+        _animationSequence = Sequence.Create()
+            .Group(Tween.Alpha(canvasGroup, 0f, hideTweenSettings))
+            .Group(Tween.UIAnchoredPosition(contentContainer, _contentOriginalPosition, _contentOriginalPosition - (Vector3.right * 1000f), hideTweenSettings))
+            .ChainCallback(() =>
+            {
+                gameObject.SetActive(false);
+                onComplete?.Invoke();
+            });
+    }
+
+    public void SetInteractable(bool interactable)
+    {
+        if (canvasGroup)
+        {
+            canvasGroup.interactable = interactable;
+        }
+    }
+
+    private void SetupButtons()
+    {
+        if (levelStartButton)
+        {
+            SelectableAnimator selectableAnimator = levelStartButton.GetComponent<SelectableAnimator>();
+            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            
+            levelStartButton.onClick.RemoveAllListeners();
+            levelStartButton.onClick.AddListener(OnStartButtonClicked);
+        }
+
+        if (backButton)
+        {
+            SelectableAnimator selectableAnimator = backButton.GetComponent<SelectableAnimator>();
+            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            
+            backButton.onClick.RemoveAllListeners();
+            backButton.onClick.AddListener(OnBackButtonClicked);
+        }
     }
 
     private void OnStartButtonClicked()
@@ -69,7 +163,16 @@ public class Match3LevelSelectionManager : MonoBehaviour
         if (!_selectedLevel || !GameManager.Instance) return;
         
         GameManager.Instance.SelectMatch3Level(_selectedLevel);
-        GameManager.Instance.LoadMatch3Scene();
+        
+        Hide(true, (() =>
+        {
+            TransitionManager.TransitionToScene(GameManager.Instance.Match3Scene, menuManager.EndLevelEffect);
+        }));
+    }
+
+    private void OnBackButtonClicked()
+    {
+        menuManager?.ShowMainMenu();
     }
 
     private void CreateLevelButtons()
@@ -99,7 +202,7 @@ public class Match3LevelSelectionManager : MonoBehaviour
             }
             
             SelectableAnimator selectableAnimator = levelButton.GetComponent<SelectableAnimator>();
-            selectableAnimator.audioSource = audioSource;
+            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
 
             levelButton.onClick.AddListener(() => OnLevelButtonClicked(level));
         }
@@ -118,7 +221,7 @@ public class Match3LevelSelectionManager : MonoBehaviour
         if (!_selectedLevel)
         {
             if (levelTitleText) levelTitleText.text = "Select a Level";
-            if (levelInfoText) levelInfoText.text = "Press any of the buttons bellow to select a level";
+            if (levelInfoText) levelInfoText.text = "Press any of the buttons below to select a level";
             if (levelStartButton) levelStartButton.interactable = false;
             return;
         }
@@ -134,7 +237,6 @@ public class Match3LevelSelectionManager : MonoBehaviour
     {
         StringBuilder info = new StringBuilder();
         
-
         if (level.Objectives is { Count: > 0 })
         {
             info.AppendLine("Objectives:");

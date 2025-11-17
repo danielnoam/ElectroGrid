@@ -86,7 +86,7 @@ public class Mach3UIManager : MonoBehaviour
             AnimateLevelCompleteWindow(false);
             _levelCompleteSequence.ChainCallback(() =>
             {
-                GameManager.Instance?.LoadMainMenuScene();
+                GameManager.Instance?.MainMenu.LoadScene();
             });
         });
         
@@ -99,11 +99,11 @@ public class Mach3UIManager : MonoBehaviour
                 AnimateTopBar(false);
                 var quitSequence = Sequence.Create();
                 quitSequence.ChainDelay(VFXManager.Instance.PlayVFX(match3EffectManager.EndLevelSequence));
-                quitSequence.ChainCallback(() => GameManager.Instance?.LoadMainMenuScene());
+                quitSequence.ChainCallback(() => GameManager.Instance?.MainMenu.LoadScene());
             }
             else
             {
-                GameManager.Instance?.LoadMainMenuScene();
+                GameManager.Instance?.MainMenu.LoadScene();
             }
         });
     }
