@@ -268,7 +268,7 @@ public class Mach3UIManager : MonoBehaviour
         
         _levelCompleteSequence = Sequence.Create()
             .Group(Tween.UISizeDelta(_levelCompleteWindowRectTransform, endSize, levelCompleteTweenSettings))
-            .Group(Tween.Alpha(levelCompleteTitle, show ? 1f : 0f, levelCompleteTweenSettings))
+            .Group(Tween.Alpha(levelCompleteTitle, show ? 1f : 0f, levelCompleteTweenSettings.duration * 0.8f))
             .ChainCallback(() => 
             { 
                 levelCompleteWindow.alpha = show ? 1f : 0f;
@@ -311,7 +311,7 @@ public class Mach3UIManager : MonoBehaviour
             levelButton.onClick.AddListener(() =>
             {
                 AnimateLevelCompleteWindow(false);
-                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.75f, () =>
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.95f, () =>
                 {
                     match3Manager.SetNextLevel();
                 });
@@ -324,7 +324,7 @@ public class Mach3UIManager : MonoBehaviour
             levelButton.onClick.AddListener(() =>
             {
                 AnimateLevelCompleteWindow(false);
-                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.75f, () =>
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.95f, () =>
                 {
                     match3Manager.RestartLevel();
                 });

@@ -35,4 +35,4 @@ MonoBehaviour:
   minDistance: 1
   maxDistance: 500
   useObjectPooler: 1
-  oneShotPrefab: {fileID: 0}
+  oneShotPrefab: {fileID: 2798804331580920947, guid: c3744de143866d64593b46bab5769c97, type: 3}

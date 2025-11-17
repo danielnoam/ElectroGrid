@@ -559,13 +559,13 @@ public class Match3PlayHandler : MonoBehaviour
                 {
                     var tile = gridHandler.GetTile(new Vector2Int(x, y));
                     
-                    if (tile.HasObject || !tile.IsActive || tilesAlreadyReceiving.Contains(tile))
+                    if (!tile || tile.HasObject || !tile.IsActive || tilesAlreadyReceiving.Contains(tile))
                         continue;
                     
                     for (var i = y + 1; i < gridShape.Grid.Height; i++)
                     {
                         var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
-                        if (aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile) && aboveTile.CurrentMatch3Object.IsMovable)
+                        if (aboveTile && aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile) && aboveTile.CurrentMatch3Object.IsMovable)
                         {
                             movesThisWave.Add((aboveTile.CurrentMatch3Object, aboveTile, tile));
                             tilesAlreadyMoving.Add(aboveTile);

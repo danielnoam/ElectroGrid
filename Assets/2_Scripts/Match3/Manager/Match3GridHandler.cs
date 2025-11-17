@@ -51,8 +51,10 @@ public class Match3GridHandler : MonoBehaviour
                 Vector2Int tileGridPosition = new Vector2Int(x, y);
                 Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
                 bool tileState = Grid.IsCellActive(x, y);
+                
+                if (!tileState) continue;
 
-                var tile = CreateTile(tileWorldPosition, tileGridPosition, tileState);
+                var tile = CreateTile(tileWorldPosition, tileGridPosition, true);
                 _tiles.Add(tileGridPosition, tile);
                 
                 if (level.TileHasObjectType(x, y, Match3TileObjectType.Obstacle))

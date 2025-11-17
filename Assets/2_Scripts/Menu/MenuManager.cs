@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Match3LevelSelectionScreen match3LevelSelectionScreen;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SOAudioEvent screenSwitchSfx;
+    [SerializeField] private SOVFEffectsSequence gameStartEffect;
     [SerializeField] private SOVFEffectsSequence startLevelEffect;
     [SerializeField] private SOVFEffectsSequence endLevelEffect;
     [SerializeField] private BackgroundManager backgroundManager;
@@ -31,7 +32,7 @@ public class MenuManager : MonoBehaviour
     
     private void Start()
     {
-        VFXManager.Instance?.PlayVFX(startLevelEffect);
+        VFXManager.Instance?.PlayVFX(gameStartEffect);
         HideAllScreensImmediate();
         ShowScreen<MainMenuScreen>();
     }

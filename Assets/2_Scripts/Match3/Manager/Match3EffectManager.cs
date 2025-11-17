@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using DNExtensions.Button;
 using DNExtensions.ObjectPooling;
 using DNExtensions.VFXManager;
 using UnityEngine;
 
 public class Match3EffectManager : MonoBehaviour
 {
-    [Header("Settings")]
+    public static Match3EffectManager Instance { get; private set; }
+    
+    [Header("Effects")]
     [SerializeField] private SOVFEffectsSequence startLevelSequence;
     [SerializeField] private SOVFEffectsSequence endLevelSequence;
+    [SerializeField] private OneShotParticle backgroundParticlePrefab;
     
     [Header("Mouse Interaction")]
     [SerializeField] private float maxScaleMultiplier = 1f;
@@ -29,6 +33,14 @@ public class Match3EffectManager : MonoBehaviour
     public SOVFEffectsSequence StartLevelSequence => startLevelSequence;
     public SOVFEffectsSequence EndLevelSequence => endLevelSequence;
 
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -50,6 +62,7 @@ public class Match3EffectManager : MonoBehaviour
             gameManager.LevelStarted += OnLevelStarted;
             gameManager.LevelFailed += OnLevelEnded;
             gameManager.LevelComplete += OnLevelEnded;
+            gameManager.MatchesMade += OnMatchesMade;
         }
         
         if (gridHandler)
@@ -66,6 +79,7 @@ public class Match3EffectManager : MonoBehaviour
             gameManager.LevelStarted -= OnLevelStarted;
             gameManager.LevelFailed -= OnLevelEnded;
             gameManager.LevelComplete -= OnLevelEnded;
+            gameManager.MatchesMade -= OnMatchesMade;
         }
         
         if (gridHandler)
@@ -73,6 +87,52 @@ public class Match3EffectManager : MonoBehaviour
             gridHandler.GridCreated -= OnGridCreated;
             gridHandler.GridDestroyed -= OnGridDestroyed;
         }
+    }
+
+    private void OnMatchesMade(List<Match3Tile> tiles)
+    {
+
+        
+    }
+
+
+    private void Update()
+    {
+        UpdateTiles();
+    }
+    
+    [Button]
+    public void CreateParticleEffectAtPosition(Vector3 position, SOItemData itemData)
+    {
+        if (!backgroundParticlePrefab || !itemData) return;
+    
+        var particle = ObjectPooler.GetObjectFromPool(backgroundParticlePrefab.gameObject, position, Quaternion.identity);
+        var particleOneShot = particle.GetComponent<OneShotParticle>();
+        var textureSheetModule = particleOneShot.particle.textureSheetAnimation;
+        var colorOverLifetimeModule = particleOneShot.particle.colorOverLifetime;
+    
+        var startColor = itemData.Color;
+        startColor.a = 0.3f;
+        
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] 
+            { 
+                new GradientColorKey(startColor, 0.0f),   
+                new GradientColorKey(startColor, 0.2f),  
+                new GradientColorKey(Color.clear, 1.0f)   
+            },
+            new GradientAlphaKey[] 
+            { 
+                new GradientAlphaKey(startColor.a, 0.0f),      
+                new GradientAlphaKey(startColor.a, 0.2f),  
+                new GradientAlphaKey(0.0f, 1.0f)     
+            }
+        );
+    
+        colorOverLifetimeModule.color = new ParticleSystem.MinMaxGradient(gradient);
+        textureSheetModule.SetSprite(0, itemData.Sprite);
+        particleOneShot.Play();
     }
 
     private void OnGridDestroyed()
@@ -101,6 +161,24 @@ public class Match3EffectManager : MonoBehaviour
         if (!gridHandler) return;
         
         var mainTiles = gridHandler.Tiles;
+        
+        // Create background tiles in inactive cells
+        for (int x = 0; x < grid.Width; x++)
+        {
+            for (int y = 0; y < grid.Height; y++)
+            {
+                Vector2Int tileGridPosition = new Vector2Int(x, y);
+                Vector3 tileWorldPosition = grid.GetCellWorldPosition(x, y);
+                bool tileState = grid.IsCellActive(x, y);
+
+                if (!tileState && !mainTiles.ContainsKey(tileGridPosition))
+                {
+                    var tile = CreateBackgroundTile(tileWorldPosition);
+                    _backgroundTiles.Add(tileGridPosition, tile);
+                }
+            }
+        }
+        
         
         // Create around each boundary tile another disabled tile
         foreach (var kvp in mainTiles)
@@ -150,6 +228,34 @@ public class Match3EffectManager : MonoBehaviour
             }
         }
         
+        // Create extra tiles to the left and right of the grid
+        for (int y = -1; y < grid.Height + 1; y++)
+        {
+            // To the left of the grid
+            for (int x = -1; x < 0; x++)
+            {
+                Vector2Int tileGridPosition = new Vector2Int(x, y);
+                if (mainTiles.ContainsKey(tileGridPosition) || _backgroundTiles.ContainsKey(tileGridPosition))
+                    continue;
+
+                Vector3 tileWorldPosition = grid.GetCellWorldPosition(x, y);
+                var tile = CreateBackgroundTile(tileWorldPosition);
+                _backgroundTiles.Add(tileGridPosition, tile);
+            }
+
+            // To the right of the grid
+            for (int x = grid.Width; x < grid.Width + 1; x++)
+            {
+                Vector2Int tileGridPosition = new Vector2Int(x, y);
+                if (mainTiles.ContainsKey(tileGridPosition) || _backgroundTiles.ContainsKey(tileGridPosition))
+                    continue;
+
+                Vector3 tileWorldPosition = grid.GetCellWorldPosition(x, y);
+                var tile = CreateBackgroundTile(tileWorldPosition);
+                _backgroundTiles.Add(tileGridPosition, tile);
+            }
+        }
+        
         
         // Set the color of the tiles
         foreach (var backgroundTile in _backgroundTiles)
@@ -184,11 +290,7 @@ public class Match3EffectManager : MonoBehaviour
         VFXManager.Instance?.PlayVFX(endLevelSequence);
     }
     
-    
-    private void Update()
-    {
-        UpdateTiles();
-    }
+
 
     private void UpdateTiles()
     {

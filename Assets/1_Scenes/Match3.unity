@@ -880,6 +880,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Match3EffectManager
   startLevelSequence: {fileID: 11400000, guid: c2f69f0253062a64ab8b2766a9cc2758, type: 2}
   endLevelSequence: {fileID: 11400000, guid: 4782391fb82941c42850019135143b65, type: 2}
+  backgroundParticlePrefab: {fileID: 243077210646262330, guid: de67b1264aecd6c4a886b5cb84c1bd45, type: 3}
   maxScaleMultiplier: 1
   minScaleMultiplier: 0.9
   effectRadius: 3
