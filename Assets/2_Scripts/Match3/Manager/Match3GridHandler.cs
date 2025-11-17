@@ -23,6 +23,7 @@ public class Match3GridHandler : MonoBehaviour
     public SOGridShape GridShape => _gridShape ? _gridShape : defaultGridShape;
     
     public event Action GridDestroyed;
+    public event Action<Grid> GridCreated;
     
     public void CreateGrid(SOMatch3Level level)
     {
@@ -73,52 +74,7 @@ public class Match3GridHandler : MonoBehaviour
             var tile = CreateTileAsTrash(tileWorldPosition, tileGridPosition);
             _tiles.Add(tileGridPosition, tile);
         }
-        
-        
-        // Create around each boundary tile another disabled tile
-        foreach (var gridPosition in _tiles.Keys.ToList())
-        {
-            if (Grid.IsTouchingEdge(gridPosition, out var directions))
-            {
-                foreach (var direction in directions)
-                {
-                    var edgePosition = gridPosition + direction;
-                    if (!_tiles.ContainsKey(edgePosition))
-                    {
-                        var tileWorldPosition = Grid.GetCellWorldPosition(edgePosition.x, edgePosition.y);
-                        var tile = CreateTile(tileWorldPosition, edgePosition, false);
-                        _tiles.Add(edgePosition, tile);
-                    }
-                }
-            }
-        }
-        
-        // create extra tiles above and bellow the grid
-        for (int x = -1; x < Grid.Width + 1; x++)
-        {
-            for (int y = Grid.Height; y < Grid.Height + 4; y++)
-            {
-                Vector2Int tileGridPosition = new Vector2Int(x, y);
-                if (_tiles.ContainsKey(tileGridPosition)) continue;
-                
-                Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
-                var tile = CreateTile(tileWorldPosition, tileGridPosition, false);
-                _tiles.Add(tileGridPosition, tile);
-            }
-        }
-        for (int x = -1; x < Grid.Width + 1; x++)
-        {
-            for (int y = -4; y < 0; y++)
-            {
-                Vector2Int tileGridPosition = new Vector2Int(x, y);
-                if (_tiles.ContainsKey(tileGridPosition)) continue;
-                
-                Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
-                var tile = CreateTile(tileWorldPosition, tileGridPosition, false);
-                _tiles.Add(tileGridPosition, tile);
-            }
-        }
-
+        GridCreated?.Invoke(Grid);
     }
     
     private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)

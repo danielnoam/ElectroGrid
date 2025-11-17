@@ -124,22 +124,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         else
         {
             spriteRenderer.sprite = inactiveSprite;
-            
-
-            Vector2 closestPointOnGrid = new Vector2(
-                Mathf.Clamp(gridPosition.x, 0, _match3GridHandler.Grid.Width - 1),
-                Mathf.Clamp(gridPosition.y, 0, _match3GridHandler.Grid.Height - 1)
-            );
-            
-            float distanceFromGrid = Vector2.Distance(gridPosition, closestPointOnGrid);
-            
-            float maxFadeDistance = 5;
-            float normalizedDistance = Mathf.Clamp01(distanceFromGrid / maxFadeDistance);
-            normalizedDistance = Mathf.Pow(normalizedDistance, 0.25f);
-
-            Color color = inactiveTileColor;
-            color.a = Mathf.Lerp(inactiveTileColor.a, 0f, normalizedDistance);
-            spriteRenderer.color = color;
+            spriteRenderer.color = inactiveTileColor;
         }
     }
     

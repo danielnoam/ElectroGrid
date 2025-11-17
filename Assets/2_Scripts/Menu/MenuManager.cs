@@ -1,29 +1,22 @@
 using System;
 using System.Collections.Generic;
 using DNExtensions;
-using DNExtensions.Button;
 using DNExtensions.VFXManager;
 using UnityEngine;
-using UnityEngine.VFX;
 using VFXManager = DNExtensions.VFXManager.VFXManager;
 
 public class MenuManager : MonoBehaviour
 {
-    [Header("Screens")]
+    [Header("References")]
     [SerializeField] private MainMenuScreen mainMenuScreen;
     [SerializeField] private Match3LevelSelectionScreen match3LevelSelectionScreen;
-    
-    [Header("Background")]
-    [SerializeField] private Transform backgroundParent;
-    [SerializeField] private SpriteRenderer backgroundTilePrefab;
-    [SerializeField] private Grid grid = new Grid();
-    
-    [Header("VFX")]
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private SOAudioEvent screenSwitchSfx;
     [SerializeField] private SOVFEffectsSequence startLevelEffect;
     [SerializeField] private SOVFEffectsSequence endLevelEffect;
+    [SerializeField] private BackgroundManager backgroundManager;
     
     private IMenuScreen _currentScreen;
-    private readonly List<SpriteRenderer> _backgroundTiles = new List<SpriteRenderer>();
     private readonly Dictionary<Type, IMenuScreen> _screens = new Dictionary<Type, IMenuScreen>();
 
     public SOVFEffectsSequence StartLevelEffect => startLevelEffect;
@@ -51,6 +44,7 @@ public class MenuManager : MonoBehaviour
             return;
         }
         
+        screenSwitchSfx?.Play(audioSource);
         
         if (_currentScreen != null)
         {
@@ -85,60 +79,5 @@ public class MenuManager : MonoBehaviour
         }
         
         _currentScreen = null;
-    }
-    
-    [Button]
-    private void CreateBackground()
-    {
-
-        if (grid == null || !backgroundTilePrefab || !backgroundParent) return;
-        
-        _backgroundTiles.Clear();
-        foreach (Transform child in backgroundParent)
-        {
-            if (Application.isPlaying)
-            {
-                Destroy(child.gameObject);
-            }
-            else
-            {
-                DestroyImmediate(child.gameObject);
-            }
-        }
-        
-        // Create background tiles
-        for (int x = 0; x < grid.Width; x++)
-        {
-            for (int y = 0; y < grid.Height; y++)
-            {
-                var position = grid.GetCellWorldPosition(x, y);
-                var tile = Instantiate(backgroundTilePrefab, position, Quaternion.identity,backgroundParent);
-                _backgroundTiles.Add(tile);
-            }
-        }
-            
-        // Set alpha of tiles based on distance from the middle of the grid
-        foreach  (var tile in _backgroundTiles)
-        {
-            var tileGridPosition = grid.GetCell(tile.transform.position);
-            var centerOfGrid = new Vector2(grid.Width/2, grid.Height/2);
-                
-            float distanceFromCenter = Vector2.Distance(tileGridPosition, centerOfGrid);
-            
-            float maxFadeDistance = 13;
-            float normalizedDistance = Mathf.Clamp01(distanceFromCenter / maxFadeDistance);
-            normalizedDistance = Mathf.Pow(normalizedDistance, 4f);
-
-            Color baseColor = tile.color;
-            Color color = tile.color;
-            color.a = Mathf.Lerp(0f, baseColor.a, normalizedDistance);
-            tile.color = color;
-        }
-    }
-
-
-    private void OnDrawGizmos()
-    {
-        grid?.DrawGrid();
     }
 }
