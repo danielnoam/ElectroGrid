@@ -54,8 +54,6 @@ public class MenuManager : MonoBehaviour
         
         if (_currentScreen != null)
         {
-            CameraManager.Instance?.ShakeCamera(0.5f);
-            
             _currentScreen.Hide(animated, () =>
             {
                 screen.Show(animated, onComplete);

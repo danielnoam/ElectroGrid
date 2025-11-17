@@ -144,6 +144,7 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
             SelectableAnimator selectableAnimator = levelStartButton.GetComponent<SelectableAnimator>();
             if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
             
+
             levelStartButton.onClick.RemoveAllListeners();
             levelStartButton.onClick.AddListener(OnStartButtonClicked);
         }
@@ -162,6 +163,8 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
     {
         if (!_selectedLevel || !GameManager.Instance) return;
         
+        CameraManager.Instance?.ShakeCamera(0.5f);
+        
         GameManager.Instance.SelectMatch3Level(_selectedLevel);
         
         Hide(true, (() =>
@@ -172,6 +175,7 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
 
     private void OnBackButtonClicked()
     {
+        CameraManager.Instance?.ShakeCamera(0.5f);
         menuManager?.ShowMainMenu();
     }
 
@@ -210,6 +214,7 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
 
     private void OnLevelButtonClicked(SOMatch3Level level)
     {
+        CameraManager.Instance?.ShakeCamera(0.1f);
         _selectedLevel = _selectedLevel == level ? null : level;
         UpdateLevelInfo();
     }
