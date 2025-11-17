@@ -1166,7 +1166,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     cycles: 1
     cycleMode: 0
-    startDelay: 0.5
+    startDelay: 0
     endDelay: 0
     useUnscaledTime: 0
     _useFixedUpdate: 0
@@ -1207,7 +1207,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     cycles: 1
     cycleMode: 0
-    startDelay: 0.5
+    startDelay: 0
     endDelay: 0
     useUnscaledTime: 0
     _useFixedUpdate: 0
@@ -1379,7 +1379,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 50
+  m_Spacing: 15
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
