@@ -268,6 +268,7 @@ public class Mach3UIManager : MonoBehaviour
         
         _levelCompleteSequence = Sequence.Create()
             .Group(Tween.UISizeDelta(_levelCompleteWindowRectTransform, endSize, levelCompleteTweenSettings))
+            .Group(Tween.Alpha(levelCompleteTitle, show ? 1f : 0f, levelCompleteTweenSettings))
             .ChainCallback(() => 
             { 
                 levelCompleteWindow.alpha = show ? 1f : 0f;

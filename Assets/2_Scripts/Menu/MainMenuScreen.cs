@@ -136,6 +136,7 @@ public class MainMenuScreen : MonoBehaviour, IMenuScreen
 
     private void OnMatch3ButtonClicked()
     {
+        CameraManager.Instance?.ShakeCamera(0.5f);
         menuManager?.ShowMatch3LevelSelection();
     }
 
