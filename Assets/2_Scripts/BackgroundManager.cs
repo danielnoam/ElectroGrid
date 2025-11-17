@@ -12,6 +12,7 @@ public class BackgroundManager : MonoBehaviour
     [SerializeField] private AnimationCurve zOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     
     [Header("Background Settings")]
+    [SerializeField] private float maxFadeDistance = 13f;
     [SerializeField] private Transform backgroundParent;
     [SerializeField] private Match3BackgroundTile backgroundTilePrefab;
     [SerializeField] private Grid grid = new Grid();
@@ -120,7 +121,6 @@ public class BackgroundManager : MonoBehaviour
     private void ApplyFadeEffect()
     {
         var centerOfGrid = new Vector2(grid.Width / 2f, grid.Height / 2f);
-        const float maxFadeDistance = 13f;
 
         foreach (var tile in backgroundTiles)
         {

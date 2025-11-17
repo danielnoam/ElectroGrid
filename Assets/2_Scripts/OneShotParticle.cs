@@ -47,11 +47,19 @@ public class OneShotParticle : MonoBehaviour, IPooledObject
 
     public void OnPoolReturn()
     {
-        if (particle) particle.Clear(true);
+        if (particle)
+        {
+            particle.Stop(true);
+            particle.Clear(true);
+        }
     }
 
     public void OnPoolRecycle()
     {
-        if (particle) particle.Clear(true);
+        if (particle)
+        {
+            particle.Stop(true);
+            particle.Clear(true);
+        }
     }
 }

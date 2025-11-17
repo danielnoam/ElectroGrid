@@ -84,6 +84,7 @@ public class Match3MatchableObject : Match3Object
 
     public void MatchFound()
     {
+        Match3EffectManager.Instance?.CreateParticleEffectAtPosition(transform.position, _itemData);
         _currentTile?.PunchTile();
         _currentTile?.SetCurrentItem(null);
         DestroyWithAnimation();
