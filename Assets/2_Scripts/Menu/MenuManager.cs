@@ -50,9 +50,12 @@ public class MenuManager : MonoBehaviour
             Debug.LogError($"Screen of type {typeof(T).Name} not found!");
             return;
         }
-
+        
+        
         if (_currentScreen != null)
         {
+            CameraManager.Instance?.ShakeCamera(0.5f);
+            
             _currentScreen.Hide(animated, () =>
             {
                 screen.Show(animated, onComplete);

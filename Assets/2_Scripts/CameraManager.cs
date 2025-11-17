@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
+
 using DNExtensions;
 using DNExtensions.Button;
+using PrimeTween;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    public CameraManager Instance { get; private set; }
+    public static CameraManager Instance { get; private set; }
     
     [Header("Match3")]
     [SerializeField] private float gridPadding = 0.5f; 
@@ -96,5 +96,12 @@ public class CameraManager : MonoBehaviour
             float targetHeight =  gridSize.x / screenAspect;
             cam.orthographicSize = (targetHeight / 2f) + gridPadding;
         }
+    }
+    
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    public void ShakeCamera(float strength = 1f,float duration = 0.5f,float frequency = 10f)
+    {
+        var sequence = Sequence.Create();
+        sequence.Group(Tween.ShakeCamera(cam, strength, duration, frequency));
     }
 }
