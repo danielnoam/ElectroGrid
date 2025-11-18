@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d942ccd036153a4dae3f357be10fb3d, type: 3}
+  m_Name: Grid_TriangleSquashed
+  m_EditorClassIdentifier: Assembly-CSharp::SOGridShape
+  grid:
+    size: {x: 11, y: 6}
+    origin: {x: 0, y: -1, z: 0}
+    cellSize: {x: 1, y: 1, z: 0}
+    cellSpacing: {x: 0.1, y: 0.1, z: 0}
+    cells: 010101010101010101010101010101010101010101010001010101010101010100000001010101010101000000000001010101010000000000000001010100000000
+    coordinateConverter:
+      rid: 3019431832108662932
+    editorFoldout: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 3019431832108662932
+      type: {class: VerticalConvertor, ns: , asm: Assembly-CSharp}
+      data: 

@@ -30,6 +30,7 @@ public class Mach3UIManager : MonoBehaviour
     [Header("Bottom Bar")]
     [SerializeField] private RectTransform bottomBar;
     [SerializeField] private Button bottomBarQuitButton;
+    [SerializeField] private Button bottomBarRestartButton;
     [SerializeField] private TweenSettings bottomBarTweenSettings;
     
     [Header("References")]
@@ -105,6 +106,24 @@ public class Mach3UIManager : MonoBehaviour
             {
                 GameManager.Instance?.MainMenu.LoadScene();
             }
+        });
+        
+        bottomBarRestartButton.onClick.RemoveAllListeners();
+        bottomBarRestartButton.onClick.AddListener(() =>
+        {
+            if (VFXManager.Instance)
+            {
+                AnimateBottomBar(false);
+                AnimateTopBar(false);
+                var quitSequence = Sequence.Create();
+                quitSequence.ChainDelay(VFXManager.Instance.PlayVFX(match3EffectManager.EndLevelSequence));
+                quitSequence.ChainCallback(() => match3Manager.StartNewGame());
+            }
+            else
+            {
+                match3Manager.StartNewGame();
+            }
+
         });
     }
 
@@ -311,7 +330,7 @@ public class Mach3UIManager : MonoBehaviour
             levelButton.onClick.AddListener(() =>
             {
                 AnimateLevelCompleteWindow(false);
-                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.95f, () =>
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration, () =>
                 {
                     match3Manager.SetNextLevel();
                 });
@@ -324,7 +343,7 @@ public class Mach3UIManager : MonoBehaviour
             levelButton.onClick.AddListener(() =>
             {
                 AnimateLevelCompleteWindow(false);
-                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration * 0.95f, () =>
+                _levelCompleteSequence.InsertCallback(levelCompleteTweenSettings.duration, () =>
                 {
                     match3Manager.RestartLevel();
                 });

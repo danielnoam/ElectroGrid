@@ -6,17 +6,35 @@ using UnityEngine;
 [SelectionBase]
 public class Match3BottomObject : Match3Object
 {
+    [Header("Rotation Settings")]
+    [SerializeField] private float rotationSpeed = 1f;
+    [SerializeField] private float rotationAmount = 35f;
+    [SerializeField] private float rotationRandomOffset = 0.5f;
+    
     private Match3GameManager _gameManager;
+    private float _rotationTimeOffset;
     
     public override bool IsSwappable => false;
     public override bool IsMatchable => false;
     public override bool IsMovable => true;
     public override bool IsAffectedBySpecialMatches => false;
+    
+
+    private void Update()
+    {
+        if (_currentTile)
+        {
+            float time = (Time.time + _rotationTimeOffset) * rotationSpeed;
+            float rotation = Mathf.Sin(time) * rotationAmount;
+            transform.localRotation = Quaternion.Euler(0f, 0f, rotation);
+        }
+    }
 
     public override void Initialize(SOItemData data, Match3GridHandler gridHandler)
     {
         base.Initialize(data, gridHandler);
         
+        _rotationTimeOffset = Random.Range(0f, rotationRandomOffset);
         _gameManager = Match3GameManager.Instance;
     }
 
