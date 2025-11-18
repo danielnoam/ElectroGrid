@@ -68,7 +68,7 @@ public class Match3ObstacleObject : Match3Object
         
         if (_currentHealth <= 0)
         {
-            BreakObstacle();
+            DestroyWithAnimation();
         }
         else
         {
@@ -77,14 +77,6 @@ public class Match3ObstacleObject : Match3Object
             damageSequence.Chain(Tween.Scale(transform, _baseScale, 0.1f, Ease.OutBack));
         }
     }
-
-    private void BreakObstacle()
-    {
-        _currentTile?.SetCurrentItem(null);
-        _gameManager?.NotifyObstacleBroke(this);
-        DestroyWithAnimation();
-    }
-
     private void OnMatchesMade(List<Match3Tile> matches)
     {
         if (_beingDestroyed || !_currentTile || !_currentTile.IsActive) return;
@@ -101,6 +93,9 @@ public class Match3ObstacleObject : Match3Object
     
     public override void DestroyWithAnimation()
     {
+        _currentTile?.SetCurrentItem(null);
+        _gameManager?.NotifyObstacleBroke(this);
+        
         _beingDestroyed = true;
         
         var destroySequence = Sequence.Create();

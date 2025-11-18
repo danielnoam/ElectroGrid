@@ -282,16 +282,29 @@ public class Match3EffectManager : MonoBehaviour
         {
             var gridPosition = backgroundTile.Key;
             var tile = backgroundTile.Value;
-            
-            Vector2 closestPointOnGrid = new Vector2(
-                Mathf.Clamp(gridPosition.x, 0, grid.Width - 1),
-                Mathf.Clamp(gridPosition.y, 0, grid.Height - 1)
-            );
-            
-            float distanceFromGrid = Vector2.Distance(gridPosition, closestPointOnGrid);
-            
+    
+            // Find the closest active cell on the grid
+            float minDistance = float.MaxValue;
+    
+            for (int x = 0; x < grid.Width; x++)
+            {
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid.IsCellActive(x, y))
+                    {
+                        Vector2Int activeCell = new Vector2Int(x, y);
+                        float distance = Vector2.Distance(gridPosition, activeCell);
+                
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                        }
+                    }
+                }
+            }
+    
             float maxFadeDistance = 5;
-            float normalizedDistance = Mathf.Clamp01(distanceFromGrid / maxFadeDistance);
+            float normalizedDistance = Mathf.Clamp01(minDistance / maxFadeDistance);
             normalizedDistance = Mathf.Pow(normalizedDistance, 0.25f);
 
             Color color = tile.InactiveTileColor;

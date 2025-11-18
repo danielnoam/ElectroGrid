@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4052887448178901417}
   - component: {fileID: 1895425048657667939}
   - component: {fileID: 3635964787785189804}
-  - component: {fileID: 5516485392585527746}
   m_Layer: 0
   m_Name: InputManager
   m_TagString: Untagged
@@ -83,23 +82,3 @@ MonoBehaviour:
   isCurrentDeviceGamepad: 0
   isCurrentDeviceTouchscreen: 0
   isCurrentDeviceMobile: 0
---- !u!114 &5516485392585527746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4465048672239161041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62006526678b37e44a8a36ccf5577657, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TouchInputReader
-  inputManager: {fileID: 3635964787785189804}
-  swipeThreshold: 55
-  swipeDeadzone: 0.3
-  gyroRotation: {x: 0, y: 0, z: 0}
-  mousePosition: {x: 0, y: 0}
-  isPressing: 0
-  pressStartPosition: {x: 0, y: 0}
-  swipeDirection: {x: 0, y: 0}

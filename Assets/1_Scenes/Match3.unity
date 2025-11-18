@@ -762,6 +762,7 @@ GameObject:
   - component: {fileID: 586155249}
   - component: {fileID: 586155253}
   - component: {fileID: 586155254}
+  - component: {fileID: 586155255}
   m_Layer: 0
   m_Name: Match3Manager
   m_TagString: Untagged
@@ -805,7 +806,7 @@ MonoBehaviour:
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
   selectionIndicator: {fileID: 586155252}
-  overrideLevel: {fileID: 11400000, guid: 8831c445c9354a048a12ad3c3c3a94a5, type: 2}
+  overrideLevel: {fileID: 0}
   currentLevel: {fileID: 0}
   levelComplete: 0
   finishedObjectives: 0
@@ -913,6 +914,26 @@ MonoBehaviour:
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
   backgroundTilePrefab: {fileID: 8960474688188056081, guid: 2e7070c2b1b0633469e64c050f1a3515, type: 3}
+--- !u!114 &586155255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586155247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62006526678b37e44a8a36ccf5577657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TouchInputReader
+  inputManager: {fileID: 1105389518}
+  swipeThreshold: 55
+  swipeDeadzone: 0.3
+  gyroRotation: {x: 0, y: 0, z: 0}
+  mousePosition: {x: 0, y: 0}
+  isPressing: 0
+  pressStartPosition: {x: 0, y: 0}
+  swipeDirection: {x: 0, y: 0}
 --- !u!1001 &604789036
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1884,6 +1905,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b4853befcd479f744b1c91ff139210c6, type: 3}
+--- !u!114 &1105389518 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3635964787785189804, guid: b4853befcd479f744b1c91ff139210c6, type: 3}
+  m_PrefabInstance: {fileID: 1105389517}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e7ea91dfbd4e3b46b833e32591440fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.InputSystem.InputManager
 --- !u!1 &1145269570
 GameObject:
   m_ObjectHideFlags: 0
@@ -2305,12 +2337,12 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 70
+  m_fontSize: 60
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 70
+  m_fontSizeMax: 60
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
