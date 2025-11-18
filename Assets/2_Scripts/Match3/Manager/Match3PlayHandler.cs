@@ -553,8 +553,7 @@ public class Match3PlayHandler : MonoBehaviour
             var yGroups = tilesWithMatches.GroupBy(tile => tile.GridPosition.y);
             var groups = yGroups.ToList();
             bool isHorizontal = groups.Any(group => group.Count() >= gameManager.MinMatchForLineClear);
-
-            Debug.Log($"Match count: {tilesWithMatches.Count}, Is vertical: {isVertical}, Is horizontal: {isHorizontal}");
+            
             if (isHorizontal || isVertical)
             {
                 yield return new WaitForSeconds(0.3f);
@@ -567,7 +566,6 @@ public class Match3PlayHandler : MonoBehaviour
                 var columnsToDestroy = enumerable.Where(group => group.Count() >= gameManager.MinMatchForLineClear).Select(group => group.Key);
                 foreach (var column in columnsToDestroy)
                 {
-                    Debug.Log($"Destroying column {column}");
                     for (var y = 0; y < gridHandler.Grid.Height; y++)
                     {
                         var tile = gridHandler.GetTile(new Vector2Int(column, y));
@@ -589,7 +587,6 @@ public class Match3PlayHandler : MonoBehaviour
                 var rowsToDestroy = groups.Where(group => group.Count() >= gameManager.MinMatchForLineClear).Select(group => group.Key);
                 foreach (var row in rowsToDestroy)
                 {
-                    Debug.Log($"Destroying row {row}");
                     for (var x = 0; x < gridHandler.Grid.Width; x++)
                     {
                         var tile = gridHandler.GetTile(new Vector2Int(x, row));

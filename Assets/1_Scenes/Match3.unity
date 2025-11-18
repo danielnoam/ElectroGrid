@@ -798,14 +798,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   minMatchCount: 3
-  minMatchForSpecial: 4
+  minMatchForLineClear: 4
   mxGuaranteedMatchAttempts: 100
   maxAttemptsToRecheckMatches: 999
   minPossibleMatches: 3
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
   selectionIndicator: {fileID: 586155252}
-  overrideLevel: {fileID: 11400000, guid: 49ee0b48ada61d24294a7e1bdbb8b8c2, type: 2}
+  overrideLevel: {fileID: 11400000, guid: 8831c445c9354a048a12ad3c3c3a94a5, type: 2}
   currentLevel: {fileID: 0}
   levelComplete: 0
   finishedObjectives: 0

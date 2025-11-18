@@ -69,8 +69,8 @@ public class Match3GameManager : MonoBehaviour
     private void Update()
     {
         UpdateLoseConditions();
-        CheckLoseConditions();
         CheckObjectives();
+        CheckLoseConditions();
     }
     
     public void SetNextLevel()
@@ -293,7 +293,7 @@ public class Match3GameManager : MonoBehaviour
                 continue; 
             }
             
-            Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
+            // Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
             yield return playHandler.SpawnGridLayout(gridLayout, false);
             playHandler.CanInteract = true;
             populatingGrid = false;
