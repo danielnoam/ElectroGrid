@@ -610,30 +610,40 @@ public class Match3PlayHandler : MonoBehaviour
     }
 
 
-    public IEnumerator MoveObjectsDown(SOGridShape gridShape)
+public IEnumerator MoveObjectsDown(SOGridShape gridShape)
+{
+    bool objectsMoved;
+    
+    do
     {
-        bool objectsMoved;
+        objectsMoved = false;
+        List<(Match3Object obj, Match3Tile fromTile, Match3Tile toTile)> movesThisWave = new List<(Match3Object, Match3Tile, Match3Tile)>();
+        HashSet<Match3Tile> tilesAlreadyMoving = new HashSet<Match3Tile>();
+        HashSet<Match3Tile> tilesAlreadyReceiving = new HashSet<Match3Tile>();
         
-        do
+        for (var y = 0; y < gridShape.Grid.Height; y++)
         {
-            objectsMoved = false;
-            List<(Match3Object obj, Match3Tile fromTile, Match3Tile toTile)> movesThisWave = new List<(Match3Object, Match3Tile, Match3Tile)>();
-            HashSet<Match3Tile> tilesAlreadyMoving = new HashSet<Match3Tile>();
-            HashSet<Match3Tile> tilesAlreadyReceiving = new HashSet<Match3Tile>();
-            
-            for (var y = 0; y < gridShape.Grid.Height; y++)
+            for (var x = 0; x < gridShape.Grid.Width; x++)
             {
-                for (var x = 0; x < gridShape.Grid.Width; x++)
+                var tile = gridHandler.GetTile(new Vector2Int(x, y));
+                
+                if (!tile || tile.HasObject || !tile.IsActive || tilesAlreadyReceiving.Contains(tile))
+                    continue;
+                
+                for (var i = y + 1; i < gridShape.Grid.Height; i++)
                 {
-                    var tile = gridHandler.GetTile(new Vector2Int(x, y));
+                    var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
                     
-                    if (!tile || tile.HasObject || !tile.IsActive || tilesAlreadyReceiving.Contains(tile))
-                        continue;
-                    
-                    for (var i = y + 1; i < gridShape.Grid.Height; i++)
+                    // Check if there's a non-movable object blocking the path
+                    if (aboveTile && aboveTile.HasObject)
                     {
-                        var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
-                        if (aboveTile && aboveTile.HasObject && !tilesAlreadyMoving.Contains(aboveTile) && aboveTile.CurrentMatch3Object.IsMovable)
+                        if (!aboveTile.CurrentMatch3Object.IsMovable)
+                        {
+                            // Non-movable object blocks this column
+                            break;
+                        }
+                        
+                        if (!tilesAlreadyMoving.Contains(aboveTile))
                         {
                             movesThisWave.Add((aboveTile.CurrentMatch3Object, aboveTile, tile));
                             tilesAlreadyMoving.Add(aboveTile);
@@ -644,21 +654,22 @@ public class Match3PlayHandler : MonoBehaviour
                     }
                 }
             }
-            
-            foreach (var move in movesThisWave)
-            {
-                move.fromTile.SetCurrentItem(null);
-                move.toTile.SetCurrentItem(move.obj);
-                move.obj.SetCurrentTile(move.toTile);
-            }
-            
-            if (objectsMoved)
-            {
-                yield return new WaitForSeconds(delayBetweenObjectMovement);
-            }
-            
-        } while (objectsMoved);
-    }
+        }
+        
+        foreach (var move in movesThisWave)
+        {
+            move.fromTile.SetCurrentItem(null);
+            move.toTile.SetCurrentItem(move.obj);
+            move.obj.SetCurrentTile(move.toTile);
+        }
+        
+        if (objectsMoved)
+        {
+            yield return new WaitForSeconds(delayBetweenObjectMovement);
+        }
+        
+    } while (objectsMoved);
+}
     
     public IEnumerator ClearObjects()
     {

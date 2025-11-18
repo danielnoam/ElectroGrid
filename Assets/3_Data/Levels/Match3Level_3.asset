@@ -41,7 +41,7 @@ MonoBehaviour:
       data:
         objectiveSprite: {fileID: 0}
         gridShape: {fileID: 11400000, guid: 1de084dc7c72cf549bfc73702b720a2f, type: 2}
-        requiredAmount: 20
+        requiredAmount: 19
     - rid: 190982044644802816
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:

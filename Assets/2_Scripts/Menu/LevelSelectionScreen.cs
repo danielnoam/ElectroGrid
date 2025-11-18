@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using DNExtensions;
 using DNExtensions.MenuSystem;
 using DNExtensions.VFXManager;
 using PrimeTween;
@@ -7,26 +8,23 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Match3LevelSelectionScreen : MenuScreen
+public class LevelSelectionScreen : MenuScreen
 {
-    [Header("Level Buttons")]
-    [SerializeField] private Transform buttonsHolder;
-    [SerializeField] private Button levelButtonPrefab;
-    
     [Header("Level Info Window")]
-    [SerializeField] private RectTransform gridContainer;
-    [SerializeField] private Image gridCellPrefab;
-    [SerializeField] private float cellSize = 35f;
+    [SerializeField, MinMaxRange(25f, 35f)] private RangedFloat cellSize = 35f;
     [SerializeField] private float cellSpacing = 2.5f;
-    [SerializeField] private TextMeshProUGUI levelTitleText;
-    [SerializeField] private TextMeshProUGUI levelInfoText;
-    [SerializeField] private Button levelStartButton;
-    
-    [Header("Grid Colors")]
+    [SerializeField] private int maxGridWidthForLargeSize = 8;
     [SerializeField] private Color activeCellColor = new Color(0.3f, 0.7f, 0.3f);
     [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
     
     [Header("References")]
+    [SerializeField] private Transform buttonsHolder;
+    [SerializeField] private Button levelButtonPrefab;
+    [SerializeField] private TextMeshProUGUI levelTitleText;
+    [SerializeField] private TextMeshProUGUI levelInfoText;
+    [SerializeField] private Button levelStartButton;
+    [SerializeField] private RectTransform gridContainer;
+    [SerializeField] private Image gridCellPrefab;
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private Button backButton;
     [SerializeField] private AudioSource audioSource;
@@ -52,6 +50,8 @@ public class Match3LevelSelectionScreen : MenuScreen
         Vector3 endPosition = contentOriginalPosition - (Vector3.right * 1000f);
         return Tween.UIAnchoredPosition(contentContainer, contentOriginalPosition, endPosition, hideTweenSettings);
     }
+    
+
 
     private void SetupButtons()
     {
@@ -78,14 +78,13 @@ public class Match3LevelSelectionScreen : MenuScreen
     {
         if (!_selectedLevel || !GameManager.Instance) return;
         
-        CameraManager.Instance?.ShakeCamera(0.5f);
-        
+
+        var vfxDuration = VFXManager.Instance.PlayVFX(menuManager.EndLevelEffect);
+        CameraManager.Instance?.ShakeCamera(vfxDuration);
         GameManager.Instance.SelectMatch3Level(_selectedLevel);
         
-        Hide(true, (() =>
-        {
-            TransitionManager.TransitionToScene(GameManager.Instance.Match3Scene, menuManager.EndLevelEffect);
-        }));
+        
+        HideByFade(4, () => { GameManager.Instance.Match3Scene.LoadScene(); });
     }
 
     private void OnBackButtonClicked()
@@ -192,8 +191,11 @@ public class Match3LevelSelectionScreen : MenuScreen
         int width = grid.Width;
         int height = grid.Height;
 
-        float totalWidth = (width * cellSize) + ((width - 1) * cellSpacing);
-        float totalHeight = (height * cellSize) + ((height - 1) * cellSpacing);
+        // Use max size if grid width is below threshold, otherwise use min size
+        float actualCellSize = width <= maxGridWidthForLargeSize ? cellSize.maxValue : cellSize.minValue;
+
+        float totalWidth = (width * actualCellSize) + ((width - 1) * cellSpacing);
+        float totalHeight = (height * actualCellSize) + ((height - 1) * cellSpacing);
 
         gridContainer.sizeDelta = new Vector2(totalWidth, totalHeight);
 
@@ -201,21 +203,21 @@ public class Match3LevelSelectionScreen : MenuScreen
         {
             for (int x = 0; x < width; x++)
             {
-                CreateCell(x, y, grid);
+                CreateCell(x, y, grid, actualCellSize);
             }
         }
     }
 
-    private void CreateCell(int x, int y, Grid grid)
+    private void CreateCell(int x, int y, Grid grid, float actualCellSize)
     {
         Image cell = Instantiate(gridCellPrefab, gridContainer);
         cell.name = $"Cell ({x},{y})";
     
         RectTransform cellRect = cell.rectTransform;
-        cellRect.sizeDelta = new Vector2(cellSize, cellSize);
+        cellRect.sizeDelta = new Vector2(actualCellSize, actualCellSize);
 
-        float posX = (x * (cellSize + cellSpacing)) - (gridContainer.sizeDelta.x / 2f) + (cellSize / 2f);
-        float posY = (y * (cellSize + cellSpacing)) - (gridContainer.sizeDelta.y / 2f) + (cellSize / 2f);
+        float posX = (x * (actualCellSize + cellSpacing)) - (gridContainer.sizeDelta.x / 2f) + (actualCellSize / 2f);
+        float posY = (y * (actualCellSize + cellSpacing)) - (gridContainer.sizeDelta.y / 2f) + (actualCellSize / 2f);
     
         cellRect.anchoredPosition = new Vector2(posX, posY);
 

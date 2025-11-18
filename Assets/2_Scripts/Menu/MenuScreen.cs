@@ -56,7 +56,25 @@ public abstract class MenuScreen : MonoBehaviour
     {
         Show(animated, onComplete);
     }
-
+    
+    public virtual void HideByFade(float durationMultiplier, Action onComplete = null)
+    {
+        animationSequence.Stop();
+        
+        animationSequence = Sequence.Create()
+            .Group(Tween.Alpha(canvasGroup, 0f, showTweenSettings.duration * durationMultiplier))
+            .ChainCallback(() =>
+            {
+                if (canvasGroup)
+                {
+                    canvasGroup.interactable = false;
+                    canvasGroup.blocksRaycasts = false;
+                }
+                gameObject.SetActive(true);
+                onComplete?.Invoke();
+            });
+    }
+    
     public virtual void Hide(bool animated = true, Action onComplete = null)
     {
         if (canvasGroup)

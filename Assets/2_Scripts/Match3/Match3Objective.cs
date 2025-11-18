@@ -183,12 +183,12 @@ public class ClearObstaclesObjective : Match3Objective
 
     public override string GetName()
     {
-        return "Pop Double Stars";
+        return "Destroy Double Stars";
     }
     
     public override string GetDescription()
     {
-        return $"Pop {requiredAmount} Double Stars";
+        return $"Destroy {requiredAmount} Double Stars";
     }
 }
 

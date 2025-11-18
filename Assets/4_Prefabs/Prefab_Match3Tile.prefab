@@ -282,7 +282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tile
   selectedTileColor: {r: 1, g: 1, b: 1, a: 1}
-  hoverTileColor: {r: 0.57861626, g: 0, b: 0.5355038, a: 1}
+  hoverTileColor: {r: 0.7176471, g: 0, b: 1, a: 1}
   activeTileColor: {r: 0.7168293, g: 0, b: 1, a: 1}
   inactiveTileColor: {r: 0, g: 0.1947934, b: 0.5647059, a: 0.60784316}
   activeSprite: {fileID: 21300000, guid: d972ed0f4dd9be7489951ee890952f5b, type: 3}
