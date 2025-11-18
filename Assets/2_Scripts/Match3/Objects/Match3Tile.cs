@@ -26,7 +26,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     [Header("References")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private GameObject trashObject;
+    [SerializeField] private Transform trashSprite;
 
     [Separator]
     [SerializeField, ReadOnly] private Vector2Int gridPosition;
@@ -38,6 +38,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     private bool _isSelected;
     private bool _isHovered;
     private Vector3 _baseScale;
+    private Vector3 _baseTrashScale;
     private Sequence _pulseSequence;
     
     public Vector2Int GridPosition => gridPosition;
@@ -49,6 +50,7 @@ public class Match3Tile : MonoBehaviour, IPooledObject
 
     private void Awake()
     {
+        _baseTrashScale = trashSprite.localScale;
         _baseScale = transform.localScale;
     }
 
@@ -59,13 +61,15 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _match3GridHandler.GridDestroyed -= OnGridDestroyed;
         _match3GridHandler.GridDestroyed += OnGridDestroyed;
         
+        
         transform.localScale = _baseScale;
+        trashSprite.localScale = _baseTrashScale;
         gameObject.name = $"Tile ({position.x},{position.y})";
         gridPosition = position;
         _isSelected = false;
         _isHovered = false;
         isActive = active;
-        trashObject.SetActive(false);
+        ToggleTrash(false);
         
         UpdateVisuals();
     }
@@ -78,12 +82,13 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _match3GridHandler.GridDestroyed += OnGridDestroyed;
         
         transform.localScale = _baseScale;
+        trashSprite.localScale = _baseTrashScale;
         gameObject.name = $"Tile ({position.x},{position.y})";
         gridPosition = position;
         _isSelected = false;
         _isHovered = false;
-        isActive = false;
-        trashObject.SetActive(true);
+        isActive = false;   
+        ToggleTrash(true);
         
         UpdateVisuals();
     }
@@ -91,6 +96,18 @@ public class Match3Tile : MonoBehaviour, IPooledObject
     private void OnGridDestroyed()
     {
         ObjectPooler.ReturnObjectToPool(gameObject);
+    }
+    
+    private void ToggleTrash(bool state)
+    {
+        trashSprite.gameObject.SetActive(state);
+        
+        if (state)
+        {
+            trashSprite.localScale = new Vector3(_baseTrashScale.x, 0f, _baseTrashScale.z);
+            var animationSequence = Sequence.Create();
+            animationSequence.Group(Tween.ScaleY(trashSprite, _baseTrashScale.y, 0.5f, Ease.OutBack, startDelay: 0.5f));
+        }
     }
 
     public void SetCurrentItem(Match3Object match3Object)
