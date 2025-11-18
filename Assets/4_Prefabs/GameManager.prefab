@@ -66,6 +66,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 49ee0b48ada61d24294a7e1bdbb8b8c2, type: 2}
   - {fileID: 11400000, guid: a09c9761575dbd045a3b9aef49f33e31, type: 2}
   - {fileID: 11400000, guid: 0785e76520845d14ca62abbb70677333, type: 2}
+  - {fileID: 11400000, guid: 84a203dab072b184bb51684af998f64f, type: 2}
+  - {fileID: 11400000, guid: ce1ea01ef30370443ae7c11eac2e76cd, type: 2}
   selectedMatch3Level: {fileID: 0}
 --- !u!114 &8216671408826984226
 MonoBehaviour:
@@ -132,7 +134,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -229,7 +231,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0
   m_Pitch: 1
   Loop: 1
   Mute: 0

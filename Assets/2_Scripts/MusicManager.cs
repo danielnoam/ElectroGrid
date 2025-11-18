@@ -32,7 +32,15 @@ public class MusicManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        SetupAudioSources();
+        
+        
+        if (!audioSourceA || !audioSourceB)
+        {
+            Debug.LogError("AudioSources not assigned in MusicManager");
+            return;
+        }
+        _currentSource = audioSourceA;
+        _nextSource = audioSourceB;
     }
 
     private void OnEnable()
@@ -43,25 +51,12 @@ public class MusicManager : MonoBehaviour
     private void OnDisable()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-    
-    private void SetupAudioSources()
-    {
-        if (!audioSourceA || !audioSourceB)
+        
+        if (Match3GameManager.Instance)
         {
-            Debug.LogError("AudioSources not assigned in MusicManager");
-            return;
+            Match3GameManager.Instance.LevelStarted -= OnLevelStarted;
+            Match3GameManager.Instance.LevelStarted += OnLevelStarted;
         }
-
-        audioSourceA.loop = true;
-        audioSourceB.loop = true;
-        audioSourceA.volume = 0f;
-        audioSourceB.volume = 0f;
-        audioSourceA.playOnAwake = false;
-        audioSourceB.playOnAwake = false;
-
-        _currentSource = audioSourceA;
-        _nextSource = audioSourceB;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -76,7 +71,18 @@ public class MusicManager : MonoBehaviour
         else if (GameManager.Instance.Match3Scene.SceneName == currentSceneName)
         {
             Play(gameplayClips.GetRandomItem());
+
+            if (Match3GameManager.Instance)
+            {
+                Match3GameManager.Instance.LevelStarted -= OnLevelStarted;
+                Match3GameManager.Instance.LevelStarted += OnLevelStarted;
+            }
         }
+    }
+
+    private void OnLevelStarted(Match3LevelData levelData)
+    {
+        Play(gameplayClips.GetRandomItem());
     }
 
     private void Play(AudioClip clip)
@@ -95,8 +101,8 @@ public class MusicManager : MonoBehaviour
         _nextSource.Play();
 
         _transitionSequence = Sequence.Create();
-        _transitionSequence.Group(Tween.AudioVolume(_currentSource, 0f, transitionDuration, Ease.InOutSine));
-        _transitionSequence.Group(Tween.AudioVolume(_nextSource, maxVolume, transitionDuration, Ease.InOutSine));
+        if (!Mathf.Approximately(_currentSource.volume, 0f)) _transitionSequence.Group(Tween.AudioVolume(_currentSource, 0f, transitionDuration, Ease.InOutSine));
+        if (!Mathf.Approximately(_nextSource.volume, maxVolume)) _transitionSequence.Group(Tween.AudioVolume(_nextSource, maxVolume, transitionDuration, Ease.InOutSine));
         _transitionSequence.ChainCallback(() =>
             {
                 _currentSource.Stop();

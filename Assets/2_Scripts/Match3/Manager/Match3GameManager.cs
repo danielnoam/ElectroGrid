@@ -92,8 +92,10 @@ public class Match3GameManager : MonoBehaviour
     }
     
     [Button(ButtonPlayMode.OnlyWhenPlaying)]
-    private void StartNewGame()
+    public void StartNewGame()
     {
+        if (populatingGrid) return;
+        
         if (!currentLevel)
         {
             if (overrideLevel)
