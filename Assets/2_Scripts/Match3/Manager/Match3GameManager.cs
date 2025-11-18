@@ -13,6 +13,8 @@ public class Match3GameManager : MonoBehaviour
     [Header("Settings")]
     [Tooltip("Minimum tiles required to form a match")]
     [SerializeField] private int minMatchCount = 3;
+    [Tooltip("Minimum tiles required to form a match")]
+    [SerializeField] private int minMatchForLineClear = 4;
     [Tooltip("Maximum attempts to create a grid with guaranteed matches")]
     [SerializeField] private int mxGuaranteedMatchAttempts = 100;
     [Tooltip("Maximum attempts to recheck matches in grid")]
@@ -35,8 +37,10 @@ public class Match3GameManager : MonoBehaviour
     private Match3LevelData _currentLevelData;
     
     public Match3GridHandler GridHandler => gridHandler;
+    
     public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
     public int MinMatchCount => minMatchCount;
+    public int MinMatchForLineClear => minMatchForLineClear;
     public int MaxAttemptsToRecheckMatches => maxAttemptsToRecheckMatches;
     
     public event Action<Match3LevelData> LevelStarted;

@@ -16,6 +16,7 @@ public class Match3ObstacleObject : Match3Object
     public override bool IsSwappable => false;
     public override bool IsMatchable => false;
     public override bool IsMovable => false;
+    public override bool IsAffectedBySpecialMatches => true;
     public int CurrentHealth => _currentHealth;
     
     

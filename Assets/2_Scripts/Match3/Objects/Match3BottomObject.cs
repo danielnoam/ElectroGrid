@@ -11,6 +11,7 @@ public class Match3BottomObject : Match3Object
     public override bool IsSwappable => false;
     public override bool IsMatchable => false;
     public override bool IsMovable => true;
+    public override bool IsAffectedBySpecialMatches => false;
 
     public override void Initialize(SOItemData data, Match3GridHandler gridHandler)
     {

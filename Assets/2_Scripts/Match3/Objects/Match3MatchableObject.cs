@@ -19,7 +19,7 @@ public class Match3MatchableObject : Match3Object
     public override bool IsSwappable => true;
     public override bool IsMatchable => true;
     public override bool IsMovable => true;
-    
+    public override bool IsAffectedBySpecialMatches => true;
     
     
 
