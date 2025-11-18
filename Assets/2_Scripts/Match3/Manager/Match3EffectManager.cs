@@ -16,9 +16,9 @@ public class Match3EffectManager : MonoBehaviour
     
     [Header("Mouse Interaction")]
     [SerializeField] private float maxScaleMultiplier = 1f;
-    [SerializeField] private float minScaleMultiplier = 0.8f;
+    [SerializeField] private float minScaleMultiplier = 0.9f;
     [SerializeField] private float effectRadius = 3f;
-    [SerializeField] private AnimationCurve zOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    [SerializeField] private AnimationCurve effectOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     [Header("References")]
     [SerializeField] private Match3GameManager gameManager;
@@ -89,10 +89,70 @@ public class Match3EffectManager : MonoBehaviour
         }
     }
 
-    private void OnMatchesMade(List<Match3Tile> tiles)
+    private void OnMatchesMade(List<Match3Tile> matchedTiles)
     {
-
+        var backgroundTilesPositions = new List<Vector2Int>(_backgroundTiles.Keys);
         
+        bool isVertical = false;
+        bool isHorizontal = false;
+        
+        if (matchedTiles.Count >= 2)
+        {
+            Vector2Int? firstPos = null;
+            Vector2Int? secondPos = null;
+            
+            for (int i = 0; i < matchedTiles.Count && secondPos == null; i++)
+            {
+                if (matchedTiles[i])
+                {
+                    if (firstPos == null)
+                        firstPos = matchedTiles[i].GridPosition;
+                    else
+                        secondPos = matchedTiles[i].GridPosition;
+                }
+            }
+            
+            if (firstPos.HasValue && secondPos.HasValue)
+            {
+                isVertical = firstPos.Value.x == secondPos.Value.x;
+                isHorizontal = firstPos.Value.y == secondPos.Value.y;
+            }
+        }
+        
+        for (int matchedTile = 0; matchedTile < matchedTiles.Count; matchedTile++)
+        {
+            if (!matchedTiles[matchedTile]) continue;
+
+            Vector2Int matchedPos = matchedTiles[matchedTile].GridPosition;
+
+            for (int backgroundTile = 0; backgroundTile < backgroundTilesPositions.Count; backgroundTile++)
+            {
+                Vector2Int bgPos = backgroundTilesPositions[backgroundTile];
+                
+                bool shouldAnimate = false;
+                int distance = 0;
+                
+                if (isVertical && matchedPos.x == bgPos.x)
+                {
+                    shouldAnimate = true;
+                    distance = Mathf.Abs(matchedPos.y - bgPos.y);
+                }
+                else if (isHorizontal && matchedPos.y == bgPos.y)
+                {
+                    shouldAnimate = true;
+                    distance = Mathf.Abs(matchedPos.x - bgPos.x);
+                }
+                
+                if (shouldAnimate)
+                {
+                    _backgroundTiles.TryGetValue(bgPos, out var tile);
+                    if (tile)
+                    {
+                        tile.SquashTile(distance);
+                    }
+                }
+            }
+        }
     }
 
 
@@ -101,39 +161,7 @@ public class Match3EffectManager : MonoBehaviour
         UpdateTiles();
     }
     
-    [Button]
-    public void CreateParticleEffectAtPosition(Vector3 position, SOItemData itemData)
-    {
-        if (!backgroundParticlePrefab || !itemData) return;
-    
-        var particle = ObjectPooler.GetObjectFromPool(backgroundParticlePrefab.gameObject, position, Quaternion.identity);
-        var particleOneShot = particle.GetComponent<OneShotParticle>();
-        var textureSheetModule = particleOneShot.particle.textureSheetAnimation;
-        var colorOverLifetimeModule = particleOneShot.particle.colorOverLifetime;
-    
-        var startColor = itemData.Color;
-        startColor.a = 0.3f;
-        
-        Gradient gradient = new Gradient();
-        gradient.SetKeys(
-            new GradientColorKey[] 
-            { 
-                new GradientColorKey(startColor, 0.0f),   
-                new GradientColorKey(startColor, 0.2f),  
-                new GradientColorKey(Color.clear, 1.0f)   
-            },
-            new GradientAlphaKey[] 
-            { 
-                new GradientAlphaKey(startColor.a, 0.0f),      
-                new GradientAlphaKey(startColor.a, 0.2f),  
-                new GradientAlphaKey(0.0f, 1.0f)     
-            }
-        );
-    
-        colorOverLifetimeModule.color = new ParticleSystem.MinMaxGradient(gradient);
-        textureSheetModule.SetSprite(0, itemData.Sprite);
-        particleOneShot.Play();
-    }
+
 
     private void OnGridDestroyed()
     {
@@ -321,7 +349,7 @@ public class Match3EffectManager : MonoBehaviour
         }
 
         float normalizedDistance = distance / effectRadius;
-        float curveValue = zOffsetCurve.Evaluate(normalizedDistance);
+        float curveValue = effectOffsetCurve.Evaluate(normalizedDistance);
         return Mathf.Lerp( minScaleMultiplier, maxScaleMultiplier, curveValue);
     }
     
@@ -331,6 +359,40 @@ public class Match3EffectManager : MonoBehaviour
         var tile = tileGo.GetComponent<Match3BackgroundTile>();
         
         return tile;
+    }
+    
+    [Button]
+    public void CreateShapeEffect(Vector3 position, SOItemData itemData)
+    {
+        if (!backgroundParticlePrefab || !itemData) return;
+    
+        var particle = ObjectPooler.GetObjectFromPool(backgroundParticlePrefab.gameObject, position, Quaternion.identity);
+        var particleOneShot = particle.GetComponent<OneShotParticle>();
+        var textureSheetModule = particleOneShot.particle.textureSheetAnimation;
+        var colorOverLifetimeModule = particleOneShot.particle.colorOverLifetime;
+    
+        var startColor = itemData.Color;
+        startColor.a = 0.3f;
+        
+        Gradient gradient = new Gradient();
+        gradient.SetKeys(
+            new GradientColorKey[] 
+            { 
+                new GradientColorKey(startColor, 0.0f),   
+                new GradientColorKey(startColor, 0.2f),  
+                new GradientColorKey(Color.clear, 1.0f)   
+            },
+            new GradientAlphaKey[] 
+            { 
+                new GradientAlphaKey(startColor.a, 0.0f),      
+                new GradientAlphaKey(startColor.a, 0.2f),  
+                new GradientAlphaKey(0.0f, 1.0f)     
+            }
+        );
+    
+        colorOverLifetimeModule.color = new ParticleSystem.MinMaxGradient(gradient);
+        textureSheetModule.SetSprite(0, itemData.Sprite);
+        particleOneShot.Play();
     }
 
 }

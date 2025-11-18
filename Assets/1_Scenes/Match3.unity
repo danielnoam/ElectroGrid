@@ -804,7 +804,7 @@ MonoBehaviour:
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
   selectionIndicator: {fileID: 586155252}
-  overrideLevel: {fileID: 0}
+  overrideLevel: {fileID: 11400000, guid: 49ee0b48ada61d24294a7e1bdbb8b8c2, type: 2}
   currentLevel: {fileID: 0}
   levelComplete: 0
   finishedObjectives: 0
@@ -883,8 +883,8 @@ MonoBehaviour:
   backgroundParticlePrefab: {fileID: 243077210646262330, guid: de67b1264aecd6c4a886b5cb84c1bd45, type: 3}
   maxScaleMultiplier: 1
   minScaleMultiplier: 0.9
-  effectRadius: 3
-  zOffsetCurve:
+  effectRadius: 2.5
+  effectOffsetCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -899,11 +899,11 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2.0952375
-      outSlope: 2.0952375
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.050000012
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
