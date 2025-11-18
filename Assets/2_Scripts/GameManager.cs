@@ -1,6 +1,7 @@
 using System;
 using DNExtensions;
 using DNExtensions.Button;
+using PrimeTween;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -42,6 +43,7 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
+        PrimeTweenConfig.SetTweensCapacity(400);
         if (Application.platform == RuntimePlatform.Android)
         {
             Application.targetFrameRate = 120;
