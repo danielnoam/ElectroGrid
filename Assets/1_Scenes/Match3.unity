@@ -798,6 +798,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
   minMatchCount: 3
+  minMatchForSpecial: 4
   mxGuaranteedMatchAttempts: 100
   maxAttemptsToRecheckMatches: 999
   minPossibleMatches: 3

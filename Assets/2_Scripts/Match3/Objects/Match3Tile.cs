@@ -169,12 +169,12 @@ public class Match3Tile : MonoBehaviour, IPooledObject
         _pulseSequence.Chain(Tween.Scale(transform, _baseScale, squashDuration * 0.7f, Ease.OutSine));
     }
     
-    public void PunchTile()
+    public void PunchTile(float multiplier = 1f)
     {
         if (!isActive) return;
         
         _pulseSequence = Sequence.Create();
-        _pulseSequence.Group(Tween.Scale(transform, _baseScale * punchScaleAmount, punchDuration/2, Ease.OutElastic));
+        _pulseSequence.Group(Tween.Scale(transform, _baseScale * (punchScaleAmount * multiplier), punchDuration/2, Ease.OutElastic));
         _pulseSequence.Chain(Tween.Scale(transform, _baseScale, punchDuration/2, Ease.InQuad));
     }
 

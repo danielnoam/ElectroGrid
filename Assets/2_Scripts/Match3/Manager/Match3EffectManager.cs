@@ -170,15 +170,7 @@ public class Match3EffectManager : MonoBehaviour
         foreach (Match3BackgroundTile tile in tilesToClear)
         {
             if (!tile) continue;
-        
-            if (Application.isPlaying)
-            {
-                Destroy(tile.gameObject);
-            }
-            else
-            {
-                DestroyImmediate(tile.gameObject);
-            }
+            ObjectPooler.ReturnObjectToPool(tile.gameObject);
         }
     
         _backgroundTiles.Clear();

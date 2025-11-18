@@ -94,10 +94,10 @@ public class MusicManager : MonoBehaviour
         _nextSource.volume = 0f;
         _nextSource.Play();
 
-        _transitionSequence = Sequence.Create()
-            .Group(Tween.AudioVolume(_currentSource, 0f, transitionDuration, Ease.InOutSine))
-            .Group(Tween.AudioVolume(_nextSource, maxVolume, transitionDuration, Ease.InOutSine))
-            .ChainCallback(() =>
+        _transitionSequence = Sequence.Create();
+        _transitionSequence.Group(Tween.AudioVolume(_currentSource, 0f, transitionDuration, Ease.InOutSine));
+        _transitionSequence.Group(Tween.AudioVolume(_nextSource, maxVolume, transitionDuration, Ease.InOutSine));
+        _transitionSequence.ChainCallback(() =>
             {
                 _currentSource.Stop();
                 (_currentSource, _nextSource) = (_nextSource, _currentSource);

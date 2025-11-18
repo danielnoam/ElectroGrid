@@ -524,12 +524,11 @@ public class Match3PlayHandler : MonoBehaviour
             gameManager.NotifyMatchesWhereMade(immediateMatches);
             
             yield return HandleMatches(immediateMatches);
-            yield return HandleSpecialMatches(immediateMatches);
             yield return MoveObjectsDown(gridShape);
             yield return PopulateGrid(level, gridShape, minPossibleMatches, true);
         }
     }
-    
+
     public IEnumerator HandleMatches(List<Match3Tile> tilesWithMatches)
     {
         foreach (var tile in tilesWithMatches)
@@ -540,56 +539,80 @@ public class Match3PlayHandler : MonoBehaviour
                 yield return new WaitForSeconds(delayBetweenMatchPops);
             }
         }
-    }
-    
-    public IEnumerator HandleSpecialMatches(List<Match3Tile> tilesWithMatches)
-    {
-        Debug.Log($"HandleSpecialMatches called with {tilesWithMatches.Count} matches");
-        // Check if the match amount is more then the minimum amount for a match
-        if (tilesWithMatches.Count > gameManager.MinMatchCount)
-        {
-            // Check if the matches are vertical and/or horizontal
-            bool isVertical = tilesWithMatches.All(tile => tile.GridPosition.x == tilesWithMatches[0].GridPosition.x);
-            bool isHorizontal = tilesWithMatches.All(tile => tile.GridPosition.y == tilesWithMatches[0].GridPosition.y);
 
-            Debug.Log($"Match count: {tilesWithMatches.Count}, MinMatchCount: {gameManager.MinMatchCount}");
-            Debug.Log($"Is vertical: {isVertical}, Is horizontal: {isHorizontal}");
+
+        // Check if the match amount is more than the minimum amount for a match
+        if (tilesWithMatches.Count >= gameManager.MinMatchForLineClear)
+        {
+            // Check if the matches form a significant vertical line (multiple tiles share the same x)
+            var xGroups = tilesWithMatches.GroupBy(tile => tile.GridPosition.x);
+            var enumerable = xGroups.ToList();
+            bool isVertical = enumerable.Any(group => group.Count() >= gameManager.MinMatchForLineClear);
             
-            // If vertical also destroy the column
+            // Check if the matches form a significant horizontal line (multiple tiles share the same y)
+            var yGroups = tilesWithMatches.GroupBy(tile => tile.GridPosition.y);
+            var groups = yGroups.ToList();
+            bool isHorizontal = groups.Any(group => group.Count() >= gameManager.MinMatchForLineClear);
+
+            Debug.Log($"Match count: {tilesWithMatches.Count}, Is vertical: {isVertical}, Is horizontal: {isHorizontal}");
+            if (isHorizontal || isVertical)
+            {
+                yield return new WaitForSeconds(0.3f);
+                CameraManager.Instance?.ShakeCamera(3, 0.75f);
+            }
+            
+            // If vertical, destroy all columns that have more than MinMatchForSpecial matches
             if (isVertical)
             {
-                var column = tilesWithMatches[0].GridPosition.x;
-                Debug.Log($"Destroying column {column}");
-                for (var y = 0; y < gridHandler.Grid.Height; y++)
+                var columnsToDestroy = enumerable.Where(group => group.Count() >= gameManager.MinMatchForLineClear).Select(group => group.Key);
+                foreach (var column in columnsToDestroy)
                 {
-                    var tile = gridHandler.GetTile(new Vector2Int(column, y));
-                    if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
+                    Debug.Log($"Destroying column {column}");
+                    for (var y = 0; y < gridHandler.Grid.Height; y++)
                     {
-                        matchable.DestroyWithAnimation();
-                        yield return new WaitForSeconds(delayBetweenMatchPops);
+                        var tile = gridHandler.GetTile(new Vector2Int(column, y));
+                        if (!tile || !tile.CurrentMatch3Object) continue;
+                        
+                        if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
+                        {
+                            tile.CurrentMatch3Object.DestroyWithAnimation();
+                            tile.PunchTile(1.5f);
+                            tile.SetCurrentItem(null);
+                        } 
                     }
                 }
             }
-        
-            // if horizontal also destroy the row
+
+            // If horizontal, destroy all rows that have more than MinMatchForSpecial matches
             if (isHorizontal)
             {
-                var row = tilesWithMatches[0].GridPosition.y;
-                Debug.Log($"Destroying row {row}");
-                for (var x = 0; x < gridHandler.Grid.Width; x++)
+                var rowsToDestroy = groups.Where(group => group.Count() >= gameManager.MinMatchForLineClear).Select(group => group.Key);
+                foreach (var row in rowsToDestroy)
                 {
-                    var tile = gridHandler.GetTile(new Vector2Int(x, row));
-                    if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
+                    Debug.Log($"Destroying row {row}");
+                    for (var x = 0; x < gridHandler.Grid.Width; x++)
                     {
-                        matchable.DestroyWithAnimation();
-                        yield return new WaitForSeconds(delayBetweenMatchPops);
+                        var tile = gridHandler.GetTile(new Vector2Int(x, row));
+                        if (!tile || !tile.CurrentMatch3Object) continue;
+                        
+                        if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
+                        {
+                            tile.CurrentMatch3Object.DestroyWithAnimation();
+                            tile.PunchTile(1.5f);
+                            tile.SetCurrentItem(null);
+                        } 
                     }
                 }
+            }
+
+            if (isHorizontal || isVertical)
+            {
+                yield return new WaitForSeconds(0.3f);
             }
         }
     }
-    
-    
+
+
     public IEnumerator MoveObjectsDown(SOGridShape gridShape)
     {
         bool objectsMoved;

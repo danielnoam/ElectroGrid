@@ -30,6 +30,7 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
     public abstract bool IsSwappable { get; }
     public abstract bool IsMatchable { get; }
     public abstract bool IsMovable { get; }
+    public abstract bool IsAffectedBySpecialMatches { get; }
 
     protected virtual void OnDestroy()
     {
