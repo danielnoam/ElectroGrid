@@ -4,68 +4,51 @@ using PrimeTween;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MainMenuScreen : MonoBehaviour, IMenuScreen
+public class MainMenuScreen : MenuScreen
 {
-    [Header("Animation")]
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private RectTransform contentContainer;
-    [SerializeField] private TweenSettings showTweenSettings;
-    [SerializeField] private TweenSettings hideTweenSettings;
-    
     [Header("References")]
     [SerializeField] private Button match3Button;
     [SerializeField] private Button quitButton;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private MenuManager menuManager;
-    
-    private Vector3 _contentOriginalPosition;
-    private Vector3 _contentOriginalScale;
-    private Sequence _animationSequence;
-
-    private void Awake()
-    {
-        if (contentContainer)
-        {
-            _contentOriginalScale = contentContainer.localScale;
-            _contentOriginalPosition = contentContainer.anchoredPosition3D;
-        }
-    }
 
     private void OnEnable()
     {
         SetupButtons();
     }
 
-    public void Show(bool animated = true, Action onComplete = null)
+    protected override Tween GetShowPositionTween()
+    {
+        Vector3 startPosition = contentOriginalPosition - (Vector3.left * 1000f);
+        return Tween.UIAnchoredPosition(contentContainer, startPosition, contentOriginalPosition, showTweenSettings);
+    }
+
+    protected override Tween GetHidePositionTween()
+    {
+        Vector3 endPosition = contentOriginalPosition - (Vector3.left * 1000f);
+        return Tween.UIAnchoredPosition(contentContainer, contentOriginalPosition, endPosition, hideTweenSettings);
+    }
+
+    public override void ShowInitial(bool animated = true, Action onComplete = null)
     {
         gameObject.SetActive(true);
         
         if (!animated)
         {
-            if (canvasGroup)
-            {
-                canvasGroup.alpha = 1f;
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
-
-            if (contentContainer)
-            {
-                contentContainer.localScale = _contentOriginalScale;
-                contentContainer.anchoredPosition3D = _contentOriginalPosition;
-            }
-            
+            ShowInstant();
             onComplete?.Invoke();
             return;
         }
 
-        _animationSequence.Stop();
+        animationSequence.Stop();
         
         if (canvasGroup) canvasGroup.alpha = 0f;
         
-        _animationSequence = Sequence.Create()
+        Vector3 startPosition = contentOriginalPosition + (Vector3.up * 1000f);
+        
+        animationSequence = Sequence.Create()
             .Group(Tween.Alpha(canvasGroup, 1f, showTweenSettings))
-            .Group(Tween.UIAnchoredPosition(contentContainer,_contentOriginalPosition - (Vector3.left * 1000f),_contentOriginalPosition, showTweenSettings))
+            .Group(Tween.UIAnchoredPosition(contentContainer, startPosition, contentOriginalPosition, showTweenSettings))
             .ChainCallback(() =>
             {
                 if (canvasGroup)
@@ -75,42 +58,6 @@ public class MainMenuScreen : MonoBehaviour, IMenuScreen
                 }
                 onComplete?.Invoke();
             });
-    }
-
-    public void Hide(bool animated = true, Action onComplete = null)
-    {
-        if (canvasGroup)
-        {
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
-
-        if (!animated)
-        {
-            if (canvasGroup) canvasGroup.alpha = 0f;
-            gameObject.SetActive(false);
-            onComplete?.Invoke();
-            return;
-        }
-
-        _animationSequence.Stop();
-        
-        _animationSequence = Sequence.Create()
-            .Group(Tween.Alpha(canvasGroup, 0f, hideTweenSettings))
-            .Group(Tween.UIAnchoredPosition(contentContainer, _contentOriginalPosition, _contentOriginalPosition - (Vector3.left * 1000f), hideTweenSettings))
-            .ChainCallback(() =>
-            {
-                gameObject.SetActive(false);
-                onComplete?.Invoke();
-            });
-    }
-
-    public void SetInteractable(bool interactable)
-    {
-        if (canvasGroup)
-        {
-            canvasGroup.interactable = interactable;
-        }
     }
 
     private void SetupButtons()

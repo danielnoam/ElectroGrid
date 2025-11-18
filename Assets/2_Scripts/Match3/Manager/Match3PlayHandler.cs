@@ -524,6 +524,7 @@ public class Match3PlayHandler : MonoBehaviour
             gameManager.NotifyMatchesWhereMade(immediateMatches);
             
             yield return HandleMatches(immediateMatches);
+            yield return HandleSpecialMatches(immediateMatches);
             yield return MoveObjectsDown(gridShape);
             yield return PopulateGrid(level, gridShape, minPossibleMatches, true);
         }
@@ -537,6 +538,53 @@ public class Match3PlayHandler : MonoBehaviour
             {
                 matchable.MatchFound();
                 yield return new WaitForSeconds(delayBetweenMatchPops);
+            }
+        }
+    }
+    
+    public IEnumerator HandleSpecialMatches(List<Match3Tile> tilesWithMatches)
+    {
+        Debug.Log($"HandleSpecialMatches called with {tilesWithMatches.Count} matches");
+        // Check if the match amount is more then the minimum amount for a match
+        if (tilesWithMatches.Count > gameManager.MinMatchCount)
+        {
+            // Check if the matches are vertical and/or horizontal
+            bool isVertical = tilesWithMatches.All(tile => tile.GridPosition.x == tilesWithMatches[0].GridPosition.x);
+            bool isHorizontal = tilesWithMatches.All(tile => tile.GridPosition.y == tilesWithMatches[0].GridPosition.y);
+
+            Debug.Log($"Match count: {tilesWithMatches.Count}, MinMatchCount: {gameManager.MinMatchCount}");
+            Debug.Log($"Is vertical: {isVertical}, Is horizontal: {isHorizontal}");
+            
+            // If vertical also destroy the column
+            if (isVertical)
+            {
+                var column = tilesWithMatches[0].GridPosition.x;
+                Debug.Log($"Destroying column {column}");
+                for (var y = 0; y < gridHandler.Grid.Height; y++)
+                {
+                    var tile = gridHandler.GetTile(new Vector2Int(column, y));
+                    if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
+                    {
+                        matchable.DestroyWithAnimation();
+                        yield return new WaitForSeconds(delayBetweenMatchPops);
+                    }
+                }
+            }
+        
+            // if horizontal also destroy the row
+            if (isHorizontal)
+            {
+                var row = tilesWithMatches[0].GridPosition.y;
+                Debug.Log($"Destroying row {row}");
+                for (var x = 0; x < gridHandler.Grid.Width; x++)
+                {
+                    var tile = gridHandler.GetTile(new Vector2Int(x, row));
+                    if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
+                    {
+                        matchable.DestroyWithAnimation();
+                        yield return new WaitForSeconds(delayBetweenMatchPops);
+                    }
+                }
             }
         }
     }

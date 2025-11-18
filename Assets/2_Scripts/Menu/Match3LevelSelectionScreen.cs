@@ -7,14 +7,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
+public class Match3LevelSelectionScreen : MenuScreen
 {
-    [Header("Animation")]
-    [SerializeField] private CanvasGroup canvasGroup;
-    [SerializeField] private RectTransform contentContainer;
-    [SerializeField] private TweenSettings showTweenSettings;
-    [SerializeField] private TweenSettings hideTweenSettings;
-    
     [Header("Level Buttons")]
     [SerializeField] private Transform buttonsHolder;
     [SerializeField] private Button levelButtonPrefab;
@@ -36,21 +30,8 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private Button backButton;
     [SerializeField] private AudioSource audioSource;
-    
 
     private SOMatch3Level _selectedLevel;
-    private Vector3 _contentOriginalPosition;
-    private Vector3 _contentOriginalScale;
-    private Sequence _animationSequence;
-
-    private void Awake()
-    {
-        if (contentContainer)
-        {
-            _contentOriginalScale = contentContainer.localScale;
-            _contentOriginalPosition = contentContainer.anchoredPosition3D;
-        }
-    }
 
     private void Start()
     {
@@ -60,81 +41,16 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
         SetupButtons();
     }
 
-    public void Show(bool animated = true, Action onComplete = null)
+    protected override Tween GetShowPositionTween()
     {
-        gameObject.SetActive(true);
-        
-        if (!animated)
-        {
-            if (canvasGroup)
-            {
-                canvasGroup.alpha = 1f;
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
-
-            if (contentContainer)
-            {
-                contentContainer.localScale = _contentOriginalScale;
-                contentContainer.anchoredPosition3D = _contentOriginalPosition;
-            }
-            
-            onComplete?.Invoke();
-            return;
-        }
-
-        _animationSequence.Stop();
-        
-        if (canvasGroup) canvasGroup.alpha = 0f;
-        
-        _animationSequence = Sequence.Create()
-            .Group(Tween.Alpha(canvasGroup, 1f, showTweenSettings))
-            .Group(Tween.UIAnchoredPosition(contentContainer,_contentOriginalPosition - (Vector3.right * 1000f),_contentOriginalPosition, showTweenSettings))
-            .ChainCallback(() =>
-            {
-                if (canvasGroup)
-                {
-                    canvasGroup.interactable = true;
-                    canvasGroup.blocksRaycasts = true;
-                }
-                onComplete?.Invoke();
-            });
+        Vector3 startPosition = contentOriginalPosition - (Vector3.right * 1000f);
+        return Tween.UIAnchoredPosition(contentContainer, startPosition, contentOriginalPosition, showTweenSettings);
     }
 
-    public void Hide(bool animated = true, Action onComplete = null)
+    protected override Tween GetHidePositionTween()
     {
-        if (canvasGroup)
-        {
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
-
-        if (!animated)
-        {
-            if (canvasGroup) canvasGroup.alpha = 0f;
-            gameObject.SetActive(false);
-            onComplete?.Invoke();
-            return;
-        }
-
-        _animationSequence.Stop();
-        
-        _animationSequence = Sequence.Create()
-            .Group(Tween.Alpha(canvasGroup, 0f, hideTweenSettings))
-            .Group(Tween.UIAnchoredPosition(contentContainer, _contentOriginalPosition, _contentOriginalPosition - (Vector3.right * 1000f), hideTweenSettings))
-            .ChainCallback(() =>
-            {
-                gameObject.SetActive(false);
-                onComplete?.Invoke();
-            });
-    }
-
-    public void SetInteractable(bool interactable)
-    {
-        if (canvasGroup)
-        {
-            canvasGroup.interactable = interactable;
-        }
+        Vector3 endPosition = contentOriginalPosition - (Vector3.right * 1000f);
+        return Tween.UIAnchoredPosition(contentContainer, contentOriginalPosition, endPosition, hideTweenSettings);
     }
 
     private void SetupButtons()
@@ -143,7 +59,6 @@ public class Match3LevelSelectionScreen : MonoBehaviour, IMenuScreen
         {
             SelectableAnimator selectableAnimator = levelStartButton.GetComponent<SelectableAnimator>();
             if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
-            
 
             levelStartButton.onClick.RemoveAllListeners();
             levelStartButton.onClick.AddListener(OnStartButtonClicked);
