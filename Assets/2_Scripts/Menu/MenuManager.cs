@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using DNExtensions;
 using DNExtensions.VFXManager;
 using UnityEngine;
-using VFXManager = DNExtensions.VFXManager.VFXManager;
 
 public class MenuManager : MonoBehaviour
 {
@@ -17,8 +16,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private SOVFEffectsSequence endLevelEffect;
     [SerializeField] private BackgroundManager backgroundManager;
     
-    private IMenuScreen _currentScreen;
-    private readonly Dictionary<Type, IMenuScreen> _screens = new Dictionary<Type, IMenuScreen>();
+    private MenuScreen _currentScreen;
+    private readonly Dictionary<Type, MenuScreen> _screens = new Dictionary<Type, MenuScreen>();
 
     public SOVFEffectsSequence StartLevelEffect => startLevelEffect;
     public SOVFEffectsSequence EndLevelEffect => endLevelEffect;
@@ -34,12 +33,12 @@ public class MenuManager : MonoBehaviour
     {
         VFXManager.Instance?.PlayVFX(gameStartEffect);
         HideAllScreensImmediate();
-        ShowScreen<MainMenuScreen>();
+        ShowScreen<MainMenuScreen>(true);
     }
     
-    private void ShowScreen<T>(bool animated = true, Action onComplete = null) where T : IMenuScreen
+    private void ShowScreen<T>(bool animated = true, Action onComplete = null) where T : MenuScreen
     {
-        if (!_screens.TryGetValue(typeof(T), out IMenuScreen screen))
+        if (!_screens.TryGetValue(typeof(T), out MenuScreen screen))
         {
             Debug.LogError($"Screen of type {typeof(T).Name} not found!");
             return;
@@ -57,7 +56,7 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
-            screen.Show(animated, onComplete);
+            screen.ShowInitial(animated, onComplete);
             _currentScreen = screen;
         }
     }
