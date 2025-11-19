@@ -56,9 +56,17 @@ public class Match3SelectionIndicator : MonoBehaviour
         _animationSequence.Stop();
         
         _pressedMatch3Tile = match3Tile;
-        spriteRenderer.sprite = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Sprite;
-        spriteRenderer.color = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Color;
-        UpdateEmissionMask(_pressedMatch3Tile.CurrentMatch3Object.ItemData.EmissionMask);
+        spriteRenderer.sprite = _pressedMatch3Tile.CurrentMatch3Object.Sprite;
+        if (_pressedMatch3Tile.CurrentMatch3Object.ItemData)
+        {
+            spriteRenderer.color = _pressedMatch3Tile.CurrentMatch3Object.ItemData.Color;
+            UpdateEmissionMask(_pressedMatch3Tile.CurrentMatch3Object.ItemData.EmissionMask);
+        }
+        else
+        {
+            spriteRenderer.color = Color.white;
+            UpdateEmissionMask(null);
+        }
         if (spriteRenderer.transform.localScale != _baseSpriteScale) Tween.Scale(spriteRenderer.transform, _baseSpriteScale, 0.2f, Ease.OutBack);
         
         _enabled = true;

@@ -26,6 +26,15 @@ public class MoveLimit : Match3LoseCondition
 
     public int AllowedMoves => allowedMoves;
     public int MovesRemaining => _movesRemaining;
+    
+    public void AddMoves(int amount)
+    {
+        _movesRemaining += amount;
+        if (_movesRemaining > allowedMoves)
+        {
+            _movesRemaining = allowedMoves;
+        }
+    }
 
     public override void Setup()
     {
@@ -73,6 +82,15 @@ public class TimeLimit : Match3LoseCondition
 
     public float AllowedTime => allowedTime;
     public float TimeRemaining => _timeRemaining;
+    
+    public void AddTime(float amount)
+    {
+        _timeRemaining += amount;
+        if (_timeRemaining > allowedTime)
+        {
+            _timeRemaining = allowedTime;
+        }
+    }
 
     public override void Setup()
     {

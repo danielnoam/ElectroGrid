@@ -74,7 +74,7 @@ public class Match3MatchableObject : Match3Object
     }
     
     
-    public void SetHeld(bool held)
+    public override void SetHeld(bool held)
     {
         if (_beingDestroyed) return;
         

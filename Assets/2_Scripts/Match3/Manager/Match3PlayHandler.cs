@@ -168,9 +168,9 @@ public class Match3PlayHandler : MonoBehaviour
         selectedMatch3Tile = match3Tile;
         heldMatch3Object = selectedMatch3Tile.CurrentMatch3Object;
         
-        if (heldMatch3Object is Match3MatchableObject matchable)
+        if (heldMatch3Object && heldMatch3Object.IsSwappable)
         {
-            matchable.SetHeld(true);
+            heldMatch3Object.SetHeld(true);
         }
         
         selectionIndicator?.EnableIndicator(selectedMatch3Tile);
@@ -181,9 +181,9 @@ public class Match3PlayHandler : MonoBehaviour
         selectedMatch3Tile?.SetSelected(false);
         selectedMatch3Tile = null;
         
-        if (heldMatch3Object is Match3MatchableObject matchable)
+        if (heldMatch3Object && heldMatch3Object.IsSwappable)
         {
-            matchable.SetHeld(false);
+            heldMatch3Object.SetHeld(false);
         }
         
         heldMatch3Object = null;
@@ -823,7 +823,15 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
             {
                 foreach (var tileObjectMatch in row)
                 {
-                    gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
+                    // calculate chance to spawn helper object
+                    if (gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper)
+                    {
+                        gridHandler.CreateHelperObject(tileObjectMatch.Key);
+                    }
+                    else
+                    {
+                        gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
+                    }
                 }
             
                 yield return new WaitForSeconds(populationDuration / totalRows);
@@ -833,7 +841,16 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
         {
             foreach (var tileObjectMatch in layout)
             {
-                gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
+                // calculate chance to spawn helper object
+                if (gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper)
+                {
+                    gridHandler.CreateHelperObject(tileObjectMatch.Key);
+                }
+                else
+                {
+                    gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
+                }
+
                 yield return new WaitForSeconds(populationDuration / totalActiveTiles);
             }
         }

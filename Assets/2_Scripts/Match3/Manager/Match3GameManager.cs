@@ -15,6 +15,8 @@ public class Match3GameManager : MonoBehaviour
     [SerializeField] private int minMatchCount = 3;
     [Tooltip("Minimum tiles required to form a match")]
     [SerializeField] private int minMatchForLineClear = 4;
+    [Tooltip("Duration taken to spawn helper objects")]
+    [SerializeField, Range(0f,100f)] private float chanceToSpawnHelper = 5f;
     [Tooltip("Maximum attempts to create a grid with guaranteed matches")]
     [SerializeField] private int mxGuaranteedMatchAttempts = 100;
     [Tooltip("Maximum attempts to recheck matches in grid")]
@@ -39,6 +41,7 @@ public class Match3GameManager : MonoBehaviour
     public Match3GridHandler GridHandler => gridHandler;
     
     public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
+    public float ChanceToSpawnHelper => chanceToSpawnHelper;
     public int MinMatchCount => minMatchCount;
     public int MinMatchForLineClear => minMatchForLineClear;
     public int MaxAttemptsToRecheckMatches => maxAttemptsToRecheckMatches;
@@ -153,6 +156,11 @@ public class Match3GameManager : MonoBehaviour
     {
         _currentLevelData?.OnMatchesMade(matches);
         MatchesMade?.Invoke(matches);
+    }
+    
+    public void NotifyHelperObjectDestroyed()
+    {
+        _currentLevelData?.OnHelperObjectDestroyed();
     }
     
     private void NotifyAMoveWasMade()
