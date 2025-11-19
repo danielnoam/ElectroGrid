@@ -117,4 +117,23 @@ public class Match3LevelData
 
         return false;
     }
+
+    public void OnHelperObjectDestroyed()
+    {
+        foreach (var condition in CurrentLoseConditions)
+        {
+            if (condition is { IsConditionMet: false })
+            {
+
+                if (condition is TimeLimit timeCondition)
+                {
+                    timeCondition.AddTime(5);
+                }
+                else if (condition is MoveLimit movesCondition)
+                {
+                    movesCondition.AddMoves(3);
+                }
+            }
+        }
+    }
 }

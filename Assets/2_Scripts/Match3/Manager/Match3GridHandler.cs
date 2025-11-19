@@ -12,6 +12,7 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Match3MatchableObject match3MatchableObjectPrefab;
     [SerializeField] private Match3ObstacleObject match3ObstacleObjectPrefab;
     [SerializeField] private Match3BottomObject match3BottomObjectPrefab;
+    [SerializeField] private Match3HelperObject match3HelperObjectPrefab;
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private SOGridShape defaultGridShape;
     
@@ -139,6 +140,21 @@ public class Match3GridHandler : MonoBehaviour
         bottomObj.SetCurrentTile(match3Tile);
 
         return bottomObj;
+    }
+    
+    public Match3HelperObject CreateHelperObject(Match3Tile match3Tile)
+    {
+        if (!IsValidTile(match3Tile)) return null;
+        
+        var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
+        var helperObjGo = ObjectPooler.GetObjectFromPool(match3HelperObjectPrefab.gameObject, spawnPosition, Quaternion.identity);
+        var helperOb = helperObjGo.GetComponent<Match3HelperObject>();
+        
+        helperOb.Initialize(null, this);
+        match3Tile.SetCurrentItem(helperOb);
+        helperOb.SetCurrentTile(match3Tile);
+
+        return helperOb;
     }
 
     public Match3Tile GetTile(Vector2Int position)

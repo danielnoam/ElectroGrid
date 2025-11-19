@@ -71,6 +71,7 @@ MonoBehaviour:
   match3GeneralTutorials:
   - {fileID: 11400000, guid: ad96ffe295951a04a8a8580fb044a531, type: 2}
   - {fileID: 11400000, guid: ef715159d1e16e24ba56e292a96dec42, type: 2}
+  - {fileID: 11400000, guid: 41d47e63a62f5df4495b57256f258595, type: 2}
   - {fileID: 11400000, guid: e511aabf80dc9524cbdfef4096082732, type: 2}
   - {fileID: 11400000, guid: b326567c9cb654e4280880435d36bf1a, type: 2}
   selectedMatch3Level: {fileID: 0}

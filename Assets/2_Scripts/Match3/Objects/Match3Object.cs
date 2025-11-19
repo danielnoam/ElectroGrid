@@ -26,6 +26,8 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
     
     public SOItemData ItemData => _itemData;
     public Match3Tile CurrentTile => _currentTile;
+    public Sprite Sprite => itemRenderer.sprite;
+    public Color Color => itemRenderer.color;
     
     public abstract bool IsSwappable { get; }
     public abstract bool IsMatchable { get; }
@@ -69,6 +71,11 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
             itemRenderer.color = _itemData.Color;
         }
         gameObject.name = _itemData ? $"{GetType().Name} ({_itemData.Label})" : GetType().Name;
+    }
+    public virtual void SetHeld(bool held)
+    {
+        if (_beingDestroyed) return;
+        
     }
 
     public virtual void SetCurrentTile(Match3Tile match3Tile)

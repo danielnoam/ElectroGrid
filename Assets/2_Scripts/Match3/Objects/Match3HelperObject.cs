@@ -1,23 +1,25 @@
+using System.Collections.Generic;
 using DNExtensions;
+using DNExtensions.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
 [SelectionBase]
-public class Match3MatchableObject : Match3Object
+public class Match3HelperObject : Match3Object
 {
-    private static readonly int EmissionMask = Shader.PropertyToID("_Emission_Mask");
 
-    [Header("Matchable Settings")]
+    [Header("Held Settings")]
     [SerializeField] private float heldDuration = 0.2f;
     [SerializeField] private float heldScaleMultiplier = 0.8f;
     [SerializeField] private Color heldColor;
     [SerializeField] private SOAudioEvent swapSfx;
 
+    private Match3GameManager _gameManager;
     private Color _baseColor;
     private bool _held;
     
     public override bool IsSwappable => true;
-    public override bool IsMatchable => true;
+    public override bool IsMatchable => false;
     public override bool IsMovable => true;
     public override bool IsAffectedBySpecialMatches => true;
     
@@ -33,13 +35,29 @@ public class Match3MatchableObject : Match3Object
     {
         base.Initialize(data, gridHandler);
         
-        if (data)
+        _gameManager = Match3GameManager.Instance;
+        if (_gameManager)
         {
-            _baseColor = data.Color;
-            UpdateEmissionMask(data.EmissionMask);
+            _gameManager.MatchesMade -= OnMatchesMade;
+            _gameManager.MatchesMade += OnMatchesMade;
         }
+        
         _held = false;
         UpdateVisuals();
+    }
+
+    private void OnMatchesMade(List<Match3Tile> matches)
+    {
+        if (_beingDestroyed || !_currentTile || !_currentTile.IsActive) return;
+        
+        foreach (var match in matches)
+        {
+            if (_gridHandler.AreTilesNeighbours(match, _currentTile))
+            {
+                MatchFound();
+                return;
+            }
+        }
     }
 
     public override void SetCurrentTile(Match3Tile match3Tile)
@@ -76,7 +94,7 @@ public class Match3MatchableObject : Match3Object
     
     public override void SetHeld(bool held)
     {
-        if (_beingDestroyed) return;
+        if (_beingDestroyed || !IsSwappable) return;
         
         _held = held;
         UpdateVisuals();
@@ -84,12 +102,33 @@ public class Match3MatchableObject : Match3Object
 
     public void MatchFound()
     {
-        Match3EffectManager.Instance?.CreateShapeEffect(transform.position, _itemData);
+        _gameManager?.NotifyHelperObjectDestroyed();
         _currentTile?.PunchTile();
         _currentTile?.SetCurrentItem(null);
         DestroyWithAnimation();
     }
     
+    public override void DestroyWithAnimation()
+    {
+        _beingDestroyed = true;
+        
+        var destroySequence = Sequence.Create();
+        destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
+        destroySequence.InsertCallback(destroyDuration * 0.5f, () =>
+        {
+            MobileHaptics.Vibrate(50);
+            CameraManager.Instance?.ShakeCamera(0.2f);
+            destroySfx?.PlayAtPoint(transform.position);
+            
+            if (destroyParticle)
+            {
+                var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
+                var particle = particleGo.GetComponent<OneShotParticle>();
+                particle.Play(transform.position);
+            }
+        });
+        destroySequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
+    }
     private void UpdateVisuals()
     {
         if (_beingDestroyed || !itemRenderer) return;
@@ -98,10 +137,5 @@ public class Match3MatchableObject : Match3Object
         var endScale = _held ? _baseScale * heldScaleMultiplier : _baseScale;
         if (transform.localScale != endScale) Tween.Scale(transform, endScale, heldDuration, Ease.OutBack);
     }
-
-    private void UpdateEmissionMask(Texture2D emissionMask)
-    {
-        itemRenderer.material.SetTexture(EmissionMask, emissionMask);
-        
-    }
+    
 }
