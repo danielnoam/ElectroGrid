@@ -168,7 +168,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   inactiveTileColor: {r: 0, g: 0.19607843, b: 0.5647059, a: 0.60784316}
-  squashScaleAmount: 0.7
+  squashScaleAmount: 0.6
   squashDuration: 0.25
   spriteRenderer: {fileID: 8255792042855677773}
   squashTransform: {fileID: 2216026353058079229}

@@ -27,6 +27,7 @@ public class Match3PlayHandler : MonoBehaviour
 
     [Separator]
     [SerializeField, ReadOnly] private bool canInteract;
+    [SerializeField, ReadOnly] private bool isPaused;
     [SerializeField, ReadOnly] private Match3Tile selectedMatch3Tile;
     [SerializeField, ReadOnly] private Match3Object heldMatch3Object;
     private Camera _camera;
@@ -57,6 +58,12 @@ public class Match3PlayHandler : MonoBehaviour
             _inputReader.OnSelect += OnSelect;
             _inputReader.OnSwipe += OnSwipe;
         }
+
+        if (GameManager.Instance)
+        {
+            GameManager.Instance.PauseToggled -= OnPauseToggled;
+            GameManager.Instance.PauseToggled += OnPauseToggled;
+        }
     }
 
     private void OnEnable()
@@ -73,21 +80,36 @@ public class Match3PlayHandler : MonoBehaviour
             _inputReader.OnSelect += OnSelect;
             _inputReader.OnSwipe += OnSwipe;
         }
+        
+        if (GameManager.Instance)
+        {
+            GameManager.Instance.PauseToggled -= OnPauseToggled;
+            GameManager.Instance.PauseToggled += OnPauseToggled;
+        }
     }
     
     private void OnDisable()
     {
         _inputReader.OnSelect -= OnSelect;
         _inputReader.OnSwipe -= OnSwipe;
+        
+        if (GameManager.Instance)
+        {
+            GameManager.Instance.PauseToggled -= OnPauseToggled;
+        }
+    }
+
+    private void OnPauseToggled(bool paused)
+    {
+        isPaused = paused;
     }
 
 
-    
     #region Selection & Swapping
     
     private void OnSwipe(Vector2 direction)
     {
-        if (!canInteract || !heldMatch3Object) return;
+        if (!canInteract || !heldMatch3Object || isPaused) return;
 
         Vector2Int gridDirection;
 
@@ -121,7 +143,7 @@ public class Match3PlayHandler : MonoBehaviour
 
     private void OnSelect(InputAction.CallbackContext callbackContext)
     {
-        if (!canInteract) return;
+        if (!canInteract || isPaused) return;
 
         if (!heldMatch3Object && callbackContext.started)
         {

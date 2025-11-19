@@ -16,6 +16,7 @@ public class GameManager : MonoBehaviour
     [Header("Match3")]
     [SerializeField] private SceneField match3Scene;
     [SerializeField] private SOMatch3Level[] match3Levels = Array.Empty<SOMatch3Level>();
+    [SerializeField] private SOMatch3Tutorial[] match3GeneralTutorials = Array.Empty<SOMatch3Tutorial>();
     
     
     [Separator]
@@ -26,9 +27,10 @@ public class GameManager : MonoBehaviour
     public SceneField Match3Scene => match3Scene;
     
     public SOMatch3Level[] Match3Levels => match3Levels;
+    public SOMatch3Tutorial[] Match3GeneralTutorials => match3GeneralTutorials;
     public SOMatch3Level SelectedMatch3Level => selectedMatch3Level;
-    
-    
+
+    public event Action<bool> PauseToggled;
 
     private void Awake()
     {
@@ -55,6 +57,12 @@ public class GameManager : MonoBehaviour
     public void SelectMatch3Level(SOMatch3Level level)
     {
         selectedMatch3Level = level;
+    }
+    
+    public void TogglePause(bool pause, bool affectTimeScale = true)
+    {
+        if (affectTimeScale) Time.timeScale = pause ? 0 : 1;
+        PauseToggled?.Invoke(pause);
     }
     
 }

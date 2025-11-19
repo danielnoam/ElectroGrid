@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb3005d39c3a4eee8331e327243b8b42, type: 3}
+  m_Name: LineBreak
+  m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Tutorial
+  tutorialTitle: Line Break
+  tutorialText: Match 4 or more pieces in a row or column to destroy the entire line.
+  tutorialSprite: {fileID: 21300000, guid: 7bd91b4c5e24b96468ef779d3cebca3f, type: 3}

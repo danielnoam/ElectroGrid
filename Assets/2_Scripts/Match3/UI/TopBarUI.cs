@@ -6,7 +6,10 @@ using UnityEngine.UI;
 
 public class TopBarUI : MonoBehaviour
 {
-    [Header("UI Elements")]
+    [Header("Settings")]
+    [SerializeField] private TweenSettings topbarTweenSettings;
+    
+    [Header("References")]
     [SerializeField] private Transform objectivesUIParent;
     [SerializeField] private Transform loseConditionsUIParent;
     [SerializeField] private RectTransform topBar;
@@ -15,20 +18,16 @@ public class TopBarUI : MonoBehaviour
     [SerializeField] private Button infoButton;
     [SerializeField] private Button muteButton;
     [SerializeField] private Image muteButtonImage;
-    
-    [Header("Sprites")]
-    [SerializeField] private Sprite muteSprite;
-    [SerializeField] private Sprite unmuteSprite;
-    
-    [Header("Prefab")]
+    [SerializeField] private Sprite mutedSprite;
+    [SerializeField] private Sprite unmutedSprite;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
-    
-    [Header("Animation Settings")]
-    [SerializeField] private TweenSettings topbarTweenSettings;
+    [SerializeField] private InformationWindowUI informationWindowUI;
+    [SerializeField] private BottomBarUI bottomBarUI;
     
     private readonly Dictionary<Match3Objective, Match3UIElement> _currentObjectives = new Dictionary<Match3Objective, Match3UIElement>();
     private readonly Dictionary<Match3LoseCondition, Match3UIElement> _currentLoseConditions = new Dictionary<Match3LoseCondition, Match3UIElement>();
     
+    private Match3GameManager _match3Manager;
     private float _levelNameDefaultPositionY;
     private float _muteButtonDefaultPositionY;
     private float _infoButtonDefaultPositionY;
@@ -38,8 +37,10 @@ public class TopBarUI : MonoBehaviour
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
 
-    public void Initialize()
+    public void Initialize(Match3GameManager match3Manager)
     {
+        _match3Manager = match3Manager;
+        
         _topBarDefaultSize = topBar.sizeDelta;
         topBar.sizeDelta = new Vector2(_topBarDefaultSize.x, 0f);
         
@@ -59,26 +60,74 @@ public class TopBarUI : MonoBehaviour
         infoButton.transform.localPosition = new Vector3(infoButton.transform.localPosition.x, 0f, infoButton.transform.localPosition.z);
         
         SetupButtons();
+        SubscribeToEvents();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
+    }
+
+    private void SubscribeToEvents()
+    {
+        if (_match3Manager == null) return;
+        
+        _match3Manager.LevelStarted += OnLevelStarted;
+        _match3Manager.LevelComplete += OnLevelComplete;
+        _match3Manager.LevelFailed += OnLevelFailed;
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        if (_match3Manager == null) return;
+        
+        _match3Manager.LevelStarted -= OnLevelStarted;
+        _match3Manager.LevelComplete -= OnLevelComplete;
+        _match3Manager.LevelFailed -= OnLevelFailed;
+    }
+
+    private void Update()
+    {
+        UpdateUIElements();
+    }
+
+    private void OnLevelStarted(Match3LevelData levelData)
+    {
+        SetupLevel(levelData);
+        Toggle(true);
+    }
+
+    private void OnLevelComplete(Match3LevelData levelData)
+    {
+        Toggle(false);
+    }
+
+    private void OnLevelFailed(Match3LevelData levelData)
+    {
+        Toggle(false);
     }
 
     private void SetupButtons()
     {
+        muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
+    
         muteButton.onClick.RemoveAllListeners();
         muteButton.onClick.AddListener(() =>
         {
-            bool toggleOn = muteButtonImage.sprite == muteSprite;
-            muteButtonImage.sprite = toggleOn ? unmuteSprite : muteSprite;
-            AudioManager.Instance?.ToggleAudio(toggleOn);
+            AudioManager.Instance.ToggleAudio();
+            muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
         });
-        
+    
         infoButton.onClick.RemoveAllListeners();
         infoButton.onClick.AddListener(() =>
         {
-            // Info button logic here
+            Toggle(false);
+            bottomBarUI.Toggle(false);
+            informationWindowUI.Toggle(true);
         });
     }
 
-    public void SetupLevel(Match3LevelData levelData)
+    private void SetupLevel(Match3LevelData levelData)
     {
         if (levelData == null) return;
         
@@ -86,7 +135,7 @@ public class TopBarUI : MonoBehaviour
         SetupUIElements(levelData.CurrentObjectives, levelData.CurrentLoseConditions);
     }
 
-    public void UpdateUIElements()
+    private void UpdateUIElements()
     {
         foreach (var objectivePair in _currentObjectives)
         {
@@ -99,7 +148,7 @@ public class TopBarUI : MonoBehaviour
         }
     }
 
-    public void AnimateTopBar(bool show)
+    public void Toggle(bool show)
     {
         if (!topBar) return;
         
@@ -114,7 +163,7 @@ public class TopBarUI : MonoBehaviour
         var muteButtonEndPosition = show ? _muteButtonDefaultPositionY : 0;
         var muteButtonEndSize = show ? _muteButtonDefaultSize : Vector2.zero;
         
-        _topBarSequence = Sequence.Create()
+        _topBarSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))
             .Group(Tween.UISizeDelta(levelName, nameEndSize, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
             .Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))

@@ -21,11 +21,16 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip mainMenuClip;
     [SerializeField] private ChanceList<AudioClip> gameplayClips;
 
+    
+    [Separator]
+    [SerializeField, ReadOnly] private bool isMuted;
+    
     private AudioSource _currentSource;
     private AudioSource _nextSource;
     private Sequence _musicSequence;
     private Sequence _audioSequence;
-    
+
+    public bool IsMuted => isMuted;
 
     private void Awake()
     {
@@ -45,6 +50,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
+        isMuted = false;
         _currentSource = audioSourceA;
         _nextSource = audioSourceB;
     }
@@ -120,17 +126,19 @@ public class AudioManager : MonoBehaviour
     }
     
     
-    public void ToggleAudio(bool isOn)
+    public void ToggleAudio()
     {
         if (!musicMixerGroup || !sfxMixerGroup) return;
+
+        isMuted = !isMuted;
         
         _audioSequence.Stop();
         _audioSequence = Sequence.Create();
-        
+
         _audioSequence.Group(Tween.Custom(
-            startValue: isOn ? 0f : -80f,
-            endValue: isOn ? -80f : 0,
-            duration: transitionDuration/2,
+            startValue: isMuted ? 0f : -80f,
+            endValue: isMuted ? -80f : 0,
+            duration: transitionDuration / 2,
             onValueChange: value =>
             {
                 musicMixerGroup.audioMixer.SetFloat("MusicVolume", value);
@@ -138,7 +146,7 @@ public class AudioManager : MonoBehaviour
             },
             Ease.InOutSine));
 
-        
+
     }
     
 }
