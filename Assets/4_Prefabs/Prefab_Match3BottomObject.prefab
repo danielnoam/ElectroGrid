@@ -242,6 +242,9 @@ MonoBehaviour:
   spawnSfx: {fileID: 0}
   destroySfx: {fileID: 0}
   destroyParticle: {fileID: 243077210646262330, guid: 2834ac8ef1684fc498d229bf30b9cb28, type: 3}
+  rotationSpeed: 2
+  rotationAmount: 35
+  rotationRandomOffset: 3
 --- !u!1001 &5107532013297112720
 PrefabInstance:
   m_ObjectHideFlags: 0
