@@ -98,7 +98,7 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
         string obstacleText = $"Obstacles: {obstacleCount} / {obstacleNeeded}";
         if (obstacleNeeded > 0)
         {
-             obstacleText = obstacleCount >= obstacleNeeded 
+             obstacleText = obstacleCount == obstacleNeeded 
                 ? $"<color=green>Obstacles: {obstacleCount} / {obstacleNeeded}</color>" 
                 : $"<color=red>Obstacles: {obstacleCount} / {obstacleNeeded}</color>";
         }
@@ -106,7 +106,7 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
         string bottomText = $"Bottom: {bottomObjectCount} / {bottomObjectNeeded}";
         if (bottomObjectNeeded > 0)
         {
-            bottomText = bottomObjectCount >= bottomObjectNeeded 
+            bottomText = bottomObjectCount == bottomObjectNeeded 
                 ? $"<color=green>Bottom: {bottomObjectCount} / {bottomObjectNeeded}</color>" 
                 : $"<color=red>Bottom: {bottomObjectCount} / {bottomObjectNeeded}</color>";
         }
