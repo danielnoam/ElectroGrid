@@ -83,6 +83,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MusicManager
   maxVolume: 0.7
   transitionDuration: 1
+  musicMixerGroup: {fileID: -2852097523103060483, guid: 0a905c746b303df4c84e988af473a914, type: 2}
+  sfxMixerGroup: {fileID: 4447098254742166681, guid: 0a905c746b303df4c84e988af473a914, type: 2}
   audioSourceA: {fileID: 4433926562512230688}
   audioSourceB: {fileID: 953559789467627181}
   mainMenuClip: {fileID: 8300000, guid: cd8f2744e56f1b948a405f01ac9bd54a, type: 3}
@@ -130,7 +132,7 @@ AudioSource:
   m_GameObject: {fileID: 6637533252678008129}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -2852097523103060483, guid: 0a905c746b303df4c84e988af473a914, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
@@ -227,7 +229,7 @@ AudioSource:
   m_GameObject: {fileID: 6637533252678008129}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -2852097523103060483, guid: 0a905c746b303df4c84e988af473a914, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0

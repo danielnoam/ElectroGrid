@@ -2,17 +2,20 @@ using DNExtensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using PrimeTween;
+using UnityEngine.Audio;
 
 [DisallowMultipleComponent]
-public class MusicManager : MonoBehaviour
+public class AudioManager : MonoBehaviour
 {
-    public static MusicManager Instance { get; private set; }
+    public static AudioManager Instance { get; private set; }
     
-    [Header("Settings")]
+    [Header("Music")]
     [SerializeField, Range(0f, 1f)] private float maxVolume = 0.7f;
     [SerializeField, Min(0f)] private float transitionDuration = 1f;
 
     [Header("References")]
+    [SerializeField] private AudioMixerGroup musicMixerGroup;
+    [SerializeField] private AudioMixerGroup sfxMixerGroup;
     [SerializeField] private AudioSource audioSourceA;
     [SerializeField] private AudioSource audioSourceB;
     [SerializeField] private AudioClip mainMenuClip;
@@ -20,7 +23,9 @@ public class MusicManager : MonoBehaviour
 
     private AudioSource _currentSource;
     private AudioSource _nextSource;
-    private Sequence _transitionSequence;
+    private Sequence _musicSequence;
+    private Sequence _audioSequence;
+    
 
     private void Awake()
     {
@@ -39,6 +44,7 @@ public class MusicManager : MonoBehaviour
             Debug.LogError("AudioSources not assigned in MusicManager");
             return;
         }
+        
         _currentSource = audioSourceA;
         _nextSource = audioSourceB;
     }
@@ -57,6 +63,9 @@ public class MusicManager : MonoBehaviour
             Match3GameManager.Instance.LevelStarted -= OnLevelStarted;
             Match3GameManager.Instance.LevelStarted += OnLevelStarted;
         }
+        
+        _musicSequence.Stop();
+        _audioSequence.Stop();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -94,20 +103,42 @@ public class MusicManager : MonoBehaviour
             return;
         }
 
-        _transitionSequence.Stop();
+        _musicSequence.Stop();
 
         _nextSource.clip = clip;
         _nextSource.volume = 0f;
         _nextSource.Play();
 
-        _transitionSequence = Sequence.Create();
-        if (!Mathf.Approximately(_currentSource.volume, 0f)) _transitionSequence.Group(Tween.AudioVolume(_currentSource, 0f, transitionDuration, Ease.InOutSine));
-        if (!Mathf.Approximately(_nextSource.volume, maxVolume)) _transitionSequence.Group(Tween.AudioVolume(_nextSource, maxVolume, transitionDuration, Ease.InOutSine));
-        _transitionSequence.ChainCallback(() =>
+        _musicSequence = Sequence.Create();
+        if (!Mathf.Approximately(_currentSource.volume, 0f)) _musicSequence.Group(Tween.AudioVolume(_currentSource, 0f, transitionDuration, Ease.InOutSine));
+        if (!Mathf.Approximately(_nextSource.volume, maxVolume)) _musicSequence.Group(Tween.AudioVolume(_nextSource, maxVolume, transitionDuration, Ease.InOutSine));
+        _musicSequence.ChainCallback(() =>
             {
                 _currentSource.Stop();
                 (_currentSource, _nextSource) = (_nextSource, _currentSource);
             });
+    }
+    
+    
+    public void ToggleAudio(bool isOn)
+    {
+        if (!musicMixerGroup || !sfxMixerGroup) return;
+        
+        _audioSequence.Stop();
+        _audioSequence = Sequence.Create();
+        
+        _audioSequence.Group(Tween.Custom(
+            startValue: isOn ? 0f : -80f,
+            endValue: isOn ? -80f : 0,
+            duration: transitionDuration/2,
+            onValueChange: value =>
+            {
+                musicMixerGroup.audioMixer.SetFloat("MusicVolume", value);
+                sfxMixerGroup.audioMixer.SetFloat("SFXVolume", value);
+            },
+            Ease.InOutSine));
+
+        
     }
     
 }

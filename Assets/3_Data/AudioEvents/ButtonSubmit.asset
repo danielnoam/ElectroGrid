@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
   clips:
   - {fileID: 8300000, guid: 1a504153e74cd6a469888466f1920156, type: 3}
-  mixerGroup: {fileID: 0}
+  mixerGroup: {fileID: 4447098254742166681, guid: 0a905c746b303df4c84e988af473a914, type: 2}
   volume:
     minValue: 1
     maxValue: 1
