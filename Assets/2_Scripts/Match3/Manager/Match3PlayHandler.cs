@@ -564,17 +564,17 @@ public class Match3PlayHandler : MonoBehaviour
 
 
         // Check if the match amount is more than the minimum amount for a match
-        if (tilesWithMatches.Count >= gameManager.MinMatchForLineClear)
+        if (tilesWithMatches.Count >= gameManager.MinMatchForLineBreak)
         {
             // Check if the matches form a significant vertical line (multiple tiles share the same x)
             var xGroups = tilesWithMatches.GroupBy(tile => tile.GridPosition.x);
             var enumerable = xGroups.ToList();
-            bool isVertical = enumerable.Any(group => group.Count() >= gameManager.MinMatchForLineClear);
+            bool isVertical = enumerable.Any(group => group.Count() >= gameManager.MinMatchForLineBreak);
             
             // Check if the matches form a significant horizontal line (multiple tiles share the same y)
             var yGroups = tilesWithMatches.GroupBy(tile => tile.GridPosition.y);
             var groups = yGroups.ToList();
-            bool isHorizontal = groups.Any(group => group.Count() >= gameManager.MinMatchForLineClear);
+            bool isHorizontal = groups.Any(group => group.Count() >= gameManager.MinMatchForLineBreak);
             
             if (isHorizontal || isVertical)
             {
@@ -585,7 +585,7 @@ public class Match3PlayHandler : MonoBehaviour
             // If vertical, destroy all columns that have more than MinMatchForSpecial matches
             if (isVertical)
             {
-                var columnsToDestroy = enumerable.Where(group => group.Count() >= gameManager.MinMatchForLineClear).Select(group => group.Key);
+                var columnsToDestroy = enumerable.Where(group => group.Count() >= gameManager.MinMatchForLineBreak).Select(group => group.Key);
                 foreach (var column in columnsToDestroy)
                 {
                     for (var y = 0; y < gridHandler.Grid.Height; y++)
@@ -606,7 +606,7 @@ public class Match3PlayHandler : MonoBehaviour
             // If horizontal, destroy all rows that have more than MinMatchForSpecial matches
             if (isHorizontal)
             {
-                var rowsToDestroy = groups.Where(group => group.Count() >= gameManager.MinMatchForLineClear).Select(group => group.Key);
+                var rowsToDestroy = groups.Where(group => group.Count() >= gameManager.MinMatchForLineBreak).Select(group => group.Key);
                 foreach (var row in rowsToDestroy)
                 {
                     for (var x = 0; x < gridHandler.Grid.Width; x++)
@@ -632,66 +632,64 @@ public class Match3PlayHandler : MonoBehaviour
     }
 
 
-public IEnumerator MoveObjectsDown(SOGridShape gridShape)
-{
-    bool objectsMoved;
-    
-    do
+    public IEnumerator MoveObjectsDown(SOGridShape gridShape)
     {
-        objectsMoved = false;
-        List<(Match3Object obj, Match3Tile fromTile, Match3Tile toTile)> movesThisWave = new List<(Match3Object, Match3Tile, Match3Tile)>();
-        HashSet<Match3Tile> tilesAlreadyMoving = new HashSet<Match3Tile>();
-        HashSet<Match3Tile> tilesAlreadyReceiving = new HashSet<Match3Tile>();
+        bool objectsMoved;
         
-        for (var y = 0; y < gridShape.Grid.Height; y++)
+        do
         {
-            for (var x = 0; x < gridShape.Grid.Width; x++)
+            objectsMoved = false;
+            List<(Match3Object obj, Match3Tile fromTile, Match3Tile toTile)> movesThisWave = new List<(Match3Object, Match3Tile, Match3Tile)>();
+            HashSet<Match3Tile> tilesAlreadyMoving = new HashSet<Match3Tile>();
+            HashSet<Match3Tile> tilesAlreadyReceiving = new HashSet<Match3Tile>();
+            
+            for (var y = 0; y < gridShape.Grid.Height; y++)
             {
-                var tile = gridHandler.GetTile(new Vector2Int(x, y));
-                
-                if (!tile || tile.HasObject || !tile.IsActive || tilesAlreadyReceiving.Contains(tile))
-                    continue;
-                
-                for (var i = y + 1; i < gridShape.Grid.Height; i++)
+                for (var x = 0; x < gridShape.Grid.Width; x++)
                 {
-                    var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
+                    var tile = gridHandler.GetTile(new Vector2Int(x, y));
                     
-                    // Check if there's a non-movable object blocking the path
-                    if (aboveTile && aboveTile.HasObject)
+                    if (!tile || tile.HasObject || !tile.IsActive || tilesAlreadyReceiving.Contains(tile))
+                        continue;
+                    
+                    for (var i = y + 1; i < gridShape.Grid.Height; i++)
                     {
-                        if (!aboveTile.CurrentMatch3Object.IsMovable)
-                        {
-                            // Non-movable object blocks this column
-                            break;
-                        }
+                        var aboveTile = gridHandler.GetTile(new Vector2Int(x, i));
                         
-                        if (!tilesAlreadyMoving.Contains(aboveTile))
+                        if (aboveTile && aboveTile.HasObject)
                         {
-                            movesThisWave.Add((aboveTile.CurrentMatch3Object, aboveTile, tile));
-                            tilesAlreadyMoving.Add(aboveTile);
-                            tilesAlreadyReceiving.Add(tile);
-                            objectsMoved = true;
-                            break;
+                            if (!aboveTile.CurrentMatch3Object.IsMovable)
+                            {
+                                break;
+                            }
+                            
+                            if (!tilesAlreadyMoving.Contains(aboveTile))
+                            {
+                                movesThisWave.Add((aboveTile.CurrentMatch3Object, aboveTile, tile));
+                                tilesAlreadyMoving.Add(aboveTile);
+                                tilesAlreadyReceiving.Add(tile);
+                                objectsMoved = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
-        }
-        
-        foreach (var move in movesThisWave)
-        {
-            move.fromTile.SetCurrentItem(null);
-            move.toTile.SetCurrentItem(move.obj);
-            move.obj.SetCurrentTile(move.toTile);
-        }
-        
-        if (objectsMoved)
-        {
-            yield return new WaitForSeconds(delayBetweenObjectMovement);
-        }
-        
-    } while (objectsMoved);
-}
+            
+            foreach (var move in movesThisWave)
+            {
+                move.fromTile.SetCurrentItem(null);
+                move.toTile.SetCurrentItem(move.obj);
+                move.obj.SetCurrentTile(move.toTile);
+            }
+            
+            if (objectsMoved)
+            {
+                yield return new WaitForSeconds(delayBetweenObjectMovement);
+            }
+            
+        } while (objectsMoved);
+    }
     
     public IEnumerator ClearObjects()
     {
@@ -784,8 +782,7 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
         return tilesToPopulate;
     }
 
-    public (bool isValid, int immediateMatches, int possibleMatches) ValidateGridLayout(
-        Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape, int minPossibleMatches, bool checkImmediateMatches = true)
+    public (bool isValid, int immediateMatches, int possibleMatches) ValidateGridLayout(Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape, int minPossibleMatches, bool checkImmediateMatches = true)
     {
         int immediateMatchCount = 0;
         if (checkImmediateMatches)
@@ -800,31 +797,38 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
         return (isValid, immediateMatchCount, possibleMatchCount);
     }
 
-    public IEnumerator SpawnGridLayout(Dictionary<Match3Tile, SOItemData> layout, bool orderByRow)
+    public IEnumerator SpawnGridLayout(Dictionary<Match3Tile, SOItemData> layout, bool isInitialSetup)
     {
         ReleaseObject(false);
 
         int totalActiveTiles = layout.Count;
-        
+    
         if (totalActiveTiles == 0)
         {
             yield break;
         }
 
-        if (orderByRow)
+        if (isInitialSetup)
+        {
+            foreach (var tileObjectMatch in layout)
+            {
+                gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
+                yield return new WaitForSeconds(populationDuration / totalActiveTiles);
+            }
+        }
+        else
         {
             var tilesByRow = layout
                 .GroupBy(kvp => kvp.Key.GridPosition.y)
                 .OrderBy(g => g.Key);
-        
+    
             int totalRows = tilesByRow.Count();
-        
+    
             foreach (var row in tilesByRow)
             {
                 foreach (var tileObjectMatch in row)
                 {
-                    // calculate chance to spawn helper object
-                    if (gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper)
+                    if (ShouldSpawnHelperObject())
                     {
                         gridHandler.CreateHelperObject(tileObjectMatch.Key);
                     }
@@ -833,30 +837,14 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
                         gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
                     }
                 }
-            
+        
                 yield return new WaitForSeconds(populationDuration / totalRows);
             }
         }
-        else
-        {
-            foreach (var tileObjectMatch in layout)
-            {
-                // calculate chance to spawn helper object
-                if (gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper)
-                {
-                    gridHandler.CreateHelperObject(tileObjectMatch.Key);
-                }
-                else
-                {
-                    gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
-                }
-
-                yield return new WaitForSeconds(populationDuration / totalActiveTiles);
-            }
-        }
     }
+    
 
-    public IEnumerator PopulateGrid(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches, bool orderByRow)
+    public IEnumerator PopulateGrid(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches, bool isInitialSetup)
     {
         var layout = GenerateGridLayout(level, gridShape, minPossibleMatches);
         if (layout == null || layout.Count == 0)
@@ -865,7 +853,7 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
             yield break;
         }
 
-        yield return SpawnGridLayout(layout, orderByRow);
+        yield return SpawnGridLayout(layout, isInitialSetup);
     }
 
     private List<(Vector2Int posA, Vector2Int posB)> CreateGuaranteedMatchPositions(int count)
@@ -1080,6 +1068,14 @@ public IEnumerator MoveObjectsDown(SOGridShape gridShape)
         }
         
         return verticalCount >= gameManager.MinMatchCount;
+    }
+    
+    private bool ShouldSpawnHelperObject()
+    {
+        var loseConditions = gameManager.CurrentLevelData.LevelHasLoseConditions();
+        var chanceCheck = gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper;
+        
+        return loseConditions && chanceCheck;
     }
         
     #endregion

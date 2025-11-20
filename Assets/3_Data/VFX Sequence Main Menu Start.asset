@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de20f28ea40c22c43978f33a09f060b4, type: 3}
-  m_Name: VFX Sequence Game Start
+  m_Name: VFX Sequence Main Menu Start
   m_EditorClassIdentifier: 
   sequenceDuration: 4
   sequenceIsAdditive: 0

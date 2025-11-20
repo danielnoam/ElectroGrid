@@ -86,6 +86,40 @@ public class Match3LevelData
         }
     }
     
+    public void OnHelperObjectDestroyed()
+    {
+        foreach (var condition in CurrentLoseConditions)
+        {
+            if (condition is { IsConditionMet: false })
+            {
+
+                if (condition is TimeLimit timeCondition)
+                {
+                    timeCondition.AddTime(5);
+                }
+                else if (condition is MoveLimit movesCondition)
+                {
+                    movesCondition.AddMoves(3);
+                }
+            }
+        }
+    }
+    
+    public bool LevelHasLoseConditions()
+    {
+        if (CurrentLoseConditions.Count == 0) return false;
+        
+        foreach (var condition in CurrentLoseConditions)
+        {
+            if (condition != null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     
     public bool IsObjectivesComplete()
     {
@@ -118,22 +152,5 @@ public class Match3LevelData
         return false;
     }
 
-    public void OnHelperObjectDestroyed()
-    {
-        foreach (var condition in CurrentLoseConditions)
-        {
-            if (condition is { IsConditionMet: false })
-            {
 
-                if (condition is TimeLimit timeCondition)
-                {
-                    timeCondition.AddTime(5);
-                }
-                else if (condition is MoveLimit movesCondition)
-                {
-                    movesCondition.AddMoves(3);
-                }
-            }
-        }
-    }
 }
