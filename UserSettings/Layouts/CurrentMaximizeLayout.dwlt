@@ -25,7 +25,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 43680
+  controlID: 44681
   draggingID: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -98,7 +98,7 @@ MonoBehaviour:
     m_HSlider: 0
     m_VSlider: 0
     m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 0
+    m_EnableMouseInput: 1
     m_EnableSliderZoomHorizontal: 0
     m_EnableSliderZoomVertical: 0
     m_UniformScale: 1
@@ -154,7 +154,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 43592
+  controlID: 44581
   draggingID: 0
 --- !u!114 &4
 MonoBehaviour:
@@ -223,7 +223,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: d2f90200
       m_LastClickedID: 195026
-      m_ExpandedIDs: d468f2ff269bf2ff149df2ff48d6f3ff4462f6ff6062f6ff26c0f7ff00daf7ff880df8ff36eff9ffb80ffaff6cf9fffff4ffffff6ef90200c2f9020056fa0200
+      m_ExpandedIDs: aa13f2ffd468f2ff269bf2ff149df2ff48d6f3ff4462f6ff6062f6ff26c0f7ff00daf7ff880df8ff36eff9ffb80ffaff6cf9fffff4ffffff6ef90200c2f9020056fa0200
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -488,7 +488,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 43681
+  controlID: 44682
   draggingID: 0
 --- !u!114 &10
 MonoBehaviour:
@@ -509,8 +509,8 @@ MonoBehaviour:
     y: 0
     width: 779.5
     height: 530
-  m_MinSize: {x: 201, y: 226}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 202, y: 226}
+  m_MaxSize: {x: 4002, y: 4026}
   m_ActualView: {fileID: 11}
   m_Panes:
   - {fileID: 11}
@@ -1248,7 +1248,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0.0015006926, y: 0.009607182, z: 0.00001846277, w: 0.99983656}
     speed: 2
-    m_Value: {x: -0.0015006926, y: -0.009607181, z: -0.00001846277, w: -0.9998365}
+    m_Value: {x: 0.001500867, y: 0.009608299, z: 0.000018464914, w: 0.99995273}
   m_Size:
     m_Target: 0.13139367
     speed: 2
@@ -3502,8 +3502,8 @@ MonoBehaviour:
     y: 530
     width: 779.5
     height: 324
-  m_MinSize: {x: 201, y: 226}
-  m_MaxSize: {x: 4001, y: 4026}
+  m_MinSize: {x: 202, y: 226}
+  m_MaxSize: {x: 4002, y: 4026}
   m_ActualView: {fileID: 2}
   m_Panes:
   - {fileID: 2}

@@ -693,12 +693,11 @@ public class Match3PlayHandler : MonoBehaviour
     
     public IEnumerator ClearObjects()
     {
-        // Get all objects in grid
         var tiles = gridHandler.Tiles.Values.Where(t => t.HasObject).ToList();
         
-        // Destroy each one with a dealy
         foreach (var tileObjectMatch in tiles)
         {
+            CameraManager.Instance?.ShakeCamera(1, 0.25f);
             tileObjectMatch.CurrentMatch3Object.DestroyWithAnimation();
             yield return new WaitForSeconds(populationDuration / tiles.Count);
         }
@@ -810,8 +809,10 @@ public class Match3PlayHandler : MonoBehaviour
 
         if (isInitialSetup)
         {
+            Debug.Log("Initial Setup");
             foreach (var tileObjectMatch in layout)
             {
+                CameraManager.Instance?.ShakeCamera(1, 0.25f);
                 gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
                 yield return new WaitForSeconds(populationDuration / totalActiveTiles);
             }
