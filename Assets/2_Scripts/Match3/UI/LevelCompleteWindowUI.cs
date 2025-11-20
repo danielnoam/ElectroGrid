@@ -185,7 +185,9 @@ public class LevelCompleteWindowUI : MonoBehaviour
 
     private void OnNextLevelPressed()
     {
+        CameraManager.Instance.ShakeCamera(0.1f);
         Toggle(false);
+        _toggleSequence.ChainDelay(0.1f);
         _toggleSequence.ChainCallback(() =>
         {
             _match3Manager.SetNextLevel();
@@ -194,7 +196,9 @@ public class LevelCompleteWindowUI : MonoBehaviour
 
     private void OnRetryPressed()
     {
+        CameraManager.Instance.ShakeCamera(0.1f);
         Toggle(false);
+        _toggleSequence.ChainDelay(0.1f);
         _toggleSequence.ChainCallback(() =>
         {
             _match3Manager.RestartLevel();

@@ -15,4 +15,4 @@ MonoBehaviour:
   tutorialTitle: Basic Matching
   tutorialText: Swap adjacent pieces to match 3 or more of the same shape in a row
     or column.
-  tutorialSprite: {fileID: 21300000, guid: 93a29b262e7bdb04584d3811da4d325f, type: 3}
+  tutorialSprite: {fileID: 21300000, guid: a1982fd9bc1a2d34db484c36e1ccefbb, type: 3}

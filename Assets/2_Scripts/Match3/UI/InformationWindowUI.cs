@@ -52,6 +52,7 @@ public class InformationWindowUI : MonoBehaviour
         backButton.onClick.RemoveAllListeners();
         backButton.onClick.AddListener(() =>
         {
+            CameraManager.Instance.ShakeCamera(0.1f);
             Toggle(false);
             topBarUI.Toggle(true);
             bottomBarUI.Toggle(true);
