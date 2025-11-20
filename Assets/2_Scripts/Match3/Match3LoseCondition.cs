@@ -13,9 +13,25 @@ public abstract class Match3LoseCondition
     public abstract void Setup();
     public abstract void Update(float deltaTime);
     public abstract void OnMoveMade();
-    public abstract string GetProgressText(bool includeText);
+    public abstract string GetRequirementText();
+    public abstract (int, int) GetProgress();
     public abstract string GetName();
     public abstract string GetDescription();
+    
+    
+    public event Action progressChanged;
+    public event Action contidionMet;
+    
+    
+    protected void InvokeProgressChanged()
+    {
+        progressChanged?.Invoke();
+    }
+    
+    protected void InvokeConditionMet()
+    {
+        contidionMet?.Invoke();
+    }
 }
 
 [Serializable]
@@ -34,6 +50,7 @@ public class MoveLimit : Match3LoseCondition
         {
             _movesRemaining = allowedMoves;
         }
+        InvokeProgressChanged();
     }
 
     public override void Setup()
@@ -55,12 +72,21 @@ public class MoveLimit : Match3LoseCondition
         if (_movesRemaining <= 0)
         {
             ConditionMet = true;
+            InvokeConditionMet();
+        }
+        else
+        {
+            InvokeProgressChanged();
         }
     }
 
-    public override string GetProgressText(bool includeText)
+    public override string GetRequirementText()
     {
-        return !includeText ? $"{_movesRemaining}" : $"Moves Left: {_movesRemaining}";
+        return $"Moves Left:";
+    }
+    public override (int, int) GetProgress()
+    {
+        return (_movesRemaining, MovesRemaining);
     }
 
     public override string GetName()
@@ -90,6 +116,8 @@ public class TimeLimit : Match3LoseCondition
         {
             _timeRemaining = allowedTime;
         }
+        
+        InvokeProgressChanged();
     }
 
     public override void Setup()
@@ -102,12 +130,20 @@ public class TimeLimit : Match3LoseCondition
     {
         if (ConditionMet) return;
 
+
+        int previousTimeInt = Mathf.FloorToInt(_timeRemaining);
         _timeRemaining -= deltaTime;
+        int currentTimeInt = Mathf.FloorToInt(_timeRemaining);
+        if (currentTimeInt != previousTimeInt)
+        {
+            InvokeProgressChanged();
+        }
 
         if (_timeRemaining <= 0)
         {
             _timeRemaining = 0;
             ConditionMet = true;
+            InvokeConditionMet();
         }
     }
 
@@ -115,12 +151,15 @@ public class TimeLimit : Match3LoseCondition
     {
     }
 
-    public override string GetProgressText(bool includeText)
+    public override string GetRequirementText()
     {
-        int minutes = Mathf.FloorToInt(_timeRemaining / 60f);
-        int seconds = Mathf.FloorToInt(_timeRemaining % 60f);
-        
-        return !includeText ? $"{minutes:00}:{seconds:00}" : $"Time Left: {minutes:00}:{seconds:00}";
+        return $"Time Left:";
+    }
+    
+    
+    public override (int, int) GetProgress()
+    {
+        return (Mathf.FloorToInt(_timeRemaining), Mathf.FloorToInt(allowedTime));
     }
 
     public override string GetName()

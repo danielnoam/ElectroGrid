@@ -85,7 +85,7 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
 
         foreach (var objective in level.Objectives)
         {
-            if (objective is ClearObstaclesObjective clearObstaclesObjective)
+            if (objective is DestroyObstaclesObjective clearObstaclesObjective)
             {
                 obstacleNeeded += clearObstaclesObjective.RequiredAmount;
             }

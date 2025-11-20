@@ -81,6 +81,7 @@ public class BottomBarUI : MonoBehaviour
         {
             if (VFXManager.Instance)
             {
+                CameraManager.Instance.ShakeCamera(0.1f);
                 Toggle(false);
                 topBarUI.Toggle(false);
                 var quitSequence = Sequence.Create();
@@ -98,6 +99,7 @@ public class BottomBarUI : MonoBehaviour
         {
             if (VFXManager.Instance)
             {
+                CameraManager.Instance.ShakeCamera(0.1f);
                 Toggle(false);
                 topBarUI.Toggle(false);
                 var quitSequence = Sequence.Create();

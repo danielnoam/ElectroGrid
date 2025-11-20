@@ -28,6 +28,11 @@ public class TopBarUI : MonoBehaviour
     private readonly Dictionary<Match3Objective, Match3UIElement> _currentObjectives = new Dictionary<Match3Objective, Match3UIElement>();
     private readonly Dictionary<Match3LoseCondition, Match3UIElement> _currentLoseConditions = new Dictionary<Match3LoseCondition, Match3UIElement>();
     
+    private readonly Dictionary<Match3Objective, Action> _objectiveProgressCallbacks = new Dictionary<Match3Objective, Action>();
+    private readonly Dictionary<Match3Objective, Action> _objectiveCompleteCallbacks = new Dictionary<Match3Objective, Action>();
+    private readonly Dictionary<Match3LoseCondition, Action> _loseConditionProgressCallbacks = new Dictionary<Match3LoseCondition, Action>();
+    private readonly Dictionary<Match3LoseCondition, Action> _loseConditionMetCallbacks = new Dictionary<Match3LoseCondition, Action>();
+    
     private Match3GameManager _match3Manager;
     private float _levelNameDefaultPositionY;
     private float _muteButtonDefaultPositionY;
@@ -90,11 +95,6 @@ public class TopBarUI : MonoBehaviour
         _match3Manager.LevelFailed -= OnLevelFailed;
     }
 
-    private void Update()
-    {
-        UpdateUIElements();
-    }
-
     private void OnLevelStarted(Match3LevelData levelData)
     {
         SetupLevel(levelData);
@@ -118,6 +118,7 @@ public class TopBarUI : MonoBehaviour
         muteButton.onClick.RemoveAllListeners();
         muteButton.onClick.AddListener(() =>
         {
+            CameraManager.Instance.ShakeCamera(0.1f);
             AudioManager.Instance.ToggleAudio();
             muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
         });
@@ -125,6 +126,7 @@ public class TopBarUI : MonoBehaviour
         infoButton.onClick.RemoveAllListeners();
         infoButton.onClick.AddListener(() =>
         {
+            CameraManager.Instance.ShakeCamera(0.1f);
             Toggle(false);
             bottomBarUI.Toggle(false);
             informationWindowUI.Toggle(true);
@@ -139,16 +141,19 @@ public class TopBarUI : MonoBehaviour
         SetupUIElements(levelData.CurrentObjectives, levelData.CurrentLoseConditions);
     }
 
-    private void UpdateUIElements()
+    private void UpdateObjectiveUIProgress(Match3Objective objective)
     {
-        foreach (var objectivePair in _currentObjectives)
+        if (_currentObjectives.TryGetValue(objective, out var uiElement))
         {
-            objectivePair.Value.UpdateProgress(objectivePair.Key.GetProgressText(!objectivePair.Key.ObjectiveSprite));
+            uiElement.UpdateProgress(objective.GetProgress());
         }
+    }
 
-        foreach (var loseConditionPair in _currentLoseConditions)
+    private void UpdateLoseConditionUIProgress(Match3LoseCondition loseCondition)
+    {
+        if (_currentLoseConditions.TryGetValue(loseCondition, out var uiElement))
         {
-            loseConditionPair.Value.UpdateProgress(loseConditionPair.Key.GetProgressText(!loseConditionPair.Key.ConditionSprite));
+            uiElement.UpdateProgress(loseCondition.GetProgress().Item1);
         }
     }
 
@@ -174,14 +179,17 @@ public class TopBarUI : MonoBehaviour
         var muteButtonStartSize = show ? Vector2.zero : _muteButtonDefaultSize;
         var muteButtonEndSize = show ? _muteButtonDefaultSize : Vector2.zero;
         
-        // Set starting states
         topBar.sizeDelta = barStartSize;
         levelName.sizeDelta = nameStartSize;
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, nameStartPosition);
-        muteButton.GetComponent<RectTransform>().sizeDelta = muteButtonStartSize;
-        muteButton.transform.localPosition = new Vector3(muteButton.transform.localPosition.x, muteButtonStartPosition, muteButton.transform.localPosition.z);
-        infoButton.GetComponent<RectTransform>().sizeDelta = infoButtonStartSize;
-        infoButton.transform.localPosition = new Vector3(infoButton.transform.localPosition.x, infoButtonStartPosition, infoButton.transform.localPosition.z);
+        
+        var muteButtonRectTransform = muteButton.GetComponent<RectTransform>();
+        muteButtonRectTransform.sizeDelta = muteButtonStartSize;
+        muteButtonRectTransform.anchoredPosition = new Vector2(muteButtonRectTransform.anchoredPosition.x, muteButtonStartPosition);
+        
+        var infoButtonRectTransform = infoButton.GetComponent<RectTransform>();
+        infoButtonRectTransform.sizeDelta = infoButtonStartSize;
+        infoButtonRectTransform.anchoredPosition = new Vector2(infoButtonRectTransform.anchoredPosition.x, infoButtonStartPosition);
         
         _topBarSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))
@@ -196,30 +204,70 @@ public class TopBarUI : MonoBehaviour
     private void SetupUIElements(List<Match3Objective> objectives, List<Match3LoseCondition> loseConditions)
     {
         if (!objectivesUIParent || !loseConditionsUIParent) return;
-        
+    
         ClearUIElements();
-        
+    
         objectivesUIParent.gameObject.SetActive(objectives.Count > 0);
         foreach (var objective in objectives)
         {
             var uiElement = Instantiate(match3UIElementPrefab, objectivesUIParent);
-            uiElement.Setup(objective.ObjectiveSprite, objective.GetProgressText(!objective.ObjectiveSprite));
+            uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress());
             uiElement.gameObject.name = objective.GetName();
             _currentObjectives.Add(objective, uiElement);
+        
+            Action progressCallback = () => UpdateObjectiveUIProgress(objective);
+            _objectiveProgressCallbacks.Add(objective, progressCallback);
+            objective.progressChanged += progressCallback;
+        
+            Action completeCallback = () => UpdateObjectiveUIProgress(objective);
+            _objectiveCompleteCallbacks.Add(objective, completeCallback);
+            objective.complete += completeCallback;
         }
 
         loseConditionsUIParent.gameObject.SetActive(loseConditions.Count > 0);
         foreach (var loseCondition in loseConditions)
         {
             var uiElement = Instantiate(match3UIElementPrefab, loseConditionsUIParent);
-            uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetProgressText(!loseCondition.ConditionSprite));
+            uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetRequirementText(), loseCondition.GetProgress());
             uiElement.gameObject.name = loseCondition.GetName();
             _currentLoseConditions.Add(loseCondition, uiElement);
+        
+            Action progressCallback = () => UpdateLoseConditionUIProgress(loseCondition);
+            _loseConditionProgressCallbacks.Add(loseCondition, progressCallback);
+            loseCondition.progressChanged += progressCallback;
+        
+            Action metCallback = () => UpdateLoseConditionUIProgress(loseCondition);
+            _loseConditionMetCallbacks.Add(loseCondition, metCallback);
+            loseCondition.contidionMet += metCallback;
         }
     }
 
     private void ClearUIElements()
     {
+        foreach (var pair in _objectiveProgressCallbacks)
+        {
+            pair.Key.progressChanged -= pair.Value;
+        }
+        _objectiveProgressCallbacks.Clear();
+    
+        foreach (var pair in _objectiveCompleteCallbacks)
+        {
+            pair.Key.complete -= pair.Value;
+        }
+        _objectiveCompleteCallbacks.Clear();
+
+        foreach (var pair in _loseConditionProgressCallbacks)
+        {
+            pair.Key.progressChanged -= pair.Value;
+        }
+        _loseConditionProgressCallbacks.Clear();
+    
+        foreach (var pair in _loseConditionMetCallbacks)
+        {
+            pair.Key.contidionMet -= pair.Value;
+        }
+        _loseConditionMetCallbacks.Clear();
+    
         foreach (Transform child in objectivesUIParent)
         {
             Destroy(child.gameObject);
@@ -229,7 +277,7 @@ public class TopBarUI : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
-        
+    
         _currentObjectives.Clear();
         _currentLoseConditions.Clear();
     }

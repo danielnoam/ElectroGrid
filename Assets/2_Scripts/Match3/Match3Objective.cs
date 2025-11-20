@@ -20,9 +20,24 @@ public abstract class Match3Objective
     public abstract void OnMatchMade(List<Match3Tile> matchedTiles);
     public abstract void OnObstacleBreak(Match3ObstacleObject obstacle);
     public abstract void OnBottomObjectReached(Match3BottomObject bottomObject);
-    public abstract string GetProgressText(bool includeText);
     public abstract string GetName();
     public abstract string GetDescription();
+    public abstract string GetRequirementText();
+    public abstract (int, int) GetProgress();
+
+    public event Action progressChanged;
+    public event Action complete;
+    
+    
+    protected void InvokeProgressChanged()
+    {
+        progressChanged?.Invoke();
+    }
+    
+    protected void InvokeComplete()
+    {
+        complete?.Invoke();
+    }
     
     public void SetGridShape(SOGridShape shape)
     {
@@ -50,9 +65,15 @@ public class GetMatches : Match3Objective
 
         _currentAmount += matchedTiles.Count;
 
+
         if (_currentAmount >= requiredAmount)
         {
             Completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
         }
     }
 
@@ -64,10 +85,17 @@ public class GetMatches : Match3Objective
     {
     }
 
-    public override string GetProgressText(bool includeText)
+    public override string GetRequirementText()
     {
-        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Matches: {_currentAmount}/{requiredAmount}";
+        return $"Matches:";
     }
+    
+
+    public override (int, int) GetProgress()
+    {
+        return (_currentAmount, requiredAmount);
+    }
+    
 
     public override string GetName()
     {
@@ -106,12 +134,14 @@ public class GetSpecificItemMatches : Match3Objective
             if (tile.CurrentMatch3Object is Match3MatchableObject matchable && matchable.ItemData == targetItem)
             {
                 _currentAmount++;
+                InvokeProgressChanged();
             }
         }
 
         if (_currentAmount >= requiredAmount)
         {
             Completed = true;
+            InvokeComplete();
         }
     }
 
@@ -123,11 +153,15 @@ public class GetSpecificItemMatches : Match3Objective
     {
     }
 
-    public override string GetProgressText(bool includeText)
+    public override string GetRequirementText()
     {
-        if (!includeText) return $"{_currentAmount}/{requiredAmount}";
         string itemName = targetItem ? targetItem.Label : "Items";
-        return $"{itemName}: {_currentAmount}/{requiredAmount}";
+        return $"{itemName}:";
+    }
+    
+    public override (int, int) GetProgress()
+    {
+        return (_currentAmount, requiredAmount);
     }
 
     public override string GetName()
@@ -142,7 +176,7 @@ public class GetSpecificItemMatches : Match3Objective
 }
 
 [Serializable]
-public class ClearObstaclesObjective : Match3Objective
+public class DestroyObstaclesObjective : Match3Objective
 {
     [SerializeField, Min(1)] private int requiredAmount = 1;
     private int _currentAmount;
@@ -166,9 +200,15 @@ public class ClearObstaclesObjective : Match3Objective
         
         _currentAmount++;
 
+
         if (_currentAmount >= requiredAmount)
         {
             Completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
         }
     }
 
@@ -176,11 +216,15 @@ public class ClearObstaclesObjective : Match3Objective
     {
     }
 
-    public override string GetProgressText(bool includeText)
+    public override string GetRequirementText()
     {
-        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Double Stars: {_currentAmount}/{requiredAmount}";
+        return $"Double Stars:";
     }
 
+    public override (int, int) GetProgress()
+    {
+        return (_currentAmount, requiredAmount);
+    }
     public override string GetName()
     {
         return "Destroy Double Stars";
@@ -224,14 +268,24 @@ public class ReachBottomObjective : Match3Objective
         if (_currentAmount >= requiredAmount)
         {
             Completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
         }
     }
 
-    public override string GetProgressText(bool includeText)
+    public override string GetRequirementText()
     {
-        return !includeText ? $"{_currentAmount}/{requiredAmount}" : $"Square Star: {_currentAmount}/{requiredAmount}";
+        return $"Square Star:";
     }
 
+    public override (int, int) GetProgress()
+    {
+        return (_currentAmount, requiredAmount);
+    }
+    
     public override string GetName()
     {
         return "Reach Bottom";
