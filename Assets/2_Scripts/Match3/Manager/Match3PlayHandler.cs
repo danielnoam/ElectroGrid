@@ -547,7 +547,7 @@ public class Match3PlayHandler : MonoBehaviour
             
             yield return HandleMatches(immediateMatches);
             yield return MoveObjectsDown(gridShape);
-            yield return PopulateGrid(level, gridShape, minPossibleMatches, true);
+            yield return PopulateGrid(level, gridShape, minPossibleMatches, false);
         }
     }
 
@@ -809,7 +809,6 @@ public class Match3PlayHandler : MonoBehaviour
 
         if (isInitialSetup)
         {
-            Debug.Log("Initial Setup");
             foreach (var tileObjectMatch in layout)
             {
                 CameraManager.Instance?.ShakeCamera(1, 0.25f);
