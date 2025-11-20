@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using PrimeTween;
 using TMPro;
@@ -37,10 +38,8 @@ public class TopBarUI : MonoBehaviour
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
 
-    public void Initialize(Match3GameManager match3Manager)
+    private void Awake()
     {
-        _match3Manager = match3Manager;
-        
         _topBarDefaultSize = topBar.sizeDelta;
         topBar.sizeDelta = new Vector2(_topBarDefaultSize.x, 0f);
         
@@ -58,6 +57,11 @@ public class TopBarUI : MonoBehaviour
         infoButton.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, infoButton.GetComponent<RectTransform>().sizeDelta.y);
         _infoButtonDefaultPositionY = infoButton.transform.localPosition.y;
         infoButton.transform.localPosition = new Vector3(infoButton.transform.localPosition.x, 0f, infoButton.transform.localPosition.z);
+    }
+
+    public void Initialize(Match3GameManager match3Manager)
+    {
+        _match3Manager = match3Manager;
         
         SetupButtons();
         SubscribeToEvents();
@@ -155,13 +159,29 @@ public class TopBarUI : MonoBehaviour
         _topBarSequence.Stop();
         
         var barSizeMultiplier = objectivesUIParent.gameObject.activeSelf && loseConditionsUIParent.gameObject.activeSelf ? 1f : 0.6f;
+        var barStartSize = show ? new Vector2(_topBarDefaultSize.x, 0f) : _topBarDefaultSize * barSizeMultiplier;
         var barEndSize = show ? _topBarDefaultSize * barSizeMultiplier : new Vector2(_topBarDefaultSize.x, 0f);
+        var nameStartPosition = show ? 0f : _levelNameDefaultPositionY;
         var nameEndPosition = show ? _levelNameDefaultPositionY : 0f;
+        var nameStartSize = show ? Vector2.zero : _levelNameDefaultSize;
         var nameEndSize = show ? _levelNameDefaultSize : Vector2.zero;
+        var infoButtonStartPosition = show ? 0 : _infoButtonDefaultPositionY;
         var infoButtonEndPosition = show ? _infoButtonDefaultPositionY : 0;
+        var infoButtonStartSize = show ? Vector2.zero : _infoButtonDefaultSize;
         var infoButtonEndSize = show ? _infoButtonDefaultSize : Vector2.zero;
+        var muteButtonStartPosition = show ? 0 : _muteButtonDefaultPositionY;
         var muteButtonEndPosition = show ? _muteButtonDefaultPositionY : 0;
+        var muteButtonStartSize = show ? Vector2.zero : _muteButtonDefaultSize;
         var muteButtonEndSize = show ? _muteButtonDefaultSize : Vector2.zero;
+        
+        // Set starting states
+        topBar.sizeDelta = barStartSize;
+        levelName.sizeDelta = nameStartSize;
+        levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, nameStartPosition);
+        muteButton.GetComponent<RectTransform>().sizeDelta = muteButtonStartSize;
+        muteButton.transform.localPosition = new Vector3(muteButton.transform.localPosition.x, muteButtonStartPosition, muteButton.transform.localPosition.z);
+        infoButton.GetComponent<RectTransform>().sizeDelta = infoButtonStartSize;
+        infoButton.transform.localPosition = new Vector3(infoButton.transform.localPosition.x, infoButtonStartPosition, infoButton.transform.localPosition.z);
         
         _topBarSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))

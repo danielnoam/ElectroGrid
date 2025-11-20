@@ -16,7 +16,6 @@ MonoBehaviour:
   sequenceIsAdditive: 0
   resetEffectsOnComplete: 0
   effects:
-  - rid: 190982275964600407
   - rid: 4047855796283506688
   - rid: 190982246133661780
   - rid: 190982246133661782
@@ -72,21 +71,11 @@ MonoBehaviour:
         centerEase: 1
         useDefaultRoundness: 0
         setRounded: 0
-    - rid: 190982275964600407
-      type: {class: SetFullscreenColor, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
-      data:
-        duration:
-          minValue: 0
-          maxValue: 0.016990425
-        type: 0
-        startColor: {r: 0, g: 0, b: 0, a: 1}
-        endColor: {r: 0, g: 0, b: 0, a: 1}
-        ease: 1
     - rid: 4047855796283506688
       type: {class: SetFullscreenColor, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
       data:
         duration:
-          minValue: 0.13349515
+          minValue: 0
           maxValue: 0.7872169
         type: 0
         startColor: {r: 0, g: 0, b: 0, a: 1}

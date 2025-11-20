@@ -12,6 +12,7 @@ using Random = UnityEngine.Random;
 namespace DNExtensions.VFXManager
 {
     [DisallowMultipleComponent]
+    [DefaultExecutionOrder(-999)]
     public class VFXManager : MonoBehaviour
     {
         public static VFXManager Instance { get; private set; }

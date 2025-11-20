@@ -1,3 +1,4 @@
+using System;
 using DNExtensions;
 using PrimeTween;
 using TMPro;
@@ -25,10 +26,9 @@ public class LevelCompleteWindowUI : MonoBehaviour
     private Vector2 _defaultSize;
     private Sequence _toggleSequence;
 
-    public void Initialize(Match3GameManager match3Manager)
+
+    private void Awake()
     {
-        _match3Manager = match3Manager;
-        
         _levelCompleteWindow = GetComponent<CanvasGroup>();
         _rectTransform = GetComponent<RectTransform>();
         _defaultSize = _rectTransform.sizeDelta;
@@ -36,6 +36,11 @@ public class LevelCompleteWindowUI : MonoBehaviour
         _levelCompleteWindow.alpha = 0f;
         _levelCompleteWindow.interactable = false;
         _levelCompleteWindow.blocksRaycasts = false;
+    }
+
+    public void Initialize(Match3GameManager match3Manager)
+    {
+        _match3Manager = match3Manager;
         
         SetupButtons();
         SubscribeToEvents();
@@ -66,19 +71,19 @@ public class LevelCompleteWindowUI : MonoBehaviour
 
     private void OnLevelStarted(Match3LevelData levelData)
     {
-        AnimateLevelCompleteWindow(false);
+        Toggle(false);
     }
 
     private void OnLevelComplete(Match3LevelData levelData)
     {
         ShowLevelComplete(levelData);
-        AnimateLevelCompleteWindow(true);
+        Toggle(true);
     }
 
     private void OnLevelFailed(Match3LevelData levelData)
     {
         ShowLevelFailed(levelData);
-        AnimateLevelCompleteWindow(true);
+        Toggle(true);
     }
 
     private void SetupButtons()
@@ -86,7 +91,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
         quitButton.onClick.RemoveAllListeners();
         quitButton.onClick.AddListener(() =>
         {
-            AnimateLevelCompleteWindow(false);
+            Toggle(false);
             _toggleSequence.ChainCallback(() =>
             {
                 GameManager.Instance?.MainMenu.LoadScene();
@@ -116,20 +121,23 @@ public class LevelCompleteWindowUI : MonoBehaviour
         levelCompleteTitle.text = $"{levelData.Level.LevelName} Failed!";
     }
 
-    private void AnimateLevelCompleteWindow(bool show)
+    private void Toggle(bool show)
     {
         if (_toggleSequence.isAlive) return;
         if (!_levelCompleteWindow || !_rectTransform) return;
 
         var startSize = show ? new Vector2(_rectTransform.sizeDelta.x, 0f) : _defaultSize;
         var endSize = show ? _defaultSize : new Vector2(_rectTransform.sizeDelta.x, 0f);
+        var startAlpha = show ? 0f : 1f;
+        var endAlpha = show ? 1f : 0f;
         
         if (show) _levelCompleteWindow.alpha = 1f;
         _rectTransform.sizeDelta = startSize;
+        levelCompleteTitle.alpha = startAlpha;
         
         _toggleSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(_rectTransform, endSize, levelCompleteTweenSettings))
-            .Group(Tween.Alpha(levelCompleteTitle, show ? 1f : 0f, levelCompleteTweenSettings.duration * 0.8f))
+            .Group(Tween.Alpha(levelCompleteTitle, endAlpha, levelCompleteTweenSettings.duration * 0.8f))
             .ChainCallback(() => 
             { 
                 _levelCompleteWindow.alpha = show ? 1f : 0f;
@@ -177,7 +185,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
 
     private void OnNextLevelPressed()
     {
-        AnimateLevelCompleteWindow(false);
+        Toggle(false);
         _toggleSequence.ChainCallback(() =>
         {
             _match3Manager.SetNextLevel();
@@ -186,7 +194,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
 
     private void OnRetryPressed()
     {
-        AnimateLevelCompleteWindow(false);
+        Toggle(false);
         _toggleSequence.ChainCallback(() =>
         {
             _match3Manager.RestartLevel();
