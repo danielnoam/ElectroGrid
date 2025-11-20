@@ -1304,7 +1304,7 @@ MonoBehaviour:
   gridHandler: {fileID: 586155251}
   playHandler: {fileID: 586155253}
   selectionIndicator: {fileID: 586155252}
-  overrideLevel: {fileID: 11400000, guid: ce1ea01ef30370443ae7c11eac2e76cd, type: 2}
+  overrideLevel: {fileID: 0}
   currentLevel: {fileID: 0}
   levelComplete: 0
   finishedObjectives: 0

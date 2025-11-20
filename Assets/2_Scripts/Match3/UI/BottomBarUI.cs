@@ -1,3 +1,4 @@
+using System;
 using DNExtensions.VFXManager;
 using PrimeTween;
 using UnityEngine;
@@ -19,13 +20,17 @@ public class BottomBarUI : MonoBehaviour
     private float _bottomBarDefaultYPosition;
     private Sequence _bottomBarSequence;
 
-    public void Initialize(Match3GameManager match3Manager)
+
+    private void Awake()
     {
-        _match3Manager = match3Manager;
-        
         _rectTransform = GetComponent<RectTransform>();
         _bottomBarDefaultYPosition = _rectTransform.anchoredPosition.y;
         _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, -_rectTransform.sizeDelta.y);
+    }
+
+    public void Initialize(Match3GameManager match3Manager)
+    {
+        _match3Manager = match3Manager;
         
         SetupButtons();
         SubscribeToEvents();
@@ -111,7 +116,12 @@ public class BottomBarUI : MonoBehaviour
         if (!_rectTransform) return;
 
         _bottomBarSequence.Stop();
+        
+        var startYPosition = show ? -_rectTransform.sizeDelta.y : _bottomBarDefaultYPosition;
         var endYPosition = show ? _bottomBarDefaultYPosition : -_rectTransform.sizeDelta.y;
+        
+        _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, startYPosition);
+        
         _bottomBarSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UIAnchoredPositionY(_rectTransform, endYPosition, bottomBarTweenSettings));
     }

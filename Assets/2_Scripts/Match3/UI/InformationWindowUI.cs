@@ -1,3 +1,4 @@
+using System;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -23,7 +24,8 @@ public class InformationWindowUI : MonoBehaviour
     private Sequence _toggleSequence;
     private float _backButtonDefaultYPosition;
 
-    public void Initialize()
+
+    private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
         _rectTransform = GetComponent<RectTransform>();
@@ -36,6 +38,10 @@ public class InformationWindowUI : MonoBehaviour
         _canvasGroup.alpha = 0f;
         _canvasGroup.interactable = false;
         _canvasGroup.blocksRaycasts = false;
+    }
+
+    public void Initialize()
+    {
         
         SetupButtons();
         PopulateTutorials();
@@ -77,9 +83,15 @@ public class InformationWindowUI : MonoBehaviour
         
         var startSize = show ? new Vector2(_rectTransform.sizeDelta.x, 0f) : _defaultSize;
         var endSize = show ? _defaultSize : new Vector2(_rectTransform.sizeDelta.x, 0f);
-        var endYPosition = show ? _backButtonDefaultYPosition : -_rectTransform.sizeDelta.y;
+        var startYPosition = show ? -_defaultSize.y : _backButtonDefaultYPosition;
+        var endYPosition = show ? _backButtonDefaultYPosition : -_defaultSize.y;
+        var startAlpha = show ? 0f : 1f;
+        var endAlpha = show ? 1f : 0f;
         var endTimeScale = show ? 0f : 1f ;
+        
         _rectTransform.sizeDelta = startSize;
+        _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, startYPosition);
+        titleText.alpha = startAlpha;
         
         if (show) _canvasGroup.alpha = 1f;
         if (!show) GameManager.Instance.TogglePause(false, false);
@@ -87,7 +99,7 @@ public class InformationWindowUI : MonoBehaviour
         
         _toggleSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(_rectTransform, endSize, informationWindowTweenSettings))
-            .Group(Tween.Alpha(titleText, show ? 1f : 0f, informationWindowTweenSettings.duration * 0.8f))
+            .Group(Tween.Alpha(titleText, endAlpha, informationWindowTweenSettings.duration * 0.8f))
             .Group(Tween.UIAnchoredPositionY(_backButtonRectTransform, endYPosition, informationWindowTweenSettings))
             .Group(Tween.GlobalTimeScale(endTimeScale, informationWindowTweenSettings))
             .ChainCallback(() => 
