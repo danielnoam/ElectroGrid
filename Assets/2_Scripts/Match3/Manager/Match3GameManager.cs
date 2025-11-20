@@ -10,13 +10,15 @@ public class Match3GameManager : MonoBehaviour
 {
     public static Match3GameManager Instance { get; private set; }
 
-    [Header("Settings")]
+    [Header("Gameplay Settings")]
     [Tooltip("Minimum tiles required to form a match")]
     [SerializeField] private int minMatchCount = 3;
-    [Tooltip("Minimum tiles required to form a match")]
-    [SerializeField] private int minMatchForLineClear = 4;
+    [Tooltip("Minimum tiles required to line break")]
+    [SerializeField] private int minMatchForLineBreak = 4;
     [Tooltip("Duration taken to spawn helper objects")]
     [SerializeField, Range(0f,100f)] private float chanceToSpawnHelper = 5f;
+    
+    [Header("Population Settings")]
     [Tooltip("Maximum attempts to create a grid with guaranteed matches")]
     [SerializeField] private int mxGuaranteedMatchAttempts = 100;
     [Tooltip("Maximum attempts to recheck matches in grid")]
@@ -38,12 +40,12 @@ public class Match3GameManager : MonoBehaviour
 
     private Match3LevelData _currentLevelData;
     
+    public Match3LevelData CurrentLevelData => _currentLevelData;
     public Match3GridHandler GridHandler => gridHandler;
-    
     public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
     public float ChanceToSpawnHelper => chanceToSpawnHelper;
     public int MinMatchCount => minMatchCount;
-    public int MinMatchForLineClear => minMatchForLineClear;
+    public int MinMatchForLineBreak => minMatchForLineBreak;
     public int MaxAttemptsToRecheckMatches => maxAttemptsToRecheckMatches;
     
     public event Action<Match3LevelData> LevelStarted;
@@ -249,7 +251,7 @@ public class Match3GameManager : MonoBehaviour
     
         yield return StartCoroutine(playHandler.MoveObjectsDown(gridHandler.GridShape));
     
-        yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, true));
+        yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, false));
         yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches));
 
         if (!levelComplete)
@@ -304,7 +306,7 @@ public class Match3GameManager : MonoBehaviour
             }
             
             // Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
-            yield return playHandler.SpawnGridLayout(gridLayout, false);
+            yield return playHandler.SpawnGridLayout(gridLayout, true);
             playHandler.CanInteract = true;
             populatingGrid = false;
             yield break;
