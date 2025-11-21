@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f1b43a145a04e729c1b4bdcefcab301, type: 3}
-  m_Name: Match3Level_12
+  m_Name: Level_12
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
   levelName: Level 12
   gridShape: {fileID: 11400000, guid: 3608cb1d3a940e744ad7abd709127419, type: 2}

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f1b43a145a04e729c1b4bdcefcab301, type: 3}
-  m_Name: Match3Level_7
+  m_Name: Level_7
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
   levelName: Level 7
   gridShape: {fileID: 11400000, guid: c29f017b2cf440a4d99e8288fc88537c, type: 2}
@@ -29,6 +29,7 @@ MonoBehaviour:
       chance: 25
       isLocked: 0
   objectives:
+  - rid: 190982356454867031
   - rid: 3019432012391383128
   loseConditions:
   - rid: 190982044644802816
@@ -41,6 +42,12 @@ MonoBehaviour:
       data:
         conditionSprite: {fileID: 0}
         allowedMoves: 9
+    - rid: 190982356454867031
+      type: {class: GetMatches, ns: , asm: Assembly-CSharp}
+      data:
+        objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: c29f017b2cf440a4d99e8288fc88537c, type: 2}
+        requiredAmount: 16
     - rid: 3019432012391383128
       type: {class: DestroyObstaclesObjective, ns: , asm: Assembly-CSharp}
       data:

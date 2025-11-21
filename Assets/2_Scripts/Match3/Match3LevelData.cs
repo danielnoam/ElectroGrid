@@ -105,7 +105,7 @@ public class Match3LevelData
         }
     }
     
-    public bool LevelHasLoseConditions()
+    public bool HasLoseConditions()
     {
         if (CurrentLoseConditions.Count == 0) return false;
         
@@ -114,6 +114,25 @@ public class Match3LevelData
             if (condition != null)
             {
                 return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public bool IsAnyLoseConditionBellowHalf()
+    {
+        if (CurrentLoseConditions.Count == 0) return false;
+
+        foreach (var condition in CurrentLoseConditions)
+        {
+            if (condition is { IsConditionMet: false })
+            {
+                if (condition.GetProgress().Item1 < condition.GetProgress().Item2 / 2)
+                {
+                    Debug.Log("Lose condition bellow half: " + condition.GetType().Name);
+                    return true;
+                }
             }
         }
 

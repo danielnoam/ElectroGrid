@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f091914f821aeddd7b3676db7383e3d7, type: 3}
-  m_Name: Match3ObjectSpawn
+  m_Name: LevelCompleteWindowWin
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
   clips:
-  - {fileID: 8300000, guid: 9c948aea551b94d95a15c3334ba83cd8, type: 3}
-  - {fileID: 8300000, guid: f0067d383b71647c884d447e609865c4, type: 3}
+  - {fileID: 8300000, guid: 01d5cf5f121a0ee46b8ec01121c56cc4, type: 3}
   mixerGroup: {fileID: 4447098254742166681, guid: 0a905c746b303df4c84e988af473a914, type: 2}
   volume:
-    minValue: 0.3
-    maxValue: 0.3
+    minValue: 1
+    maxValue: 1
   pitch:
-    minValue: 0.8
+    minValue: 0.9
     maxValue: 1.1
   stereoPan: 0
   spatialBlend: 0

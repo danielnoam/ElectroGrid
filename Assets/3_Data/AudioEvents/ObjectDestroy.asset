@@ -10,17 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f091914f821aeddd7b3676db7383e3d7, type: 3}
-  m_Name: Match3LevelCompleteWindowFail
+  m_Name: ObjectDestroy
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
   clips:
-  - {fileID: 8300000, guid: e0a613bb5ce4b9b49acb9072a4bb9df7, type: 3}
+  - {fileID: 8300000, guid: a161527766be241efad062d931d302c5, type: 3}
+  - {fileID: 8300000, guid: 3532cdd0d03ef40a9960ec71c769f220, type: 3}
+  - {fileID: 8300000, guid: 9f9ec736ec0154c9b8b210d69cfc496e, type: 3}
   mixerGroup: {fileID: 4447098254742166681, guid: 0a905c746b303df4c84e988af473a914, type: 2}
   volume:
-    minValue: 1
-    maxValue: 1
+    minValue: 0.2
+    maxValue: 0.2
   pitch:
-    minValue: 0.7
-    maxValue: 0.8
+    minValue: 0.9
+    maxValue: 1.1
   stereoPan: 0
   spatialBlend: 0
   reverbZoneMix: 1

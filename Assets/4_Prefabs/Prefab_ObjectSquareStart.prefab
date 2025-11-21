@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 6258589931594102740}
   - component: {fileID: 8633085351261850407}
   m_Layer: 6
-  m_Name: Prefab_Match3BottomObject
+  m_Name: Prefab_ObjectSquareStart
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
