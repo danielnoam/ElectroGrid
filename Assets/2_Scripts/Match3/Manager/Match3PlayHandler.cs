@@ -818,6 +818,9 @@ public class Match3PlayHandler : MonoBehaviour
         }
         else
         {
+
+            var spawnedHelperAlready = false;
+            
             var tilesByRow = layout
                 .GroupBy(kvp => kvp.Key.GridPosition.y)
                 .OrderBy(g => g.Key);
@@ -828,9 +831,10 @@ public class Match3PlayHandler : MonoBehaviour
             {
                 foreach (var tileObjectMatch in row)
                 {
-                    if (ShouldSpawnHelperObject())
+                    if (ShouldSpawnHelperObject() && !spawnedHelperAlready)
                     {
                         gridHandler.CreateHelperObject(tileObjectMatch.Key);
+                        spawnedHelperAlready = true;
                     }
                     else
                     {
@@ -1072,7 +1076,7 @@ public class Match3PlayHandler : MonoBehaviour
     
     private bool ShouldSpawnHelperObject()
     {
-        var loseConditions = gameManager.CurrentLevelData.LevelHasLoseConditions();
+        var loseConditions = gameManager.CurrentLevelData.HasLoseConditions() && gameManager.CurrentLevelData.IsAnyLoseConditionBellowHalf();
         var chanceCheck = gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper;
         
         return loseConditions && chanceCheck;

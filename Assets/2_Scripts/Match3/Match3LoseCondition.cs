@@ -39,9 +39,6 @@ public class MoveLimit : Match3LoseCondition
 {
     [SerializeField, Min(1)] private int allowedMoves = 10;
     private int _movesRemaining;
-
-    public int AllowedMoves => allowedMoves;
-    public int MovesRemaining => _movesRemaining;
     
     public void AddMoves(int amount)
     {
@@ -86,7 +83,7 @@ public class MoveLimit : Match3LoseCondition
     }
     public override (int, int) GetProgress()
     {
-        return (_movesRemaining, MovesRemaining);
+        return (_movesRemaining, allowedMoves);
     }
 
     public override string GetName()
@@ -105,9 +102,7 @@ public class TimeLimit : Match3LoseCondition
 {
     [SerializeField, Min(10)] private float allowedTime = 15f;
     private float _timeRemaining;
-
-    public float AllowedTime => allowedTime;
-    public float TimeRemaining => _timeRemaining;
+    
     
     public void AddTime(float amount)
     {

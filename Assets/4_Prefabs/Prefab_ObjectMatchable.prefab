@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 6258589931594102740}
   - component: {fileID: 5958041342160215586}
   m_Layer: 6
-  m_Name: Prefab_Match3MatchableObject
+  m_Name: Prefab_ObjectMatchable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

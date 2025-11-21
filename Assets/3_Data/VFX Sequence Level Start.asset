@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de20f28ea40c22c43978f33a09f060b4, type: 3}
   m_Name: VFX Sequence Level Start
   m_EditorClassIdentifier: 
-  sequenceDuration: 2
+  sequenceDuration: 3
   sequenceIsAdditive: 0
   resetEffectsOnComplete: 0
   effects:
@@ -76,7 +76,7 @@ MonoBehaviour:
       data:
         duration:
           minValue: 0
-          maxValue: 0.7872169
+          maxValue: 1
         type: 0
         startColor: {r: 0, g: 0, b: 0, a: 1}
         endColor: {r: 0, g: 0, b: 0, a: 0}

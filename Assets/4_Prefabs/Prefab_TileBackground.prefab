@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 1179882405457458318}
   - component: {fileID: 8960474688188056081}
   m_Layer: 6
-  m_Name: Prefab_Match3BackgroundTile
+  m_Name: Prefab_TileBackground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

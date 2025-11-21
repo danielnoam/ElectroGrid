@@ -128,7 +128,7 @@ public class BackgroundManager : MonoBehaviour
             float distanceFromCenter = Vector2.Distance(tileGridPosition, centerOfGrid);
             
             float normalizedDistance = Mathf.Clamp01(distanceFromCenter / maxFadeDistance);
-            normalizedDistance = Mathf.Pow(normalizedDistance, 4f);
+            normalizedDistance = Mathf.Pow(normalizedDistance, 2.75f);
 
             Color color = tile.SpriteRenderer.color;
             Color baseColor = tile.SpriteRenderer.color;
