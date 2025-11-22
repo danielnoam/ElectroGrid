@@ -812,6 +812,7 @@ public class Match3PlayHandler : MonoBehaviour
             foreach (var tileObjectMatch in layout)
             {
                 CameraManager.Instance?.ShakeCamera(1, 0.25f);
+                MobileHaptics.Vibrate(50);
                 gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
                 yield return new WaitForSeconds(populationDuration / totalActiveTiles);
             }

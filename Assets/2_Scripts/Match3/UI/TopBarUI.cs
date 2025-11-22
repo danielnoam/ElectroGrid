@@ -128,8 +128,8 @@ public class TopBarUI : MonoBehaviour
         {
             CameraManager.Instance.ShakeCamera(0.1f);
             Toggle(false);
-            bottomBarUI.Toggle(false);
-            informationWindowUI.Toggle(true);
+            bottomBarUI?.Toggle(false);
+            informationWindowUI?.Toggle(true);
         });
     }
 

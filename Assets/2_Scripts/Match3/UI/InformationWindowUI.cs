@@ -42,7 +42,6 @@ public class InformationWindowUI : MonoBehaviour
 
     public void Initialize()
     {
-        
         SetupButtons();
         PopulateTutorials();
     }
@@ -54,8 +53,8 @@ public class InformationWindowUI : MonoBehaviour
         {
             CameraManager.Instance.ShakeCamera(0.1f);
             Toggle(false);
-            topBarUI.Toggle(true);
-            bottomBarUI.Toggle(true);
+            topBarUI?.Toggle(true);
+            bottomBarUI?.Toggle(true);
         });
     }
 
