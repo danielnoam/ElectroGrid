@@ -130,7 +130,6 @@ public class Match3LevelData
             {
                 if (condition.GetProgress().Item1 < condition.GetProgress().Item2 / 2)
                 {
-                    Debug.Log("Lose condition bellow half: " + condition.GetType().Name);
                     return true;
                 }
             }

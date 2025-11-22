@@ -1,7 +1,7 @@
 {
   "buildFiles": [
-    "D:\\Projects\\PopACorn\\Library\\PramData\\AndroidApplicationController\\Cache\\com.UnityTechnologies.com.unity.template.urpblank\\gradle-project\\unityLibrary\\src\\main\\cpp\\CMakeLists.txt",
-    "D:\\Projects\\PopACorn\\Library\\PramData\\AndroidApplicationController\\Cache\\com.UnityTechnologies.com.unity.template.urpblank\\gradle-project\\unityLibrary\\src\\main\\cpp\\GameActivity\\CMakeLists.txt"
+    "D:\\Projects\\PopACorn\\Library\\Bee\\Android\\Prj\\IL2CPP\\Gradle\\unityLibrary\\src\\main\\cpp\\CMakeLists.txt",
+    "D:\\Projects\\PopACorn\\Library\\Bee\\Android\\Prj\\IL2CPP\\Gradle\\unityLibrary\\src\\main\\cpp\\GameActivity\\CMakeLists.txt"
   ],
   "cleanCommandsComponents": [
     [
@@ -21,7 +21,7 @@
     "game::@d02bb112ea9f9c2ed29f": {
       "artifactName": "game",
       "abi": "arm64-v8a",
-      "output": "D:\\Projects\\PopACorn\\Library\\PramData\\AndroidApplicationController\\Cache\\com.UnityTechnologies.com.unity.template.urpblank\\gradle-project\\unityLibrary\\build\\intermediates\\cxx\\Debug\\63m635m5\\obj\\arm64-v8a\\libgame.so",
+      "output": "D:\\Projects\\PopACorn\\Library\\Bee\\Android\\Prj\\IL2CPP\\Gradle\\unityLibrary\\build\\intermediates\\cxx\\Debug\\63m635m5\\obj\\arm64-v8a\\libgame.so",
       "runtimeFiles": []
     }
   }

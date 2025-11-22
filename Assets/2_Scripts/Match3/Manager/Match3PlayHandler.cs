@@ -562,7 +562,6 @@ public class Match3PlayHandler : MonoBehaviour
             }
         }
 
-
         // Check if the match amount is more than the minimum amount for a match
         if (tilesWithMatches.Count >= gameManager.MinMatchForLineBreak)
         {
@@ -582,11 +581,21 @@ public class Match3PlayHandler : MonoBehaviour
                 CameraManager.Instance?.ShakeCamera(3, 0.75f);
             }
             
+            // Collect the actual row and column numbers that were broken
+            List<int> brokenRows = new List<int>();
+            List<int> brokenColumns = new List<int>();
+            
             // If vertical, destroy all columns that have more than MinMatchForSpecial matches
             if (isVertical)
             {
-                var columnsToDestroy = enumerable.Where(group => group.Count() >= gameManager.MinMatchForLineBreak).Select(group => group.Key);
-                foreach (var column in columnsToDestroy)
+                IEnumerable<int> columnsToDestroy = enumerable
+                    .Where(group => group.Count() >= gameManager.MinMatchForLineBreak)
+                    .Select(group => group.Key);
+
+                var toDestroy = columnsToDestroy.ToList();
+                brokenColumns.AddRange(toDestroy);
+                
+                foreach (var column in toDestroy)
                 {
                     for (var y = 0; y < gridHandler.Grid.Height; y++)
                     {
@@ -606,8 +615,14 @@ public class Match3PlayHandler : MonoBehaviour
             // If horizontal, destroy all rows that have more than MinMatchForSpecial matches
             if (isHorizontal)
             {
-                var rowsToDestroy = groups.Where(group => group.Count() >= gameManager.MinMatchForLineBreak).Select(group => group.Key);
-                foreach (var row in rowsToDestroy)
+                IEnumerable<int> rowsToDestroy = groups
+                    .Where(group => group.Count() >= gameManager.MinMatchForLineBreak)
+                    .Select(group => group.Key);
+
+                var toDestroy = rowsToDestroy.ToList();
+                brokenRows.AddRange(toDestroy);
+                
+                foreach (var row in toDestroy)
                 {
                     for (var x = 0; x < gridHandler.Grid.Width; x++)
                     {
@@ -626,6 +641,7 @@ public class Match3PlayHandler : MonoBehaviour
 
             if (isHorizontal || isVertical)
             {
+                gameManager.NotifyLineBreakMade(brokenRows, brokenColumns);
                 yield return new WaitForSeconds(0.3f);
             }
         }

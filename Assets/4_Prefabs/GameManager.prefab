@@ -97,37 +97,28 @@ MonoBehaviour:
   gameplayClips:
     internalItems:
     - item: {fileID: 8300000, guid: eeae0f9732476ed419936a018c687f93, type: 3}
-      chance: 10
-      isLocked: 0
-    - item: {fileID: 8300000, guid: e1f42a46d0580c146a84bf05dcf3aabe, type: 3}
-      chance: 9
+      chance: 13
       isLocked: 0
     - item: {fileID: 8300000, guid: 49069720be65d494086de3db4e1b0a1d, type: 3}
-      chance: 9
+      chance: 13
       isLocked: 0
     - item: {fileID: 8300000, guid: 33936d7cf65fc94478cb766cf58ac020, type: 3}
-      chance: 9
+      chance: 13
       isLocked: 0
     - item: {fileID: 8300000, guid: aa30146c7098fb0499d3ba41b284d6fa, type: 3}
-      chance: 9
-      isLocked: 0
-    - item: {fileID: 8300000, guid: f831666427c2f624088edccb7cfe92ae, type: 3}
-      chance: 9
-      isLocked: 0
-    - item: {fileID: 8300000, guid: e46a512ba76ec47469d7ebabd3e419be, type: 3}
-      chance: 9
+      chance: 13
       isLocked: 0
     - item: {fileID: 8300000, guid: cd8f2744e56f1b948a405f01ac9bd54a, type: 3}
-      chance: 9
+      chance: 12
       isLocked: 0
     - item: {fileID: 8300000, guid: 41e6a74989c251c4ea41d998ce899198, type: 3}
-      chance: 9
+      chance: 12
       isLocked: 0
     - item: {fileID: 8300000, guid: 0fcdf68de9f7e8d4a8d71e50dd3b12a3, type: 3}
-      chance: 9
+      chance: 12
       isLocked: 0
     - item: {fileID: 8300000, guid: f7c623d9bd239754390a45ecf483855d, type: 3}
-      chance: 9
+      chance: 12
       isLocked: 0
   isMuted: 0
 --- !u!82 &4433926562512230688
