@@ -228,7 +228,7 @@ public class TopBarUI : MonoBehaviour
         foreach (var loseCondition in loseConditions)
         {
             var uiElement = Instantiate(match3UIElementPrefab, loseConditionsUIParent);
-            uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetRequirementText(), loseCondition.GetProgress());
+            uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetRequirementText(), loseCondition.GetProgress().Item1);
             uiElement.gameObject.name = loseCondition.GetName();
             _currentLoseConditions.Add(loseCondition, uiElement);
         

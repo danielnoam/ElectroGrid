@@ -52,6 +52,9 @@ public class Match3GameManager : MonoBehaviour
     public event Action<Match3LevelData> LevelComplete;
     public event Action<Match3LevelData> LevelFailed;
     public event Action<List<Match3Tile>> MatchesMade;
+    public event Action<List<int>, List<int>> LineBreakMade;
+    
+    
 
     private void Awake()
     {
@@ -154,6 +157,16 @@ public class Match3GameManager : MonoBehaviour
         }
     }
     
+    private void UpdateLoseConditions()
+    {
+        if (levelComplete || !playHandler.CanInteract || _currentLevelData == null) return;
+        
+        foreach (var condition in _currentLevelData.CurrentLoseConditions)
+        {
+            condition?.Update(Time.deltaTime);
+        }
+    }
+    
     public void NotifyMatchesWhereMade(List<Match3Tile> matches)
     {
         _currentLevelData?.OnMatchesMade(matches);
@@ -180,15 +193,11 @@ public class Match3GameManager : MonoBehaviour
         _currentLevelData?.OnBottomObjectReached(bottomObject);
     }
     
-    private void UpdateLoseConditions()
+    public void NotifyLineBreakMade(List<int> rows, List<int> columns)
     {
-        if (levelComplete || !playHandler.CanInteract || _currentLevelData == null) return;
-        
-        foreach (var condition in _currentLevelData.CurrentLoseConditions)
-        {
-            condition?.Update(Time.deltaTime);
-        }
+        LineBreakMade?.Invoke(rows, columns);
     }
+    
 
     private IEnumerator CompleteLevel()
     {

@@ -66,7 +66,7 @@
 				{
 					"directoryIndex" : 1,
 					"id" : "game::@d02bb112ea9f9c2ed29f",
-					"jsonFile" : "target-game-Debug-cbd8a8b7e3007208d840.json",
+					"jsonFile" : "target-game-Debug-a19173e531d484286bf7.json",
 					"name" : "game",
 					"projectIndex" : 1
 				}
@@ -77,7 +77,7 @@
 	"paths" : 
 	{
 		"build" : "D:/Projects/PopACorn/.utmp/Debug/63m635m5/arm64-v8a",
-		"source" : "D:/Projects/PopACorn/Library/PramData/AndroidApplicationController/Cache/com.UnityTechnologies.com.unity.template.urpblank/gradle-project/unityLibrary/src/main/cpp"
+		"source" : "D:/Projects/PopACorn/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp"
 	},
 	"version" : 
 	{

@@ -15,9 +15,10 @@ public class Match3EffectManager : MonoBehaviour
     [SerializeField] private OneShotParticle backgroundParticlePrefab;
     
     [Header("Mouse Interaction")]
+    [SerializeField] private bool mouseInteractionEffect;
     [SerializeField] private float maxScaleMultiplier = 1f;
     [SerializeField] private float minScaleMultiplier = 0.9f;
-    [SerializeField] private float effectRadius = 3f;
+    [SerializeField] private float effectRadius = 2.5f;
     [SerializeField] private AnimationCurve effectOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     [Header("References")]
@@ -63,6 +64,7 @@ public class Match3EffectManager : MonoBehaviour
             gameManager.LevelFailed += OnLevelEnded;
             gameManager.LevelComplete += OnLevelEnded;
             gameManager.MatchesMade += OnMatchesMade;
+            gameManager.LineBreakMade += OnLineBreakMade;
         }
         
         if (gridHandler)
@@ -80,6 +82,7 @@ public class Match3EffectManager : MonoBehaviour
             gameManager.LevelFailed -= OnLevelEnded;
             gameManager.LevelComplete -= OnLevelEnded;
             gameManager.MatchesMade -= OnMatchesMade;
+            gameManager.LineBreakMade -= OnLineBreakMade;
         }
         
         if (gridHandler)
@@ -92,33 +95,7 @@ public class Match3EffectManager : MonoBehaviour
     private void OnMatchesMade(List<Match3Tile> matchedTiles)
     {
         var backgroundTilesPositions = new List<Vector2Int>(_backgroundTiles.Keys);
-        
-        bool isVertical = false;
-        bool isHorizontal = false;
-        
-        if (matchedTiles.Count >= 2)
-        {
-            Vector2Int? firstPos = null;
-            Vector2Int? secondPos = null;
-            
-            for (int i = 0; i < matchedTiles.Count && secondPos == null; i++)
-            {
-                if (matchedTiles[i])
-                {
-                    if (firstPos == null)
-                        firstPos = matchedTiles[i].GridPosition;
-                    else
-                        secondPos = matchedTiles[i].GridPosition;
-                }
-            }
-            
-            if (firstPos.HasValue && secondPos.HasValue)
-            {
-                isVertical = firstPos.Value.x == secondPos.Value.x;
-                isHorizontal = firstPos.Value.y == secondPos.Value.y;
-            }
-        }
-        
+    
         for (int matchedTile = 0; matchedTile < matchedTiles.Count; matchedTile++)
         {
             if (!matchedTiles[matchedTile]) continue;
@@ -129,27 +106,47 @@ public class Match3EffectManager : MonoBehaviour
             {
                 Vector2Int bgPos = backgroundTilesPositions[backgroundTile];
                 
-                bool shouldAnimate = false;
-                int distance = 0;
-                
-                if (isVertical && matchedPos.x == bgPos.x)
-                {
-                    shouldAnimate = true;
-                    distance = Mathf.Abs(matchedPos.y - bgPos.y);
-                }
-                else if (isHorizontal && matchedPos.y == bgPos.y)
-                {
-                    shouldAnimate = true;
-                    distance = Mathf.Abs(matchedPos.x - bgPos.x);
-                }
-                
-                if (shouldAnimate)
+                int distance = Mathf.Abs(matchedPos.x - bgPos.x) + Mathf.Abs(matchedPos.y - bgPos.y);
+                float maxWaveDistance = 3f;
+                if (distance <= maxWaveDistance && distance > 0)
                 {
                     _backgroundTiles.TryGetValue(bgPos, out var tile);
                     if (tile)
                     {
                         tile.SquashTile(distance);
                     }
+                }
+            }
+        }
+    }
+    
+    private void OnLineBreakMade(List<int> rows, List<int> columns)
+    {
+        var backgroundTilesPositions = new List<Vector2Int>(_backgroundTiles.Keys);
+    
+        // For each background tile, find the closest distance to any broken line
+        foreach (var bgPos in backgroundTilesPositions)
+        {
+            int minDistance = int.MaxValue;
+            
+            foreach (int row in rows)
+            {
+                int distance = Mathf.Abs(bgPos.y - row);
+                minDistance = Mathf.Min(minDistance, distance);
+            }
+            foreach (int column in columns)
+            {
+                int distance = Mathf.Abs(bgPos.x - column);
+                minDistance = Mathf.Min(minDistance, distance);
+            }
+            
+            float maxWaveDistance = 6f;
+            if (minDistance <= maxWaveDistance && minDistance > 0)
+            {
+                _backgroundTiles.TryGetValue(bgPos, out var tile);
+                if (tile)
+                {
+                    tile.SquashTile(minDistance);
                 }
             }
         }
@@ -327,7 +324,7 @@ public class Match3EffectManager : MonoBehaviour
 
     private void UpdateTiles()
     {
-        if (!_camera || !_inputReader || _backgroundTiles.Count == 0) return;
+        if (!_camera || !_inputReader || _backgroundTiles.Count == 0 || !mouseInteractionEffect) return;
     
         Vector2 mousePos = _inputReader.MousePosition;
         Vector3 mouseWorldPos = _camera.ScreenToWorldPoint(mousePos);

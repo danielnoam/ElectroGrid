@@ -120,12 +120,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5312188147448270709}
+  m_Father: {fileID: 548980144345713879}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -240}
-  m_SizeDelta: {x: -50, y: 25}
+  m_AnchoredPosition: {x: 0, y: 100}
+  m_SizeDelta: {x: 0, y: 25}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &6367585329507478886
 CanvasRenderer:
@@ -258,7 +258,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2841296296622609070}
-  - {fileID: 9106692308311285197}
   - {fileID: 548980144345713879}
   - {fileID: 1162430885490449510}
   m_Father: {fileID: 0}
@@ -320,7 +319,9 @@ MonoBehaviour:
   topBarUI: {fileID: 0}
   bottomBarUI: {fileID: 0}
   titleText: {fileID: 4584618277212780355}
+  windowRectTransform: {fileID: 548980144345713879}
   tutorialElementsParent: {fileID: 5728584791518599174}
+  backgroundImage: {fileID: 2181402246067585805}
   tutorialElementPrefab: {fileID: 8804968279864379365, guid: a1afbe02327339d4697c9c47a4b1b0c4, type: 3}
 --- !u!1 &2580253122950720218
 GameObject:
@@ -484,6 +485,7 @@ GameObject:
   - component: {fileID: 1349640132570358365}
   - component: {fileID: 6875550985100391894}
   - component: {fileID: 1195093719389957730}
+  - component: {fileID: 799744161897707328}
   m_Layer: 5
   m_Name: Scrollbar Vertical
   m_TagString: Untagged
@@ -598,6 +600,20 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &799744161897707328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5083671319658471903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &5231544807885045485
 GameObject:
   m_ObjectHideFlags: 0
@@ -699,7 +715,7 @@ GameObject:
   m_Component:
   - component: {fileID: 548980144345713879}
   m_Layer: 5
-  m_Name: Inside
+  m_Name: Window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -717,14 +733,15 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 9106692308311285197}
   - {fileID: 7186437209203539076}
   - {fileID: 6960068610667828775}
   m_Father: {fileID: 5312188147448270709}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -50, y: -540}
+  m_SizeDelta: {x: -50, y: 1380}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6299154104331812034
 GameObject:
