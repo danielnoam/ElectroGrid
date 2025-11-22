@@ -42,7 +42,7 @@ MonoBehaviour:
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
         conditionSprite: {fileID: 0}
-        allowedMoves: 18
+        allowedMoves: 16
     - rid: 190982295477551195
       type: {class: TimeLimit, ns: , asm: Assembly-CSharp}
       data:

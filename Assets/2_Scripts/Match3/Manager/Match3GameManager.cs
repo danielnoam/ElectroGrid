@@ -252,6 +252,7 @@ public class Match3GameManager : MonoBehaviour
         yield return StartCoroutine(playHandler.MoveObjectsDown(gridHandler.GridShape));
     
         yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, false));
+        
         yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches));
 
         if (!levelComplete)

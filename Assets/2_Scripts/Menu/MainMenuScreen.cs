@@ -11,10 +11,17 @@ public class MainMenuScreen : MenuScreen
     [SerializeField] private Button quitButton;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private MenuManager menuManager;
+    [SerializeField] private InformationWindowUI informationWindowUI;
+    [SerializeField] private Button infoButton;
+    [SerializeField] private Button muteButton;
+    [SerializeField] private Image muteButtonImage;
+    [SerializeField] private Sprite mutedSprite;
+    [SerializeField] private Sprite unmutedSprite;
 
-    private void OnEnable()
+    private void Start()
     {
         SetupButtons();
+        informationWindowUI?.Initialize();
     }
 
     protected override Tween GetShowPositionTween()
@@ -68,7 +75,11 @@ public class MainMenuScreen : MenuScreen
             if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
             
             match3Button.onClick.RemoveAllListeners();
-            match3Button.onClick.AddListener(OnMatch3ButtonClicked);
+            match3Button.onClick.AddListener(() =>
+            {
+                CameraManager.Instance?.ShakeCamera(0.5f);
+                menuManager?.ShowMatch3LevelSelection();
+            });
         }
         
         if (quitButton)
@@ -77,25 +88,42 @@ public class MainMenuScreen : MenuScreen
             if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
             
             quitButton.onClick.RemoveAllListeners();
-            quitButton.onClick.AddListener(OnQuitButtonClicked);
+            quitButton.onClick.AddListener(() =>
+            {
+                #if UNITY_EDITOR
+                if (Application.isEditor)
+                {
+                    UnityEditor.EditorApplication.isPlaying = false;
+                    return;
+                }
+                #endif
+                Application.Quit();
+            });
         }
-    }
 
-    private void OnMatch3ButtonClicked()
-    {
-        CameraManager.Instance?.ShakeCamera(0.5f);
-        menuManager?.ShowMatch3LevelSelection();
-    }
 
-    private void OnQuitButtonClicked()
-    {
-#if UNITY_EDITOR
-        if (Application.isEditor)
+        if (muteButtonImage)
         {
-            UnityEditor.EditorApplication.isPlaying = false;
-            return;
+            muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
+    
+            muteButton.onClick.RemoveAllListeners();
+            muteButton.onClick.AddListener(() =>
+            {
+                CameraManager.Instance.ShakeCamera(0.1f);
+                AudioManager.Instance.ToggleAudio();
+                muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
+            });
         }
-#endif
-        Application.Quit();
+
+        if (infoButton)
+        {
+            infoButton.onClick.RemoveAllListeners();
+            infoButton.onClick.AddListener(() =>
+            {
+                CameraManager.Instance.ShakeCamera(0.1f);
+                informationWindowUI?.Toggle(true);
+            });
+        }
     }
+    
 }

@@ -47,7 +47,7 @@ MonoBehaviour:
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}
       data:
         conditionSprite: {fileID: 0}
-        allowedMoves: 18
+        allowedMoves: 16
     - rid: 3019432012391383129
       type: {class: DestroyObstaclesObjective, ns: , asm: Assembly-CSharp}
       data:
