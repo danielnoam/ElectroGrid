@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d942ccd036153a4dae3f357be10fb3d, type: 3}
-  m_Name: Grid_HeartBig
+  m_Name: Grid_ChestPlate
   m_EditorClassIdentifier: Assembly-CSharp::SOGridShape
   grid:
     size: {x: 9, y: 8}
     origin: {x: 0, y: -1.5, z: 0}
     cellSize: {x: 1, y: 1, z: 0}
     cellSpacing: {x: 0.1, y: 0.1, z: 0}
-    cells: 000001010101010000000001010101010000000101010101010100010101010101010101010101010101010101010101010101010101010101010101010101000101010001010100
+    cells: 000001010101010000000001010101010000000001010101010000010101010101010101010101010101010101010101010101010101010101010101010101010101010001010101
     coordinateConverter:
       rid: 3019431853672366085
     editorFoldout: 1

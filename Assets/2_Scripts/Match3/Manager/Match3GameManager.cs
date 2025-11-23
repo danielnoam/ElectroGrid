@@ -52,6 +52,7 @@ public class Match3GameManager : MonoBehaviour
     public event Action<Match3LevelData> LevelComplete;
     public event Action<Match3LevelData> LevelFailed;
     public event Action<List<Match3Tile>> MatchesMade;
+    public event Action<Match3HelperObject> HelperDestroyed;
     public event Action<List<int>, List<int>> LineBreakMade;
     
     
@@ -173,8 +174,9 @@ public class Match3GameManager : MonoBehaviour
         MatchesMade?.Invoke(matches);
     }
     
-    public void NotifyHelperObjectDestroyed()
+    public void NotifyHelperObjectDestroyed(Match3HelperObject helper)
     {
+        HelperDestroyed?.Invoke(helper);
         _currentLevelData?.OnHelperObjectDestroyed();
     }
     

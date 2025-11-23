@@ -240,7 +240,7 @@ MonoBehaviour:
   itemRenderer: {fileID: 4412200537256300565}
   spawnSfx: {fileID: 11400000, guid: ec1798503e56cf94886c358078f8a94c, type: 2}
   destroySfx: {fileID: 11400000, guid: 0ce69c39d12e15c4faef1f8a595e9865, type: 2}
-  destroyParticle: {fileID: 243077210646262330, guid: faebadce7c9ff64499063d22df2a111d, type: 3}
+  destroyParticle: {fileID: 0}
   heldDuration: 0.2
   heldScaleMultiplier: 0.8
   heldColor: {r: 0, g: 0, b: 0, a: 0}
