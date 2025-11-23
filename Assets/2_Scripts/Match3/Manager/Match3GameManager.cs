@@ -241,8 +241,6 @@ public class Match3GameManager : MonoBehaviour
         selectionIndicator.ResetHoveredTile();
     
         yield return StartCoroutine(playHandler.SwapObjects(posA, posB));
-        
-        NotifyAMoveWasMade();
     
         var matchesWithTileA = playHandler.FindMatchesWithTile(gridHandler.GetTile(posA), gridHandler.GridShape);
         var matchesWithTileB = playHandler.FindMatchesWithTile(gridHandler.GetTile(posB), gridHandler.GridShape);
@@ -255,6 +253,8 @@ public class Match3GameManager : MonoBehaviour
             populatingGrid = false;
             yield break;
         }
+        
+        NotifyAMoveWasMade();
         
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
         

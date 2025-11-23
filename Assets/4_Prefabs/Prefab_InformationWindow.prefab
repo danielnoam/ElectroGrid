@@ -300,8 +300,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InformationWindowUI
   informationWindowTweenSettings:
-    duration: 1
-    ease: 0
+    duration: 0.7
+    ease: 15
     customEase:
       serializedVersion: 2
       m_Curve: []
