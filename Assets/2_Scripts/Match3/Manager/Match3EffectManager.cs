@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DNExtensions.Button;
 using DNExtensions.ObjectPooling;
 using DNExtensions.VFXManager;
+using PrimeTween;
 using UnityEngine;
 
 public class Match3EffectManager : MonoBehaviour
@@ -12,7 +13,12 @@ public class Match3EffectManager : MonoBehaviour
     [Header("Effects")]
     [SerializeField] private SOVFEffectsSequence startLevelSequence;
     [SerializeField] private SOVFEffectsSequence endLevelSequence;
-    [SerializeField] private OneShotParticle backgroundParticlePrefab;
+    [SerializeField] private OneShotParticle matchableBgParticlePrefab;
+    [SerializeField] private OneShotParticle helperBgParticlePrefab;
+    
+    [Header("LineBreak")]
+    [SerializeField] private bool lineBreakPulseGrid = true;
+    [SerializeField] private SOVFEffectsSequence lineBreakEffect;
     
     [Header("Mouse Interaction")]
     [SerializeField] private bool mouseInteractionEffect;
@@ -28,6 +34,7 @@ public class Match3EffectManager : MonoBehaviour
     [SerializeField] private Match3BackgroundTile backgroundTilePrefab;
 
     private Camera _camera;
+    private Sequence _lineBreakSequence;
     private TouchInputReader _inputReader;
     private readonly Dictionary<Vector2Int, Match3BackgroundTile> _backgroundTiles = new Dictionary<Vector2Int, Match3BackgroundTile>();
     
@@ -91,6 +98,24 @@ public class Match3EffectManager : MonoBehaviour
             gridHandler.GridDestroyed -= OnGridDestroyed;
         }
     }
+    
+    private void Update()
+    {
+        UpdateTiles();
+    }
+
+    
+
+    private void OnLevelStarted(Match3LevelData levelData)
+    {
+        VFXManager.Instance?.PlayVFX(startLevelSequence);
+    }
+    
+    private void OnLevelEnded(Match3LevelData levelData)
+    {
+        VFXManager.Instance?.PlayVFX(endLevelSequence);
+    }
+    
 
     private void OnMatchesMade(List<Match3Tile> matchedTiles)
     {
@@ -122,43 +147,47 @@ public class Match3EffectManager : MonoBehaviour
     
     private void OnLineBreakMade(List<int> rows, List<int> columns)
     {
-        var backgroundTilesPositions = new List<Vector2Int>(_backgroundTiles.Keys);
-    
-        // For each background tile, find the closest distance to any broken line
-        foreach (var bgPos in backgroundTilesPositions)
+        if (lineBreakPulseGrid)
         {
-            int minDistance = int.MaxValue;
+            var backgroundTilesPositions = new List<Vector2Int>(_backgroundTiles.Keys);
+        
+            foreach (var bgPos in backgroundTilesPositions)
+            {
+                int minDistance = int.MaxValue;
             
-            foreach (int row in rows)
-            {
-                int distance = Mathf.Abs(bgPos.y - row);
-                minDistance = Mathf.Min(minDistance, distance);
-            }
-            foreach (int column in columns)
-            {
-                int distance = Mathf.Abs(bgPos.x - column);
-                minDistance = Mathf.Min(minDistance, distance);
-            }
-            
-            float maxWaveDistance = 6f;
-            if (minDistance <= maxWaveDistance && minDistance > 0)
-            {
-                _backgroundTiles.TryGetValue(bgPos, out var tile);
-                if (tile)
+                foreach (int row in rows)
                 {
-                    tile.SquashTile(minDistance);
+                    int distance = Mathf.Abs(bgPos.y - row);
+                    minDistance = Mathf.Min(minDistance, distance);
+                }
+                foreach (int column in columns)
+                {
+                    int distance = Mathf.Abs(bgPos.x - column);
+                    minDistance = Mathf.Min(minDistance, distance);
+                }
+            
+                float maxWaveDistance = 6f;
+                if (minDistance <= maxWaveDistance && minDistance > 0)
+                {
+                    _backgroundTiles.TryGetValue(bgPos, out var tile);
+                    if (tile)
+                    {
+                        tile.SquashTile(minDistance);
+                    }
                 }
             }
         }
+        
+        if (_lineBreakSequence.isAlive)
+        {
+            _lineBreakSequence.Stop();
+        }
+
+        VFXManager.Instance?.PlayVFX(lineBreakEffect);
+        _lineBreakSequence = Sequence.Create(useUnscaledTime: true)
+            .Group(Tween.GlobalTimeScale(0.3f, 0.2f))
+            .Chain(Tween.GlobalTimeScale(1f, 0.4f));
     }
-
-
-    private void Update()
-    {
-        UpdateTiles();
-    }
-    
-
 
     private void OnGridDestroyed()
     {
@@ -310,16 +339,7 @@ public class Match3EffectManager : MonoBehaviour
         }
     }
     
-    private void OnLevelStarted(Match3LevelData levelData)
-    {
-        VFXManager.Instance?.PlayVFX(startLevelSequence);
-    }
-    
-    private void OnLevelEnded(Match3LevelData levelData)
-    {
-        VFXManager.Instance?.PlayVFX(endLevelSequence);
-    }
-    
+
 
 
     private void UpdateTiles()
@@ -364,11 +384,11 @@ public class Match3EffectManager : MonoBehaviour
     }
     
     [Button]
-    public void CreateShapeEffect(Vector3 position, SOItemData itemData)
+    public void CreateMatchBackgroundParticle(Vector3 position, SOItemData itemData)
     {
-        if (!backgroundParticlePrefab || !itemData) return;
+        if (!matchableBgParticlePrefab || !itemData) return;
     
-        var particle = ObjectPooler.GetObjectFromPool(backgroundParticlePrefab.gameObject, position, Quaternion.identity);
+        var particle = ObjectPooler.GetObjectFromPool(matchableBgParticlePrefab.gameObject, position, Quaternion.identity);
         var particleOneShot = particle.GetComponent<OneShotParticle>();
         var textureSheetModule = particleOneShot.particle.textureSheetAnimation;
         var colorOverLifetimeModule = particleOneShot.particle.colorOverLifetime;
@@ -394,6 +414,16 @@ public class Match3EffectManager : MonoBehaviour
     
         colorOverLifetimeModule.color = new ParticleSystem.MinMaxGradient(gradient);
         textureSheetModule.SetSprite(0, itemData.Sprite);
+        particleOneShot.Play();
+    }
+    
+    [Button]
+    public void CreateHelperBackgroundParticle(Vector3 position)
+    {
+        if (!helperBgParticlePrefab) return;
+
+        var particle = ObjectPooler.GetObjectFromPool(helperBgParticlePrefab.gameObject, position, Quaternion.identity);
+        var particleOneShot = particle.GetComponent<OneShotParticle>();
         particleOneShot.Play();
     }
 

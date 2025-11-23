@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de20f28ea40c22c43978f33a09f060b4, type: 3}
+  m_Name: VFX Sequence Line Break
+  m_EditorClassIdentifier: 
+  sequenceDuration: 0.5
+  sequenceIsAdditive: 0
+  resetEffectsOnComplete: 1
+  effects:
+  - rid: 3019432083264897111
+  - rid: 3019432083264897112
+  - rid: 3019432083264897113
+  references:
+    version: 2
+    RefIds:
+    - rid: 3019432083264897111
+      type: {class: SetChromaticAberration, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0
+          maxValue: 0.5
+        useDefaultIntensity: 0
+        startIntensity: 0
+        endIntensity: 0.5
+        ease: 2
+    - rid: 3019432083264897112
+      type: {class: SetChromaticAberration, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0.5785456
+          maxValue: 1
+        useDefaultIntensity: 0
+        startIntensity: 0.5
+        endIntensity: 0
+        ease: 15
+    - rid: 3019432083264897113
+      type: {class: SetLensDistortionDynamic, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      data:
+        duration:
+          minValue: 0
+          maxValue: 1
+        useDefaultIntensity: 0
+        startIntensity: 0
+        endIntensity: 0
+        intensityEase: 1
+        useAdvancedAnimation: 1
+        createPulseEffect: 1
+        peakIntensity: -0.2
+        pulseCount: 1
+        usePresets: 0
+        distortionType: 3

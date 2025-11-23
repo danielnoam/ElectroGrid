@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cfbb599c3ab5344e95fa2b3ef03d6dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  inactiveTileColor: {r: 0, g: 0.19607843, b: 0.5647059, a: 0.60784316}
+  inactiveTileColor: {r: 0, g: 0.19607843, b: 0.5647059, a: 0.78431374}
   squashScaleAmount: 0.6
   squashDuration: 0.25
   spriteRenderer: {fileID: 8255792042855677773}

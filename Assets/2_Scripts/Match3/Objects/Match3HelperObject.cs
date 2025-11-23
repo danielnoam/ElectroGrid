@@ -100,9 +100,10 @@ public class Match3HelperObject : Match3Object
         UpdateVisuals();
     }
 
-    public void MatchFound()
+    private void MatchFound()
     {
-        _gameManager?.NotifyHelperObjectDestroyed();
+        Match3EffectManager.Instance?.CreateHelperBackgroundParticle(transform.position);
+        _gameManager?.NotifyHelperObjectDestroyed(this);
         _currentTile?.PunchTile();
         _currentTile?.SetCurrentItem(null);
         DestroyWithAnimation();
