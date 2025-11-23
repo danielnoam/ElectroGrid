@@ -9,6 +9,7 @@ public class MenuManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private MainMenuScreen mainMenuScreen;
     [SerializeField] private LevelSelectionScreen levelSelectionScreen;
+    [SerializeField] private CreditsScreen creditsScreen;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SOAudioEvent screenSwitchSfx;
     [SerializeField] private SOVFEffectsSequence gameStartEffect;
@@ -27,6 +28,7 @@ public class MenuManager : MonoBehaviour
         _screens.Clear();
         if (mainMenuScreen) _screens[typeof(MainMenuScreen)] = mainMenuScreen;
         if (levelSelectionScreen) _screens[typeof(LevelSelectionScreen)] = levelSelectionScreen;
+        if (creditsScreen) _screens[typeof(CreditsScreen)] = creditsScreen;
     }
     
     private void Start()
@@ -69,6 +71,11 @@ public class MenuManager : MonoBehaviour
     public void ShowMatch3LevelSelection(bool animated = true)
     {
         ShowScreen<LevelSelectionScreen>(animated);
+    }
+    
+    public void ShowCredits(bool animated = true)
+    {
+        ShowScreen<CreditsScreen>(animated);
     }
 
     private void HideAllScreensImmediate()

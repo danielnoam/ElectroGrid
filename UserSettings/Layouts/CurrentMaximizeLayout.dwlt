@@ -25,7 +25,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 100}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 11237
+  controlID: 54034
   draggingID: 0
 --- !u!114 &2
 MonoBehaviour:
@@ -66,7 +66,7 @@ MonoBehaviour:
   m_SerializedViewNames:
   - UnityEditor.GameView
   m_SerializedViewValues:
-  - C:\Unity\Projects\PopACorn\Library\PlayModeViewStates\dfc16e0e596795a4fbe8c80ea112442e
+  - C:\Unity\Projects\ElectroGrid\Library\PlayModeViewStates\a43322226e7e0d24ab9ef8a876abb3c5
   m_PlayModeViewName: Device Simulator
   m_ShowGizmos: 0
   m_TargetDisplay: 0
@@ -89,11 +89,11 @@ MonoBehaviour:
     pluginStates:
     - '{}'
     - '{}'
-    scale: 11
+    scale: 12
     fitToScreenEnabled: 1
     rotationDegree: 0
     highlightSafeAreaEnabled: 0
-    friendlyName: Google Pixel 2
+    friendlyName: Xiaomi Mi Max
     screenIndex: 0
     networkReachability: 1
     systemLanguage: 10
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 11138
+  controlID: 53879
   draggingID: 0
 --- !u!114 &4
 MonoBehaviour:
@@ -188,9 +188,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 220c0100
-      m_LastClickedID: 0
-      m_ExpandedIDs: 00f6ffff
+      m_SelectedIDs: b011feff
+      m_LastClickedID: -126544
+      m_ExpandedIDs: f2e2fdff5a01feff5013fefff013feff9c17feff402ffeff442ffeff1467feff5067feffc27afeff00f6ffff9a2101005e26010070280100
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -207,7 +207,7 @@ MonoBehaviour:
         m_OriginalEventType: 11
         m_IsRenamingFilename: 0
         m_TrimLeadingAndTrailingWhitespace: 0
-        m_ClientGUIView: {fileID: 0}
+        m_ClientGUIView: {fileID: 4}
       m_SearchString: 
     m_ExpandedScenes: []
     m_CurrenRootInstanceID: 0
@@ -289,7 +289,7 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/3_Data
+    - Assets/Plugins/Audio
     m_Globs: []
     m_ProductIds: 
     m_AnyWithAssetOrigin: 0
@@ -299,16 +299,16 @@ MonoBehaviour:
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/3_Data
+  - Assets/Plugins/Audio/8 Synthwave Tracks
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Unity\Projects\ElectroGrid
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 4ad00000
-    m_LastClickedID: 53322
-    m_ExpandedIDs: 000000007acf0000
+    m_SelectedIDs: 1ed30000
+    m_LastClickedID: 54046
+    m_ExpandedIDs: 000000007acf00004ed00000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -363,8 +363,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 220c0100
-    m_LastClickedInstanceID: 68642
+    m_SelectedInstanceIDs: b011feff
+    m_LastClickedInstanceID: -126544
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000fae70200f8e702000ad800004e7e04005cd40000e8480100e4480100e6560100908d000030b3000036adedff522a010070580300e42301000000000040c9000084e100009c0e0100ec7f000032ea0000e6dc00005cde0000a6de0000a8de000040df000046df000044df000048df000042df0000
     m_RenameOverlay:
@@ -455,7 +455,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 11238
+  controlID: 54035
   draggingID: 0
 --- !u!114 &10
 MonoBehaviour:
@@ -467,7 +467,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: SceneView
+  m_Name: PackageManagerWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -476,16 +476,16 @@ MonoBehaviour:
     y: 0
     width: 759
     height: 529.5
-  m_MinSize: {x: 201, y: 226}
-  m_MaxSize: {x: 4001, y: 4026}
-  m_ActualView: {fileID: 11}
+  m_MinSize: {x: 282, y: 276}
+  m_MaxSize: {x: 4002, y: 4026}
+  m_ActualView: {fileID: 12}
   m_Panes:
   - {fileID: 11}
   - {fileID: 12}
   - {fileID: 13}
   - {fileID: 14}
   - {fileID: 15}
-  m_Selected: 0
+  m_Selected: 1
   m_LastSelected: 2
 --- !u!114 &11
 MonoBehaviour:
@@ -1164,9 +1164,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 0.90037423, y: 2.1812632, z: -12.341133}
+    m_Target: {x: 1.2712462, y: 0.91110426, z: 95.99989}
     speed: 2
-    m_Value: {x: 0.90037423, y: 2.1812632, z: -12.341133}
+    m_Value: {x: 1.2712462, y: 0.91110426, z: 95.99989}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -1212,13 +1212,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.06594382, y: 0.004349562, z: -0.0002649351, w: 0.9976863}
+    m_Target: {x: 0.0074966364, y: 0.029849079, z: -0.00020321719, w: 0.9993965}
     speed: 2
-    m_Value: {x: -0.06594382, y: -0.0043495623, z: 0.0002649351, w: -0.9976864}
+    m_Value: {x: -0.007496636, y: -0.029849079, z: 0.00020321719, w: -0.9993965}
   m_Size:
-    m_Target: 1.1731076
+    m_Target: 13.097574
     speed: 2
-    m_Value: 1.1731076
+    m_Value: 13.097574
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1273,10 +1273,10 @@ MonoBehaviour:
     m_TextWithWhitespace: "Package Manager\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 432
+    x: 452.5
     y: 78
-    width: 777.5
-    height: 504
+    width: 757
+    height: 503.5
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1309,10 +1309,10 @@ MonoBehaviour:
     m_TextWithWhitespace: "Build Profiles\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 432
+    x: 452.5
     y: 78
-    width: 777.5
-    height: 504
+    width: 757
+    height: 503.5
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -1345,10 +1345,10 @@ MonoBehaviour:
     m_TextWithWhitespace: "Project Settings\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 432
+    x: 452.5
     y: 78
-    width: 777.5
-    height: 504
+    width: 757
+    height: 503.5
   m_SerializedDataModeController:
     m_DataMode: 0
     m_PreferredDataMode: 0
@@ -2287,7 +2287,7 @@ MonoBehaviour:
   - {fileID: 17}
   - {fileID: 2}
   m_Selected: 1
-  m_LastSelected: 0
+  m_LastSelected: 1
 --- !u!114 &17
 MonoBehaviour:
   m_ObjectHideFlags: 52

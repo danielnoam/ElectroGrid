@@ -8,6 +8,7 @@ public class MainMenuScreen : MenuScreen
 {
     [Header("References")]
     [SerializeField] private Button match3Button;
+    [SerializeField] private Button creditsButton;
     [SerializeField] private Button quitButton;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private MenuManager menuManager;
@@ -101,6 +102,18 @@ public class MainMenuScreen : MenuScreen
             });
         }
 
+        if (creditsButton)
+        {
+            SelectableAnimator selectableAnimator = creditsButton.GetComponent<SelectableAnimator>();
+            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+
+            creditsButton.onClick.RemoveAllListeners();
+            creditsButton.onClick.AddListener(() =>
+            {
+                CameraManager.Instance?.ShakeCamera(0.1f);
+                menuManager?.ShowCredits();
+            });
+        }
 
         if (muteButtonImage)
         {
