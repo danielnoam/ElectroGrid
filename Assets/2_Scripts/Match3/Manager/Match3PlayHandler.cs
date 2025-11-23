@@ -575,15 +575,17 @@ public class Match3PlayHandler : MonoBehaviour
             var groups = yGroups.ToList();
             bool isHorizontal = groups.Any(group => group.Count() >= gameManager.MinMatchForLineBreak);
             
+            // Collect the actual row and column numbers that were broken
+            List<int> brokenRows = new List<int>();
+            List<int> brokenColumns = new List<int>();
+            bool destroyedAObject = false;
+            
+            
             if (isHorizontal || isVertical)
             {
                 yield return new WaitForSeconds(0.3f);
                 CameraManager.Instance?.ShakeCamera(3, 0.75f);
             }
-            
-            // Collect the actual row and column numbers that were broken
-            List<int> brokenRows = new List<int>();
-            List<int> brokenColumns = new List<int>();
             
             // If vertical, destroy all columns that have more than MinMatchForSpecial matches
             if (isVertical)
@@ -604,6 +606,7 @@ public class Match3PlayHandler : MonoBehaviour
                         
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
+                            destroyedAObject = true;
                             tile.CurrentMatch3Object.DestroyWithAnimation();
                             tile.PunchTile(1.5f);
                             tile.SetCurrentItem(null);
@@ -631,6 +634,7 @@ public class Match3PlayHandler : MonoBehaviour
                         
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
+                            destroyedAObject = true;
                             tile.CurrentMatch3Object.DestroyWithAnimation();
                             tile.PunchTile(1.5f);
                             tile.SetCurrentItem(null);
@@ -639,7 +643,7 @@ public class Match3PlayHandler : MonoBehaviour
                 }
             }
 
-            if (isHorizontal || isVertical)
+            if (destroyedAObject)
             {
                 gameManager.NotifyLineBreakMade(brokenRows, brokenColumns);
                 yield return new WaitForSeconds(0.3f);

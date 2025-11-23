@@ -3340,7 +3340,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_text
-      value: Quit
+      value: Main menu
       objectReference: {fileID: 0}
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_fontSize

@@ -100,6 +100,11 @@ public class MainMenuScreen : MenuScreen
                 #endif
                 Application.Quit();
             });
+            
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                quitButton.gameObject.SetActive(false);
+            }
         }
 
         if (creditsButton)
