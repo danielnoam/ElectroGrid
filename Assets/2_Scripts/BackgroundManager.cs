@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using DNExtensions;
 using DNExtensions.Button;
 using UnityEngine;
+using PrimeTween;
 
 public class BackgroundManager : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class BackgroundManager : MonoBehaviour
     [SerializeField] private float effectRadius = 3f;
     [SerializeField] private AnimationCurve zOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     
+    [Header("Pulse Settings")]
+    [SerializeField] private bool enablePulse = true;
+    [SerializeField] private float pulseInterval = 1.5f;
+    
     [Header("Background Settings")]
     [SerializeField] private float maxFadeDistance = 13f;
     [SerializeField] private Transform backgroundParent;
@@ -18,9 +23,9 @@ public class BackgroundManager : MonoBehaviour
     [SerializeField] private Grid grid = new Grid();
     [SerializeField, ReadOnly] private List<Match3BackgroundTile> backgroundTiles = new List<Match3BackgroundTile>();
     
-
     private Camera _camera;
     private TouchInputReader _inputReader;
+    private float _pulseTimer;
 
     private void Awake()
     {
@@ -33,11 +38,47 @@ public class BackgroundManager : MonoBehaviour
         {
             _inputReader = TouchInputReader.Instance;
         }
+        
+        _pulseTimer = pulseInterval;
     }
 
     private void Update()
     {
         UpdateTiles();
+        
+        if (enablePulse)
+        {
+            UpdatePulse();
+        }
+    }
+
+    private void UpdatePulse()
+    {
+        _pulseTimer -= Time.deltaTime;
+        
+        if (_pulseTimer <= 0)
+        {
+            _pulseTimer = pulseInterval;
+            PulseFromCenter();
+        }
+    }
+
+    private void PulseFromCenter()
+    {
+        if (backgroundTiles.Count == 0) return;
+        
+        var centerOfGrid = new Vector2(grid.Width / 2f, grid.Height / 2f);
+
+        foreach (var tile in backgroundTiles)
+        {
+            if (!tile) continue;
+            
+            var tileGridPosition = grid.GetCell(tile.transform.position);
+            float distanceFromCenter = Vector2.Distance(tileGridPosition, centerOfGrid);
+            int delayMultiplier = Mathf.RoundToInt(distanceFromCenter);
+            
+            tile.SquashTile(delayMultiplier);
+        }
     }
 
     private void UpdateTiles()
@@ -69,7 +110,7 @@ public class BackgroundManager : MonoBehaviour
 
         float normalizedDistance = distance / effectRadius;
         float curveValue = zOffsetCurve.Evaluate(normalizedDistance);
-        return Mathf.Lerp( minScaleMultiplier, maxScaleMultiplier, curveValue);
+        return Mathf.Lerp(minScaleMultiplier, maxScaleMultiplier, curveValue);
     }
     
     [Button]
@@ -104,7 +145,6 @@ public class BackgroundManager : MonoBehaviour
         ApplyFadeEffect();
     }
 
-
     private void GenerateTiles()
     {
         for (int x = 0; x < grid.Width; x++)
@@ -120,6 +160,8 @@ public class BackgroundManager : MonoBehaviour
 
     private void ApplyFadeEffect()
     {
+        if (maxFadeDistance <= 0) return;
+        
         var centerOfGrid = new Vector2(grid.Width / 2f, grid.Height / 2f);
 
         foreach (var tile in backgroundTiles)
