@@ -4272,7 +4272,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   enablePulse: 1
-  pulseInterval: 1.5
+  pulseInterval: 0.45
   maxFadeDistance: 9
   backgroundParent: {fileID: 122557089}
   backgroundTilePrefab: {fileID: 8960474688188056081, guid: 2e7070c2b1b0633469e64c050f1a3515, type: 3}
