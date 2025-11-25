@@ -4765,7 +4765,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BackgroundManager
   maxScaleMultiplier: 1
-  minScaleMultiplier: 0.8
+  minScaleMultiplier: 0.5
   effectRadius: 3
   zOffsetCurve:
     serializedVersion: 2
@@ -4791,6 +4791,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  enablePulse: 1
+  pulseInterval: 0.45
   maxFadeDistance: 13
   backgroundParent: {fileID: 122557089}
   backgroundTilePrefab: {fileID: 8960474688188056081, guid: 2e7070c2b1b0633469e64c050f1a3515, type: 3}
@@ -28737,7 +28739,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 135
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
