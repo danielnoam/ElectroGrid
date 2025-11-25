@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f9661a0429b436340938200404610d99
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 301503
+  packageName: Editable Asset Attribute
+  packageVersion: 1.0
+  assetPath: Assets/EditableAssetAttribute/Scripts/Attributes/Editor/CreateEditableAssetDrawer.cs
+  uploadId: 705477
