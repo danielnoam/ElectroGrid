@@ -412,7 +412,7 @@ namespace VFolders
         }
         static void ItemGUI_2022_1_and_newer(int instanceId, Rect itemRect)
         {
-            var guid = AssetDatabase.GetAssetPath(instanceId).ToGuid();
+            var guid = _AssetDatabase_GetAssetPath(instanceId).ToGuid();
 
             ItemGUI(itemRect, guid, instanceId);
 
@@ -1258,7 +1258,7 @@ namespace VFolders
                                 iconNames.Add("cs Script Icon");
 
                             else if (AssetPreview.GetMiniTypeThumbnail(type) is Texture2D icon)
-                                if (AssetDatabase.Contains(icon))
+                                if (AssetDatabase.Contains(icon) && !icon.GetPath().StartsWith("Library"))
                                     iconNames.Add(icon.GetPath());
                                 else
                                     iconNames.Add(icon.name);
@@ -1674,7 +1674,7 @@ namespace VFolders
 
 
 
-        const string version = "2.1.9";
+        const string version = "2.1.10";
 
     }
 

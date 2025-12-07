@@ -101,6 +101,7 @@ public class CameraManager : MonoBehaviour
     [Button(ButtonPlayMode.OnlyWhenPlaying)]
     public void ShakeCamera(float strength = 1f,float duration = 0.5f,float frequency = 10f)
     {
+        if (FirebaseManager.Instance) strength *= FirebaseManager.Instance.ScreenShakeIntensityMultiplier;
         var sequence = Sequence.Create();
         sequence.Group(Tween.ShakeCamera(cam, strength, duration, frequency));
     }

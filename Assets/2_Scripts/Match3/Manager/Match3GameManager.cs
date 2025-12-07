@@ -77,11 +77,19 @@ public class Match3GameManager : MonoBehaviour
 
     private void Update()
     {
+        UpdateLevelTime();
         UpdateLoseConditions();
         CheckObjectives();
         CheckLoseConditions();
     }
-    
+
+    private void UpdateLevelTime()
+    {
+        if (levelComplete || _currentLevelData == null) return;
+
+        _currentLevelData.TimeSpent += Time.deltaTime;
+    }
+
     public void SetNextLevel()
     {
         var levels = GameManager.Instance.Match3Levels;
@@ -134,6 +142,7 @@ public class Match3GameManager : MonoBehaviour
         _currentLevelData = new Match3LevelData(currentLevel);
         StartCoroutine(InitialLevelSetup());
         
+        FirebaseManager.Instance?.LogLevelStarted(_currentLevelData);
         LevelStarted?.Invoke(_currentLevelData);
     }
 
@@ -197,6 +206,7 @@ public class Match3GameManager : MonoBehaviour
     
     public void NotifyLineBreakMade(List<int> rows, List<int> columns)
     {
+        FirebaseManager.Instance?.LogLineBreak();
         LineBreakMade?.Invoke(rows, columns);
     }
     
@@ -212,6 +222,7 @@ public class Match3GameManager : MonoBehaviour
         
         yield return new WaitForSeconds(0.2f);
         
+        FirebaseManager.Instance?.LogLevelCompleted(_currentLevelData);
         LevelComplete?.Invoke(_currentLevelData);
     }
 
@@ -226,6 +237,7 @@ public class Match3GameManager : MonoBehaviour
         
         yield return new WaitForSeconds(0.2f);
 
+        FirebaseManager.Instance?.LogLevelFailed(_currentLevelData);
         LevelFailed?.Invoke(_currentLevelData);
     }
     
