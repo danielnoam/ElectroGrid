@@ -18,10 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SOMatch3Level[] match3Levels = Array.Empty<SOMatch3Level>();
     [SerializeField] private SOMatch3Tutorial[] match3GeneralTutorials = Array.Empty<SOMatch3Tutorial>();
     
-    
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level selectedMatch3Level;
-    
     
     public SceneField MainMenu => mainMenu;
     public SceneField Match3Scene => match3Scene;
@@ -39,20 +37,16 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        else
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
+        
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
-        PrimeTweenConfig.SetTweensCapacity(400);
+        PrimeTweenConfig.SetTweensCapacity(1600);
         if (Application.platform == RuntimePlatform.Android)
         {
             Application.targetFrameRate = 120;
         }
     }
-    
-    
 
     public void SelectMatch3Level(SOMatch3Level level)
     {
@@ -64,5 +58,4 @@ public class GameManager : MonoBehaviour
         if (affectTimeScale) Time.timeScale = pause ? 0 : 1;
         PauseToggled?.Invoke(pause);
     }
-    
 }

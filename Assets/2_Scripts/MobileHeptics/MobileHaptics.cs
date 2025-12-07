@@ -45,6 +45,8 @@ public static class MobileHaptics
     public static void Vibrate(long milliseconds = 50)
     {
         if (!_isInitialized) Initialize();
+        
+        if (FirebaseManager.Instance && !FirebaseManager.Instance.HapticsEnabled) return;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (vibrator != null)

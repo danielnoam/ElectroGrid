@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id">
+  <string name="gcm_defaultSenderId" translatable="false">487289260112</string>
+  <string name="google_storage_bucket" translatable="false">electro-grid.firebasestorage.app</string>
+  <string name="project_id" translatable="false">electro-grid</string>
+  <string name="google_api_key" translatable="false">AIzaSyBJZUNTy2ZOLUsQKXt1H8ekjgKkYzZUm9o</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBJZUNTy2ZOLUsQKXt1H8ekjgKkYzZUm9o</string>
+  <string name="google_app_id" translatable="false">1:487289260112:android:8b8366bb1ff162534c6955</string>
+</resources>

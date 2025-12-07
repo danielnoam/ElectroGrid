@@ -53,6 +53,7 @@ public class MoveLimit : Match3LoseCondition
     public override void Setup()
     {
         _movesRemaining = allowedMoves;
+        if (FirebaseManager.Instance) _movesRemaining += FirebaseManager.Instance.GlobalMoveBonus;
         ConditionMet = false;
     }
 

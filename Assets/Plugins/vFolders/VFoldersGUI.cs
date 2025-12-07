@@ -800,7 +800,8 @@ namespace VFolders
                     if (!VFoldersMenu.twoLineNamesEnabled) return;
 
 
-                    var isSelected = listArea_dragSelectionList.Any() ? listArea_dragSelectionList.Contains(instanceId) : Selection.instanceIDs.Contains(instanceId);
+                    var isSelected = listArea_dragSelectionList.Any() ? listArea_dragSelectionList.Contains(instanceId)
+                                                                      : _Selection_instanceIDs.Contains(instanceId);
 
                     var isCellBeingRenamed = isSelected && renamingCell;
 

@@ -130,6 +130,7 @@ public class TopBarUI : MonoBehaviour
             Toggle(false);
             bottomBarUI?.Toggle(false);
             informationWindowUI?.Toggle(true);
+            FirebaseManager.Instance?.LogInformationClicked();
         });
     }
 

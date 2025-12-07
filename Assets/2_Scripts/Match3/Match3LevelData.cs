@@ -6,7 +6,8 @@ public class Match3LevelData
     public readonly SOMatch3Level Level;
     public readonly List<Match3Objective> CurrentObjectives = new List<Match3Objective>();
     public readonly List<Match3LoseCondition> CurrentLoseConditions = new List<Match3LoseCondition>();
-    
+
+    public float TimeSpent;
     public int MovesMade;
     public int MatchesMade;
     public int ObstaclesBroken;
@@ -15,6 +16,7 @@ public class Match3LevelData
     public Match3LevelData(SOMatch3Level level)
     {
         Level = level;
+        TimeSpent = 0;
         MovesMade = 0;
         MatchesMade = 0;
         ObstaclesBroken = 0;
@@ -45,6 +47,7 @@ public class Match3LevelData
             }
         }
     }
+    
     
     public void OnMoveMade()
     {

@@ -148,6 +148,8 @@ namespace VHierarchy
             if (doNavbarFirst)
                 navbarGui();
 
+            GUILayout.Space(0); // to fix GameAnalytics accessing lastRect for some reason
+
             defaultGuiWithOffset();
             shadow();
 
@@ -320,14 +322,22 @@ namespace VHierarchy
                 if (!guis_byWindow.ContainsKey(window)) return;
 
 
+#if UNITY_6000_3_OR_NEWER
+                Object getObject(int id) => EditorUtility.EntityIdToObject(instanceId);
+                int getSceneId(Scene scene) => scene.handle.GetMemberValue<EntityId>("m_Value");
+#else
+                Object getObject(int id) => EditorUtility.InstanceIDToObject(instanceId);
+                int getSceneId(Scene scene) => scene.GetHashCode();
+#endif
+
 
                 var gui = guis_byWindow[window];
 
-                if (EditorUtility.InstanceIDToObject(instanceId) is GameObject go)
+                if (getObject(instanceId) is GameObject go)
                     gui.RowGUI_GameObject(rowRect, go);
                 else
                     for (int i = 0; i < EditorSceneManager.sceneCount; i++)
-                        if (EditorSceneManager.GetSceneAt(i).GetHashCode() == instanceId)
+                        if (getSceneId(EditorSceneManager.GetSceneAt(i)) == instanceId)
                             gui.RowGUI_Scene(rowRect, EditorSceneManager.GetSceneAt(i));
 
             }
@@ -1814,7 +1824,7 @@ namespace VHierarchy
 
 
 
-        public const string version = "2.1.5";
+        public const string version = "2.1.6";
 
     }
 

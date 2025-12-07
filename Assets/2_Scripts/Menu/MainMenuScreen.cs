@@ -117,6 +117,7 @@ public class MainMenuScreen : MenuScreen
             {
                 CameraManager.Instance?.ShakeCamera(0.1f);
                 menuManager?.ShowCredits();
+                FirebaseManager.Instance?.LogCreditsClicked();
             });
         }
 
@@ -140,6 +141,7 @@ public class MainMenuScreen : MenuScreen
             {
                 CameraManager.Instance.ShakeCamera(0.1f);
                 informationWindowUI?.Toggle(true);
+                FirebaseManager.Instance?.LogInformationClicked();
             });
         }
     }

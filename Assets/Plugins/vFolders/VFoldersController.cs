@@ -217,12 +217,12 @@ namespace VFolders
         public void CollapseAll()
         {
 
-            var idsToCollapse_roots = expandedIds.Where(id => EditorUtility.InstanceIDToObject(id).GetPath() is string path &&
+            var idsToCollapse_roots = expandedIds.Where(id => _EditorUtility_InstanceIDToObject(id).GetPath() is string path &&
                                                                    path.HasParentPath() &&
                                                                   (path.GetParentPath() == "Assets" || path.GetParentPath() == "Packages"));
 
 
-            var idsToCollapse_children = expandedIds.Where(id => EditorUtility.InstanceIDToObject(id).GetPath() is string path &&
+            var idsToCollapse_children = expandedIds.Where(id => _EditorUtility_InstanceIDToObject(id).GetPath() is string path &&
                                                                      !path.IsNullOrEmpty() &&
                                                                       path != "Assets" &&
                                                                       path != "Packages" &&
@@ -301,7 +301,7 @@ namespace VFolders
 
             bool hasParentToCollapse(int id)
             {
-                var o = Resources.InstanceIDToObject(id);
+                var o = _EditorUtility_InstanceIDToObject(id);
 
                 if (!o) return false;
 
@@ -325,7 +325,7 @@ namespace VFolders
             }
             bool areAllParentsExpanded(int id)
             {
-                var o = Resources.InstanceIDToObject(id);
+                var o = _EditorUtility_InstanceIDToObject(id);
 
                 if (!o) return true;
 
