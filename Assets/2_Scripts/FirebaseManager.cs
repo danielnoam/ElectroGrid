@@ -80,27 +80,25 @@ public class FirebaseManager : MonoBehaviour
             { "enable_haptics", true },
             { "global_move_bonus", 0 },
         };
-
+    
         var defaultsTask = FirebaseRemoteConfig.DefaultInstance.SetDefaultsAsync(defaults);
         yield return new WaitUntil(() => defaultsTask.IsCompleted);
         
-
         var fetchTask = FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero);
+        
         yield return new WaitUntil(() => fetchTask.IsCompleted);
         
-
-        if (fetchTask.IsCompleted)
+        if (fetchTask.IsFaulted || fetchTask.IsCanceled)
         {
-            
-            var activateTask = FirebaseRemoteConfig.DefaultInstance.ActivateAsync();
-            yield return new WaitUntil(() => activateTask.IsCompleted);
-            
-            LoadRemoteConfigValues();
+            Debug.LogWarning("Firebase Remote Config Fetch Failed/Canceled. Using defaults.");
         }
         else
         {
-            LoadRemoteConfigValues();
+            var activateTask = FirebaseRemoteConfig.DefaultInstance.ActivateAsync();
+            yield return new WaitUntil(() => activateTask.IsCompleted);
         }
+        
+        LoadRemoteConfigValues();
     }
 
     private void LoadRemoteConfigValues()
