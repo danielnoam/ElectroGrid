@@ -143,6 +143,8 @@ public class Match3GameManager : MonoBehaviour
         StartCoroutine(InitialLevelSetup());
         
         FirebaseManager.Instance?.LogLevelStarted(_currentLevelData);
+        UnityAnalyticsManager.Instance?.LogGameStarted();
+        
         LevelStarted?.Invoke(_currentLevelData);
     }
 
@@ -223,6 +225,7 @@ public class Match3GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         
         FirebaseManager.Instance?.LogLevelCompleted(_currentLevelData);
+        UnityAnalyticsManager.Instance?.LogGameCompleted();
         LevelComplete?.Invoke(_currentLevelData);
     }
 
@@ -238,6 +241,7 @@ public class Match3GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         FirebaseManager.Instance?.LogLevelFailed(_currentLevelData);
+        UnityAnalyticsManager.Instance?.LogGameFailed();
         LevelFailed?.Invoke(_currentLevelData);
     }
     

@@ -6,7 +6,6 @@ using UnityEngine;
 using Firebase;
 using Firebase.Analytics;
 using Firebase.RemoteConfig;
-using UnityEngine.InputSystem;
 
 public class FirebaseManager : MonoBehaviour
 {

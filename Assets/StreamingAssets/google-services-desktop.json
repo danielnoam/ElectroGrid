@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:487289260112:android:b0bf7dc5094c3fed4c6955",
+        "android_client_info": {
+          "package_name": "com.DanielsGames.ElectroGrid"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJZUNTy2ZOLUsQKXt1H8ekjgKkYzZUm9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:487289260112:android:8b8366bb1ff162534c6955",
         "android_client_info": {
           "package_name": "com.UnityTechnologies.com.unity.template.urpblank"
