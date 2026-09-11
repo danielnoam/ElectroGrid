@@ -87,7 +87,7 @@ public class GetMatches : Match3Objective
 
     public override string GetRequirementText()
     {
-        return $"Matches:";
+        return $"Pieces:";
     }
     
 
@@ -99,12 +99,12 @@ public class GetMatches : Match3Objective
 
     public override string GetName()
     {
-        return "Get Matches";
+        return "Collect Pieces";
     }
 
     public override string GetDescription()
     {
-        return $"Get {requiredAmount} Matches";
+        return $"Collect {requiredAmount} Pieces";
     }
 }
 
@@ -166,12 +166,12 @@ public class GetSpecificItemMatches : Match3Objective
 
     public override string GetName()
     {
-        return $"Get {targetItem.Label} Matches";
+        return $"Collect {targetItem.Label} Pieces";
     }
     
     public override string GetDescription()
     {
-        return $"Get {requiredAmount} Matches of {targetItem.Label}";
+        return $"Collect {requiredAmount} {targetItem.Label} Pieces";
     }
 }
 

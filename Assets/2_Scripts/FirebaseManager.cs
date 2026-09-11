@@ -141,7 +141,8 @@ public class FirebaseManager : MonoBehaviour
             new Parameter[] {
                 new(FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName),
                 new(FirebaseAnalytics.ParameterSuccess, 1),
-                new("matches_made", levelData.MatchesMade),
+                // Wire name kept as-is so the existing Firebase series stays continuous after the field rename
+                new("matches_made", levelData.PiecesCleared),
                 new("moves_made", levelData.MovesMade),
                 new("time_spent_seconds", (int)levelData.TimeSpent)
             }
@@ -157,7 +158,8 @@ public class FirebaseManager : MonoBehaviour
             new Parameter[] {
                 new(FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName),
                 new(FirebaseAnalytics.ParameterSuccess, 0),
-                new("matches_made", levelData.MatchesMade),
+                // Wire name kept as-is so the existing Firebase series stays continuous after the field rename
+                new("matches_made", levelData.PiecesCleared),
                 new("moves_made", levelData.MovesMade),
                 new("time_spent_seconds", (int)levelData.TimeSpent)
             }

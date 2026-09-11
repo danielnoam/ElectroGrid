@@ -9,7 +9,7 @@ public class Match3LevelData
 
     public float TimeSpent;
     public int MovesMade;
-    public int MatchesMade;
+    public int PiecesCleared;
     public int ObstaclesBroken;
     public int BottomObjectsReached;
     
@@ -18,7 +18,7 @@ public class Match3LevelData
         Level = level;
         TimeSpent = 0;
         MovesMade = 0;
-        MatchesMade = 0;
+        PiecesCleared = 0;
         ObstaclesBroken = 0;
         BottomObjectsReached = 0;
         
@@ -61,7 +61,7 @@ public class Match3LevelData
     
     public void OnMatchesMade(List<Match3Tile> allMatches)
     {
-        MatchesMade += allMatches.Count;
+        PiecesCleared += allMatches.Count;
         
         foreach (var objective in CurrentObjectives)
         {

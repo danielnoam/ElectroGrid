@@ -155,9 +155,9 @@ public class LevelCompleteWindowUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        var matchedMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        matchedMadeElement.Setup(null, $"Matches Made: {levelData.MatchesMade}");
-        matchedMadeElement.gameObject.name = "MatchesMade";
+        var piecesClearedElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
+        piecesClearedElement.Setup(null, $"Pieces Cleared: {levelData.PiecesCleared}");
+        piecesClearedElement.gameObject.name = "PiecesCleared";
         
         var movesMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
         movesMadeElement.Setup(null, $"Moves Made: {levelData.MovesMade}");
