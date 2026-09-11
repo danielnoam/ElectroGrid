@@ -80,12 +80,7 @@ public class Match3BottomObject : Match3Object
         _movementSequence.InsertCallback(duration * 0.5f, () => {
             
             MobileHaptics.Vibrate(50);
-            if (destroyParticle)
-            {
-                var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-                var particle = particleGo.GetComponent<OneShotParticle>();
-                particle.Play(transform.position);
-            }
+            SpawnDestroyParticle();
         });
 
         _movementSequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });

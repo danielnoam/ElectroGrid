@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DNExtensions;
 using DNExtensions.ObjectPooling;
 using PrimeTween;
@@ -94,21 +95,33 @@ public abstract class Match3Object : MonoBehaviour, IPooledObject
             MobileHaptics.Vibrate(50);
             CameraManager.Instance?.ShakeCamera(0.2f);
             destroySfx?.PlayAtPoint(transform.position);
-            
-            if (destroyParticle)
-            {
-                var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-                var oneShotParticle = particleGo.GetComponent<OneShotParticle>();
-                var mainModule = oneShotParticle.particle.main;
-                var textureSheetModule = oneShotParticle.particle.textureSheetAnimation;
-                mainModule.startColor = itemRenderer.color;
-                textureSheetModule.SetSprite(0, itemRenderer.sprite);
-                oneShotParticle.Play(transform.position);
-            }
+
+            SpawnDestroyParticle();
         });
         destroySequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
     }
-    
+
+    protected virtual void SpawnDestroyParticle()
+    {
+        if (!destroyParticle) return;
+
+        var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
+        var oneShotParticle = particleGo.GetComponent<OneShotParticle>();
+        oneShotParticle.Play(transform.position);
+    }
+
+    protected bool IsAdjacentToAnyMatch(List<Match3Tile> matches)
+    {
+        if (_beingDestroyed || !_currentTile || !_currentTile.IsActive) return false;
+
+        foreach (var match in matches)
+        {
+            if (_gridHandler.AreTilesNeighbours(match, _currentTile)) return true;
+        }
+
+        return false;
+    }
+
     protected bool IsTouchingEndOfGrid()
     {
         if (!_currentTile) return false;

@@ -239,7 +239,7 @@ public class TopBarUI : MonoBehaviour
         
             Action metCallback = () => UpdateLoseConditionUIProgress(loseCondition);
             _loseConditionMetCallbacks.Add(loseCondition, metCallback);
-            loseCondition.contidionMet += metCallback;
+            loseCondition.conditionMet += metCallback;
         }
     }
 
@@ -265,7 +265,7 @@ public class TopBarUI : MonoBehaviour
     
         foreach (var pair in _loseConditionMetCallbacks)
         {
-            pair.Key.contidionMet -= pair.Value;
+            pair.Key.conditionMet -= pair.Value;
         }
         _loseConditionMetCallbacks.Clear();
     

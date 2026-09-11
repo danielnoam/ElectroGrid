@@ -543,7 +543,7 @@ public class Match3PlayHandler : MonoBehaviour
                 break;
             }
         
-            gameManager.NotifyMatchesWhereMade(immediateMatches);
+            gameManager.NotifyMatchesWereMade(immediateMatches);
             
             yield return HandleMatches(immediateMatches);
             yield return MoveObjectsDown(gridShape);
@@ -1097,7 +1097,7 @@ public class Match3PlayHandler : MonoBehaviour
     
     private bool ShouldSpawnHelperObject()
     {
-        var loseConditions = gameManager.CurrentLevelData.HasLoseConditions() && gameManager.CurrentLevelData.IsAnyLoseConditionBellowHalf();
+        var loseConditions = gameManager.CurrentLevelData.HasLoseConditions() && gameManager.CurrentLevelData.IsAnyLoseConditionBelowHalf();
         var chanceCheck = gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper;
         
         return loseConditions && chanceCheck;

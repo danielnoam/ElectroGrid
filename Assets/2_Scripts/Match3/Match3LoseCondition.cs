@@ -20,7 +20,7 @@ public abstract class Match3LoseCondition
     
     
     public event Action progressChanged;
-    public event Action contidionMet;
+    public event Action conditionMet;
     
     
     protected void InvokeProgressChanged()
@@ -30,7 +30,7 @@ public abstract class Match3LoseCondition
     
     protected void InvokeConditionMet()
     {
-        contidionMet?.Invoke();
+        conditionMet?.Invoke();
     }
 }
 

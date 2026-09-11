@@ -849,7 +849,7 @@ MonoBehaviour:
   minMatchCount: 3
   minMatchForLineBreak: 4
   chanceToSpawnHelper: 6
-  mxGuaranteedMatchAttempts: 100
+  maxGuaranteedMatchAttempts: 100
   maxAttemptsToRecheckMatches: 999
   minPossibleMatches: 3
   gridHandler: {fileID: 586155251}

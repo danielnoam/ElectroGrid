@@ -110,32 +110,22 @@ public class Match3LevelData
     
     public bool HasLoseConditions()
     {
-        if (CurrentLoseConditions.Count == 0) return false;
-        
         foreach (var condition in CurrentLoseConditions)
         {
-            if (condition != null)
-            {
-                return true;
-            }
+            if (condition != null) return true;
         }
 
         return false;
     }
-    
-    public bool IsAnyLoseConditionBellowHalf()
-    {
-        if (CurrentLoseConditions.Count == 0) return false;
 
+    public bool IsAnyLoseConditionBelowHalf()
+    {
         foreach (var condition in CurrentLoseConditions)
         {
-            if (condition is { IsConditionMet: false })
-            {
-                if (condition.GetProgress().Item1 < condition.GetProgress().Item2 / 2)
-                {
-                    return true;
-                }
-            }
+            if (condition is not { IsConditionMet: false }) continue;
+
+            var (current, total) = condition.GetProgress();
+            if (current < total / 2) return true;
         }
 
         return false;
@@ -160,7 +150,7 @@ public class Match3LevelData
         return allComplete;
     }
     
-    public bool IsLostCondition()
+    public bool IsAnyLoseConditionMet()
     {
         foreach (var condition in CurrentLoseConditions)
         {

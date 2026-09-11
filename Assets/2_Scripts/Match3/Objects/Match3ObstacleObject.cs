@@ -1,6 +1,5 @@
 
 using System.Collections.Generic;
-using DNExtensions.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
@@ -111,41 +110,15 @@ public class Match3ObstacleObject : Match3Object
     }
     private void OnMatchesMade(List<Match3Tile> matches)
     {
-        if (_beingDestroyed || !_currentTile || !_currentTile.IsActive) return;
-        
-        foreach (var match in matches)
-        {
-            if (_gridHandler.AreTilesNeighbours(match, _currentTile))
-            {
-                TakeDamage();
-                return;
-            }
-        }
+        if (IsAdjacentToAnyMatch(matches)) TakeDamage();
     }
-    
+
     public override void DestroyWithAnimation()
     {
         _currentTile?.SetCurrentItem(null);
         _gameManager?.NotifyObstacleBroke(this);
-        
-        _beingDestroyed = true;
-        
-        var destroySequence = Sequence.Create();
-        destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
-        destroySequence.InsertCallback(destroyDuration * 0.5f, () =>
-        {
-            MobileHaptics.Vibrate(50);
-            CameraManager.Instance?.ShakeCamera(0.2f);
-            destroySfx?.PlayAtPoint(transform.position);
-            
-            if (destroyParticle)
-            {
-                var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-                var oneShotParticle = particleGo.GetComponent<OneShotParticle>();
-                oneShotParticle.Play(transform.position);
-            }
-        });
-        destroySequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
+
+        base.DestroyWithAnimation();
     }
 
     public override void OnPoolReturn()

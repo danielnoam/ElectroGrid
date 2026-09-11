@@ -20,7 +20,7 @@ public class Match3GameManager : MonoBehaviour
     
     [Header("Population Settings")]
     [Tooltip("Maximum attempts to create a grid with guaranteed matches")]
-    [SerializeField] private int mxGuaranteedMatchAttempts = 100;
+    [SerializeField] private int maxGuaranteedMatchAttempts = 100;
     [Tooltip("Maximum attempts to recheck matches in grid")]
     [SerializeField] private int maxAttemptsToRecheckMatches = 50;
     [Tooltip("Minimum possible matches required in grid")]
@@ -42,7 +42,7 @@ public class Match3GameManager : MonoBehaviour
     
     public Match3LevelData CurrentLevelData => _currentLevelData;
     public Match3GridHandler GridHandler => gridHandler;
-    public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
+    public int MaxGuaranteedMatchAttempts => maxGuaranteedMatchAttempts;
     public float ChanceToSpawnHelper => chanceToSpawnHelper;
     public int MinMatchCount => minMatchCount;
     public int MinMatchForLineBreak => minMatchForLineBreak;
@@ -163,7 +163,7 @@ public class Match3GameManager : MonoBehaviour
     {
         if (levelComplete || populatingGrid || _currentLevelData == null || finishedObjectives) return;
         
-        if (_currentLevelData.IsLostCondition())
+        if (_currentLevelData.IsAnyLoseConditionMet())
         {
             StartCoroutine(FailLevel());
         }
@@ -179,7 +179,7 @@ public class Match3GameManager : MonoBehaviour
         }
     }
     
-    public void NotifyMatchesWhereMade(List<Match3Tile> matches)
+    public void NotifyMatchesWereMade(List<Match3Tile> matches)
     {
         _currentLevelData?.OnMatchesMade(matches);
         MatchesMade?.Invoke(matches);
@@ -274,7 +274,7 @@ public class Match3GameManager : MonoBehaviour
         
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
         
-        NotifyMatchesWhereMade(allMatches);
+        NotifyMatchesWereMade(allMatches);
     
         yield return StartCoroutine(playHandler.MoveObjectsDown(gridHandler.GridShape));
     
