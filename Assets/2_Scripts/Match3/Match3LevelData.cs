@@ -134,20 +134,17 @@ public class Match3LevelData
     
     public bool IsObjectivesComplete()
     {
-        bool allComplete = true;
-        
+        bool hasObjective = false;
+
         foreach (var objective in CurrentObjectives)
         {
-            if (objective == null)  continue;
-            
-            if (!objective.IsCompleted)
-            {
-                allComplete = false;
-                break;
-            }
+            if (objective == null) continue;
+
+            hasObjective = true;
+            if (!objective.IsCompleted) return false;
         }
-        
-        return allComplete;
+
+        return hasObjective;
     }
     
     public bool IsAnyLoseConditionMet()

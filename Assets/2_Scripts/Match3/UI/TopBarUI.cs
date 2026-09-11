@@ -218,11 +218,11 @@ public class TopBarUI : MonoBehaviour
         
             Action progressCallback = () => UpdateObjectiveUIProgress(objective);
             _objectiveProgressCallbacks.Add(objective, progressCallback);
-            objective.progressChanged += progressCallback;
+            objective.ProgressChanged += progressCallback;
         
             Action completeCallback = () => UpdateObjectiveUIProgress(objective);
             _objectiveCompleteCallbacks.Add(objective, completeCallback);
-            objective.complete += completeCallback;
+            objective.Completed += completeCallback;
         }
 
         loseConditionsUIParent.gameObject.SetActive(loseConditions.Count > 0);
@@ -235,11 +235,11 @@ public class TopBarUI : MonoBehaviour
         
             Action progressCallback = () => UpdateLoseConditionUIProgress(loseCondition);
             _loseConditionProgressCallbacks.Add(loseCondition, progressCallback);
-            loseCondition.progressChanged += progressCallback;
+            loseCondition.ProgressChanged += progressCallback;
         
             Action metCallback = () => UpdateLoseConditionUIProgress(loseCondition);
             _loseConditionMetCallbacks.Add(loseCondition, metCallback);
-            loseCondition.conditionMet += metCallback;
+            loseCondition.ConditionMet += metCallback;
         }
     }
 
@@ -247,25 +247,25 @@ public class TopBarUI : MonoBehaviour
     {
         foreach (var pair in _objectiveProgressCallbacks)
         {
-            pair.Key.progressChanged -= pair.Value;
+            pair.Key.ProgressChanged -= pair.Value;
         }
         _objectiveProgressCallbacks.Clear();
     
         foreach (var pair in _objectiveCompleteCallbacks)
         {
-            pair.Key.complete -= pair.Value;
+            pair.Key.Completed -= pair.Value;
         }
         _objectiveCompleteCallbacks.Clear();
 
         foreach (var pair in _loseConditionProgressCallbacks)
         {
-            pair.Key.progressChanged -= pair.Value;
+            pair.Key.ProgressChanged -= pair.Value;
         }
         _loseConditionProgressCallbacks.Clear();
     
         foreach (var pair in _loseConditionMetCallbacks)
         {
-            pair.Key.conditionMet -= pair.Value;
+            pair.Key.ConditionMet -= pair.Value;
         }
         _loseConditionMetCallbacks.Clear();
     

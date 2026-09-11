@@ -83,8 +83,10 @@ public class FirebaseManager : MonoBehaviour
         var defaultsTask = FirebaseRemoteConfig.DefaultInstance.SetDefaultsAsync(defaults);
         yield return new WaitUntil(() => defaultsTask.IsCompleted);
         
-        var fetchTask = FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero);
-        
+        // Production clients are throttled to a handful of fetches per hour, so only bypass the cache in development builds
+        var cacheExpiration = Debug.isDebugBuild ? TimeSpan.Zero : TimeSpan.FromHours(12);
+        var fetchTask = FirebaseRemoteConfig.DefaultInstance.FetchAsync(cacheExpiration);
+
         yield return new WaitUntil(() => fetchTask.IsCompleted);
         
         if (fetchTask.IsFaulted || fetchTask.IsCanceled)

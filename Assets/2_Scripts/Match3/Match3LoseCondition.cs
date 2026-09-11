@@ -6,9 +6,9 @@ public abstract class Match3LoseCondition
 {
     [SerializeField] protected Sprite conditionSprite;
     
-    protected bool ConditionMet;
+    protected bool _conditionMet;
     public Sprite ConditionSprite => conditionSprite;
-    public bool IsConditionMet => ConditionMet;
+    public bool IsConditionMet => _conditionMet;
 
     public abstract void Setup();
     public abstract void Update(float deltaTime);
@@ -19,18 +19,18 @@ public abstract class Match3LoseCondition
     public abstract string GetDescription();
     
     
-    public event Action progressChanged;
-    public event Action conditionMet;
+    public event Action ProgressChanged;
+    public event Action ConditionMet;
     
     
     protected void InvokeProgressChanged()
     {
-        progressChanged?.Invoke();
+        ProgressChanged?.Invoke();
     }
     
     protected void InvokeConditionMet()
     {
-        conditionMet?.Invoke();
+        ConditionMet?.Invoke();
     }
 }
 
@@ -54,7 +54,7 @@ public class MoveLimit : Match3LoseCondition
     {
         _movesRemaining = allowedMoves;
         if (FirebaseManager.Instance) _movesRemaining += FirebaseManager.Instance.GlobalMoveBonus;
-        ConditionMet = false;
+        _conditionMet = false;
     }
 
     public override void Update(float deltaTime)
@@ -63,13 +63,13 @@ public class MoveLimit : Match3LoseCondition
 
     public override void OnMoveMade()
     {
-        if (ConditionMet) return;
+        if (_conditionMet) return;
 
         _movesRemaining--;
 
         if (_movesRemaining <= 0)
         {
-            ConditionMet = true;
+            _conditionMet = true;
             InvokeConditionMet();
         }
         else
@@ -119,12 +119,12 @@ public class TimeLimit : Match3LoseCondition
     public override void Setup()
     {
         _timeRemaining = allowedTime;
-        ConditionMet = false;
+        _conditionMet = false;
     }
 
     public override void Update(float deltaTime)
     {
-        if (ConditionMet) return;
+        if (_conditionMet) return;
 
 
         int previousTimeInt = Mathf.FloorToInt(_timeRemaining);
@@ -138,7 +138,7 @@ public class TimeLimit : Match3LoseCondition
         if (_timeRemaining <= 0)
         {
             _timeRemaining = 0;
-            ConditionMet = true;
+            _conditionMet = true;
             InvokeConditionMet();
         }
     }
