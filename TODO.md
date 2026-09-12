@@ -114,6 +114,71 @@ setting does not survive a restart. Every level is always selectable, and
 For a mobile match-3 this is where retention lives, and it is the one substantial
 item left.
 
+#### Planned approach: a JSON `SaveManager`
+
+JSON over `PlayerPrefs`. `PlayerPrefs` is fine for a couple of scalars, but this
+needs a record per level, and that degenerates into building key names by hand
+(`"level_3_stars"`). A single JSON file is inspectable while developing, carries a
+version field so the schema can migrate later, and writes in one go.
+
+```csharp
+[Serializable]
+public class SaveData
+{
+    public int version = 1;
+    public bool muted;
+    public int highestLevelUnlocked = 1;
+    public List<LevelRecord> levels = new List<LevelRecord>();
+}
+
+[Serializable]
+public class LevelRecord
+{
+    public string levelName;
+    public bool completed;
+    public int bestMoves;
+    public float bestTime;
+    public int bestPiecesCleared;
+}
+```
+
+`SaveManager`, a singleton alongside `GameManager` with `DontDestroyOnLoad`:
+
+- File at `Application.persistentDataPath + "/save.json"`.
+- `JsonUtility.ToJson` / `FromJson`, already used elsewhere in the project, so no
+  new dependency.
+- **Write atomically** — write `save.json.tmp`, then `File.Replace` onto the real
+  file. A process kill mid-write otherwise truncates the save, and on mobile the
+  OS can kill the app at any point.
+- Load in `Awake` inside a `try`/`catch`, falling back to a fresh `SaveData` if
+  the file is missing or unparseable. A corrupt save must never block startup.
+- Write on level complete and on mute toggle only, never per frame.
+- Key `LevelRecord` by `levelName`, not by array index, so reordering or
+  inserting levels does not scramble existing records.
+
+Wiring:
+
+- `LevelSelectionScreen` — render levels above `highestLevelUnlocked` as locked
+  instead of every level always being selectable.
+- `Match3GameManager` — on `LevelComplete`, write the record and unlock the next.
+- `SetNextLevel` — stop at the last level instead of wrapping modulo to level 1,
+  and show something for finishing the game.
+- `AudioManager` — read and write `muted` so it survives a restart.
+
+Two design calls are needed before this can be built:
+
+1. **What unlocks a level** — completing the previous one, or a star threshold?
+2. **Stars at all?** If yes, what earns 1/2/3? Nothing in `SOMatch3Level`
+   expresses a threshold today, so it would need a new field per level and all 12
+   assets retuned.
+
+Notes:
+
+- `JsonUtility` cannot serialise a `Dictionary`, hence `List<LevelRecord>`.
+- `persistentDataPath` on Android is app-private and cleared on uninstall, which
+  is fine here. There is no cloud sync; Firebase is already in the project if
+  that is ever wanted.
+
 ### Smaller items
 
 - `Match3LevelData` deep-copies objectives and lose conditions by round-tripping
