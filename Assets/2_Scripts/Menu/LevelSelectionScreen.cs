@@ -38,6 +38,21 @@ public class LevelSelectionScreen : MenuScreen
         CreateLevelButtons();
         UpdateLevelInfo();
         SetupButtons();
+
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset += OnSaveReset;
+    }
+
+    private void OnDestroy()
+    {
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset -= OnSaveReset;
+    }
+
+    private void OnSaveReset()
+    {
+        _selectedLevel = null;
+        GameManager.Instance?.SelectMatch3Level(null);
+        CreateLevelButtons();
+        UpdateLevelInfo();
     }
 
     protected override Tween GetShowPositionTween()
@@ -186,7 +201,24 @@ public class LevelSelectionScreen : MenuScreen
             }
         }
 
+        AppendBestStats(info, level);
+
         return info.ToString();
+    }
+
+    private void AppendBestStats(StringBuilder info, SOMatch3Level level)
+    {
+        var record = SaveManager.Instance ? SaveManager.Instance.GetRecord(level) : null;
+        if (record is not { completed: true }) return;
+
+        int minutes = Mathf.FloorToInt(record.bestTime / 60f);
+        int seconds = Mathf.FloorToInt(record.bestTime % 60f);
+
+        info.AppendLine();
+        info.AppendLine("Best:");
+        info.AppendLine($"• Moves: {record.bestMoves}");
+        info.AppendLine($"• Time: {minutes:00}:{seconds:00}");
+        info.AppendLine($"• Pieces Cleared: {record.bestPiecesCleared}");
     }
 
     private void DrawGrid(Grid grid)

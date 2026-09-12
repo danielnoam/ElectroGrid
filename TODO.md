@@ -47,6 +47,10 @@ needed scene and prefab work that could not be done without the editor.
       background `Image`, a back `Button`, plus two `Slider`s (music, sfx, both
       min 0 max 1) and two `Toggle`s (haptics, screen shake). Assign every field
       on the component.
+- [ ] Add a reset-progress `Button` and assign both it and its label text to
+      `resetProgressButton` and `resetProgressLabel`. It confirms by being
+      tapped twice rather than opening a second dialog, so the label has to be
+      assigned or the confirm step is invisible.
 - [ ] Drop one instance in the main menu scene and one in the Match3 scene.
 - [ ] Assign it to `settingsWindowUI` on `MainMenuScreen` and on `TopBarUI`.
 
@@ -80,6 +84,12 @@ needed scene and prefab work that could not be done without the editor.
       clickable. The last level shows **Finish**, not a dead **Next Level**.
 - [ ] **Settings.** Sliders move volume smoothly across their whole travel, both
       toggles take effect, and all four values survive a restart.
+- [ ] **Reset progress.** First tap arms it, second within 3s wipes progress, and
+      it disarms itself on timeout or on closing the window. Levels relock, the
+      Continue button disappears, tutorials re-arm, and the volume and toggle
+      settings are deliberately kept.
+- [ ] **Best stats.** After completing a level, selecting it in level select
+      shows Best moves, time and pieces cleared.
 - [ ] **Continue.** Appears only after a level has been started, and loads
       straight into the right level.
 
@@ -202,10 +212,6 @@ needed no new fields and no level asset was retuned.
 
 ## Known gaps, not yet done
 
-- **`bestMoves`, `bestTime` and `bestPiecesCleared` are write-only.** They are
-  recorded on every completion and nothing displays them. Either surface them on
-  the level select info panel, which is where they would naturally go, or drop
-  them from `LevelRecord`. Right now they are speculative data.
 - **No combo or cascade feedback.** `HandleMatchesAndRepopulate` already loops
   cascades but nothing counts them, so a four-chain feels identical to a single
   match in a game that is otherwise very loud.
@@ -215,8 +221,6 @@ needed no new fields and no level asset was retuned.
 - **No tests**, despite `com.unity.test-framework` being installed. Match
   detection, objective progress and `SaveManager` are all testable without a
   scene, and the reshuffle has no safety net.
-- **No reset-progress option.** Now that a settings window exists, that is where
-  it belongs; `SaveManager.DeleteSave()` already does the work.
 
 ### Notes on things that are fine
 

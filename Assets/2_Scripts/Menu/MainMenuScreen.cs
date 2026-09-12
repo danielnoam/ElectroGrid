@@ -25,6 +25,13 @@ public class MainMenuScreen : MenuScreen
         SetupButtons();
         informationWindowUI?.Initialize();
         settingsWindowUI?.Initialize();
+
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
+    }
+
+    private void OnDestroy()
+    {
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset -= SetupContinueButton;
     }
 
     private void SetupContinueButton()

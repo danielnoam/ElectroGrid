@@ -19,6 +19,14 @@ public class SettingsWindowUI : MonoBehaviour
     [SerializeField] private Toggle hapticsToggle;
     [SerializeField] private Toggle screenShakeToggle;
 
+    [Header("Reset Progress")]
+    [SerializeField] private Button resetProgressButton;
+    [SerializeField] private TextMeshProUGUI resetProgressLabel;
+    [SerializeField] private string resetLabel = "Reset Progress";
+    [SerializeField] private string resetConfirmLabel = "Tap again to confirm";
+    [Tooltip("How long the confirm state stays armed before reverting")]
+    [SerializeField, Min(1f)] private float resetConfirmTimeout = 3f;
+
     [Header("References")]
     [SerializeField] private Button backButton;
     [SerializeField] private RectTransform windowRectTransform;
@@ -33,6 +41,7 @@ public class SettingsWindowUI : MonoBehaviour
     private float _backgroundStartAlpha;
     private bool _applyingValues;
     private Action _onClosed;
+    private float _resetConfirmExpiry;
 
     private void Awake()
     {
@@ -76,6 +85,7 @@ public class SettingsWindowUI : MonoBehaviour
     public void Show(Action onClosed = null)
     {
         _onClosed = onClosed;
+        DisarmReset();
         PullValuesFromSettings();
         Toggle(true);
     }
@@ -111,6 +121,47 @@ public class SettingsWindowUI : MonoBehaviour
             screenShakeToggle.onValueChanged.RemoveAllListeners();
             screenShakeToggle.onValueChanged.AddListener(OnScreenShakeChanged);
         }
+
+        if (resetProgressButton)
+        {
+            resetProgressButton.onClick.RemoveAllListeners();
+            resetProgressButton.onClick.AddListener(OnResetProgressPressed);
+        }
+    }
+
+    private void Update()
+    {
+        if (_resetConfirmExpiry <= 0f) return;
+
+        // Unscaled, the window sets the global time scale to zero while it is open
+        if (Time.unscaledTime < _resetConfirmExpiry) return;
+
+        DisarmReset();
+    }
+
+    /// <summary>
+    /// Two presses on one button rather than a separate confirm dialog, which keeps a destructive
+    /// action behind a deliberate second tap without another prefab to build and wire.
+    /// </summary>
+    private void OnResetProgressPressed()
+    {
+        if (_resetConfirmExpiry <= 0f)
+        {
+            _resetConfirmExpiry = Time.unscaledTime + resetConfirmTimeout;
+            if (resetProgressLabel) resetProgressLabel.text = resetConfirmLabel;
+            return;
+        }
+
+        DisarmReset();
+
+        SaveManager.Instance?.ResetProgress();
+        CameraManager.Instance?.ShakeCamera(0.5f);
+    }
+
+    private void DisarmReset()
+    {
+        _resetConfirmExpiry = 0f;
+        if (resetProgressLabel) resetProgressLabel.text = resetLabel;
     }
 
     private void PullValuesFromSettings()
@@ -164,6 +215,7 @@ public class SettingsWindowUI : MonoBehaviour
     private void Close()
     {
         CameraManager.Instance?.ShakeCamera(0.1f);
+        DisarmReset();
 
         // Written once on close rather than on every slider frame, which would hit the disk continuously
         SaveManager.Instance?.Save();

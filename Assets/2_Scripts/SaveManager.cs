@@ -52,6 +52,9 @@ public class SaveManager : MonoBehaviour
     public bool HapticsEnabled => _data.settings.hapticsEnabled;
     public bool ScreenShakeEnabled => _data.settings.screenShakeEnabled;
 
+    /// <summary>Raised when progress is wiped, so menus showing unlock state can rebuild.</summary>
+    public event Action SaveReset;
+
     private static string SavePath => Path.Combine(Application.persistentDataPath, FileName);
     private static string TempPath => SavePath + ".tmp";
 
@@ -206,6 +209,18 @@ public class SaveManager : MonoBehaviour
         }
     }
 
+    /// <summary>Clears progress but keeps audio and accessibility preferences, which are not progress.</summary>
+    public void ResetProgress()
+    {
+        _data.levels.Clear();
+        _data.seenTutorials.Clear();
+        _data.highestLevelUnlocked = 0;
+        _data.lastPlayedLevel = null;
+
+        Save();
+        SaveReset?.Invoke();
+    }
+
     [ContextMenu("Delete Save")]
     public void DeleteSave()
     {
@@ -219,5 +234,6 @@ public class SaveManager : MonoBehaviour
         }
 
         _data = new SaveData();
+        SaveReset?.Invoke();
     }
 }
