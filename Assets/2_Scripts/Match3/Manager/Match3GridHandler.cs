@@ -25,6 +25,7 @@ public class Match3GridHandler : MonoBehaviour
     
     public event Action GridDestroyed;
     public event Action<Grid> GridCreated;
+    public event Action<Match3HelperObject> HelperSpawned;
     
     public void CreateGrid(SOMatch3Level level)
     {
@@ -153,6 +154,8 @@ public class Match3GridHandler : MonoBehaviour
         helperOb.Initialize(null, this);
         match3Tile.SetCurrentItem(helperOb);
         helperOb.SetCurrentTile(match3Tile);
+
+        HelperSpawned?.Invoke(helperOb);
 
         return helperOb;
     }

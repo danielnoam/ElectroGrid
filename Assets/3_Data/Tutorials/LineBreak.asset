@@ -15,3 +15,5 @@ MonoBehaviour:
   tutorialTitle: Line Break
   tutorialText: Match 4 or more pieces in a row or column to destroy the entire line.
   tutorialSprite: {fileID: 21300000, guid: cbc814385f043bc4c8fd4d5ee4a0eb29, type: 3}
+  showContextually: 1
+  trigger: 4

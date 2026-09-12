@@ -7,7 +7,7 @@ public class Match3UIManager : MonoBehaviour
     [SerializeField] private BottomBarUI bottomBarUI;
     [SerializeField] private LevelCompleteWindowUI levelCompleteWindowUI;
     [SerializeField] private InformationWindowUI informationWindowUI;
-    
+
     [Header("References")]
     [SerializeField] private Match3GameManager match3Manager;
 
@@ -17,5 +17,9 @@ public class Match3UIManager : MonoBehaviour
         bottomBarUI.Initialize(match3Manager);
         levelCompleteWindowUI.Initialize(match3Manager);
         informationWindowUI.Initialize();
+
+        // Added here rather than placed in the scene, so it needs no serialized wiring of its own
+        var tutorialPresenter = gameObject.AddComponent<Match3TutorialPresenter>();
+        tutorialPresenter.Initialize(match3Manager, informationWindowUI, topBarUI, bottomBarUI);
     }
 }

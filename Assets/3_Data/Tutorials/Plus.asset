@@ -16,3 +16,5 @@ MonoBehaviour:
   tutorialText: Plus gives you extra moves or time. You can swap it and create matches
     next to it or use a line break.
   tutorialSprite: {fileID: 21300000, guid: a0fdcf426da588f45b49dbc36456e17f, type: 3}
+  showContextually: 1
+  trigger: 3

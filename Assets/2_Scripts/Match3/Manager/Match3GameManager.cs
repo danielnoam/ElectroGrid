@@ -46,6 +46,7 @@ public class Match3GameManager : MonoBehaviour
     
     public Match3LevelData CurrentLevelData => _currentLevelData;
     public Match3GridHandler GridHandler => gridHandler;
+    public Match3PlayHandler PlayHandler => playHandler;
     public int MaxGuaranteedMatchAttempts => maxGuaranteedMatchAttempts;
     public float ChanceToSpawnHelper => chanceToSpawnHelper;
     public int MinMatchCount => minMatchCount;

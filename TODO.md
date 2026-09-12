@@ -100,6 +100,12 @@ Worth checking specifically:
   `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`, so neither needs a prefab.
   The `FirebaseManager` prefab and its instances in both scenes were removed.
   Confirm Firebase still initialises and Remote Config still applies.
+- **Contextual tutorials.** Each card shows once, the first time its mechanic
+  appears: `BasicMatching` on the first level played, `DoubleStars` and
+  `SquareStars` when a level contains those tiles, `Plus` when a helper spawns,
+  `LineBreak` after the first line break. Triggers are set per asset in the
+  inspector. Clearing the save via *Delete Save* on `SaveManager` re-arms them
+  all. The info button should still list all five.
 - **Playtest the reshuffle.** It is the change with the most sequencing risk.
   Easiest way to force it is to temporarily raise `minPossibleMatches` in the
   Match3 scene so the no-moves check trips on an ordinary board.

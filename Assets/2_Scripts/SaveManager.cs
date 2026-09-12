@@ -20,6 +20,7 @@ public class SaveData
     public bool muted;
     public int highestLevelUnlocked;
     public List<LevelRecord> levels = new List<LevelRecord>();
+    public List<string> seenTutorials = new List<string>();
 }
 
 [DisallowMultipleComponent]
@@ -62,6 +63,19 @@ public class SaveManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         Load();
+    }
+
+    public bool HasSeenTutorial(SOMatch3Tutorial tutorial)
+    {
+        return tutorial && _data.seenTutorials.Contains(tutorial.name);
+    }
+
+    public void MarkTutorialSeen(SOMatch3Tutorial tutorial)
+    {
+        if (!tutorial || _data.seenTutorials.Contains(tutorial.name)) return;
+
+        _data.seenTutorials.Add(tutorial.name);
+        Save();
     }
 
     public bool IsLevelUnlocked(int levelIndex)
@@ -164,6 +178,7 @@ public class SaveManager : MonoBehaviour
 
             _data = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath)) ?? new SaveData();
             _data.levels ??= new List<LevelRecord>();
+            _data.seenTutorials ??= new List<string>();
 
             // Schema changes go here, keyed off the loaded _data.version, before it is stamped forward
             _data.version = CurrentVersion;

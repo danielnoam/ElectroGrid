@@ -140,7 +140,7 @@ public class MainMenuScreen : MenuScreen
             infoButton.onClick.AddListener(() =>
             {
                 CameraManager.Instance.ShakeCamera(0.1f);
-                informationWindowUI?.Toggle(true);
+                informationWindowUI?.ShowAllTutorials();
                 FirebaseManager.Instance?.LogInformationClicked();
             });
         }
