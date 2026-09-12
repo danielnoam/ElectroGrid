@@ -14,10 +14,20 @@ public class LevelRecord
 }
 
 [Serializable]
+public class SettingsData
+{
+    public float musicVolume = 1f;
+    public float sfxVolume = 1f;
+    public bool hapticsEnabled = true;
+    public bool screenShakeEnabled = true;
+}
+
+[Serializable]
 public class SaveData
 {
     public int version = 1;
-    public bool muted;
+    public SettingsData settings = new SettingsData();
+    public string lastPlayedLevel;
     public int highestLevelUnlocked;
     public List<LevelRecord> levels = new List<LevelRecord>();
     public List<string> seenTutorials = new List<string>();
@@ -35,8 +45,12 @@ public class SaveManager : MonoBehaviour
     private SaveData _data = new SaveData();
 
     public SaveData Data => _data;
-    public bool IsMuted => _data.muted;
+    public SettingsData Settings => _data.settings;
+    public string LastPlayedLevel => _data.lastPlayedLevel;
     public int HighestLevelUnlocked => _data.highestLevelUnlocked;
+
+    public bool HapticsEnabled => _data.settings.hapticsEnabled;
+    public bool ScreenShakeEnabled => _data.settings.screenShakeEnabled;
 
     private static string SavePath => Path.Combine(Application.persistentDataPath, FileName);
     private static string TempPath => SavePath + ".tmp";
@@ -129,11 +143,11 @@ public class SaveManager : MonoBehaviour
         Save();
     }
 
-    public void SetMuted(bool muted)
+    public void SetLastPlayedLevel(SOMatch3Level level)
     {
-        if (_data.muted == muted) return;
+        if (!level || _data.lastPlayedLevel == level.name) return;
 
-        _data.muted = muted;
+        _data.lastPlayedLevel = level.name;
         Save();
     }
 
@@ -179,6 +193,7 @@ public class SaveManager : MonoBehaviour
             _data = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath)) ?? new SaveData();
             _data.levels ??= new List<LevelRecord>();
             _data.seenTutorials ??= new List<string>();
+            _data.settings ??= new SettingsData();
 
             // Schema changes go here, keyed off the loaded _data.version, before it is stamped forward
             _data.version = CurrentVersion;

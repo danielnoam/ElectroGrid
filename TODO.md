@@ -112,6 +112,32 @@ Worth checking specifically:
 
 ---
 
+## 2b. Editor wiring the settings window and Continue button need
+
+The code for both is written and pushed, but neither can work until some
+scene work is done, which needed the editor rather than a cloud session.
+
+**Settings window.** `SettingsWindowUI` mirrors `InformationWindowUI`, so build
+its prefab the same way `Prefab_InformationWindow` is built: a `CanvasGroup` on
+the root, a window `RectTransform`, a title, a background `Image`, a back
+`Button`, then two `Slider`s (music, sfx, both 0-1) and two `Toggle`s (haptics,
+screen shake). Assign all of them on the component. Drop one instance in the
+main menu and one in the Match3 scene, then assign it to the `settingsWindowUI`
+field on `MainMenuScreen` and `TopBarUI`.
+
+**The mute button is now the settings button.** The `muteButton` field became
+`settingsButton` with a `[FormerlySerializedAs]`, so the existing scene
+reference carries over and the top bar keeps animating it exactly as before.
+Only the icon needs swapping to something settings shaped. The `mutedSprite`,
+`unmutedSprite` and `muteButtonImage` fields are gone, so their sprite
+assignments will drop off those components.
+
+**Continue button.** `MainMenuScreen` has a new `continueButton` field. Add a
+button to the main menu and assign it. It hides itself when the save has no last
+played level, so it will simply not appear until a level has been started once.
+
+---
+
 ## 3. Known remaining issues
 
 ### Persistence — built, needs playtesting

@@ -152,6 +152,7 @@ public class Match3GameManager : MonoBehaviour
         populatingGrid = false;
         
         _currentLevelData = new Match3LevelData(currentLevel);
+        SaveManager.Instance?.SetLastPlayedLevel(currentLevel);
         StartCoroutine(InitialLevelSetup());
         
         FirebaseManager.Instance?.LogLevelStarted(_currentLevelData);

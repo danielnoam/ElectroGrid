@@ -1,5 +1,6 @@
 using System;
 using DNExtensions.MenuSystem;
+using UnityEngine.Serialization;
 using PrimeTween;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,15 +15,53 @@ public class MainMenuScreen : MenuScreen
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private InformationWindowUI informationWindowUI;
     [SerializeField] private Button infoButton;
-    [SerializeField] private Button muteButton;
-    [SerializeField] private Image muteButtonImage;
-    [SerializeField] private Sprite mutedSprite;
-    [SerializeField] private Sprite unmutedSprite;
+    [FormerlySerializedAs("muteButton")]
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private SettingsWindowUI settingsWindowUI;
+    [SerializeField] private Button continueButton;
 
     private void Start()
     {
         SetupButtons();
         informationWindowUI?.Initialize();
+        settingsWindowUI?.Initialize();
+    }
+
+    private void SetupContinueButton()
+    {
+        if (!continueButton) return;
+
+        var level = ResolveLastPlayedLevel();
+
+        // Nothing to continue into on a fresh save, so the button is hidden rather than shown disabled
+        continueButton.gameObject.SetActive(level);
+        if (!level) return;
+
+        SelectableAnimator selectableAnimator = continueButton.GetComponent<SelectableAnimator>();
+        if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+
+        continueButton.onClick.RemoveAllListeners();
+        continueButton.onClick.AddListener(() =>
+        {
+            CameraManager.Instance?.ShakeCamera(0.5f);
+            GameManager.Instance.SelectMatch3Level(level);
+            GameManager.Instance.Match3Scene.LoadScene();
+        });
+    }
+
+    private SOMatch3Level ResolveLastPlayedLevel()
+    {
+        if (!SaveManager.Instance || !GameManager.Instance) return null;
+
+        string lastPlayed = SaveManager.Instance.LastPlayedLevel;
+        if (string.IsNullOrEmpty(lastPlayed)) return null;
+
+        foreach (var level in GameManager.Instance.Match3Levels)
+        {
+            if (level && level.name == lastPlayed) return level;
+        }
+
+        return null;
     }
 
     protected override Tween GetShowPositionTween()
@@ -121,18 +160,17 @@ public class MainMenuScreen : MenuScreen
             });
         }
 
-        if (muteButtonImage)
+        if (settingsButton)
         {
-            muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
-    
-            muteButton.onClick.RemoveAllListeners();
-            muteButton.onClick.AddListener(() =>
+            settingsButton.onClick.RemoveAllListeners();
+            settingsButton.onClick.AddListener(() =>
             {
                 CameraManager.Instance.ShakeCamera(0.1f);
-                AudioManager.Instance.ToggleAudio();
-                muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
+                settingsWindowUI?.Show();
             });
         }
+
+        SetupContinueButton();
 
         if (infoButton)
         {

@@ -8,6 +8,10 @@ using UnityEngine.Audio;
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
+
+    private const string MusicVolumeParameter = "MusicVolume";
+    private const string SfxVolumeParameter = "SFXVolume";
+    private const float MinDecibels = -80f;
     
     [Header("Music")]
     [SerializeField, Range(0f, 1f)] private float maxVolume = 0.7f;
@@ -23,14 +27,15 @@ public class AudioManager : MonoBehaviour
 
     
     [Separator]
-    [SerializeField, ReadOnly] private bool isMuted;
+    [SerializeField, ReadOnly] private float musicVolume = 1f;
+    [SerializeField, ReadOnly] private float sfxVolume = 1f;
     
     private AudioSource _currentSource;
     private AudioSource _nextSource;
     private Sequence _musicSequence;
-    private Sequence _audioSequence;
 
-    public bool IsMuted => isMuted;
+    public float MusicVolume => musicVolume;
+    public float SfxVolume => sfxVolume;
 
     private void Awake()
     {
@@ -50,7 +55,10 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
-        isMuted = SaveManager.Instance && SaveManager.Instance.IsMuted;
+        var settings = SaveManager.Instance ? SaveManager.Instance.Settings : null;
+        musicVolume = settings?.musicVolume ?? 1f;
+        sfxVolume = settings?.sfxVolume ?? 1f;
+
         _currentSource = audioSourceA;
         _nextSource = audioSourceB;
     }
@@ -58,15 +66,31 @@ public class AudioManager : MonoBehaviour
     private void Start()
     {
         // Applied here rather than in Awake, an AudioMixer does not reliably accept SetFloat until the first frame
-        ApplyMuteVolume(isMuted ? -80f : 0f);
+        ApplyMixerVolumes();
     }
 
-    private void ApplyMuteVolume(float volume)
+    public void SetMusicVolume(float normalized)
     {
-        if (!musicMixerGroup || !sfxMixerGroup) return;
+        musicVolume = Mathf.Clamp01(normalized);
+        if (musicMixerGroup) musicMixerGroup.audioMixer.SetFloat(MusicVolumeParameter, NormalizedToDecibels(musicVolume));
+    }
 
-        musicMixerGroup.audioMixer.SetFloat("MusicVolume", volume);
-        sfxMixerGroup.audioMixer.SetFloat("SFXVolume", volume);
+    public void SetSfxVolume(float normalized)
+    {
+        sfxVolume = Mathf.Clamp01(normalized);
+        if (sfxMixerGroup) sfxMixerGroup.audioMixer.SetFloat(SfxVolumeParameter, NormalizedToDecibels(sfxVolume));
+    }
+
+    private void ApplyMixerVolumes()
+    {
+        SetMusicVolume(musicVolume);
+        SetSfxVolume(sfxVolume);
+    }
+
+    /// <summary>Sliders are linear but loudness is not, so a raw 0-1 value maps onto the mixer's decibel range.</summary>
+    private static float NormalizedToDecibels(float normalized)
+    {
+        return normalized <= 0.0001f ? MinDecibels : Mathf.Log10(normalized) * 20f;
     }
 
     private void OnEnable()
@@ -85,7 +109,6 @@ public class AudioManager : MonoBehaviour
         }
         
         _musicSequence.Stop();
-        _audioSequence.Stop();
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -140,24 +163,5 @@ public class AudioManager : MonoBehaviour
     }
     
     
-    public void ToggleAudio()
-    {
-        if (!musicMixerGroup || !sfxMixerGroup) return;
-
-        isMuted = !isMuted;
-        SaveManager.Instance?.SetMuted(isMuted);
-
-        _audioSequence.Stop();
-        _audioSequence = Sequence.Create();
-
-        _audioSequence.Group(Tween.Custom(
-            startValue: isMuted ? 0f : -80f,
-            endValue: isMuted ? -80f : 0,
-            duration: transitionDuration / 2,
-            onValueChange: ApplyMuteVolume,
-            Ease.InOutSine));
-
-
-    }
     
 }
