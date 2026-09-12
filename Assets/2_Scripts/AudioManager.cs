@@ -50,9 +50,23 @@ public class AudioManager : MonoBehaviour
             return;
         }
         
-        isMuted = false;
+        isMuted = SaveManager.Instance && SaveManager.Instance.IsMuted;
         _currentSource = audioSourceA;
         _nextSource = audioSourceB;
+    }
+
+    private void Start()
+    {
+        // Applied here rather than in Awake, an AudioMixer does not reliably accept SetFloat until the first frame
+        ApplyMuteVolume(isMuted ? -80f : 0f);
+    }
+
+    private void ApplyMuteVolume(float volume)
+    {
+        if (!musicMixerGroup || !sfxMixerGroup) return;
+
+        musicMixerGroup.audioMixer.SetFloat("MusicVolume", volume);
+        sfxMixerGroup.audioMixer.SetFloat("SFXVolume", volume);
     }
 
     private void OnEnable()
@@ -131,7 +145,8 @@ public class AudioManager : MonoBehaviour
         if (!musicMixerGroup || !sfxMixerGroup) return;
 
         isMuted = !isMuted;
-        
+        SaveManager.Instance?.SetMuted(isMuted);
+
         _audioSequence.Stop();
         _audioSequence = Sequence.Create();
 
@@ -139,11 +154,7 @@ public class AudioManager : MonoBehaviour
             startValue: isMuted ? 0f : -80f,
             endValue: isMuted ? -80f : 0,
             duration: transitionDuration / 2,
-            onValueChange: value =>
-            {
-                musicMixerGroup.audioMixer.SetFloat("MusicVolume", value);
-                sfxMixerGroup.audioMixer.SetFloat("SFXVolume", value);
-            },
+            onValueChange: ApplyMuteVolume,
             Ease.InOutSine));
 
 

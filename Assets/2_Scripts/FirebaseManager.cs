@@ -28,6 +28,16 @@ public class FirebaseManager : MonoBehaviour
     private Vector2 _scrollPosition;
     private const int MaxLogs = 30;
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
+    {
+        if (Instance) return;
+
+        var go = new GameObject(nameof(FirebaseManager));
+        go.AddComponent<FirebaseManager>();
+        DontDestroyOnLoad(go);
+    }
+
     private void Awake()
     {
         if (Instance && Instance != this)

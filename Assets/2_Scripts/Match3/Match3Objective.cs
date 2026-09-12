@@ -38,6 +38,15 @@ public abstract class Match3Objective
     {
         Completed?.Invoke();
     }
+
+    /// <summary>Runtime copy of the authored objective, so playing a level never mutates the level asset.</summary>
+    public Match3Objective Clone()
+    {
+        var clone = (Match3Objective)MemberwiseClone();
+        clone.ProgressChanged = null;
+        clone.Completed = null;
+        return clone;
+    }
     
     public void SetGridShape(SOGridShape shape)
     {
@@ -166,12 +175,12 @@ public class GetSpecificItemMatches : Match3Objective
 
     public override string GetName()
     {
-        return $"Collect {targetItem.Label} Pieces";
+        return $"Collect {(targetItem ? targetItem.Label : "Items")} Pieces";
     }
     
     public override string GetDescription()
     {
-        return $"Collect {requiredAmount} {targetItem.Label} Pieces";
+        return $"Collect {requiredAmount} {(targetItem ? targetItem.Label : "Items")} Pieces";
     }
 }
 

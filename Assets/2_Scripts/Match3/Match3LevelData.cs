@@ -27,24 +27,20 @@ public class Match3LevelData
         
         foreach (var objective in Level.Objectives)
         {
-            if (objective != null)
-            {
-                string json = JsonUtility.ToJson(objective);
-                Match3Objective copy = (Match3Objective)JsonUtility.FromJson(json, objective.GetType());
-                copy.Setup();
-                CurrentObjectives.Add(copy);
-            }
+            if (objective == null) continue;
+
+            var copy = objective.Clone();
+            copy.Setup();
+            CurrentObjectives.Add(copy);
         }
-        
+
         foreach (var condition in Level.LoseConditions)
         {
-            if (condition != null)
-            {
-                string json = JsonUtility.ToJson(condition);
-                Match3LoseCondition copy = (Match3LoseCondition)JsonUtility.FromJson(json, condition.GetType());
-                copy.Setup();
-                CurrentLoseConditions.Add(copy);
-            }
+            if (condition == null) continue;
+
+            var copy = condition.Clone();
+            copy.Setup();
+            CurrentLoseConditions.Add(copy);
         }
     }
     

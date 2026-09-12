@@ -94,17 +94,24 @@ public class Match3GameManager : MonoBehaviour
         _currentLevelData.TimeSpent += Time.deltaTime;
     }
 
+    public bool HasNextLevel()
+    {
+        var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
+        if (levels == null || levels.Length == 0) return false;
+
+        return Array.IndexOf(levels, currentLevel) + 1 < levels.Length;
+    }
+
     public void SetNextLevel()
     {
-        var levels = GameManager.Instance.Match3Levels;
-        if (levels != null && levels.Length != 0)
-        {
-            int currentIndex = Array.IndexOf(levels, currentLevel);
-            int nextIndex = (currentIndex + 1) % levels.Length;
+        var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
+        if (levels == null || levels.Length == 0) return;
 
-            currentLevel = levels[nextIndex];
-            StartNewGame();
-        }
+        int nextIndex = Array.IndexOf(levels, currentLevel) + 1;
+        if (nextIndex <= 0 || nextIndex >= levels.Length) return;
+
+        currentLevel = levels[nextIndex];
+        StartNewGame();
     }
     
     public void RestartLevel()
@@ -228,6 +235,13 @@ public class Match3GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         
         FirebaseManager.Instance?.LogLevelCompleted(_currentLevelData);
+
+        if (SaveManager.Instance && GameManager.Instance)
+        {
+            int levelIndex = Array.IndexOf(GameManager.Instance.Match3Levels, currentLevel);
+            SaveManager.Instance.RecordLevelCompleted(currentLevel, _currentLevelData, levelIndex);
+        }
+
         LevelComplete?.Invoke(_currentLevelData);
     }
 

@@ -32,6 +32,15 @@ public abstract class Match3LoseCondition
     {
         ConditionMet?.Invoke();
     }
+
+    /// <summary>Runtime copy of the authored condition, so playing a level never mutates the level asset.</summary>
+    public Match3LoseCondition Clone()
+    {
+        var clone = (Match3LoseCondition)MemberwiseClone();
+        clone.ProgressChanged = null;
+        clone.ConditionMet = null;
+        return clone;
+    }
 }
 
 [Serializable]

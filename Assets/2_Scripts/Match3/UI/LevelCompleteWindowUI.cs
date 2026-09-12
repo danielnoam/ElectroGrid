@@ -171,16 +171,32 @@ public class LevelCompleteWindowUI : MonoBehaviour
         levelButton.onClick.RemoveAllListeners();
         var levelButtonText = levelButton.GetComponentInChildren<TextMeshProUGUI>();
         
-        if (won)
+        if (won && _match3Manager.HasNextLevel())
         {
             levelButtonText.text = "Next Level";
             levelButton.onClick.AddListener(OnNextLevelPressed);
+        }
+        else if (won)
+        {
+            levelButtonText.text = "Finish";
+            levelButton.onClick.AddListener(OnFinishPressed);
         }
         else
         {
             levelButtonText.text = "Try Again";
             levelButton.onClick.AddListener(OnRetryPressed);
         }
+    }
+
+    private void OnFinishPressed()
+    {
+        CameraManager.Instance.ShakeCamera(0.1f);
+        Toggle(false);
+        _toggleSequence.ChainDelay(0.1f);
+        _toggleSequence.ChainCallback(() =>
+        {
+            GameManager.Instance?.MainMenu.LoadScene();
+        });
     }
 
     private void OnNextLevelPressed()

@@ -16,6 +16,7 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private int maxGridWidthForLargeSize = 8;
     [SerializeField] private Color activeCellColor = new Color(0.3f, 0.7f, 0.3f);
     [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
+    [SerializeField] private string lockedLevelLabel = "?";
     
     [Header("References")]
     [SerializeField] private Transform buttonsHolder;
@@ -112,15 +113,19 @@ public class LevelSelectionScreen : MenuScreen
 
             Button levelButton = Instantiate(levelButtonPrefab, buttonsHolder);
             int levelIndex = i;
+            bool unlocked = !SaveManager.Instance || SaveManager.Instance.IsLevelUnlocked(levelIndex);
 
             TextMeshProUGUI buttonText = levelButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText)
             {
-                buttonText.text = (levelIndex + 1).ToString();
+                buttonText.text = unlocked ? (levelIndex + 1).ToString() : lockedLevelLabel;
             }
-            
+
             SelectableAnimator selectableAnimator = levelButton.GetComponent<SelectableAnimator>();
             if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+
+            levelButton.interactable = unlocked;
+            if (!unlocked) continue;
 
             levelButton.onClick.AddListener(() => OnLevelButtonClicked(level));
         }

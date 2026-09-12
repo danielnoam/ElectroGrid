@@ -96,6 +96,10 @@ Worth checking specifically:
   `UnityAnalyticsManager` instances were removed from both by editing the scene
   YAML directly.
 - `Match3GameManager` shows the new `maxReshuffleAttempts` field at 5.
+- `FirebaseManager` and `SaveManager` now create themselves via
+  `[RuntimeInitializeOnLoadMethod(BeforeSceneLoad)]`, so neither needs a prefab.
+  The `FirebaseManager` prefab and its instances in both scenes were removed.
+  Confirm Firebase still initialises and Remote Config still applies.
 - **Playtest the reshuffle.** It is the change with the most sequencing risk.
   Easiest way to force it is to temporarily raise `minPossibleMatches` in the
   Match3 scene so the no-moves check trips on an ordinary board.
@@ -104,17 +108,18 @@ Worth checking specifically:
 
 ## 3. Known remaining issues
 
-### No persistence (largest remaining gap)
+### Persistence — built, needs playtesting
 
-There is no `PlayerPrefs` usage anywhere in the project. No level unlocking, no
-stars or best scores, no record of the furthest level reached, and the mute
-setting does not survive a restart. Every level is always selectable, and
-`SetNextLevel` wraps modulo so level 12 returns to level 1 with nothing recorded.
+`SaveManager` is implemented and wired up. Unlock rule is completing the previous
+level; no stars. Still unverified in the editor, see section 2.
 
-For a mobile match-3 this is where retention lives, and it is the one substantial
-item left.
+Worth checking: the save file appears at `Application.persistentDataPath/save.json`
+after finishing a level, locked buttons show the `lockedLevelLabel` and are not
+clickable, mute survives a restart, and the last level shows **Finish** rather
+than a dead **Next Level** button. `SaveManager` has a *Delete Save* context-menu
+item for resetting between tests.
 
-#### Planned approach: a JSON `SaveManager`
+#### Implemented design: a JSON `SaveManager`
 
 JSON over `PlayerPrefs`. `PlayerPrefs` is fine for a couple of scalars, but this
 needs a record per level, and that degenerates into building key names by hand
@@ -127,7 +132,7 @@ public class SaveData
 {
     public int version = 1;
     public bool muted;
-    public int highestLevelUnlocked = 1;
+    public int highestLevelUnlocked;   // level index, 0 means only the first is unlocked
     public List<LevelRecord> levels = new List<LevelRecord>();
 }
 
@@ -165,12 +170,8 @@ Wiring:
   and show something for finishing the game.
 - `AudioManager` — read and write `muted` so it survives a restart.
 
-Two design calls are needed before this can be built:
-
-1. **What unlocks a level** — completing the previous one, or a star threshold?
-2. **Stars at all?** If yes, what earns 1/2/3? Nothing in `SOMatch3Level`
-   expresses a threshold today, so it would need a new field per level and all 12
-   assets retuned.
+Decided: a level unlocks by completing the previous one. No stars, so
+`SOMatch3Level` needed no new fields and no level asset was retuned.
 
 Notes:
 
@@ -181,16 +182,13 @@ Notes:
 
 ### Smaller items
 
-- `Match3LevelData` deep-copies objectives and lose conditions by round-tripping
-  them through `JsonUtility`. It works, but it relies on Unity object references
-  surviving as instance IDs within a session and is fragile.
-- `GetSpecificItemMatches.GetName()` dereferences `targetItem.Label` with no null
-  check, unlike `GetRequirementText()` two methods below. It would throw in the
-  level-select info panel if the field were left unassigned. No shipped level
-  uses that objective, so it is currently unreachable.
-- `Match3EffectManager.Awake` returns without destroying a duplicate instance,
-  unlike the other singletons in the project.
 - No tests, despite `com.unity.test-framework` being installed.
+
+Fixed already: the `JsonUtility` round-trip in `Match3LevelData` (now a
+`Clone()` on the objective and condition base classes, which also clears the
+copy's event subscriptions), the unguarded `targetItem.Label` derefs in
+`GetSpecificItemMatches`, and `Match3EffectManager.Awake` not destroying a
+duplicate.
 
 ### Notes on things that are fine
 
