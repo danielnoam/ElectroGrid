@@ -142,6 +142,47 @@ of as a new blob per edit.
 
 ---
 
+## 5. Toolchain: Unity upgrade and DNExtensions
+
+**Do this last, after the branch is verified working on the current version.**
+Upgrading the editor and updating the framework will each trigger their own
+recompiles and their own breakage. Doing either on top of ten commits that have
+never been compiled means untangling three unrelated sources of failure at once.
+Get to a known-good state first, commit it, then change the toolchain one step at
+a time.
+
+### Unity
+
+Currently on **6000.2.9f1**.
+
+- [ ] Upgrade to the latest Unity 6 release.
+- [ ] Back up or branch first. A Unity upgrade rewrites asset metadata and is not
+      cleanly reversible.
+- [ ] Watch these, they are the ones most likely to complain:
+      - **Firebase** — the SDK is 12.6.0 with native libraries per platform and is
+        the single most upgrade-sensitive dependency here. Check the Firebase
+        Unity release notes support the editor version *before* upgrading.
+      - **URP 17.2.0** — a major URP bump can change the look of the emission
+        shader work on matchable pieces.
+      - **PrimeTween** — installed from a local tarball
+        (`Assets/Plugins/PrimeTween/internal/`), so it will not update itself with
+        the registry packages. Everything in the game animates through it.
+      - Input System 1.14.2, Cinemachine 3.1.5, Timeline 1.8.9.
+- [ ] Recompile, reopen both scenes, replay the section 3 checklist.
+
+### DNExtensions
+
+- [ ] Install the latest DNExtensions.
+
+Nothing in this project references a specific DNExtensions version, so there is
+nothing recorded here to diff against. The game code uses `SceneField`,
+`ChanceList`, `RangedFloat`, `SOAudioEvent`, `ObjectPooler`, `MenuScreen`,
+`SelectableAnimator`, `InputReaderBase`, `VFXManager` and the attribute set
+(`ReadOnly`, `Separator`, `Button`, `MinMaxRange`, `Preview`), so those are the
+surfaces to check after updating.
+
+---
+
 ## Reference
 
 ### The optional full history rewrite
