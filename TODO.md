@@ -279,10 +279,11 @@ needed no new fields and no level asset was retuned.
       conditions and becomes unwinnable, and it will only show up on device, never
       in the editor. Cheap insurance is a `link.xml` preserving the assembly, or
       `[Preserve]` on those six classes.
-- [ ] **`Application.targetFrameRate = 120` on Android** (`GameManager.cs:47`).
-      For a match-3 that is a lot of battery and heat for very little benefit, and
-      thermal throttling will make it inconsistent anyway. Worth deciding
-      deliberately rather than inheriting it; 60 is the usual choice.
+- [ ] **Frame rate is hardcoded to 120 on Android** (`GameManager.cs:47`, inside
+      the `RuntimePlatform.Android` check). Superseded by the settings item in
+      Features below — the value should come from the player's choice rather than
+      being baked in. For a match-3, 120 is a lot of battery and heat for very
+      little benefit, and thermal throttling makes it inconsistent anyway.
 - [ ] **No crash reporting.** The Firebase plugins are Analytics, App, Platform,
       RemoteConfig and TaskExtension — Crashlytics is not installed. With no test
       coverage and a lot of recently changed code, a crash in the wild is
@@ -303,6 +304,12 @@ needed no new fields and no level asset was retuned.
       these. On levels built around Double Stars and Square Stars they are the
       numbers that describe how the level went. Surface them in both places or
       delete them.
+- [ ] **Tidy the inert autorotate flags.** `allowedAutorotateToPortrait`,
+      `PortraitUpsideDown`, `LandscapeRight` and `LandscapeLeft` are all `1` while
+      `defaultScreenOrientation` is `0` (Portrait), so they do nothing. Setting the
+      three non-portrait ones to `0` changes no behaviour but stops the settings
+      contradicting each other, and means a future switch to AutoRotation does not
+      silently allow landscape. Cosmetic, not urgent.
 - [ ] **Quitting mid-level fires no analytics event.** The bottom bar's quit
       button returns to the menu silently, so abandonment does not appear in the
       funnel — only starts, completions and failures do. A `level_quit` event
@@ -315,6 +322,29 @@ needed no new fields and no level asset was retuned.
       single match in a game that is otherwise very loud. Rising audio pitch per
       cascade step, a combo counter, escalating shake. The loop to hook into
       already exists; this is the biggest gap in feel.
+- [ ] **Frame rate modes in settings, 60 and 120.** `GameManager.Awake` currently
+      forces `Application.targetFrameRate = 120` on Android. That becomes a stored
+      preference instead: add a field to `SettingsData`, a control to
+      `SettingsWindowUI` alongside the existing sliders and toggles, and have
+      `GameManager` read the saved value rather than hardcoding it.
+
+      Two things worth getting right:
+
+      - **Hide or disable 120 on a display that cannot do it.** Most phones are
+        still 60Hz, and `Application.targetFrameRate` above the panel's refresh
+        rate does nothing. `Screen.currentResolution.refreshRateRatio` gives the
+        real ceiling, so the option should only be offered when it means
+        something. Offering a setting that visibly does nothing is worse than not
+        offering it.
+      - **Default to 60, not 120.** Battery life on a puzzle game people play in
+        long sessions matters more than frame rate, and a device that thermally
+        throttles delivers an inconsistent 120 which feels worse than a steady 60.
+        Let players opt into 120.
+
+      A third mode worth considering is a "match display" option that just uses the
+      panel's refresh rate, which avoids the whole question on high refresh
+      hardware.
+
 - [ ] **Localisation.** Not started. Scope, so it can be costed honestly:
 
       **Volume is small.** Roughly 25 player-facing strings in code, plus 5
