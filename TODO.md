@@ -262,11 +262,26 @@ needed no new fields and no level asset was retuned.
       fix is a small component that insets a `RectTransform` by
       `Screen.safeArea`, applied to the top and bottom bar containers in both
       scenes.
-- [ ] **All four orientations are enabled.** `allowedAutorotateToPortrait`,
-      `PortraitUpsideDown`, `LandscapeRight` and `LandscapeLeft` are all `1`, but
-      the game is portrait, 540x960 reference, with a vertical grid and portrait
-      UI. Landscape will look broken. Lock to portrait, and decide whether
-      upside-down is wanted.
+- [ ] **`AndroidTargetSdkVersion` is 0**, meaning "Automatic (highest
+      installed)". The API level a build targets then depends on whichever SDK
+      happens to be installed on the machine doing the build, so it can change
+      silently between machines or after an SDK update. Google Play also enforces
+      a minimum target API for new uploads. Pin it to a specific level.
+- [ ] **Verify a device build still loads levels, before trusting IL2CPP
+      stripping.** Android builds with IL2CPP, there is no `link.xml` and no
+      `[Preserve]` anywhere, and the `[SerializeReference]` subclasses
+      (`GetMatches`, `MoveLimit`, `TimeLimit`, `DestroyObstaclesObjective`,
+      `ReachBottomObjective`, `GetSpecificItemMatches`) are never constructed in
+      runtime code — they only ever come into being through Unity's deserialiser.
+      Types reachable only through serialised data are the classic thing managed
+      stripping removes. If it happens, every level loads with null objectives and
+      conditions and becomes unwinnable, and it will only show up on device, never
+      in the editor. Cheap insurance is a `link.xml` preserving the assembly, or
+      `[Preserve]` on those six classes.
+- [ ] **`Application.targetFrameRate = 120` on Android** (`GameManager.cs:47`).
+      For a match-3 that is a lot of battery and heat for very little benefit, and
+      thermal throttling will make it inconsistent anyway. Worth deciding
+      deliberately rather than inheriting it; 60 is the usual choice.
 - [ ] **No crash reporting.** The Firebase plugins are Analytics, App, Platform,
       RemoteConfig and TaskExtension — Crashlytics is not installed. With no test
       coverage and a lot of recently changed code, a crash in the wild is
@@ -311,6 +326,12 @@ needed no new fields and no level asset was retuned.
   and no level uses it yet.
 
 ### Notes on things that are fine
+
+- **The game is already locked to portrait.** `defaultScreenOrientation: 0` is
+  `UIOrientation.Portrait`. The four `allowedAutorotateTo*` flags are all `1` but
+  they are inert, they only apply when the default orientation is `4`
+  (AutoRotation). Setting them to `0` would make the settings read consistently
+  but would change nothing.
 
 - The Firebase API key in `google-services-desktop.json` is a client config and
   is safe to commit. It only matters if Firestore or Storage is added, at which
