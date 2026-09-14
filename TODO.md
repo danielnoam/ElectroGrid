@@ -251,17 +251,64 @@ needed no new fields and no level asset was retuned.
 
 ---
 
-## Known gaps, not yet done
+## Backlog
 
-- **No combo or cascade feedback.** `HandleMatchesAndRepopulate` already loops
-  cascades but nothing counts them, so a four-chain feels identical to a single
-  match in a game that is otherwise very loud.
+### Ships broken on modern phones — do these first
+
+- [ ] **No safe-area handling.** Nothing in the project references
+      `Screen.safeArea`. This is a portrait game with a top bar and a bottom bar,
+      so on any notched or punch-hole Android phone, or an iPhone with a Dynamic
+      Island, both bars sit partly under the cutout and the home indicator. The
+      fix is a small component that insets a `RectTransform` by
+      `Screen.safeArea`, applied to the top and bottom bar containers in both
+      scenes.
+- [ ] **All four orientations are enabled.** `allowedAutorotateToPortrait`,
+      `PortraitUpsideDown`, `LandscapeRight` and `LandscapeLeft` are all `1`, but
+      the game is portrait, 540x960 reference, with a vertical grid and portrait
+      UI. Landscape will look broken. Lock to portrait, and decide whether
+      upside-down is wanted.
+- [ ] **No crash reporting.** The Firebase plugins are Analytics, App, Platform,
+      RemoteConfig and TaskExtension — Crashlytics is not installed. With no test
+      coverage and a lot of recently changed code, a crash in the wild is
+      currently invisible.
+
+### Loose ends in code
+
+- [ ] **`AllowOnlyOneObjectiveOfThisType` is dead.** Declared abstract on
+      `Match3Objective`, overridden `=> true` by all four subclasses, and read by
+      nothing. Nothing stops a level being authored with two `GetMatches`
+      objectives, which would show two competing "Pieces:" rows in the top bar.
+      Either enforce it in `SOMatch3LevelEditor`, which already draws the
+      objectives list, or delete the property.
+- [ ] **`ObstaclesBroken` and `BottomObjectsReached` are write-only.**
+      Incremented in `Match3LevelData` and read by nothing. Firebase logs
+      `matches_made`, `moves_made` and `time_spent_seconds` but not these, and
+      the level complete window shows Pieces Cleared and Moves Made but not
+      these. On levels built around Double Stars and Square Stars they are the
+      numbers that describe how the level went. Surface them in both places or
+      delete them.
+- [ ] **Quitting mid-level fires no analytics event.** The bottom bar's quit
+      button returns to the menu silently, so abandonment does not appear in the
+      funnel — only starts, completions and failures do. A `level_quit` event
+      carrying the level name and progress so far would close that.
+
+### Features
+
+- [ ] **Combo and cascade feedback.** `HandleMatchesAndRepopulate` already loops
+      cascades but nothing counts them, so a four-chain feels identical to a
+      single match in a game that is otherwise very loud. Rising audio pitch per
+      cascade step, a combo counter, escalating shake. The loop to hook into
+      already exists; this is the biggest gap in feel.
+- [ ] **No tests**, despite `com.unity.test-framework` being installed. Match
+      detection, objective progress and `SaveManager` are all testable without a
+      scene, and the reshuffle has no safety net.
+
+### Content, not engineering
+
 - **Twelve levels is roughly 25 minutes of play.** The level painter and 16 grid
-  shapes are already there, several shapes unused by any level. This is content
-  work, not engineering, and it is the real limit on retention.
-- **No tests**, despite `com.unity.test-framework` being installed. Match
-  detection, objective progress and `SaveManager` are all testable without a
-  scene, and the reshuffle has no safety net.
+  shapes are already there, several shapes unused by any level. Note also that
+  `GetSpecificItemMatches` now works (an ordering bug meant it could never score)
+  and no level uses it yet.
 
 ### Notes on things that are fine
 
