@@ -98,7 +98,49 @@ re-arms the tutorials too.
 
 ---
 
-## 4. In a terminal: finish the Git LFS conversion
+## 4. Upgrade Unity
+
+**Only after section 3 passes.** An editor upgrade triggers its own recompile;
+doing it on top of commits that have never been compiled means untangling two
+unrelated sources of breakage at once. Get to a known-good state, commit it,
+then upgrade.
+
+Currently on **6000.2.9f1**.
+
+- [ ] Upgrade to the latest Unity 6 release.
+- [ ] Back up or branch first. A Unity upgrade rewrites asset metadata and is not
+      cleanly reversible.
+- [ ] Watch these, they are the ones most likely to complain:
+      - **Firebase** — the SDK is 12.6.0 with native libraries per platform and is
+        the single most upgrade-sensitive dependency here. Check the Firebase
+        Unity release notes support the editor version *before* upgrading.
+      - **URP 17.2.0** — a major URP bump can change the look of the emission
+        shader work on matchable pieces.
+      - **PrimeTween** — installed from a local tarball
+        (`Assets/Plugins/PrimeTween/internal/`), so it will not update itself with
+        the registry packages. Everything in the game animates through it.
+      - Input System 1.14.2, Cinemachine 3.1.5, Timeline 1.8.9.
+- [ ] Recompile, reopen both scenes, replay the section 3 checklist.
+
+---
+
+## 5. Update DNExtensions
+
+Do this after the Unity upgrade has settled, for the same reason — one
+toolchain change at a time.
+
+- [ ] Install the latest DNExtensions.
+
+Nothing in this project references a specific DNExtensions version, so there is
+nothing recorded here to diff against. The game code uses `SceneField`,
+`ChanceList`, `RangedFloat`, `SOAudioEvent`, `ObjectPooler`, `MenuScreen`,
+`SelectableAnimator`, `InputReaderBase`, `VFXManager` and the attribute set
+(`ReadOnly`, `Separator`, `Button`, `MinMaxRange`, `Preview`), so those are the
+surfaces to check after updating.
+
+---
+
+## 6. In a terminal: finish the Git LFS conversion
 
 `.gitattributes` was broken until this branch — every pattern was missing its
 glob (`.png` instead of `*.png`), so it only matched a file literally named
@@ -139,47 +181,6 @@ watch, it is spent on every clone and CI run.
 commits, so `.git` remains ~450 MB. It only stops the tree and `.gitattributes`
 from disagreeing, so a binary changed from now on is stored once in LFS instead
 of as a new blob per edit.
-
----
-
-## 5. Toolchain: Unity upgrade and DNExtensions
-
-**Do this last, after the branch is verified working on the current version.**
-Upgrading the editor and updating the framework will each trigger their own
-recompiles and their own breakage. Doing either on top of ten commits that have
-never been compiled means untangling three unrelated sources of failure at once.
-Get to a known-good state first, commit it, then change the toolchain one step at
-a time.
-
-### Unity
-
-Currently on **6000.2.9f1**.
-
-- [ ] Upgrade to the latest Unity 6 release.
-- [ ] Back up or branch first. A Unity upgrade rewrites asset metadata and is not
-      cleanly reversible.
-- [ ] Watch these, they are the ones most likely to complain:
-      - **Firebase** — the SDK is 12.6.0 with native libraries per platform and is
-        the single most upgrade-sensitive dependency here. Check the Firebase
-        Unity release notes support the editor version *before* upgrading.
-      - **URP 17.2.0** — a major URP bump can change the look of the emission
-        shader work on matchable pieces.
-      - **PrimeTween** — installed from a local tarball
-        (`Assets/Plugins/PrimeTween/internal/`), so it will not update itself with
-        the registry packages. Everything in the game animates through it.
-      - Input System 1.14.2, Cinemachine 3.1.5, Timeline 1.8.9.
-- [ ] Recompile, reopen both scenes, replay the section 3 checklist.
-
-### DNExtensions
-
-- [ ] Install the latest DNExtensions.
-
-Nothing in this project references a specific DNExtensions version, so there is
-nothing recorded here to diff against. The game code uses `SceneField`,
-`ChanceList`, `RangedFloat`, `SOAudioEvent`, `ObjectPooler`, `MenuScreen`,
-`SelectableAnimator`, `InputReaderBase`, `VFXManager` and the attribute set
-(`ReadOnly`, `Separator`, `Button`, `MinMaxRange`, `Preview`), so those are the
-surfaces to check after updating.
 
 ---
 
@@ -314,6 +315,40 @@ needed no new fields and no level asset was retuned.
       single match in a game that is otherwise very loud. Rising audio pitch per
       cascade step, a combo counter, escalating shake. The loop to hook into
       already exists; this is the biggest gap in feel.
+- [ ] **Localisation.** Not started. Scope, so it can be costed honestly:
+
+      **Volume is small.** Roughly 25 player-facing strings in code, plus 5
+      tutorial cards (title and body), 12 level names and 4 item labels in
+      ScriptableObjects, plus whatever sits in scene and prefab TMP components
+      (menu buttons, window titles). Translation cost is genuinely low.
+
+      **The work is in the plumbing, not the words.** The strings are currently
+      built by string interpolation inside `Match3Objective` and
+      `Match3LoseCondition` — `$"Collect {requiredAmount} Pieces"`,
+      `$"Destroy {requiredAmount} Double Stars"`. Those become table lookups with
+      arguments. Watch for word order: languages do not agree that the number
+      comes first, so the translator needs the placeholder, not a concatenation.
+
+      **Suggested route:** the official `com.unity.localization` package, which
+      handles TMP, ScriptableObject fields and a locale selector. Add it during
+      or after the Unity upgrade (section 4) rather than before, so the package
+      resolves against the final editor version.
+
+      **Font coverage is the trap.** TMP renders from a pre-baked atlas. Latin
+      languages with accents (Spanish, Portuguese, German, French) may already
+      be covered; Cyrillic (Russian), Greek, or any CJK will need the atlas
+      rebuilt with those ranges or they render as blank boxes. Check the font
+      asset before promising a language. Leave right-to-left (Arabic, Hebrew)
+      out of a first pass, it needs TMP's RTL handling and mirrored layouts.
+
+      **A reasonable first set** is English as the base plus Spanish,
+      Portuguese (Brazil), German and French — all Latin script, all large
+      mobile markets, no atlas surprises.
+
+      **One thing to decide:** level names are currently authored strings
+      ("Level 1"). If they stay numeric they need no translation at all, which
+      is the cheaper answer.
+
 - [ ] **No tests**, despite `com.unity.test-framework` being installed. Match
       detection, objective progress and `SaveManager` are all testable without a
       scene, and the reshuffle has no safety net.
