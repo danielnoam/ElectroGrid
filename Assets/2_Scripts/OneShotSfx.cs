@@ -1,8 +1,8 @@
 using System.Collections;
-using DNExtensions.ObjectPooling;
+using DNExtensions.Systems.ObjectPooling;
 using UnityEngine;
 
-public class OneShotSfx : MonoBehaviour, IPooledObject
+public class OneShotSfx : MonoBehaviour, IPoolable
 {
     public AudioSource audioSource;
 

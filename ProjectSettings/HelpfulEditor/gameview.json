@@ -1,0 +1,33 @@
+{
+    "moduleEnabled": true,
+    "showRulers": true,
+    "guidesEnabled": false,
+    "screenshotEnabled": true,
+    "screenshotForceResolution": false,
+    "screenshotResolution": {
+        "x": 1920,
+        "y": 1080
+    },
+    "screenshotFormat": 0,
+    "screenshotJpgQuality": 90,
+    "screenshotExcludeUi": false,
+    "screenshotFolder": "C:/Users/danie/OneDrive/Desktop",
+    "recordingEnabled": true,
+    "recordingMode": 0,
+    "recordingFps": 30,
+    "recordingQuality": 1,
+    "recordingFolder": "C:/Users/danie/OneDrive/Desktop",
+    "recordingForceResolution": false,
+    "recordingResolution": {
+        "x": 1920,
+        "y": 1080
+    },
+    "guideColor": {
+        "r": 0.0,
+        "g": 0.8500000238418579,
+        "b": 1.0,
+        "a": 0.8999999761581421
+    },
+    "guideWidth": 2.0,
+    "guides": []
+}

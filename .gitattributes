@@ -1,9 +1,42 @@
-.psd filter=lfs diff=lfs merge=lfs -text
-.png filter=lfs diff=lfs merge=lfs -text
-.fbx filter=lfs diff=lfs merge=lfs -text
-.bondle filter=lfs diff=lfs merge=lfs -text
-.bundle filter=lfs diff=lfs merge=lfs -text
-.so filter=lfs diff=lfs merge=lfs -text
-.a filter=lfs diff=lfs merge=lfs -text
-Assets/Firebase/Plugins/x86_64/FirebaseCppApp-13_6_0.so filter=lfs diff=lfs merge=lfs -text
-Assets/Firebase/Plugins/x86_64/FirebaseCppApp-13_6_0.bundle filter=lfs diff=lfs merge=lfs -text
+# Unity YAML assets must stay diffable as text
+*.unity  -text merge=unityyamlmerge
+*.prefab -text merge=unityyamlmerge
+*.asset  -text merge=unityyamlmerge
+*.mat    -text merge=unityyamlmerge
+*.meta   -text
+
+# Images
+*.png  filter=lfs diff=lfs merge=lfs -text
+*.jpg  filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.psd  filter=lfs diff=lfs merge=lfs -text
+*.tga  filter=lfs diff=lfs merge=lfs -text
+*.tif  filter=lfs diff=lfs merge=lfs -text
+*.gif  filter=lfs diff=lfs merge=lfs -text
+
+# Audio
+*.wav filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text
+*.ogg filter=lfs diff=lfs merge=lfs -text
+*.aif filter=lfs diff=lfs merge=lfs -text
+
+# Fonts
+*.ttf filter=lfs diff=lfs merge=lfs -text
+*.otf filter=lfs diff=lfs merge=lfs -text
+
+# Models
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.obj filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
+
+# Native libraries and packaged binaries
+*.so     filter=lfs diff=lfs merge=lfs -text
+*.a      filter=lfs diff=lfs merge=lfs -text
+*.dll    filter=lfs diff=lfs merge=lfs -text
+*.dylib  filter=lfs diff=lfs merge=lfs -text
+*.bundle filter=lfs diff=lfs merge=lfs -text
+*.aar    filter=lfs diff=lfs merge=lfs -text
+*.jar    filter=lfs diff=lfs merge=lfs -text
+*.srcaar filter=lfs diff=lfs merge=lfs -text
+*.tgz    filter=lfs diff=lfs merge=lfs -text
+*.zip    filter=lfs diff=lfs merge=lfs -text

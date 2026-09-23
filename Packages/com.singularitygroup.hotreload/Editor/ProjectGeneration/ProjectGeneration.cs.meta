@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 254358
   packageName: Hot Reload | Edit Code Without Compiling
-  packageVersion: 1.13.12
+  packageVersion: 1.13.24
   assetPath: Packages/com.singularitygroup.hotreload/Editor/ProjectGeneration/ProjectGeneration.cs
-  uploadId: 821600
+  uploadId: 991576

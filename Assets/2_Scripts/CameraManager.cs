@@ -1,6 +1,7 @@
 
-using DNExtensions;
-using DNExtensions.Button;
+using DNExtensions.Utilities;
+using DNExtensions.Utilities.Button;
+using DNExtensions.Systems.VFXManager;
 using PrimeTween;
 using UnityEngine;
 
@@ -36,6 +37,21 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         SubscribeToMatch3Manager();
+        BindVFXCanvas();
+    }
+
+    /// <summary>
+    /// VFXManager persists across scenes and keeps the previous scene's camera, which is destroyed on load.
+    /// A Screen Space - Camera canvas with no camera renders as an overlay, putting the fullscreen fade
+    /// above the scene's own UI, so every scene's camera claims the canvas when it starts.
+    /// </summary>
+    private void BindVFXCanvas()
+    {
+        if (!cam || !VFXManager.Instance || !VFXManager.Instance.FullScreenImage) return;
+
+        var canvas = VFXManager.Instance.FullScreenImage.canvas.rootCanvas;
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.worldCamera = cam;
     }
 
     private void OnEnable()
@@ -101,6 +117,7 @@ public class CameraManager : MonoBehaviour
     [Button(ButtonPlayMode.OnlyWhenPlaying)]
     public void ShakeCamera(float strength = 1f,float duration = 0.5f,float frequency = 10f)
     {
+        if (SaveManager.Instance && !SaveManager.Instance.ScreenShakeEnabled) return;
         if (FirebaseManager.Instance) strength *= FirebaseManager.Instance.ScreenShakeIntensityMultiplier;
         var sequence = Sequence.Create();
         sequence.Group(Tween.ShakeCamera(cam, strength, duration, frequency));

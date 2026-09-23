@@ -6,9 +6,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using SingularityGroup.HotReload.DTO;
+using SingularityGroup.HotReload.Localization;
 using SingularityGroup.HotReload.Newtonsoft.Json;
 using UnityEditor;
 using UnityEngine;
+using Translations = SingularityGroup.HotReload.Editor.Localization.Translations;
 
 namespace SingularityGroup.HotReload.Editor {
     internal enum RedeemStage {
@@ -32,8 +34,8 @@ namespace SingularityGroup.HotReload.Editor {
         private string _pendingInvoiceNumber;
         private string _pendingRedeemEmail;
 
-        private const string registerFlagPath = PackageConst.LibraryCachePath + "/registerFlag.txt";
-        public const string registerOutcomePath = PackageConst.LibraryCachePath + "/registerOutcome.txt";
+        private static string registerFlagPath = PackageConst.LibraryCachePath + "/registerFlag.txt";
+        public static string registerOutcomePath = PackageConst.LibraryCachePath + "/registerOutcome.txt";
 
         public RedeemStage RedeemStage { get; private set; }
         public RegistrationOutcome RegistrationOutcome { get; private set; }
@@ -44,7 +46,6 @@ namespace SingularityGroup.HotReload.Editor {
 
         const string statusSuccess = "success";
         const string statusAlreadyClaimed = "already redeemed by this user/device";
-        const string unknownError = "We apologize, an error happened while redeeming your license. Please reach out to customer support for assistance.";
 
         private GUILayoutOption[] secondaryButtonLayoutOptions = new[] { GUILayout.MaxWidth(100) };
 
@@ -64,7 +65,7 @@ namespace SingularityGroup.HotReload.Editor {
                     }
                 }
             } catch (Exception e) {
-                Log.Warning($"Failed determining registration outcome with {e.GetType().Name}: {e.Message}");
+                Log.Warning(Translations.Errors.WarningFailedDeterminingRegistration, e.GetType().Name, e.Message);
             }
         }
 
@@ -80,8 +81,8 @@ namespace SingularityGroup.HotReload.Editor {
 
         private void RenderRegistration() {
             var message = PackageConst.IsAssetStoreBuild
-                ? "Unity Pro users are required to obtain an additional license. You are eligible to redeem one if your company has ten or fewer employees. Please enter your company details below."
-                : "The licensing model for Unity Pro users varies depending on the number of employees in your company. Please enter your company details below.";
+                ? Translations.Registration.MessageRegistrationProUsers
+                : Translations.Registration.MessageRegistrationLicensingModel;
             if (error != null) {
                 EditorGUILayout.HelpBox(error, MessageType.Warning);
             } else {
@@ -90,15 +91,15 @@ namespace SingularityGroup.HotReload.Editor {
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Company size (number of employees)");
+            EditorGUILayout.LabelField(Translations.Common.LabelCompanySize);
             GUI.SetNextControlName("company_size");
             _pendingCompanySize = EditorGUILayout.TextField(_pendingCompanySize)?.Trim();
             EditorGUILayout.Space();
 
-            if (GUILayout.Button("Proceed")) {
+            if (GUILayout.Button(Translations.Common.ButtonProceed)) {
                 int companySize;
                 if (!int.TryParse(_pendingCompanySize, out companySize)) {
-                    error = "Please enter a number.";
+                    error = Translations.Errors.ErrorEnterNumber;
                 } else {
                     error = null;
                     HandleRegistration(companySize);
@@ -123,23 +124,34 @@ namespace SingularityGroup.HotReload.Editor {
             if (error != null) {
                 EditorGUILayout.HelpBox(error, MessageType.Warning);
             } else {
-                EditorGUILayout.HelpBox("To enable us to verify your purchase, please enter your invoice number/order ID. Additionally, provide the email address that you intend to use for managing your credentials.", MessageType.Info);
+                EditorGUILayout.HelpBox(Translations.Registration.MessageRedeemInstructions, MessageType.Info);
             }
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Invoice number/Order ID");
+            if (PackageConst.DefaultLocaleField == Locale.SimplifiedChinese) {
+                EditorGUILayout.LabelField(Translations.Common.LabelInvoiceNumber);
+            } else {
+                // show american asset store orders link
+                using (new EditorGUILayout.HorizontalScope()) {
+                    EditorGUILayout.LabelField(Translations.Common.LabelInvoiceNumber);
+                    var linkColor = EditorGUIUtility.isProSkin ? new Color32(0x3F, 0x9F, 0xFF, 0xFF) : new Color32(0x0F, 0x52, 0xD7, 0xFF);
+                    if (HotReloadGUIHelper.LinkLabel("Open Asset Store orders", 11, FontStyle.Normal, TextAnchor.MiddleRight, linkColor)) {
+                        Application.OpenURL("https://assetstore.unity.com/orders");
+                    }
+                }
+            }
             GUI.SetNextControlName("invoice_number");
             _pendingInvoiceNumber = EditorGUILayout.TextField(_pendingInvoiceNumber ?? HotReloadPrefs.RedeemLicenseInvoice)?.Trim();
             EditorGUILayout.Space();
 
-            EditorGUILayout.LabelField("Email");
+            EditorGUILayout.LabelField(Translations.Common.LabelEmail);
             GUI.SetNextControlName("email_redeem");
             _pendingRedeemEmail = EditorGUILayout.TextField(_pendingRedeemEmail ?? HotReloadPrefs.RedeemLicenseEmail);
             EditorGUILayout.Space();
 
             using (new EditorGUI.DisabledScope(requestingRedeem)) {
-                if (GUILayout.Button("Redeem", HotReloadRunTab.bigButtonHeight)) {
+                if (GUILayout.Button(Translations.Common.ButtonRedeem, HotReloadRunTab.bigButtonHeight)) {
                     RedeemLicense(email: _pendingRedeemEmail, invoiceNumber: _pendingInvoiceNumber).Forget();
                 }
             }
@@ -148,7 +160,7 @@ namespace SingularityGroup.HotReload.Editor {
 
             using (new EditorGUILayout.HorizontalScope()) {
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("Skip", secondaryButtonLayoutOptions)) {
+                if (GUILayout.Button(Translations.Common.ButtonSkip, secondaryButtonLayoutOptions)) {
                     SwitchToStage(RedeemStage.Login);
                 }
                 GUILayout.FlexibleSpace();
@@ -158,7 +170,7 @@ namespace SingularityGroup.HotReload.Editor {
         async Task RedeemLicense(string email, string invoiceNumber) {
             string validationError;
             if (string.IsNullOrEmpty(invoiceNumber)) {
-                validationError = "Please enter invoice number / order ID.";
+                validationError = Translations.Errors.ErrorEnterInvoiceNumber;
             } else {
                 validationError = HotReloadRunTab.ValidateEmail(email);
             }
@@ -166,12 +178,12 @@ namespace SingularityGroup.HotReload.Editor {
                 error = validationError;
                 return;
             }
-            var resp = await RequestRedeem(email: email, invoiceNumber: invoiceNumber);
+            var resp = await RequestRedeem(email: email, invoiceNumber: invoiceNumber, isChina: PackageConst.DefaultLocale == Locale.SimplifiedChinese);
             status = resp?.status;
             if (status != null) {
                 if (status != statusSuccess && status != statusAlreadyClaimed) {
-                    Log.Error("Redeeming license failed: unknown status received");
-                    error = unknownError;
+                    Log.Error(Translations.Errors.WarningRedeemStatusUnknown);
+                    error = Translations.Registration.UnknownRedeemError;
                 } else {
                     HotReloadPrefs.RedeemLicenseEmail = email;
                     HotReloadPrefs.RedeemLicenseInvoice = invoiceNumber;
@@ -179,60 +191,65 @@ namespace SingularityGroup.HotReload.Editor {
                     HotReloadPrefs.LicenseEmail = email;
                     HotReloadPrefs.LicensePassword = null;
 
-                    SwitchToStage(RedeemStage.Login);
+                    if (resp?.initialPassword != null) {
+                        HotReloadRunTab.FinishLogin(email, resp.initialPassword);
+                    } else {
+                        SwitchToStage(RedeemStage.Login);
+                    }
                 }
             } else if (resp?.error != null) {
-                Log.Warning($"Redeeming a license failed with error: {resp.error}");
+                Log.Warning(Translations.Errors.WarningRedeemingLicenseFailed, resp.error);
                 error = GetPrettyError(resp);
             } else {
-                Log.Warning("Redeeming a license failed: uknown error encountered");
-                error = unknownError;
+                Log.Warning(Translations.Errors.WarningRedeemUnknownError);
+                error = Translations.Registration.UnknownRedeemError;
             }
         }
 
         string GetPrettyError(RedeemResponse response) {
             var err = response?.error;
             if (err == null) {
-                return unknownError;
+                return Translations.Registration.UnknownRedeemError;
             }
             if (err.Contains("Invalid email")) {
-                return "Please enter a valid email address.";
+                return Translations.Errors.ErrorInvalidEmailAddress;
             } else if (err.Contains("License invoice already redeemed")) {
-                return "The invoice number/order ID you're trying to use has already been applied to redeem a license. Please enter a different invoice number/order ID. If you have already redeemed a license for another email, you may proceed to the next step.";
+                return Translations.Errors.ErrorLicenseInvoiceRedeemed;
             } else if (err.Contains("Different license already redeemed by given email")) {
-                return "The provided email has already been used to redeem a license. If you have previously redeemed a license, you can proceed to the next step and use your existing credentials. If not, please input a different email address.";
+                return Translations.Errors.ErrorEmailAlreadyUsed;
             } else if (err.Contains("Invoice not found")) {
-                return "The invoice was not found. Please ensure that you've entered the correct invoice number/order ID.";
+                return Translations.Errors.ErrorInvoiceNotFound;
             } else if (err.Contains("Invoice refunded")) {
-                return "The purchase has been refunded. Please enter a different invoice number/order ID.";
+                return Translations.Errors.ErrorInvoiceRefunded;
             } else {
-                return unknownError;
+                return Translations.Registration.UnknownRedeemError;
             }
         }
 
-        async Task<RedeemResponse> RequestRedeem(string email, string invoiceNumber) {
+        async Task<RedeemResponse> RequestRedeem(string email, string invoiceNumber, bool isChina) {
             requestingRedeem = true;
             await ThreadUtility.SwitchToThreadPool();
             try {
                 redeemClient = redeemClient ?? (redeemClient = HttpClientUtils.CreateHttpClient());
-                var input = new Dictionary<string, string> {
+                var input = new Dictionary<string, object> {
                     { "email", email },
-                    { "invoice", invoiceNumber }
+                    { "invoice", invoiceNumber },
+                    { "isChina", isChina },
                 };
                 var content = new StringContent(JsonConvert.SerializeObject(input), Encoding.UTF8, "application/json");
                 using (var resp = await redeemClient.PostAsync(redeemUrl, content, HotReloadWindow.Current.cancelToken).ConfigureAwait(false)) {
                     if (resp.StatusCode != HttpStatusCode.OK) {
-                        return new RedeemResponse(null, $"Redeem request failed. Status code: {(int)resp.StatusCode}, reason: {resp.ReasonPhrase}");
+                        return new RedeemResponse(null, string.Format(Translations.Errors.ErrorRedeemRequestFailed, (int)resp.StatusCode, resp.ReasonPhrase), null);
                     }
                     var str = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
                     try {
                         return JsonConvert.DeserializeObject<RedeemResponse>(str);
                     } catch (Exception ex) {
-                        return new RedeemResponse(null, $"Failed deserializing redeem response with exception: {ex.GetType().Name}: {ex.Message}");
+                        return new RedeemResponse(null, string.Format(Translations.Errors.ErrorFailedDeserializingRedeem, ex.GetType().Name, ex.Message), null);
                     }
                 }
             } catch (WebException ex) {
-                return new RedeemResponse(null, $"Redeeming license failed: WebException encountered {ex.Message}");
+                return new RedeemResponse(null, string.Format(Translations.Errors.ErrorRedeemingWebException, ex.Message), null);
             } finally {
                 requestingRedeem = false;
             }
@@ -241,18 +258,20 @@ namespace SingularityGroup.HotReload.Editor {
         private class RedeemResponse {
             public string status;
             public string error;
+            public string initialPassword;
 
-            public RedeemResponse(string status, string error) {
+            public RedeemResponse(string status, string error, string initialPassword) {
                 this.status = status;
                 this.error = error;
+                this.initialPassword = initialPassword;
             }
         }
 
         private void RenderLogin(HotReloadRunTabState state) {
             if (status == statusSuccess) {
-                EditorGUILayout.HelpBox("Success! You will receive an email containing your license password shortly. Once you receive it, please enter the received password in the designated field below to complete your registration.", MessageType.Info);
+                EditorGUILayout.HelpBox(Translations.Registration.MessageRedeemSuccess, MessageType.Info);
             } else if (status == statusAlreadyClaimed) {
-                EditorGUILayout.HelpBox("Your license has already been redeemed. Please enter your existing password below.", MessageType.Info);
+                EditorGUILayout.HelpBox(Translations.Registration.MessageRedeemAlreadyClaimed, MessageType.Info);
             }
             EditorGUILayout.Space();
             EditorGUILayout.Space();
@@ -263,7 +282,7 @@ namespace SingularityGroup.HotReload.Editor {
 
             using (new EditorGUILayout.HorizontalScope()) {
                 GUILayout.FlexibleSpace();
-                if (GUILayout.Button("Go Back", secondaryButtonLayoutOptions)) {
+                if (GUILayout.Button(Translations.Common.ButtonGoBack, secondaryButtonLayoutOptions)) {
                     SwitchToStage(RedeemStage.Redeem);
                 }
                 GUILayout.FlexibleSpace();

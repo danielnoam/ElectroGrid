@@ -4,8 +4,7 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - PromptsPrefab: {fileID: 4967086677379066170, guid: 0dc8d7047b14c44b7970c5d35665dbe1,
-      type: 3}
+  - PromptsPrefab: {fileID: 4967086677379066170, guid: 0dc8d7047b14c44b7970c5d35665dbe1, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
@@ -15,6 +14,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 254358
   packageName: Hot Reload | Edit Code Without Compiling
-  packageVersion: 1.13.12
+  packageVersion: 1.13.24
   assetPath: Packages/com.singularitygroup.hotreload/Runtime/HotReloadSettingsObject.cs
-  uploadId: 821600
+  uploadId: 991576

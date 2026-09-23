@@ -1,4 +1,4 @@
-using DNExtensions;
+using DNExtensions.Utilities;
 using PrimeTween;
 using UnityEngine;
 
@@ -127,7 +127,7 @@ public class Match3SelectionIndicator : MonoBehaviour
     
     private void UpdateHoveredTile()
     {
-        if (!_camera || !match3PlayHandler.CanInteract || !_inputReader || _inputReader.IsCurrentDeviceTouchscreen) return;
+        if (!_camera || !match3PlayHandler.CanInteract || !_inputReader || _inputReader.IsTouch) return;
         
         Vector2 mousePos = _inputReader.MousePosition;
         Vector2 worldPos = _camera.ScreenToWorldPoint(mousePos);

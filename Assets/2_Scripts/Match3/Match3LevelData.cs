@@ -9,7 +9,7 @@ public class Match3LevelData
 
     public float TimeSpent;
     public int MovesMade;
-    public int MatchesMade;
+    public int PiecesCleared;
     public int ObstaclesBroken;
     public int BottomObjectsReached;
     
@@ -18,7 +18,7 @@ public class Match3LevelData
         Level = level;
         TimeSpent = 0;
         MovesMade = 0;
-        MatchesMade = 0;
+        PiecesCleared = 0;
         ObstaclesBroken = 0;
         BottomObjectsReached = 0;
         
@@ -27,24 +27,20 @@ public class Match3LevelData
         
         foreach (var objective in Level.Objectives)
         {
-            if (objective != null)
-            {
-                string json = JsonUtility.ToJson(objective);
-                Match3Objective copy = (Match3Objective)JsonUtility.FromJson(json, objective.GetType());
-                copy.Setup();
-                CurrentObjectives.Add(copy);
-            }
+            if (objective == null) continue;
+
+            var copy = objective.Clone();
+            copy.Setup();
+            CurrentObjectives.Add(copy);
         }
-        
+
         foreach (var condition in Level.LoseConditions)
         {
-            if (condition != null)
-            {
-                string json = JsonUtility.ToJson(condition);
-                Match3LoseCondition copy = (Match3LoseCondition)JsonUtility.FromJson(json, condition.GetType());
-                copy.Setup();
-                CurrentLoseConditions.Add(copy);
-            }
+            if (condition == null) continue;
+
+            var copy = condition.Clone();
+            copy.Setup();
+            CurrentLoseConditions.Add(copy);
         }
     }
     
@@ -61,7 +57,7 @@ public class Match3LevelData
     
     public void OnMatchesMade(List<Match3Tile> allMatches)
     {
-        MatchesMade += allMatches.Count;
+        PiecesCleared += allMatches.Count;
         
         foreach (var objective in CurrentObjectives)
         {
@@ -110,32 +106,22 @@ public class Match3LevelData
     
     public bool HasLoseConditions()
     {
-        if (CurrentLoseConditions.Count == 0) return false;
-        
         foreach (var condition in CurrentLoseConditions)
         {
-            if (condition != null)
-            {
-                return true;
-            }
+            if (condition != null) return true;
         }
 
         return false;
     }
-    
-    public bool IsAnyLoseConditionBellowHalf()
-    {
-        if (CurrentLoseConditions.Count == 0) return false;
 
+    public bool IsAnyLoseConditionBelowHalf()
+    {
         foreach (var condition in CurrentLoseConditions)
         {
-            if (condition is { IsConditionMet: false })
-            {
-                if (condition.GetProgress().Item1 < condition.GetProgress().Item2 / 2)
-                {
-                    return true;
-                }
-            }
+            if (condition is not { IsConditionMet: false }) continue;
+
+            var (current, total) = condition.GetProgress();
+            if (current < total / 2) return true;
         }
 
         return false;
@@ -144,23 +130,20 @@ public class Match3LevelData
     
     public bool IsObjectivesComplete()
     {
-        bool allComplete = true;
-        
+        bool hasObjective = false;
+
         foreach (var objective in CurrentObjectives)
         {
-            if (objective == null)  continue;
-            
-            if (!objective.IsCompleted)
-            {
-                allComplete = false;
-                break;
-            }
+            if (objective == null) continue;
+
+            hasObjective = true;
+            if (!objective.IsCompleted) return false;
         }
-        
-        return allComplete;
+
+        return hasObjective;
     }
     
-    public bool IsLostCondition()
+    public bool IsAnyLoseConditionMet()
     {
         foreach (var condition in CurrentLoseConditions)
         {

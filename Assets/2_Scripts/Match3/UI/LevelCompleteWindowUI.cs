@@ -1,5 +1,5 @@
 using System;
-using DNExtensions;
+using DNExtensions.Systems.Scriptables;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -155,9 +155,9 @@ public class LevelCompleteWindowUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        var matchedMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        matchedMadeElement.Setup(null, $"Matches Made: {levelData.MatchesMade}");
-        matchedMadeElement.gameObject.name = "MatchesMade";
+        var piecesClearedElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
+        piecesClearedElement.Setup(null, $"Pieces Cleared: {levelData.PiecesCleared}");
+        piecesClearedElement.gameObject.name = "PiecesCleared";
         
         var movesMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
         movesMadeElement.Setup(null, $"Moves Made: {levelData.MovesMade}");
@@ -171,16 +171,32 @@ public class LevelCompleteWindowUI : MonoBehaviour
         levelButton.onClick.RemoveAllListeners();
         var levelButtonText = levelButton.GetComponentInChildren<TextMeshProUGUI>();
         
-        if (won)
+        if (won && _match3Manager.HasNextLevel())
         {
             levelButtonText.text = "Next Level";
             levelButton.onClick.AddListener(OnNextLevelPressed);
+        }
+        else if (won)
+        {
+            levelButtonText.text = "Finish";
+            levelButton.onClick.AddListener(OnFinishPressed);
         }
         else
         {
             levelButtonText.text = "Try Again";
             levelButton.onClick.AddListener(OnRetryPressed);
         }
+    }
+
+    private void OnFinishPressed()
+    {
+        CameraManager.Instance.ShakeCamera(0.1f);
+        Toggle(false);
+        _toggleSequence.ChainDelay(0.1f);
+        _toggleSequence.ChainCallback(() =>
+        {
+            GameManager.Instance?.MainMenu.LoadScene();
+        });
     }
 
     private void OnNextLevelPressed()

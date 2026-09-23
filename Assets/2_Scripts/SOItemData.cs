@@ -1,4 +1,3 @@
-using DNExtensions;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Item Data", menuName = "Scriptable Objects/Item Data")]

@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using DNExtensions;
-using DNExtensions.Button;
-using DNExtensions.InputSystem;
+using DNExtensions.Utilities;
+using DNExtensions.Utilities.Button;
+using DNExtensions.Systems.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Gyroscope = UnityEngine.InputSystem.Gyroscope;
@@ -49,14 +49,15 @@ public class TouchInputReader : InputReaderBase
         Instance = this;
     }
 
-    protected override void Start()
+    private void Start()
     {
-        base.Start();
-        
         _match3ActionMap = PlayerInput.actions.FindActionMap("Match3",true);
         _selectAction = _match3ActionMap.FindAction("Select",true);
         _mousePositionAction = _match3ActionMap.FindAction("MousePosition",true);
         
+        // Start runs again from ResubscribeToActions, and SubscribeToAction no longer clears old handlers
+        UnsubscribeFromAction(_selectAction, OnSelectAction);
+        UnsubscribeFromAction(_mousePositionAction, OnMousePositionAction);
         SubscribeToAction(_selectAction, OnSelectAction);
         SubscribeToAction(_mousePositionAction, OnMousePositionAction);
 
@@ -110,8 +111,14 @@ public class TouchInputReader : InputReaderBase
 
     private void UpdateGyroRotation()
     {
-        if (!IsCurrentDeviceTouchscreen || !IsCurrentDeviceMobile) return;
-        gyroRotation = Gyroscope.current.angularVelocity.value;
+        if (!IsTouch || !IsMobile) return;
+
+        // Null on hardware without the sensor, which plenty of budget Android phones lack.
+        // Input System devices are plain classes, so this is a real null check, not the Unity object one
+        var gyroscope = Gyroscope.current;
+        if (gyroscope == null) return;
+
+        gyroRotation = gyroscope.angularVelocity.value;
     }
     
     

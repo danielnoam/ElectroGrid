@@ -1,8 +1,7 @@
 using System;
 using System.Text;
-using DNExtensions;
-using DNExtensions.MenuSystem;
-using DNExtensions.VFXManager;
+using DNExtensions.Utilities;
+using DNExtensions.Systems.VFXManager;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -16,6 +15,7 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private int maxGridWidthForLargeSize = 8;
     [SerializeField] private Color activeCellColor = new Color(0.3f, 0.7f, 0.3f);
     [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
+    [SerializeField] private string lockedLevelLabel = "?";
     
     [Header("References")]
     [SerializeField] private Transform buttonsHolder;
@@ -37,6 +37,21 @@ public class LevelSelectionScreen : MenuScreen
         CreateLevelButtons();
         UpdateLevelInfo();
         SetupButtons();
+
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset += OnSaveReset;
+    }
+
+    private void OnDestroy()
+    {
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset -= OnSaveReset;
+    }
+
+    private void OnSaveReset()
+    {
+        _selectedLevel = null;
+        GameManager.Instance?.SelectMatch3Level(null);
+        CreateLevelButtons();
+        UpdateLevelInfo();
     }
 
     protected override Tween GetShowPositionTween()
@@ -57,8 +72,8 @@ public class LevelSelectionScreen : MenuScreen
     {
         if (levelStartButton)
         {
-            SelectableAnimator selectableAnimator = levelStartButton.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            SelectableFeedback selectableFeedback = levelStartButton.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
 
             levelStartButton.onClick.RemoveAllListeners();
             levelStartButton.onClick.AddListener(OnStartButtonClicked);
@@ -66,8 +81,8 @@ public class LevelSelectionScreen : MenuScreen
 
         if (backButton)
         {
-            SelectableAnimator selectableAnimator = backButton.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            SelectableFeedback selectableFeedback = backButton.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
             
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(OnBackButtonClicked);
@@ -79,7 +94,7 @@ public class LevelSelectionScreen : MenuScreen
         if (!_selectedLevel || !GameManager.Instance) return;
         
 
-        var vfxDuration = VFXManager.Instance.PlayVFX(menuManager.EndLevelEffect);
+        var vfxDuration = VFXManager.Instance.PlaySequence(menuManager.EndLevelEffect);
         CameraManager.Instance?.ShakeCamera(vfxDuration);
         GameManager.Instance.SelectMatch3Level(_selectedLevel);
         
@@ -112,15 +127,19 @@ public class LevelSelectionScreen : MenuScreen
 
             Button levelButton = Instantiate(levelButtonPrefab, buttonsHolder);
             int levelIndex = i;
+            bool unlocked = !SaveManager.Instance || SaveManager.Instance.IsLevelUnlocked(levelIndex);
 
             TextMeshProUGUI buttonText = levelButton.GetComponentInChildren<TextMeshProUGUI>();
             if (buttonText)
             {
-                buttonText.text = (levelIndex + 1).ToString();
+                buttonText.text = unlocked ? (levelIndex + 1).ToString() : lockedLevelLabel;
             }
-            
-            SelectableAnimator selectableAnimator = levelButton.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+
+            SelectableFeedback selectableFeedback = levelButton.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
+
+            levelButton.interactable = unlocked;
+            if (!unlocked) continue;
 
             levelButton.onClick.AddListener(() => OnLevelButtonClicked(level));
         }
@@ -181,7 +200,24 @@ public class LevelSelectionScreen : MenuScreen
             }
         }
 
+        AppendBestStats(info, level);
+
         return info.ToString();
+    }
+
+    private void AppendBestStats(StringBuilder info, SOMatch3Level level)
+    {
+        var record = SaveManager.Instance ? SaveManager.Instance.GetRecord(level) : null;
+        if (record is not { completed: true }) return;
+
+        int minutes = Mathf.FloorToInt(record.bestTime / 60f);
+        int seconds = Mathf.FloorToInt(record.bestTime % 60f);
+
+        info.AppendLine();
+        info.AppendLine("Best:");
+        info.AppendLine($"• Moves: {record.bestMoves}");
+        info.AppendLine($"• Time: {minutes:00}:{seconds:00}");
+        info.AppendLine($"• Pieces Cleared: {record.bestPiecesCleared}");
     }
 
     private void DrawGrid(Grid grid)

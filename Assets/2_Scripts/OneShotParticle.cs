@@ -1,8 +1,8 @@
 using System.Collections;
-using DNExtensions.ObjectPooling;
+using DNExtensions.Systems.ObjectPooling;
 using UnityEngine;
 
-public class OneShotParticle : MonoBehaviour, IPooledObject
+public class OneShotParticle : MonoBehaviour, IPoolable
 {
     public ParticleSystem particle;
 

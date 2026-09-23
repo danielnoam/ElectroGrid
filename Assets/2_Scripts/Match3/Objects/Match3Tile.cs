@@ -1,11 +1,11 @@
 using System;
-using DNExtensions;
-using DNExtensions.ObjectPooling;
+using DNExtensions.Utilities;
+using DNExtensions.Systems.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
 [SelectionBase]
-public class Match3Tile : MonoBehaviour, IPooledObject
+public class Match3Tile : MonoBehaviour, IPoolable
 {
     [Header("Settings")]
     [SerializeField] private Color selectedTileColor = new Color(0f, 1f, 0f, 1f);

@@ -1,5 +1,6 @@
 using System;
-using DNExtensions.MenuSystem;
+using DNExtensions.Systems.VFXManager;
+using UnityEngine.Serialization;
 using PrimeTween;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,15 +15,63 @@ public class MainMenuScreen : MenuScreen
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private InformationWindowUI informationWindowUI;
     [SerializeField] private Button infoButton;
-    [SerializeField] private Button muteButton;
-    [SerializeField] private Image muteButtonImage;
-    [SerializeField] private Sprite mutedSprite;
-    [SerializeField] private Sprite unmutedSprite;
+    [FormerlySerializedAs("muteButton")]
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private SettingsWindowUI settingsWindowUI;
+    [SerializeField] private Button continueButton;
 
     private void Start()
     {
         SetupButtons();
         informationWindowUI?.Initialize();
+        settingsWindowUI?.Initialize();
+
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
+    }
+
+    private void OnDestroy()
+    {
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset -= SetupContinueButton;
+    }
+
+    private void SetupContinueButton()
+    {
+        if (!continueButton) return;
+
+        var level = ResolveLastPlayedLevel();
+
+        // Nothing to continue into on a fresh save, so the button is hidden rather than shown disabled
+        continueButton.gameObject.SetActive(level);
+        if (!level) return;
+
+        SelectableFeedback selectableFeedback = continueButton.GetComponent<SelectableFeedback>();
+        if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
+
+        continueButton.onClick.RemoveAllListeners();
+        continueButton.onClick.AddListener(() =>
+        {
+            // Same exit as starting a level from level select
+            var vfxDuration = VFXManager.Instance ? VFXManager.Instance.PlaySequence(menuManager.EndLevelEffect) : 0.5f;
+            CameraManager.Instance?.ShakeCamera(vfxDuration);
+            GameManager.Instance.SelectMatch3Level(level);
+
+            HideByFade(4, () => { GameManager.Instance.Match3Scene.LoadScene(); });
+        });
+    }
+
+    private SOMatch3Level ResolveLastPlayedLevel()
+    {
+        if (!SaveManager.Instance || !GameManager.Instance) return null;
+
+        string lastPlayed = SaveManager.Instance.LastPlayedLevel;
+        if (string.IsNullOrEmpty(lastPlayed)) return null;
+
+        foreach (var level in GameManager.Instance.Match3Levels)
+        {
+            if (level && level.name == lastPlayed) return level;
+        }
+
+        return null;
     }
 
     protected override Tween GetShowPositionTween()
@@ -72,8 +121,8 @@ public class MainMenuScreen : MenuScreen
     {
         if (match3Button)
         {
-            SelectableAnimator selectableAnimator = match3Button.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            SelectableFeedback selectableFeedback = match3Button.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
             
             match3Button.onClick.RemoveAllListeners();
             match3Button.onClick.AddListener(() =>
@@ -85,8 +134,8 @@ public class MainMenuScreen : MenuScreen
         
         if (quitButton)
         {
-            SelectableAnimator selectableAnimator = quitButton.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            SelectableFeedback selectableFeedback = quitButton.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
             
             quitButton.onClick.RemoveAllListeners();
             quitButton.onClick.AddListener(() =>
@@ -109,8 +158,8 @@ public class MainMenuScreen : MenuScreen
 
         if (creditsButton)
         {
-            SelectableAnimator selectableAnimator = creditsButton.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            SelectableFeedback selectableFeedback = creditsButton.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
 
             creditsButton.onClick.RemoveAllListeners();
             creditsButton.onClick.AddListener(() =>
@@ -121,18 +170,17 @@ public class MainMenuScreen : MenuScreen
             });
         }
 
-        if (muteButtonImage)
+        if (settingsButton)
         {
-            muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
-    
-            muteButton.onClick.RemoveAllListeners();
-            muteButton.onClick.AddListener(() =>
+            settingsButton.onClick.RemoveAllListeners();
+            settingsButton.onClick.AddListener(() =>
             {
                 CameraManager.Instance.ShakeCamera(0.1f);
-                AudioManager.Instance.ToggleAudio();
-                muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
+                settingsWindowUI?.Show();
             });
         }
+
+        SetupContinueButton();
 
         if (infoButton)
         {
@@ -140,7 +188,7 @@ public class MainMenuScreen : MenuScreen
             infoButton.onClick.AddListener(() =>
             {
                 CameraManager.Instance.ShakeCamera(0.1f);
-                informationWindowUI?.Toggle(true);
+                informationWindowUI?.ShowAllTutorials();
                 FirebaseManager.Instance?.LogInformationClicked();
             });
         }

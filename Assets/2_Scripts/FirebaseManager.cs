@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using DNExtensions;
+using DNExtensions.Utilities;
 using UnityEngine;
 using Firebase;
 using Firebase.Analytics;
@@ -27,6 +27,16 @@ public class FirebaseManager : MonoBehaviour
     private readonly List<string> _debugLogs = new List<string>();
     private Vector2 _scrollPosition;
     private const int MaxLogs = 30;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void Bootstrap()
+    {
+        if (Instance) return;
+
+        var go = new GameObject(nameof(FirebaseManager));
+        go.AddComponent<FirebaseManager>();
+        DontDestroyOnLoad(go);
+    }
 
     private void Awake()
     {
@@ -83,8 +93,10 @@ public class FirebaseManager : MonoBehaviour
         var defaultsTask = FirebaseRemoteConfig.DefaultInstance.SetDefaultsAsync(defaults);
         yield return new WaitUntil(() => defaultsTask.IsCompleted);
         
-        var fetchTask = FirebaseRemoteConfig.DefaultInstance.FetchAsync(TimeSpan.Zero);
-        
+        // Production clients are throttled to a handful of fetches per hour, so only bypass the cache in development builds
+        var cacheExpiration = Debug.isDebugBuild ? TimeSpan.Zero : TimeSpan.FromHours(12);
+        var fetchTask = FirebaseRemoteConfig.DefaultInstance.FetchAsync(cacheExpiration);
+
         yield return new WaitUntil(() => fetchTask.IsCompleted);
         
         if (fetchTask.IsFaulted || fetchTask.IsCanceled)
@@ -139,7 +151,8 @@ public class FirebaseManager : MonoBehaviour
             new Parameter[] {
                 new(FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName),
                 new(FirebaseAnalytics.ParameterSuccess, 1),
-                new("matches_made", levelData.MatchesMade),
+                // Wire name kept as-is so the existing Firebase series stays continuous after the field rename
+                new("matches_made", levelData.PiecesCleared),
                 new("moves_made", levelData.MovesMade),
                 new("time_spent_seconds", (int)levelData.TimeSpent)
             }
@@ -155,7 +168,8 @@ public class FirebaseManager : MonoBehaviour
             new Parameter[] {
                 new(FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName),
                 new(FirebaseAnalytics.ParameterSuccess, 0),
-                new("matches_made", levelData.MatchesMade),
+                // Wire name kept as-is so the existing Firebase series stays continuous after the field rename
+                new("matches_made", levelData.PiecesCleared),
                 new("moves_made", levelData.MovesMade),
                 new("time_spent_seconds", (int)levelData.TimeSpent)
             }

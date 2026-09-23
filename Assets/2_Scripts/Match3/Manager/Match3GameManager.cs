@@ -2,13 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DNExtensions;
-using DNExtensions.Button;
+using DNExtensions.Utilities;
+using DNExtensions.Utilities.Button;
 using System.Linq;
 
 public class Match3GameManager : MonoBehaviour
 {
     public static Match3GameManager Instance { get; private set; }
+
+    private const int GenerationAttemptsPerFrame = 8;
 
     [Header("Gameplay Settings")]
     [Tooltip("Minimum tiles required to form a match")]
@@ -20,11 +22,13 @@ public class Match3GameManager : MonoBehaviour
     
     [Header("Population Settings")]
     [Tooltip("Maximum attempts to create a grid with guaranteed matches")]
-    [SerializeField] private int mxGuaranteedMatchAttempts = 100;
+    [SerializeField] private int maxGuaranteedMatchAttempts = 100;
     [Tooltip("Maximum attempts to recheck matches in grid")]
     [SerializeField] private int maxAttemptsToRecheckMatches = 50;
     [Tooltip("Minimum possible matches required in grid")]
     [SerializeField] private int minPossibleMatches = 3;
+    [Tooltip("Times the grid is reshuffled when no moves are left before giving up")]
+    [SerializeField] private int maxReshuffleAttempts = 5;
     
     [Header("References")]
     [SerializeField] private Match3GridHandler gridHandler;
@@ -42,7 +46,8 @@ public class Match3GameManager : MonoBehaviour
     
     public Match3LevelData CurrentLevelData => _currentLevelData;
     public Match3GridHandler GridHandler => gridHandler;
-    public int MaxGuaranteedMatchAttempts => mxGuaranteedMatchAttempts;
+    public Match3PlayHandler PlayHandler => playHandler;
+    public int MaxGuaranteedMatchAttempts => maxGuaranteedMatchAttempts;
     public float ChanceToSpawnHelper => chanceToSpawnHelper;
     public int MinMatchCount => minMatchCount;
     public int MinMatchForLineBreak => minMatchForLineBreak;
@@ -90,17 +95,24 @@ public class Match3GameManager : MonoBehaviour
         _currentLevelData.TimeSpent += Time.deltaTime;
     }
 
+    public bool HasNextLevel()
+    {
+        var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
+        if (levels == null || levels.Length == 0) return false;
+
+        return Array.IndexOf(levels, currentLevel) + 1 < levels.Length;
+    }
+
     public void SetNextLevel()
     {
-        var levels = GameManager.Instance.Match3Levels;
-        if (levels != null && levels.Length != 0)
-        {
-            int currentIndex = Array.IndexOf(levels, currentLevel);
-            int nextIndex = (currentIndex + 1) % levels.Length;
+        var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
+        if (levels == null || levels.Length == 0) return;
 
-            currentLevel = levels[nextIndex];
-            StartNewGame();
-        }
+        int nextIndex = Array.IndexOf(levels, currentLevel) + 1;
+        if (nextIndex <= 0 || nextIndex >= levels.Length) return;
+
+        currentLevel = levels[nextIndex];
+        StartNewGame();
     }
     
     public void RestartLevel()
@@ -140,10 +152,10 @@ public class Match3GameManager : MonoBehaviour
         populatingGrid = false;
         
         _currentLevelData = new Match3LevelData(currentLevel);
+        SaveManager.Instance?.SetLastPlayedLevel(currentLevel);
         StartCoroutine(InitialLevelSetup());
         
         FirebaseManager.Instance?.LogLevelStarted(_currentLevelData);
-        UnityAnalyticsManager.Instance?.LogGameStarted();
         
         LevelStarted?.Invoke(_currentLevelData);
     }
@@ -163,7 +175,7 @@ public class Match3GameManager : MonoBehaviour
     {
         if (levelComplete || populatingGrid || _currentLevelData == null || finishedObjectives) return;
         
-        if (_currentLevelData.IsLostCondition())
+        if (_currentLevelData.IsAnyLoseConditionMet())
         {
             StartCoroutine(FailLevel());
         }
@@ -179,7 +191,7 @@ public class Match3GameManager : MonoBehaviour
         }
     }
     
-    public void NotifyMatchesWhereMade(List<Match3Tile> matches)
+    public void NotifyMatchesWereMade(List<Match3Tile> matches)
     {
         _currentLevelData?.OnMatchesMade(matches);
         MatchesMade?.Invoke(matches);
@@ -225,7 +237,13 @@ public class Match3GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         
         FirebaseManager.Instance?.LogLevelCompleted(_currentLevelData);
-        UnityAnalyticsManager.Instance?.LogGameCompleted();
+
+        if (SaveManager.Instance && GameManager.Instance)
+        {
+            int levelIndex = Array.IndexOf(GameManager.Instance.Match3Levels, currentLevel);
+            SaveManager.Instance.RecordLevelCompleted(currentLevel, _currentLevelData, levelIndex);
+        }
+
         LevelComplete?.Invoke(_currentLevelData);
     }
 
@@ -241,7 +259,6 @@ public class Match3GameManager : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         FirebaseManager.Instance?.LogLevelFailed(_currentLevelData);
-        UnityAnalyticsManager.Instance?.LogGameFailed();
         LevelFailed?.Invoke(_currentLevelData);
     }
     
@@ -271,10 +288,11 @@ public class Match3GameManager : MonoBehaviour
         }
         
         NotifyAMoveWasMade();
-        
+
+        // Must run before the matches are handled, objectives inspect the matched tiles while they still hold their objects
+        NotifyMatchesWereMade(allMatches);
+
         yield return StartCoroutine(playHandler.HandleMatches(allMatches));
-        
-        NotifyMatchesWhereMade(allMatches);
     
         yield return StartCoroutine(playHandler.MoveObjectsDown(gridHandler.GridShape));
     
@@ -284,16 +302,30 @@ public class Match3GameManager : MonoBehaviour
 
         if (!levelComplete)
         {
-            var possibleMatches = playHandler.FindPossibleMatches(gridHandler.GridShape);
-            if (possibleMatches.Count < minPossibleMatches)
+            if (playHandler.FindPossibleMatches(gridHandler.GridShape).Count < minPossibleMatches)
             {
-                Debug.Log($"No possible matches left");
-                yield break;
+                yield return StartCoroutine(ReshuffleGrid());
             }
-        
+
             playHandler.CanInteract = true;
             populatingGrid = false;
         }
+    }
+
+    private IEnumerator ReshuffleGrid()
+    {
+        for (int attempt = 0; attempt < maxReshuffleAttempts; attempt++)
+        {
+            yield return StartCoroutine(playHandler.ClearMatchableObjects());
+            yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, false));
+            yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches));
+
+            if (levelComplete) yield break;
+
+            if (playHandler.FindPossibleMatches(gridHandler.GridShape).Count >= minPossibleMatches) yield break;
+        }
+
+        Debug.LogError($"Grid still has no possible matches after {maxReshuffleAttempts} reshuffles");
     }
     
     private IEnumerator InitialLevelSetup()
@@ -322,15 +354,9 @@ public class Match3GameManager : MonoBehaviour
             
             if (!validationResult.isValid)
             {
-                if (validationResult.immediateMatches > 0)
-                {
-                    Debug.Log($"Too many immediate matches found in grid ({validationResult.immediateMatches}), retrying (attempt {retryCount}/{maxAttemptsToRecheckMatches})");
-                }
-                else if (validationResult.possibleMatches < minPossibleMatches)
-                {
-                    Debug.Log($"Not enough possible matches ({validationResult.possibleMatches}/{minPossibleMatches}), retrying (attempt {retryCount}/{maxAttemptsToRecheckMatches})");
-                }
-                continue; 
+                // Generating and validating a layout is expensive, so spread long retry runs over several frames
+                if (retryCount % GenerationAttemptsPerFrame == 0) yield return null;
+                continue;
             }
             
             // Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");

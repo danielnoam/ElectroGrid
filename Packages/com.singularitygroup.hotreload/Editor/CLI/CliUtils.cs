@@ -5,6 +5,8 @@ using System.Text;
 using SingularityGroup.HotReload.Newtonsoft.Json;
 using UnityEngine;
 using System;
+using SingularityGroup.HotReload.DTO;
+using SingularityGroup.HotReload.Localization;
 
 namespace SingularityGroup.HotReload.Editor.Cli {
     internal static class CliUtils {
@@ -15,13 +17,15 @@ namespace SingularityGroup.HotReload.Editor.Cli {
         }
 
         public static string GetProjectIdentifier() {
-            if (File.Exists(PackageConst.ConfigFileName)) {
-                var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(PackageConst.ConfigFileName));
-                if (config.singleInstance) {
-                    return null;
-                }
+            if (File.Exists(PackageConst.ConfigFilePath)) {
+                try {
+                    var config = JsonConvert.DeserializeObject<Config>(File.ReadAllText(PackageConst.ConfigFilePath));
+                    if (config.singleInstance) {
+                        return null;
+                    }
+                } catch { /*_*/}
             }
-            var path = Path.GetDirectoryName(UnityHelper.DataPath);
+            var path = Path.GetFullPath(MultiplayerPlaymodeHelper.PathToMainProject("."));
             var name = new DirectoryInfo(path).Name;
             using (SHA256 sha256 = SHA256.Create()) {
                 byte[] inputBytes = Encoding.UTF8.GetBytes(path);
@@ -41,16 +45,17 @@ namespace SingularityGroup.HotReload.Editor.Cli {
         }
         
         public static string GetHotReloadTempDir() {
-            if (UnityHelper.Platform == RuntimePlatform.OSXEditor) {
-                // project specific temp directory that is writeable on MacOS (Path.GetTempPath() wasn't when run through HotReload.app)
-                return Path.GetFullPath(PackageConst.LibraryCachePath + "/HotReloadServerTemp");
-            } else {
+            if (UnityHelper.Platform == RuntimePlatform.WindowsEditor) {
+                // library path interfereces with VS Code file watcher (Source Control window doesn't auto refresh)
+                // so we pick data path on windows instead
                 if (projectIdentifier != null) {
-                    return Path.Combine(Path.GetTempPath(), "HotReloadTemp", projectIdentifier);
+                    return Path.Combine(GetAppDataPath(), "HotReloadServerTemp", projectIdentifier);
                 } else {
-                    return Path.Combine(Path.GetTempPath(), "HotReloadTemp");
+                    return Path.Combine(GetAppDataPath(), "HotReloadServerTemp");
                 }
             }
+            // store in library path on mac and linux since it works there
+            return Path.GetFullPath(Path.Combine(PackageConst.LibraryCachePath, "HotReloadServerTemp"));
         }
         
         public static string GetAppDataPath() {
@@ -66,7 +71,13 @@ namespace SingularityGroup.HotReload.Editor.Cli {
         
         public static string GetExecutableTargetDir() {
             if (PackageConst.IsAssetStoreBuild) {
+                if (PackageConst.DefaultLocaleField == Locale.SimplifiedChinese) {
+                    return Path.Combine(GetAppDataPath(), "asset-store", "zh", $"executables_{PackageConst.ServerVersion.Replace('.', '-')}");
+                }
                 return Path.Combine(GetAppDataPath(), "asset-store", $"executables_{PackageConst.ServerVersion.Replace('.', '-')}");
+            }
+            if (PackageConst.DefaultLocaleField == Locale.SimplifiedChinese) {
+                return Path.Combine(GetAppDataPath(), "zh", $"executables_{PackageConst.ServerVersion.Replace('.', '-')}");
             }
             return Path.Combine(GetAppDataPath(), $"executables_{PackageConst.ServerVersion.Replace('.', '-')}");
         }

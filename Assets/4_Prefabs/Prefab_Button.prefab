@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3208736288784191921}
   - component: {fileID: 7826607267302580638}
   - component: {fileID: 8657510666483211056}
+  - component: {fileID: 8070639938617703997}
   m_Layer: 5
   m_Name: Prefab_Button
   m_TagString: Untagged
@@ -153,7 +154,7 @@ MonoBehaviour:
   playOnSubmit: 1
   playOnSelect: 0
   playOnDeselect: 0
-  selectableAnimator: {fileID: 8657510666483211056}
+  selectable: {fileID: 3208736288784191921}
 --- !u!114 &8657510666483211056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -166,9 +167,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c641a4da1748fa866e29dd0aa259af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableAnimator
-  mouseSelectsSelectable: 1
-  selectSfx: {fileID: 11400000, guid: 5cc75ba5af4069240917685cc9975553, type: 2}
-  submitSfx: {fileID: 11400000, guid: 4110f1894f6f21a45950420380c1f305, type: 2}
   positionEffectType: 0
   positionOffset: {x: 0, y: 10, z: 0}
   positionDuration: 0.15
@@ -213,7 +211,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  audioSource: {fileID: 0}
   selectable: {fileID: 3208736288784191921}
   eventTrigger: {fileID: 8890823435884068750}
   rectTransform: {fileID: 5544082587813058189}
@@ -366,7 +363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f2231885b2944be90dc6fb3775af10c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableTextAnimator
-  selectableAnimator: {fileID: 8657510666483211056}
+  selectable: {fileID: 3208736288784191921}
   positionEffectType: 2
   positionOffset: {x: 0, y: 10, z: 0}
   positionDuration: 0.15
@@ -388,5 +385,22 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.13521993, b: 0.86211616, a: 1}
   colorDuration: 0.15
   colorEase: 7
-  textMeshPro: {fileID: 3982775019398211998}
+  graphic: {fileID: 3982775019398211998}
   rectTransform: {fileID: 4426503580546431240}
+--- !u!114 &8070639938617703997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5302415877516245720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8deca28af3c49ff8fdcb42d3c149836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableFeedback
+  mouseSelectsSelectable: 1
+  selectSfx: {fileID: 11400000, guid: 5cc75ba5af4069240917685cc9975553, type: 2}
+  submitSfx: {fileID: 11400000, guid: 4110f1894f6f21a45950420380c1f305, type: 2}
+  audioSource: {fileID: 0}
+  selectable: {fileID: 3208736288784191921}

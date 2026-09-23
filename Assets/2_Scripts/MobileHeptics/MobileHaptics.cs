@@ -47,6 +47,7 @@ public static class MobileHaptics
         if (!_isInitialized) Initialize();
         
         if (FirebaseManager.Instance && !FirebaseManager.Instance.HapticsEnabled) return;
+        if (SaveManager.Instance && !SaveManager.Instance.HapticsEnabled) return;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (vibrator != null)

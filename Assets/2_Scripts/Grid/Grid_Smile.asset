@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d942ccd036153a4dae3f357be10fb3d, type: 3}
+  m_Script: {fileID: 11500000, guid: 6b89fa7459d581a98fc0637059510a69, type: 3}
   m_Name: Grid_Smile
   m_EditorClassIdentifier: Assembly-CSharp::SOGridShape
   grid:

@@ -65,9 +65,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: a8ae8b26d38521f4d901e390c5bd5a87, type: 3}
+  m_Sprite: {fileID: 1718567105045678179, guid: 947a4a4150039314191f967d35886cf1, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -93,7 +93,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5302415877516245720, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_Name
-      value: Prefab_ButtonMute Variant
+      value: Prefab_ButtonMute
       objectReference: {fileID: 0}
     - target: {fileID: 5544082587813058189, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_Pivot.x

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level_5
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
   levelName: Level 5
-  gridShape: {fileID: 11400000, guid: e7dd7a13155ee5541bb864131601c681, type: 2}
+  gridShape: {fileID: 11400000, guid: 45b9e5454618ba2895182ad727bd9abb, type: 2}
   matchObjects:
     internalItems:
     - item: {fileID: 11400000, guid: 06c7eecdb5f79c542a8465be434742cc, type: 2}
@@ -40,7 +40,7 @@ MonoBehaviour:
       type: {class: GetMatches, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
-        gridShape: {fileID: 11400000, guid: e7dd7a13155ee5541bb864131601c681, type: 2}
+        gridShape: {fileID: 11400000, guid: 45b9e5454618ba2895182ad727bd9abb, type: 2}
         requiredAmount: 46
     - rid: 190982044644802816
       type: {class: MoveLimit, ns: , asm: Assembly-CSharp}

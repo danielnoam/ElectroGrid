@@ -14,7 +14,10 @@ public class Grid
     public Vector3 cellSpacing;
     public bool[] cells;
     [SerializeReference] public CoordinateConverter coordinateConverter;
+    // Only read by GridDrawer through SerializedProperty
+#pragma warning disable CS0414
     [SerializeField, HideInInspector] private bool editorFoldout = true;
+#pragma warning restore CS0414
     
     public int Width => size.x;
     public int Height => size.y;

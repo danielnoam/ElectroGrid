@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using DNExtensions;
+using DNExtensions.Utilities;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -543,7 +543,7 @@ public class Match3PlayHandler : MonoBehaviour
                 break;
             }
         
-            gameManager.NotifyMatchesWhereMade(immediateMatches);
+            gameManager.NotifyMatchesWereMade(immediateMatches);
             
             yield return HandleMatches(immediateMatches);
             yield return MoveObjectsDown(gridShape);
@@ -714,11 +714,34 @@ public class Match3PlayHandler : MonoBehaviour
     public IEnumerator ClearObjects()
     {
         var tiles = gridHandler.Tiles.Values.Where(t => t.HasObject).ToList();
-        
+
         foreach (var tileObjectMatch in tiles)
         {
             CameraManager.Instance?.ShakeCamera(1, 0.25f);
             tileObjectMatch.CurrentMatch3Object.DestroyWithAnimation();
+            yield return new WaitForSeconds(populationDuration / tiles.Count);
+        }
+    }
+
+    public IEnumerator ClearMatchableObjects()
+    {
+        ReleaseObject(false);
+
+        var tiles = gridHandler.Tiles.Values
+            .Where(tile => tile.HasObject && tile.CurrentMatch3Object is Match3MatchableObject)
+            .ToList();
+
+        if (tiles.Count == 0) yield break;
+
+        CameraManager.Instance?.ShakeCamera(1, 0.25f);
+
+        foreach (var tile in tiles)
+        {
+            var matchable = tile.CurrentMatch3Object;
+            // The tile has to be released explicitly, otherwise it still reports HasObject and never gets repopulated
+            tile.SetCurrentItem(null);
+            tile.PunchTile();
+            matchable.DestroyWithAnimation();
             yield return new WaitForSeconds(populationDuration / tiles.Count);
         }
     }
@@ -1097,7 +1120,7 @@ public class Match3PlayHandler : MonoBehaviour
     
     private bool ShouldSpawnHelperObject()
     {
-        var loseConditions = gameManager.CurrentLevelData.HasLoseConditions() && gameManager.CurrentLevelData.IsAnyLoseConditionBellowHalf();
+        var loseConditions = gameManager.CurrentLevelData.HasLoseConditions() && gameManager.CurrentLevelData.IsAnyLoseConditionBelowHalf();
         var chanceCheck = gameManager.ChanceToSpawnHelper > 0 && Random.Range(0, 100) < gameManager.ChanceToSpawnHelper;
         
         return loseConditions && chanceCheck;

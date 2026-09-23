@@ -1,9 +1,9 @@
 using System;
-using DNExtensions.ObjectPooling;
+using DNExtensions.Systems.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
-public class Match3BackgroundTile : MonoBehaviour, IPooledObject
+public class Match3BackgroundTile : MonoBehaviour, IPoolable
 {
     [Header("Settings")]
     [SerializeField] private Color inactiveTileColor = new Color(0.1f, 0.1f, 0.1f, 0.1f);

@@ -12,12 +12,16 @@ namespace SingularityGroup.HotReload.Editor {
         public readonly BuildTarget activeBuildTarget;
         public readonly string[] omittedProjects;
         public readonly bool batchMode;
+        public readonly string locale;
+        public readonly bool disableTelemetry;
 
-        public BuildInfoInput(string allDefineSymbols, BuildTarget activeBuildTarget, string[] omittedProjects, bool batchMode) {
+        public BuildInfoInput(string allDefineSymbols, BuildTarget activeBuildTarget, string[] omittedProjects, bool batchMode, string locale, bool disableTelemetry) {
             this.allDefineSymbols = allDefineSymbols;
             this.activeBuildTarget = activeBuildTarget;
             this.omittedProjects = omittedProjects;
             this.batchMode = batchMode;
+            this.locale = locale;
+            this.disableTelemetry = disableTelemetry;
         }
     }
     
@@ -26,17 +30,21 @@ namespace SingularityGroup.HotReload.Editor {
             var buildTarget = EditorUserBuildSettings.activeBuildTarget;
             var activeDefineSymbols = EditorUserBuildSettings.activeScriptCompilationDefines;
             var batchMode = Application.isBatchMode;
+            var disableTelemetry = HotReloadPrefs.DisableTelemetry;
             var allDefineSymbols = await Task.Run(() => {
                 return GetAllAndroidMonoBuildDefineSymbolsThreaded(activeDefineSymbols);
             });
             // cached so unexpensive most of the time
             var omittedProjects = AssemblyOmission.GetOmittedProjects(allDefineSymbols);
+            var locale = PackageConst.DefaultLocale;
 
             return new BuildInfoInput(
                 allDefineSymbols: allDefineSymbols,
                 activeBuildTarget: buildTarget,
                 omittedProjects: omittedProjects,
-                batchMode: batchMode
+                batchMode: batchMode,
+                locale: locale,
+                disableTelemetry: disableTelemetry
             );
         }
 
@@ -50,7 +58,9 @@ namespace SingularityGroup.HotReload.Editor {
                 allDefineSymbols: allDefineSymbols, 
                 activeBuildTarget: buildTarget, 
                 omittedProjects: AssemblyOmission.GetOmittedProjects(allDefineSymbols),
-                batchMode: Application.isBatchMode
+                batchMode: Application.isBatchMode,
+                locale: PackageConst.DefaultLocale,
+                disableTelemetry: HotReloadPrefs.DisableTelemetry
             ));
         }
 
@@ -72,6 +82,8 @@ namespace SingularityGroup.HotReload.Editor {
                 buildMachinePort = RequestHelper.port,
                 activeBuildTarget = input.activeBuildTarget.ToString(),
                 buildMachineRequestOrigin = RequestHelper.origin,
+                locale = input.locale,
+                disableTelemetry = input.disableTelemetry,
             };
         }
 
@@ -132,7 +144,7 @@ namespace SingularityGroup.HotReload.Editor {
         //   Hardcoding the differences was less effort and is less error prone.
         // I also looked into it and tried all the Build interfaces like this one https://docs.unity3d.com/ScriptReference/Build.IPostBuildPlayerScriptDLLs.html
         //   and logging EditorUserBuildSettings.activeScriptCompilationDefines in the callbacks - result: all same like editor, so I agree that hardcode is best. 
-        public static string GetAllAndroidMonoBuildDefineSymbolsThreaded(string[] defineSymbols) {
+        private static string GetAllAndroidMonoBuildDefineSymbolsThreaded(string[] defineSymbols) {
             var defines = new HashSet<string>(defineSymbols);
             defines.ExceptWith(editorSymbolsToRemove);
             defines.UnionWith(androidSymbolsToAdd);

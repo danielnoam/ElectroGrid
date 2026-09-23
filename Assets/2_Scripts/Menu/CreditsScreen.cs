@@ -1,8 +1,6 @@
 using System;
 using System.Text;
-using DNExtensions;
-using DNExtensions.MenuSystem;
-using DNExtensions.VFXManager;
+using DNExtensions.Systems.VFXManager;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -41,8 +39,8 @@ public class CreditsScreen : MenuScreen
 
         if (backButton)
         {
-            SelectableAnimator selectableAnimator = backButton.GetComponent<SelectableAnimator>();
-            if (selectableAnimator && audioSource) selectableAnimator.audioSource = audioSource;
+            SelectableFeedback selectableFeedback = backButton.GetComponent<SelectableFeedback>();
+            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
             
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(() =>

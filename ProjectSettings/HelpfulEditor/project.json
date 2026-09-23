@@ -1,0 +1,118 @@
+{
+    "moduleEnabled": true,
+    "hoverHighlightEnabled": true,
+    "hoverColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+    },
+    "hoverOpacity": 0.05999999865889549,
+    "zebraStripesEnabled": true,
+    "zebraColorEven": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.0
+    },
+    "zebraColorOdd": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 1.0
+    },
+    "zebraOpacity": 0.07000000029802322,
+    "treeLinesEnabled": true,
+    "treeLineColor": {
+        "r": 0.5,
+        "g": 0.5,
+        "b": 0.5,
+        "a": 0.3499999940395355
+    },
+    "treeLineStyle": 1,
+    "twoLineNamesEnabled": false,
+    "showFileExtensionsEnabled": false,
+    "folderContentIconsEnabled": true,
+    "folderContentMaxIcons": 4,
+    "folderContentIconSize": 12.0,
+    "folderContentRecursive": false,
+    "folderContentIconsInObjectView": false,
+    "createFolderButtonEnabled": true,
+    "linkedAssetsEnabled": true,
+    "linkedAssetFolders": [
+        "LinkedAssets"
+    ],
+    "dragConflictResolutionEnabled": true,
+    "conflictDefaultChoice": 0,
+    "cancelIsDefaultOnEscape": true,
+    "animatedFoldsEnabled": true,
+    "expandCollapseKey": {
+        "key": 101,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    },
+    "expandCollapseRecursiveKey": {
+        "key": 101,
+        "ctrl": false,
+        "alt": false,
+        "shift": true
+    },
+    "collapseAllKey": {
+        "key": 101,
+        "ctrl": true,
+        "alt": false,
+        "shift": true
+    },
+    "isolateKey": {
+        "key": 101,
+        "ctrl": true,
+        "alt": false,
+        "shift": false
+    },
+    "revealInFinderKey": {
+        "key": 114,
+        "ctrl": false,
+        "alt": true,
+        "shift": false
+    },
+    "quickObjectWindowKey": {
+        "key": 323,
+        "ctrl": false,
+        "alt": true,
+        "shift": false
+    },
+    "openInNewTabKey": {
+        "key": 325,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    },
+    "tabsEnabled": true,
+    "dropOnTabsEnabled": true,
+    "closeWindowKey": {
+        "key": 119,
+        "ctrl": true,
+        "alt": false,
+        "shift": false
+    },
+    "reopenWindowKey": {
+        "key": 116,
+        "ctrl": true,
+        "alt": false,
+        "shift": true
+    },
+    "closeWindowExcludedTypes": [],
+    "navigateBackKey": {
+        "key": 326,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    },
+    "navigateForwardKey": {
+        "key": 327,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    }
+}

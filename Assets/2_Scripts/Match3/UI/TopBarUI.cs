@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine.Serialization;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -17,10 +18,9 @@ public class TopBarUI : MonoBehaviour
     [SerializeField] private RectTransform levelName;
     [SerializeField] private TextMeshProUGUI levelNameText;
     [SerializeField] private Button infoButton;
-    [SerializeField] private Button muteButton;
-    [SerializeField] private Image muteButtonImage;
-    [SerializeField] private Sprite mutedSprite;
-    [SerializeField] private Sprite unmutedSprite;
+    [FormerlySerializedAs("muteButton")]
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private SettingsWindowUI settingsWindowUI;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
     [SerializeField] private InformationWindowUI informationWindowUI;
     [SerializeField] private BottomBarUI bottomBarUI;
@@ -35,10 +35,10 @@ public class TopBarUI : MonoBehaviour
     
     private Match3GameManager _match3Manager;
     private float _levelNameDefaultPositionY;
-    private float _muteButtonDefaultPositionY;
+    private float _settingsButtonDefaultPositionY;
     private float _infoButtonDefaultPositionY;
     private Vector2 _levelNameDefaultSize;
-    private Vector2 _muteButtonDefaultSize;
+    private Vector2 _settingsButtonDefaultSize;
     private Vector2 _infoButtonDefaultSize;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
@@ -53,10 +53,10 @@ public class TopBarUI : MonoBehaviour
         levelName.sizeDelta = Vector2.zero;
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, 0f);
         
-        _muteButtonDefaultSize = muteButton.GetComponent<RectTransform>().sizeDelta;
-        muteButton.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, muteButton.GetComponent<RectTransform>().sizeDelta.y);
-        _muteButtonDefaultPositionY = muteButton.transform.localPosition.y;
-        muteButton.transform.localPosition = new Vector3(muteButton.transform.localPosition.x, 0f, muteButton.transform.localPosition.z);
+        _settingsButtonDefaultSize = settingsButton.GetComponent<RectTransform>().sizeDelta;
+        settingsButton.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, settingsButton.GetComponent<RectTransform>().sizeDelta.y);
+        _settingsButtonDefaultPositionY = settingsButton.transform.localPosition.y;
+        settingsButton.transform.localPosition = new Vector3(settingsButton.transform.localPosition.x, 0f, settingsButton.transform.localPosition.z);
         
         _infoButtonDefaultSize = infoButton.GetComponent<RectTransform>().sizeDelta;
         infoButton.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, infoButton.GetComponent<RectTransform>().sizeDelta.y);
@@ -113,14 +113,17 @@ public class TopBarUI : MonoBehaviour
 
     private void SetupButtons()
     {
-        muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
-    
-        muteButton.onClick.RemoveAllListeners();
-        muteButton.onClick.AddListener(() =>
+        settingsButton.onClick.RemoveAllListeners();
+        settingsButton.onClick.AddListener(() =>
         {
             CameraManager.Instance.ShakeCamera(0.1f);
-            AudioManager.Instance.ToggleAudio();
-            muteButtonImage.sprite = AudioManager.Instance.IsMuted ? mutedSprite : unmutedSprite;
+            Toggle(false);
+            bottomBarUI?.Toggle(false);
+            settingsWindowUI?.Show(() =>
+            {
+                Toggle(true);
+                bottomBarUI?.Toggle(true);
+            });
         });
     
         infoButton.onClick.RemoveAllListeners();
@@ -129,7 +132,7 @@ public class TopBarUI : MonoBehaviour
             CameraManager.Instance.ShakeCamera(0.1f);
             Toggle(false);
             bottomBarUI?.Toggle(false);
-            informationWindowUI?.Toggle(true);
+            informationWindowUI?.ShowAllTutorials();
             FirebaseManager.Instance?.LogInformationClicked();
         });
     }
@@ -175,18 +178,18 @@ public class TopBarUI : MonoBehaviour
         var infoButtonEndPosition = show ? _infoButtonDefaultPositionY : 0;
         var infoButtonStartSize = show ? Vector2.zero : _infoButtonDefaultSize;
         var infoButtonEndSize = show ? _infoButtonDefaultSize : Vector2.zero;
-        var muteButtonStartPosition = show ? 0 : _muteButtonDefaultPositionY;
-        var muteButtonEndPosition = show ? _muteButtonDefaultPositionY : 0;
-        var muteButtonStartSize = show ? Vector2.zero : _muteButtonDefaultSize;
-        var muteButtonEndSize = show ? _muteButtonDefaultSize : Vector2.zero;
+        var settingsButtonStartPosition = show ? 0 : _settingsButtonDefaultPositionY;
+        var settingsButtonEndPosition = show ? _settingsButtonDefaultPositionY : 0;
+        var settingsButtonStartSize = show ? Vector2.zero : _settingsButtonDefaultSize;
+        var settingsButtonEndSize = show ? _settingsButtonDefaultSize : Vector2.zero;
         
         topBar.sizeDelta = barStartSize;
         levelName.sizeDelta = nameStartSize;
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, nameStartPosition);
         
-        var muteButtonRectTransform = muteButton.GetComponent<RectTransform>();
-        muteButtonRectTransform.sizeDelta = muteButtonStartSize;
-        muteButtonRectTransform.anchoredPosition = new Vector2(muteButtonRectTransform.anchoredPosition.x, muteButtonStartPosition);
+        var settingsButtonRectTransform = settingsButton.GetComponent<RectTransform>();
+        settingsButtonRectTransform.sizeDelta = settingsButtonStartSize;
+        settingsButtonRectTransform.anchoredPosition = new Vector2(settingsButtonRectTransform.anchoredPosition.x, settingsButtonStartPosition);
         
         var infoButtonRectTransform = infoButton.GetComponent<RectTransform>();
         infoButtonRectTransform.sizeDelta = infoButtonStartSize;
@@ -196,8 +199,8 @@ public class TopBarUI : MonoBehaviour
             .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))
             .Group(Tween.UISizeDelta(levelName, nameEndSize, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
             .Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UISizeDelta(muteButton.transform as RectTransform, muteButtonEndSize, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UIAnchoredPositionY(muteButton.transform as RectTransform, muteButtonEndPosition, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
+            .Group(Tween.UISizeDelta(settingsButton.transform as RectTransform, settingsButtonEndSize, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
+            .Group(Tween.UIAnchoredPositionY(settingsButton.transform as RectTransform, settingsButtonEndPosition, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
             .Group(Tween.UISizeDelta(infoButton.transform as RectTransform, infoButtonEndSize, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
             .Group(Tween.UIAnchoredPositionY(infoButton.transform as RectTransform, infoButtonEndPosition, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
     }
@@ -218,11 +221,11 @@ public class TopBarUI : MonoBehaviour
         
             Action progressCallback = () => UpdateObjectiveUIProgress(objective);
             _objectiveProgressCallbacks.Add(objective, progressCallback);
-            objective.progressChanged += progressCallback;
+            objective.ProgressChanged += progressCallback;
         
             Action completeCallback = () => UpdateObjectiveUIProgress(objective);
             _objectiveCompleteCallbacks.Add(objective, completeCallback);
-            objective.complete += completeCallback;
+            objective.Completed += completeCallback;
         }
 
         loseConditionsUIParent.gameObject.SetActive(loseConditions.Count > 0);
@@ -235,11 +238,11 @@ public class TopBarUI : MonoBehaviour
         
             Action progressCallback = () => UpdateLoseConditionUIProgress(loseCondition);
             _loseConditionProgressCallbacks.Add(loseCondition, progressCallback);
-            loseCondition.progressChanged += progressCallback;
+            loseCondition.ProgressChanged += progressCallback;
         
             Action metCallback = () => UpdateLoseConditionUIProgress(loseCondition);
             _loseConditionMetCallbacks.Add(loseCondition, metCallback);
-            loseCondition.contidionMet += metCallback;
+            loseCondition.ConditionMet += metCallback;
         }
     }
 
@@ -247,25 +250,25 @@ public class TopBarUI : MonoBehaviour
     {
         foreach (var pair in _objectiveProgressCallbacks)
         {
-            pair.Key.progressChanged -= pair.Value;
+            pair.Key.ProgressChanged -= pair.Value;
         }
         _objectiveProgressCallbacks.Clear();
     
         foreach (var pair in _objectiveCompleteCallbacks)
         {
-            pair.Key.complete -= pair.Value;
+            pair.Key.Completed -= pair.Value;
         }
         _objectiveCompleteCallbacks.Clear();
 
         foreach (var pair in _loseConditionProgressCallbacks)
         {
-            pair.Key.progressChanged -= pair.Value;
+            pair.Key.ProgressChanged -= pair.Value;
         }
         _loseConditionProgressCallbacks.Clear();
     
         foreach (var pair in _loseConditionMetCallbacks)
         {
-            pair.Key.contidionMet -= pair.Value;
+            pair.Key.ConditionMet -= pair.Value;
         }
         _loseConditionMetCallbacks.Clear();
     

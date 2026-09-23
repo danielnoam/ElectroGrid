@@ -11,9 +11,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de20f28ea40c22c43978f33a09f060b4, type: 3}
   m_Name: VFX Sequence Main Menu Start
-  m_EditorClassIdentifier: 
-  sequenceDuration: 4
-  sequenceIsAdditive: 0
+  m_EditorClassIdentifier: DNExtensions.Systems::DNExtensions.Systems.VFXManager.EffectSequence
+  duration: 4
+  isAdditive: 0
   resetEffectsOnComplete: 0
   effects:
   - rid: 190982275964600406
@@ -26,80 +26,121 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 190982246133661780
-      type: {class: SetLensDistortionDynamic, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetLensDistortion, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0
           maxValue: 1
-        useDefaultIntensity: 0
-        startIntensity: 0.5
-        endIntensity: 0.1
-        intensityEase: 12
-        useAdvancedAnimation: 0
-        createPulseEffect: 0
-        peakIntensity: 0.8
-        pulseCount: 1
-        usePresets: 1
-        distortionType: 6
+        intensity:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: 0.5
+          endValue: 0.1
+          ease: 12
+        xMultiplier:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+        yMultiplier:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+        center:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: {x: 0, y: 0}
+          endValue: {x: 0.5, y: 0.5}
+          ease: 1
+        scale:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
     - rid: 190982246133661782
-      type: {class: SetFullscreenScale, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetFullscreenScale, ns: , asm: Assembly-CSharp}
       data:
         duration:
           minValue: 0.20226526
           maxValue: 0.5
-        useDefaultScale: 0
         startScale: {x: 1, y: 1, z: 1}
         endScale: {x: 0, y: 1, z: 0}
         ease: 10
     - rid: 190982246133661783
-      type: {class: SetVignette, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetVignette, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0
           maxValue: 0.3
-        useDefaultIntensity: 0
-        startIntensity: 0
-        endIntensity: 0.25
-        intensityEase: 4
-        animateSmoothness: 1
-        useDefaultSmoothness: 0
-        startSmoothness: 0.2
-        endSmoothness: 1
-        smoothnessEase: 1
-        animateCenter: 0
-        useDefaultCenter: 0
-        startCenter: {x: 0.5, y: 0.5}
-        endCenter: {x: 0.5, y: 0.5}
-        centerEase: 1
-        useDefaultRoundness: 0
-        setRounded: 0
+        intensity:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 0.25
+          ease: 4
+        smoothness:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: 0.2
+          endValue: 1
+          ease: 1
+        center:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: {x: 0, y: 0}
+          endValue: {x: 0.5, y: 0.5}
+          ease: 1
+        rounded: 2
     - rid: 190982275964600406
-      type: {class: SetFullscreenColor, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetFullscreenColor, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0
           maxValue: 0.029126346
-        type: 0
-        startColor: {r: 0, g: 0, b: 0, a: 1}
+        overrideStartColor:
+          isSet: 1
+          hideWhenUnchecked: 0
+          value: {r: 0, g: 0, b: 0, a: 1}
         endColor: {r: 0, g: 0, b: 0, a: 1}
         ease: 1
     - rid: 190982290084462680
-      type: {class: SetFullscreenScale, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetFullscreenScale, ns: , asm: Assembly-CSharp}
       data:
         duration:
           minValue: 0
           maxValue: 0.016990244
-        useDefaultScale: 0
         startScale: {x: 1, y: 1, z: 1}
         endScale: {x: 1, y: 1, z: 1}
         ease: 1
     - rid: 4047855796283506688
-      type: {class: SetFullscreenColor, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetFullscreenColor, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0.12135923
           maxValue: 0.5
-        type: 0
-        startColor: {r: 0, g: 0, b: 0, a: 1}
+        overrideStartColor:
+          isSet: 1
+          hideWhenUnchecked: 0
+          value: {r: 0, g: 0, b: 0, a: 1}
         endColor: {r: 0, g: 0, b: 0, a: 0}
         ease: 1

@@ -1,6 +1,7 @@
 using System;
-using DNExtensions;
-using DNExtensions.Button;
+using DNExtensions.Utilities;
+using DNExtensions.Utilities.CustomFields;
+using DNExtensions.Utilities.Button;
 using PrimeTween;
 using UnityEngine;
 

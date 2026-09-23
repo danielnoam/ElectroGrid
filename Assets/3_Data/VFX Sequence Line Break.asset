@@ -11,50 +11,135 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de20f28ea40c22c43978f33a09f060b4, type: 3}
   m_Name: VFX Sequence Line Break
-  m_EditorClassIdentifier: 
-  sequenceDuration: 0.5
-  sequenceIsAdditive: 0
+  m_EditorClassIdentifier: DNExtensions.Systems::DNExtensions.Systems.VFXManager.EffectSequence
+  duration: 0.5
+  isAdditive: 0
   resetEffectsOnComplete: 1
   effects:
   - rid: 3019432083264897111
   - rid: 3019432083264897112
   - rid: 3019432083264897113
+  - rid: 3019432083264897114
   references:
     version: 2
     RefIds:
     - rid: 3019432083264897111
-      type: {class: SetChromaticAberration, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetChromaticAberration, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0
           maxValue: 0.5
-        useDefaultIntensity: 0
-        startIntensity: 0
-        endIntensity: 0.5
-        ease: 2
+        intensity:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 0.5
+          ease: 2
     - rid: 3019432083264897112
-      type: {class: SetChromaticAberration, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetChromaticAberration, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0.5785456
           maxValue: 1
-        useDefaultIntensity: 0
-        startIntensity: 0.5
-        endIntensity: 0
-        ease: 15
+        intensity:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: 0.5
+          endValue: 0
+          ease: 15
     - rid: 3019432083264897113
-      type: {class: SetLensDistortionDynamic, ns: DNExtensions.VFXManager, asm: Assembly-CSharp-firstpass}
+      type: {class: SetLensDistortion, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
       data:
         duration:
           minValue: 0
+          maxValue: 0.5
+        intensity:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: -0.2
+          ease: 1
+        xMultiplier:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+        yMultiplier:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+        center:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: {x: 0, y: 0}
+          endValue: {x: 0.5, y: 0.5}
+          ease: 1
+        scale:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+    - rid: 3019432083264897114
+      type: {class: SetLensDistortion, ns: DNExtensions.Systems.VFXManager, asm: DNExtensions.Systems}
+      data:
+        duration:
+          minValue: 0.5
           maxValue: 1
-        useDefaultIntensity: 0
-        startIntensity: 0
-        endIntensity: 0
-        intensityEase: 1
-        useAdvancedAnimation: 1
-        createPulseEffect: 1
-        peakIntensity: -0.2
-        pulseCount: 1
-        usePresets: 0
-        distortionType: 3
+        intensity:
+          animate: 1
+          startValue:
+            isSet: 1
+            hideWhenUnchecked: 0
+            value: -0.2
+          endValue: 0
+          ease: 1
+        xMultiplier:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+        yMultiplier:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1
+        center:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: {x: 0, y: 0}
+          endValue: {x: 0.5, y: 0.5}
+          ease: 1
+        scale:
+          animate: 0
+          startValue:
+            isSet: 0
+            hideWhenUnchecked: 0
+            value: 0
+          endValue: 1
+          ease: 1

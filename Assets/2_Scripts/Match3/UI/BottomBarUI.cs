@@ -1,5 +1,5 @@
 using System;
-using DNExtensions.VFXManager;
+using DNExtensions.Systems.VFXManager;
 using PrimeTween;
 using UnityEngine;
 using UnityEngine.UI;
@@ -85,7 +85,7 @@ public class BottomBarUI : MonoBehaviour
                 Toggle(false);
                 topBarUI.Toggle(false);
                 var quitSequence = Sequence.Create();
-                quitSequence.ChainDelay(VFXManager.Instance.PlayVFX(match3EffectManager.EndLevelSequence));
+                quitSequence.ChainDelay(VFXManager.Instance.PlaySequence(match3EffectManager.EndLevelSequence));
                 quitSequence.ChainCallback(() => GameManager.Instance?.MainMenu.LoadScene());
             }
             else
@@ -103,7 +103,7 @@ public class BottomBarUI : MonoBehaviour
                 Toggle(false);
                 topBarUI.Toggle(false);
                 var quitSequence = Sequence.Create();
-                quitSequence.ChainDelay(VFXManager.Instance.PlayVFX(match3EffectManager.EndLevelSequence));
+                quitSequence.ChainDelay(VFXManager.Instance.PlaySequence(match3EffectManager.EndLevelSequence));
                 quitSequence.ChainCallback(() => _match3Manager.StartNewGame());
             }
             else

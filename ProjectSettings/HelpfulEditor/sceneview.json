@@ -1,0 +1,66 @@
+{
+    "moduleEnabled": true,
+    "pickerEnabled": true,
+    "pickerKey": {
+        "key": 324,
+        "ctrl": true,
+        "alt": false,
+        "shift": false
+    },
+    "pickerMaxResults": 30,
+    "pickerMaxIcons": 6,
+    "pickerExcludedComponentTypes": [
+        "Transform",
+        "RectTransform"
+    ],
+    "pickerHighlightEnabled": true,
+    "pickerHighlightColor": {
+        "r": 1.0,
+        "g": 0.6000000238418579,
+        "b": 0.10000000149011612,
+        "a": 0.8999999761581421
+    },
+    "snapMenuEnabled": true,
+    "snapMaxDistance": 1000.0,
+    "guidesEnabled": true,
+    "showRulers": true,
+    "guideColor": {
+        "r": 0.0,
+        "g": 0.8500000238418579,
+        "b": 1.0,
+        "a": 0.8999999761581421
+    },
+    "guideWidth": 2.0,
+    "guideOutlineColor": {
+        "r": 0.0,
+        "g": 0.0,
+        "b": 0.0,
+        "a": 0.6499999761581421
+    },
+    "guideOutlineWidth": 1.5,
+    "guideSnapColor": {
+        "r": 1.0,
+        "g": 0.44999998807907104,
+        "b": 0.10000000149011612,
+        "a": 1.0
+    },
+    "guideSnapEnabled": true,
+    "guideSnapDistance": 8.0,
+    "gridEnabled": false,
+    "gridCellSize": 100.0,
+    "gridSubdivisions": 1,
+    "gridColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 1.0
+    },
+    "gridSubdivisionColor": {
+        "r": 1.0,
+        "g": 1.0,
+        "b": 1.0,
+        "a": 0.27450981736183167
+    },
+    "gridSnapEnabled": true,
+    "guides": []
+}

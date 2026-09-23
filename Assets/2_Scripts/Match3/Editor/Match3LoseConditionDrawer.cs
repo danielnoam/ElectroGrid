@@ -136,12 +136,8 @@ public class Match3LoseConditionDrawer : PropertyDrawer
     private static void BuildTypeMap() 
     {
         var baseType = typeof(Match3LoseCondition);
-        _typeMap = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(asm => {
-                try { return asm.GetTypes(); }
-                catch { return Type.EmptyTypes; }
-            })
-            .Where(t => !t.IsAbstract && baseType.IsAssignableFrom(t) && t != baseType)
+        _typeMap = TypeCache.GetTypesDerivedFrom(baseType)
+            .Where(t => !t.IsAbstract)
             .ToDictionary(t => GetNiceName(t), t => t);
     }
 

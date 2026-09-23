@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using DNExtensions.Button;
-using DNExtensions.ObjectPooling;
-using DNExtensions.VFXManager;
+using DNExtensions.Utilities.Button;
+using DNExtensions.Systems.ObjectPooling;
+using DNExtensions.Systems.VFXManager;
 using PrimeTween;
 using UnityEngine;
 
@@ -11,14 +11,14 @@ public class Match3EffectManager : MonoBehaviour
     public static Match3EffectManager Instance { get; private set; }
     
     [Header("Effects")]
-    [SerializeField] private SOVFEffectsSequence startLevelSequence;
-    [SerializeField] private SOVFEffectsSequence endLevelSequence;
+    [SerializeField] private EffectSequence startLevelSequence;
+    [SerializeField] private EffectSequence endLevelSequence;
     [SerializeField] private OneShotParticle matchableBgParticlePrefab;
     [SerializeField] private OneShotParticle helperBgParticlePrefab;
     
     [Header("LineBreak")]
     [SerializeField] private bool lineBreakPulseGrid = true;
-    [SerializeField] private SOVFEffectsSequence lineBreakEffect;
+    [SerializeField] private EffectSequence lineBreakEffect;
     
     [Header("Mouse Interaction")]
     [SerializeField] private bool mouseInteractionEffect;
@@ -34,19 +34,22 @@ public class Match3EffectManager : MonoBehaviour
     [SerializeField] private Match3BackgroundTile backgroundTilePrefab;
 
     private Camera _camera;
+    private Vector2 _lastPointerPosition = Vector2.positiveInfinity;
     private Sequence _lineBreakSequence;
     private TouchInputReader _inputReader;
     private readonly Dictionary<Vector2Int, Match3BackgroundTile> _backgroundTiles = new Dictionary<Vector2Int, Match3BackgroundTile>();
     
-    public SOVFEffectsSequence StartLevelSequence => startLevelSequence;
-    public SOVFEffectsSequence EndLevelSequence => endLevelSequence;
+    public EffectSequence StartLevelSequence => startLevelSequence;
+    public EffectSequence EndLevelSequence => endLevelSequence;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Instance && Instance != this)
         {
+            Destroy(gameObject);
             return;
         }
+
         Instance = this;
     }
 
@@ -108,12 +111,12 @@ public class Match3EffectManager : MonoBehaviour
 
     private void OnLevelStarted(Match3LevelData levelData)
     {
-        VFXManager.Instance?.PlayVFX(startLevelSequence);
+        VFXManager.Instance?.PlaySequence(startLevelSequence);
     }
     
     private void OnLevelEnded(Match3LevelData levelData)
     {
-        VFXManager.Instance?.PlayVFX(endLevelSequence);
+        VFXManager.Instance?.PlaySequence(endLevelSequence);
     }
     
 
@@ -183,7 +186,7 @@ public class Match3EffectManager : MonoBehaviour
             _lineBreakSequence.Stop();
         }
 
-        VFXManager.Instance?.PlayVFX(lineBreakEffect);
+        VFXManager.Instance?.PlaySequence(lineBreakEffect);
         _lineBreakSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.GlobalTimeScale(0.3f, 0.2f))
             .Chain(Tween.GlobalTimeScale(1f, 0.4f));
@@ -345,21 +348,26 @@ public class Match3EffectManager : MonoBehaviour
     private void UpdateTiles()
     {
         if (!_camera || !_inputReader || _backgroundTiles.Count == 0 || !mouseInteractionEffect) return;
-    
-        Vector2 mousePos = _inputReader.MousePosition;
-        Vector3 mouseWorldPos = _camera.ScreenToWorldPoint(mousePos);
-        mouseWorldPos.z = 0;
+
+        // The pointer only moves while a finger is down, so without this the whole grid is
+        // recalculated and rewritten every frame to produce exactly the same picture
+        Vector2 pointerPosition = _inputReader.MousePosition;
+        if (pointerPosition == _lastPointerPosition) return;
+        _lastPointerPosition = pointerPosition;
+
+        Vector3 pointerWorldPosition = _camera.ScreenToWorldPoint(pointerPosition);
+        pointerWorldPosition.z = 0;
 
         foreach (var kvp in _backgroundTiles)
         {
             var tile = kvp.Value;
             if (!tile) continue;
 
-            Vector3 tilePos = tile.transform.position;
-            float distance = Vector2.Distance(new Vector2(mouseWorldPos.x, mouseWorldPos.y), new Vector2(tilePos.x, tilePos.y));
-        
-            float scaleMultiplier = CalculateScaleMultiplier(distance);
-            tile.transform.localScale = Vector3.one * scaleMultiplier;
+            float distance = Vector2.Distance(pointerWorldPosition, tile.transform.position);
+            var scale = Vector3.one * CalculateScaleMultiplier(distance);
+
+            // Assigning an identical scale still dirties the transform, so only write real changes
+            if (tile.transform.localScale != scale) tile.transform.localScale = scale;
         }
     }
     

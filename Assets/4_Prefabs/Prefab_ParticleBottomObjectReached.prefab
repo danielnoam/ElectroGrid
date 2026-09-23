@@ -4924,7 +4924,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2798804331580920947}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2233ba07e37a4ee6bf6e2e68096ee3e7, type: 3}
+  m_Script: {fileID: 11500000, guid: 4ceb0275d563960321723c245d68617c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::OneShotParticle
   particle: {fileID: 6756617360464747664}

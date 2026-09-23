@@ -1,6 +1,7 @@
 using UnityEngine;
 
 
+[System.Serializable]
 public abstract class CoordinateConverter
 {
 	/// <summary>
@@ -44,6 +45,7 @@ public abstract class CoordinateConverter
 	public abstract Vector3 Forward { get;}
 }
 
+[System.Serializable]
 public class VerticalConvertor : CoordinateConverter
 {
 	public override Vector3 GridToWorld(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)
@@ -113,6 +115,7 @@ public class VerticalConvertor : CoordinateConverter
 	public override Vector3 Forward => Vector3.forward;
 }
 
+[System.Serializable]
 public class HorizontalConvertor : CoordinateConverter
 {
 	public override Vector3 GridToWorld(Vector2Int cellPosition, Vector2Int gridSize, Vector3 cellSize, Vector3 cellSpacing, Vector3 origin)

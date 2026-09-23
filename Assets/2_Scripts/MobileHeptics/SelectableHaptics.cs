@@ -1,41 +1,39 @@
-using System;
-using DNExtensions.MenuSystem;
+using DNExtensions.Utilities;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SelectableHaptics : MonoBehaviour
 {
-    
+
     [Header("Settings")]
     [Tooltip("Duration of the haptic feedback in milliseconds")]
     [SerializeField, Min(1)] private long duration = 50;
     [SerializeField] private bool playOnSubmit = true;
     [SerializeField] private bool playOnSelect;
     [SerializeField] private bool playOnDeselect;
-    
+
     [Header("References")]
-    [SerializeField] private SelectableAnimator selectableAnimator;
+    [SerializeField] private Selectable selectable;
 
 
-    private void OnEnable()
+    private void Awake()
     {
-        if (!selectableAnimator) return;
-        
-        if (playOnSubmit) selectableAnimator.OnSubmitEvent += PlayHaptics;
-        if (playOnSelect) selectableAnimator.OnSubmitEvent += PlayHaptics;
-        if (playOnDeselect) selectableAnimator.OnSubmitEvent += PlayHaptics;
+        if (!selectable) return;
+
+        if (playOnSubmit)
+        {
+            selectable.OnSubmit(PlayHaptics);
+            selectable.OnPointerClick(PlayHaptics);
+        }
+        if (playOnSelect) selectable.OnSelect(PlayHaptics);
+        if (playOnDeselect) selectable.OnDeselect(PlayHaptics);
     }
 
-
-    private void OnDisable()
+    private void PlayHaptics(BaseEventData eventData)
     {
-        if (!selectableAnimator) return;
-        
-        selectableAnimator.OnSubmitEvent -= PlayHaptics;
+        if (!isActiveAndEnabled || !selectable.interactable) return;
 
-    }
-
-    private void PlayHaptics()
-    {
         MobileHaptics.Vibrate(duration);
     }
 }

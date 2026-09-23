@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using DNExtensions;
-using DNExtensions.VFXManager;
+using DNExtensions.Systems.Scriptables;
+using DNExtensions.Systems.VFXManager;
 using UnityEngine;
 
 public class MenuManager : MonoBehaviour
@@ -12,16 +12,16 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private CreditsScreen creditsScreen;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private SOAudioEvent screenSwitchSfx;
-    [SerializeField] private SOVFEffectsSequence gameStartEffect;
-    [SerializeField] private SOVFEffectsSequence startLevelEffect;
-    [SerializeField] private SOVFEffectsSequence endLevelEffect;
+    [SerializeField] private EffectSequence gameStartEffect;
+    [SerializeField] private EffectSequence startLevelEffect;
+    [SerializeField] private EffectSequence endLevelEffect;
     [SerializeField] private BackgroundManager backgroundManager;
     
     private MenuScreen _currentScreen;
     private readonly Dictionary<Type, MenuScreen> _screens = new Dictionary<Type, MenuScreen>();
 
-    public SOVFEffectsSequence StartLevelEffect => startLevelEffect;
-    public SOVFEffectsSequence EndLevelEffect => endLevelEffect;
+    public EffectSequence StartLevelEffect => startLevelEffect;
+    public EffectSequence EndLevelEffect => endLevelEffect;
     
     private void Awake()
     {
@@ -33,7 +33,7 @@ public class MenuManager : MonoBehaviour
     
     private void Start()
     {
-        VFXManager.Instance?.PlayVFX(gameStartEffect);
+        VFXManager.Instance?.PlaySequence(gameStartEffect);
         HideAllScreensImmediate();
         ShowScreen<MainMenuScreen>(true);
     }

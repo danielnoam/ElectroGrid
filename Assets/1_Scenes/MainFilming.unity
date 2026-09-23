@@ -18449,6 +18449,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 8434494797635188864, guid: bce79ebf0377e9d4d934082fabe40e33, type: 3}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8434494797635188864, guid: bce79ebf0377e9d4d934082fabe40e33, type: 3}
+      propertyPath: m_SortingLayerID
+      value: -69269427
+      objectReference: {fileID: 0}
+    - target: {fileID: 8434494797635188864, guid: bce79ebf0377e9d4d934082fabe40e33, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5289649589199521043, guid: bce79ebf0377e9d4d934082fabe40e33, type: 3}
+      propertyPath: autoSetCameraIfUsingCameraOverlay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8434494797635188864, guid: bce79ebf0377e9d4d934082fabe40e33, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 2060200154}
     - target: {fileID: 496627579960774621, guid: bce79ebf0377e9d4d934082fabe40e33, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -37347,7 +37367,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1256740628}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7523403e9547c3a4b933513d2a6d2e18, type: 3}
+  m_Script: {fileID: 11500000, guid: 1bb8447b591ac1f41764ea15f4d1c0a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuManager
   mainMenuScreen: {fileID: 0}

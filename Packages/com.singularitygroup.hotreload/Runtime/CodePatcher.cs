@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SingularityGroup.HotReload.DTO;
+using SingularityGroup.HotReload.Localization;
 using JetBrains.Annotations;
 using SingularityGroup.HotReload.Burst;
 using SingularityGroup.HotReload.HarmonyLib;
@@ -64,10 +65,15 @@ namespace SingularityGroup.HotReload {
         readonly string tmpDir;
         public FieldHandler fieldHandler;
         public bool debuggerCompatibilityEnabled;
+        public bool anyFailures;
+        public bool ignoreCompileErrorOnRecompileUnsupported;
+        public bool disableTelemetry;
         
+        public IReadOnlyList<MethodPatchResponse> PatchHistory => patchHistory;
+
         CodePatcher() {
             pendingPatches = new List<MethodPatchResponse>();
-            patchHistory = new List<MethodPatchResponse>(); 
+            patchHistory = new List<MethodPatchResponse>();
             if(UnityHelper.IsEditor) {
                 tmpDir = PackageConst.LibraryCachePath;
             } else {
@@ -78,9 +84,23 @@ namespace SingularityGroup.HotReload {
                 try {
                     LoadPatches(PersistencePath);
                 } catch(Exception ex) {
-                    Log.Error("Encountered exception when loading patches from disk:\n{0}", ex);
+                    Log.Error($"{Localization.Translations.Logging.LoadingPatchesFromDiskError}\n{ex}");
                 }
+            } else {
+                PersistencePath = Path.Combine(PackageConst.LibraryCachePath, "patches.json");
             }
+#if UNITY_EDITOR
+            // Unity event methods are not assigned outside the scene. 
+            // So we need to ensure they are added when entering play mode from edit mode
+            EditorApplication.playModeStateChanged += state => {
+                if (state != PlayModeStateChange.EnteredPlayMode) {
+                    return;
+                }
+                foreach (var unityEventMethod in unityEventMethods) {
+                    EnsureUnityEventMethod(unityEventMethod);
+                }
+            };
+#endif
         }
         
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -90,12 +110,12 @@ namespace SingularityGroup.HotReload {
 
         
         void LoadPatches(string filePath) {
-            PlayerLog("Loading patches from file {0}", filePath);
+            PlayerLog(Localization.Translations.Logging.LoadingPatchesFromFile, filePath);
             var file = new FileInfo(filePath);
             if(file.Exists) {
                 var bytes = File.ReadAllText(filePath);
                 var patches = JsonConvert.DeserializeObject<List<MethodPatchResponse>>(bytes);
-                PlayerLog("Loaded {0} patches from disk", patches.Count.ToString());
+                PlayerLog(Localization.Translations.Logging.LoadedPatchesFromDisk, patches.Count.ToString());
                 foreach (var patch in patches) {
                     RegisterPatches(patch, persist: false);
                 }
@@ -111,15 +131,19 @@ namespace SingularityGroup.HotReload {
             EnsureSymbolResolver();
             return assemblySearchPaths;
         }
+
+        internal void RegisterFailures(MethodPatchResponse patch, RegisterPatchesResult result) {
+            anyFailures |= patch.failures?.Length > 0 || result?.patchFailures.Count > 0 || result?.patchExceptions.Count > 0;
+        }
        
         internal RegisterPatchesResult RegisterPatches(MethodPatchResponse patches, bool persist) {
-            PlayerLog("Register patches.\nWarnings: {0} \nMethods:\n{1}", string.Join("\n", patches.failures), string.Join("\n", patches.patches.SelectMany(p => p.modifiedMethods).Select(m => m.displayName)));
+            PlayerLog(Localization.Translations.Logging.RegisterPatches, string.Join("\n", patches.failures), string.Join("\n", patches.patches.SelectMany(p => p.modifiedMethods).Select(m => m.displayName)));
             pendingPatches.Add(patches);
             return ApplyPatches(persist);
         }
         
         RegisterPatchesResult ApplyPatches(bool persist) {
-            PlayerLog("ApplyPatches. {0} patches pending.", pendingPatches.Count);
+            PlayerLog(Localization.Translations.Logging.ApplyPatchesPending, pendingPatches.Count);
             EnsureSymbolResolver();
 
             var result = new RegisterPatchesResult();
@@ -160,7 +184,7 @@ namespace SingularityGroup.HotReload {
                     Dispatch.OnHotReload(result.patchedMethods).Forget();
                 }
             } catch(Exception ex) {
-                Log.Warning("Exception occured when handling method patch. Exception:\n{0}", ex);
+                Log.Warning($"{Localization.Translations.Logging.ExceptionHandlingMethodPatch}\n{ex}");
             } finally {
                 pendingPatches.Clear();
             }
@@ -184,9 +208,46 @@ namespace SingularityGroup.HotReload {
                 if (didLog || !UnityEventHelper.UnityMethodsAdded()) {
                     return;
                 }
-                Log.Warning("A new Scene was loaded while new unity event methods were added at runtime. MonoBehaviours in the Scene will not trigger these new events.");
+                Log.Warning(Localization.Translations.Logging.SceneLoadedWithNewUnityEventMethods);
                 didLog = true;
             };
+        }
+
+        static HashSet<MethodBase> unityEventMethods = new HashSet<MethodBase>();
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnSceneLoad() {
+            SceneManager.sceneLoaded += (_, __) => {
+                foreach (var unityEventMethod in unityEventMethods) {
+                    EnsureUnityEventMethod(unityEventMethod);
+                }
+            };
+        }
+
+        static bool EnsureUnityEventMethod(MethodBase newMethod) {
+            try {
+                return UnityEventHelper.EnsureUnityEventMethod(newMethod);
+            } catch(Exception ex) {
+                Log.Warning(Localization.Translations.Logging.ExceptionEnsureUnityEventMethod, ex.GetType().Name, ex.Message);
+                return false;
+            }
+        }
+        
+        static bool IsUnsupportedAddedOnValidate(MethodBase newMethod) {
+            try {
+                return UnityEventHelper.IsUnsupportedAddedOnValidate(newMethod);
+            } catch(Exception ex) {
+                Log.Warning(Localization.Translations.Logging.ExceptionIsUnsupportedAddedOnValidate, ex.GetType().Name, ex.Message);
+                return false;
+            }
+        }
+
+        static bool IsUnsupportedAddedScriptableObjectEventMethod(MethodBase newMethod) {
+            try {
+                return UnityEventHelper.IsUnsupportedAddedScriptableObjectEventMethod(newMethod);
+            } catch(Exception ex) {
+                Log.Warning(Localization.Translations.Logging.ExceptionIsUnsupportedAddedScriptableObjectEventMethod, ex.GetType().Name, ex.Message);
+                return false;
+            }
         }
 
         void HandleMethodPatchResponse(MethodPatchResponse response, RegisterPatchesResult result) {
@@ -196,11 +257,17 @@ namespace SingularityGroup.HotReload {
                 try {
                     foreach(var sMethod in patch.newMethods) {
                         var newMethod = SymbolResolver.Resolve(sMethod);
-                        try {
-                            UnityEventHelper.EnsureUnityEventMethod(newMethod);
-                        } catch(Exception ex) {
-                            Log.Warning("Encountered exception in EnsureUnityEventMethod: {0} {1}", ex.GetType().Name, ex.Message);
+
+                        if (IsUnsupportedAddedOnValidate(newMethod)) {
+                            var targetType = ((MethodInfo)newMethod).GetParameters()[0].ParameterType;
+                            result.patchFailures.Add(Tuple.Create(sMethod, string.Format(Translations.Logging.AddedOnValidateUnsupported, targetType.FullName)));
+                        } else if (IsUnsupportedAddedScriptableObjectEventMethod(newMethod)) {
+                            var targetType = ((MethodInfo)newMethod).GetParameters()[0].ParameterType;
+                            result.patchFailures.Add(Tuple.Create(sMethod, string.Format(Translations.Logging.AddedScriptableObjectEventUnsupported, newMethod.Name, targetType.FullName)));
+                        } else if (EnsureUnityEventMethod(newMethod)) {
+                            unityEventMethods.Add(newMethod);
                         }
+                        
                         MethodUtils.DisableVisibilityChecks(newMethod);
                         if (!patch.patchMethods.Any(m => m.metadataToken == sMethod.metadataToken)) {
                             result.patchedMethods.Add(new MethodPatch(null, null, newMethod));
@@ -226,13 +293,20 @@ namespace SingularityGroup.HotReload {
                     HandleNewFields(patch.patchId, result, patch.newFields);
 #endif
                 } catch (Exception ex) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.Exception), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.Exception), new EditorExtraData {
                         { StatKey.PatchId, patch.patchId },
                         { StatKey.Detailed_Exception, ex.ToString() },
-                    }).Forget();
-                    result.patchExceptions.Add($"Edit requires full recompile to apply: Encountered exception when applying a patch.\nCommon causes: editing code that failed to patch previously, an unsupported change, or a real bug in Hot Reload.\nIf you think this is a bug, please report the issue on Discord and include a code-snippet before/after.\nException: {ex}");
+                    });
+                    result.patchExceptions.Add($"{Localization.Translations.Logging.ExceptionApplyingPatch}\nException: {ex}");
                 }
             }
+        }
+        
+        void SendRuntimeTelemetryIfEnabled(Stat stat, EditorExtraData extraData = null) {
+            if (disableTelemetry) {
+                return;
+            }
+            RequestHelper.RequestEditorEventWithRetry(stat, extraData).Forget();
         }
         
         void HandleRemovedUnityMethods(SMethod[] removedMethods) {
@@ -243,10 +317,11 @@ namespace SingularityGroup.HotReload {
                 try {
                     var oldMethod = SymbolResolver.Resolve(sMethod);
                     UnityEventHelper.RemoveUnityEventMethod(oldMethod);
+                    unityEventMethods.Remove(oldMethod);
                 } catch (SymbolResolvingFailedException) {
                     // ignore, not a unity event method if can't resolve
                 } catch(Exception ex) {
-                    Log.Warning("Encountered exception in RemoveUnityEventMethod: {0} {1}", ex.GetType().Name, ex.Message);
+                    Log.Warning(Localization.Translations.Logging.ExceptionRemoveUnityEventMethod, ex.GetType().Name, ex.Message);
                 }
             }
         }
@@ -260,7 +335,7 @@ namespace SingularityGroup.HotReload {
                     var declaringType = SymbolResolver.Resolve(sField.declaringType);
                     var method = SymbolResolver.Resolve(sMethod);
                     if (!(method is MethodInfo initializer)) {
-                        Log.Warning($"Failed registering initializer for field {sField.fieldName} in {sField.declaringType.typeName}. Field value might not be initialized correctly. Invalid method.");
+                        Log.Warning(string.Format(Localization.Translations.Logging.FailedRegisteringInitializerInvalidMethod, sField.fieldName, sField.declaringType.typeName));
                         continue;
                     }
                     // We infer if the field is static by the number of parameters the method has
@@ -271,11 +346,11 @@ namespace SingularityGroup.HotReload {
                     FieldInitializerRegister.RegisterInitializer(declaringType, sField.fieldName, initializer.ReturnType, initializer, isStatic);
                     
                 } catch (Exception e) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.RegisterFieldInitializer), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.RegisterFieldInitializer), new EditorExtraData {
                         { StatKey.PatchId, resp.id },
                         { StatKey.Detailed_Exception, e.ToString() },
-                    }).Forget();
-                    Log.Warning($"Failed registering initializer for field {sField.fieldName} in {sField.declaringType.typeName}. Field value might not be initialized correctly. Exception: {e.Message}");
+                    });
+                    Log.Warning(string.Format(Localization.Translations.Logging.FailedRegisteringInitializerException, sField.fieldName, sField.declaringType.typeName, e.Message));
                 }
             }
         }
@@ -287,11 +362,11 @@ namespace SingularityGroup.HotReload {
                     var fieldType = SymbolResolver.Resolve(sField).FieldType;
                     FieldResolver.RegisterFieldType(declaringType, sField.fieldName, fieldType);
                 } catch (Exception e) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.RegisterFieldDefinition), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.RegisterFieldDefinition), new EditorExtraData {
                         { StatKey.PatchId, resp.id },
                         { StatKey.Detailed_Exception, e.ToString() },
-                    }).Forget();
-                    Log.Warning($"Failed registering new field definitions for field {sField.fieldName} in {sField.declaringType.typeName}. Exception: {e.Message}");
+                    });
+                    Log.Warning(string.Format(Localization.Translations.Logging.FailedRegisteringNewFieldDefinitions, sField.fieldName, sField.declaringType.typeName, e.Message));
                 }
             }
         }
@@ -305,11 +380,11 @@ namespace SingularityGroup.HotReload {
                     var fieldType = SymbolResolver.Resolve(sField.declaringType);
                     FieldInitializerRegister.UnregisterInitializer(declaringType, sField.fieldName, fieldType, sField.isStatic);
                 } catch (Exception e) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.UnregisterFieldInitializer), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.UnregisterFieldInitializer), new EditorExtraData {
                         { StatKey.PatchId, resp.id },
                         { StatKey.Detailed_Exception, e.ToString() },
-                    }).Forget();
-                    Log.Warning($"Failed removing initializer for field {sField.fieldName} in {sField.declaringType.typeName}. Field value might not be initialized correctly. Exception: {e.Message}");
+                    });
+                    Log.Warning(string.Format(Localization.Translations.Logging.FailedRemovingInitializer, sField.fieldName, sField.declaringType.typeName, e.Message));
                 }
             }
         }
@@ -328,11 +403,11 @@ namespace SingularityGroup.HotReload {
                         var fieldType = SymbolResolver.Resolve(f).FieldType;
                         FieldResolver.ClearHolders(declaringType, f.isStatic, f.fieldName, fieldType);
                     } catch (Exception e) {
-                        RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.ClearHolders), new EditorExtraData {
+                        SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.ClearHolders), new EditorExtraData {
                             { StatKey.PatchId, resp.id },
                             { StatKey.Detailed_Exception, e.ToString() },
-                        }).Forget();
-                        Log.Warning($"Failed removing field value from {f.fieldName} in {f.declaringType.typeName}. Field value in code might not be up to date. Exception: {e.Message}");
+                        });
+                        Log.Warning(string.Format(Localization.Translations.Logging.FailedRemovingFieldValue, f.fieldName, f.declaringType.typeName, e.Message));
                     }
                 }
                 for (var i = 0; i < renamedReshapedFieldsFrom.Length; i++) {
@@ -351,11 +426,11 @@ namespace SingularityGroup.HotReload {
                         }
                         FieldResolver.MoveHolders(declaringType, fromField.fieldName, toField.fieldName, fieldType, fromField.isStatic);
                     } catch (Exception e) {
-                        RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MoveHolders), new EditorExtraData {
+                        SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MoveHolders), new EditorExtraData {
                             { StatKey.PatchId, resp.id },
                             { StatKey.Detailed_Exception, e.ToString() },
-                        }).Forget();
-                        Log.Warning($"Failed moving field value from {fromField} to {toField} in {toField.declaringType.typeName}. Field value in code might not be up to date. Exception: {e.Message}");
+                        });
+                        Log.Warning(Localization.Translations.Logging.FailedMovingFieldValue, fromField, toField, toField.declaringType.typeName, e.Message);
                     }
                 }
             }
@@ -395,11 +470,11 @@ namespace SingularityGroup.HotReload {
                         fieldHandler?.registerInspectorFieldAttributes?.Invoke(declaringType, originalField, updatedField);
                         result.inspectorModified = true;
                     } catch (Exception e) {
-                        RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MoveHolders), new EditorExtraData {
+                        SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MoveHolders), new EditorExtraData {
                             { StatKey.PatchId, resp.id },
                             { StatKey.Detailed_Exception, e.ToString() },
-                        }).Forget();
-                        Log.Warning($"Failed updating field attributes of {original.fieldName} in {original.declaringType.typeName}. Updates might not reflect in the inspector. Exception: {e.Message}");
+                        });
+                        Log.Warning(string.Format(Localization.Translations.Logging.FailedUpdatingFieldAttributes, original.fieldName, original.declaringType.typeName, e.Message));
                     }
                 }
             }
@@ -416,11 +491,11 @@ namespace SingularityGroup.HotReload {
                     result.inspectorFieldAdded = fieldHandler?.storeField?.Invoke(declaringType, field) ?? false;
                     result.inspectorModified = true;
                 } catch (Exception e) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.AddInspectorField), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.AddInspectorField), new EditorExtraData {
                         { StatKey.PatchId, patchId },
                         { StatKey.Detailed_Exception, e.ToString() },
-                    }).Forget();
-                    Log.Warning($"Failed adding field {sField.fieldName}:{sField.declaringType.typeName} to the inspector. Field will not be displayed. Exception: {e.Message}");
+                    });
+                    Log.Warning(string.Format(Localization.Translations.Logging.FailedAddingFieldToInspector, sField.fieldName, sField.declaringType.typeName, e.Message));
                 }
             }
             result.addedFields.AddRange(sFields);
@@ -439,11 +514,11 @@ namespace SingularityGroup.HotReload {
                         alteredFieldHidden = true;
                     }
                 } catch(Exception e) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.HideInspectorField), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.HideInspectorField), new EditorExtraData {
                         { StatKey.PatchId, patchId },
                         { StatKey.Detailed_Exception, e.ToString() },
-                    }).Forget();
-                    Log.Warning($"Failed hiding field {sField.fieldName}:{sField.declaringType.typeName} from the inspector. Exception: {e.Message}");
+                    });
+                    Log.Warning(string.Format(Localization.Translations.Logging.FailedHidingFieldFromInspector, sField.fieldName, sField.declaringType.typeName, e.Message));
                 }
             }
             if (alteredFieldHidden) {
@@ -462,25 +537,24 @@ namespace SingularityGroup.HotReload {
                 var start = DateTime.UtcNow;
                 var state = TryResolveMethod(sOriginalMethod, patchMethod);
                 if (Debugger.IsAttached && !debuggerCompatibilityEnabled) {
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.DebuggerAttached), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.DebuggerAttached), new EditorExtraData {
                         { StatKey.PatchId, patchId },
-                    }).Forget();
-                    return "Patching methods is not allowed while the Debugger is attached. You can change this behavior in settings if Hot Reload is compatible with the debugger you're running.";
+                    });
+                    return Localization.Translations.Logging.DebuggerAttachedNotAllowed;
                 }
 
                 if (DateTime.UtcNow - start > TimeSpan.FromMilliseconds(500)) {
-                    Log.Info("Hot Reload apply took {0}", (DateTime.UtcNow - start).TotalMilliseconds);
+                    Log.Info(Localization.Translations.Logging.HotReloadApplyTook, (DateTime.UtcNow - start).TotalMilliseconds);
                 }
 
                 if(state.match == null) {
-                    var error = "Edit requires full recompile to apply: Method mismatch: {0}, patch: {1}. \nCommon causes: editing code that failed to patch previously, an unsupported change, or a real bug in Hot Reload.\nIf you think this is a bug, please report the issue on Discord and include a code-snippet before/after.";
-                    RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MethodMismatch), new EditorExtraData {
+                    SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.MethodMismatch), new EditorExtraData {
                         { StatKey.PatchId, patchId },
-                    }).Forget();
-                    return string.Format(error, sOriginalMethod.simpleName, patchMethod.Name);
+                    });
+                    return string.Format(Localization.Translations.Logging.MethodMismatch, sOriginalMethod.simpleName, patchMethod.Name);
                 }
 
-                PlayerLog("Detour method {0:X8} {1}, offset: {2}", sOriginalMethod.metadataToken, patchMethod.Name, state.offset);
+                PlayerLog(Localization.Translations.Logging.DetourMethod, sOriginalMethod.metadataToken, patchMethod.Name, state.offset);
                 DetourResult result;
                 DetourApi.DetourMethod(state.match, patchMethod, out result);
                 if (result.success) {
@@ -508,18 +582,18 @@ namespace SingularityGroup.HotReload {
                         //ignore. The method is likely burst compiled and can't be patched
                         return null;
                     } else {
-                        RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.Failure), new EditorExtraData {
+                        SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.Failure), new EditorExtraData {
                             { StatKey.PatchId, patchId },
                             { StatKey.Detailed_Exception, result.exception.ToString() },
-                        }).Forget();
+                        });
                         return HandleMethodPatchFailure(sOriginalMethod, result.exception);
                     }
                 }
             } catch(Exception ex) {
-                RequestHelper.RequestEditorEventWithRetry(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.Exception), new EditorExtraData {
+                SendRuntimeTelemetryIfEnabled(new Stat(StatSource.Client, StatLevel.Error, StatFeature.Patching, StatEventType.Exception), new EditorExtraData {
                     { StatKey.PatchId, patchId },
                     { StatKey.Detailed_Exception, ex.ToString() },
-                }).Forget();
+                });
                 return HandleMethodPatchFailure(sOriginalMethod, ex);
             }
         }
@@ -616,7 +690,7 @@ namespace SingularityGroup.HotReload {
         }
     
         string HandleMethodPatchFailure(SMethod method, Exception exception) {
-            return $"Edit requires full recompile to apply: Failed to apply patch for method {method.displayName} in assembly {method.assemblyName}.\nCommon causes: editing code that failed to patch previously, an unsupported change, or a real bug in Hot Reload.\nIf you think this is a bug, please report the issue on Discord and include a code-snippet before/after.\nException: {exception}";
+            return string.Format(Localization.Translations.Logging.FailedToApplyPatchForMethod, method.displayName, method.assemblyName, exception);
         }
 
         void EnsureSymbolResolver() {
@@ -663,12 +737,12 @@ namespace SingularityGroup.HotReload {
             filePath = Path.GetFullPath(filePath);
             var dir = Path.GetDirectoryName(filePath);
             if(string.IsNullOrEmpty(dir)) {
-                throw new ArgumentException("Invalid path: " + filePath, nameof(filePath));
+                throw new ArgumentException(string.Format(Localization.Translations.Logging.InvalidPath, filePath), nameof(filePath));
             }
             Directory.CreateDirectory(dir);
             var history = patchHistory.ToList();
             
-            PlayerLog("Saving {0} applied patches to {1}", history.Count, filePath);
+            PlayerLog(Localization.Translations.Logging.SavingAppliedPatches, history.Count, filePath);
 
             await Task.Run(() => {
                 using (FileStream fs = File.Create(filePath))
@@ -682,9 +756,12 @@ namespace SingularityGroup.HotReload {
             });
         }
         
-        public void InitPatchesBlocked(string filePath) {
+        public void InitPatchesBlocked() {
+            if (PersistencePath == null) {
+                return;
+            }
             seenResponses.Clear();
-            var file = new FileInfo(filePath);
+            var file = new FileInfo(PersistencePath);
             if (file.Exists) {
                 using(var fs = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.SequentialScan))
                 using (StreamReader sr = new StreamReader(fs))
@@ -696,6 +773,13 @@ namespace SingularityGroup.HotReload {
                 }
                 ApplyPatches(persist: false);
             }
+        }
+
+        public void ClearPatchesThreaded() {
+            if (PersistencePath == null) {
+                return;
+            }
+            Task.Run(() => File.Delete(PersistencePath));
         }
         
         

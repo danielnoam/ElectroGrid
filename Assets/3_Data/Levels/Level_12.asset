@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level_12
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
   levelName: Level 12
-  gridShape: {fileID: 11400000, guid: 3608cb1d3a940e744ad7abd709127419, type: 2}
+  gridShape: {fileID: 11400000, guid: 92db7aa244d1853908523a7c4c275b5c, type: 2}
   matchObjects:
     internalItems:
     - item: {fileID: 11400000, guid: 06c7eecdb5f79c542a8465be434742cc, type: 2}
@@ -46,11 +46,11 @@ MonoBehaviour:
       type: {class: ReachBottomObjective, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
-        gridShape: {fileID: 11400000, guid: 3608cb1d3a940e744ad7abd709127419, type: 2}
+        gridShape: {fileID: 11400000, guid: 92db7aa244d1853908523a7c4c275b5c, type: 2}
         requiredAmount: 1
     - rid: 3019432012391383126
       type: {class: DestroyObstaclesObjective, ns: , asm: Assembly-CSharp}
       data:
         objectiveSprite: {fileID: 0}
-        gridShape: {fileID: 11400000, guid: 3608cb1d3a940e744ad7abd709127419, type: 2}
+        gridShape: {fileID: 11400000, guid: 92db7aa244d1853908523a7c4c275b5c, type: 2}
         requiredAmount: 8

@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: SpriteLineMask
-  m_Shader: {fileID: -6465566751694194690, guid: 427190bb31b84f445be4b915397186be, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: e7c1f4c20743df434dd569f6b524f2e7, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

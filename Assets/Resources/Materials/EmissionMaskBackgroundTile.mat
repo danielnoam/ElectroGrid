@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: EmissionMaskBackgroundTile
-  m_Shader: {fileID: -6465566751694194690, guid: dbdfd81ca520f084d849e2a0917b81d9, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 2f6d6fbc7daf6cf907b09360facf6a62, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -46,6 +46,7 @@ Material:
     m_Ints: []
     m_Floats: []
     m_Colors:
+    - White: {r: 1, g: 1, b: 1, a: 1}
     - _Emission_Color: {r: 21.36125, g: 21.36125, b: 21.36125, a: 1}
     - _Emission_Mask_Color: {r: 11.984314, g: 11.984314, b: 11.984314, a: 1}
     - _Emission_Mask_Offset: {r: 0, g: 0, b: 0, a: 0}

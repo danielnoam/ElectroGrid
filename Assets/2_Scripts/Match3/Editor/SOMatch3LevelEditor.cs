@@ -1,325 +1,120 @@
 #if UNITY_EDITOR
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
+/// <summary>
+/// Read-only summary of a level. All editing happens in the Level Editor window,
+/// so there is one place where a level can be changed rather than two that can disagree.
+/// </summary>
 [CustomEditor(typeof(SOMatch3Level))]
 public class SOMatch3LevelEditor : UnityEditor.Editor
 {
-    private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
-    private bool _isDragging;
-    
-    private const float CellSize = 20f;
-    private const float CellBorder = 1f;
-    private const float GridSpacing = 10f;
-    
-    private static readonly Color BackgroundColor = new Color(0.2f, 0.2f, 0.2f);
-    private static readonly Color ActiveTileColor = new Color(0.3f, 0.7f, 0.3f);
-    private static readonly Color InactiveTileColor = new Color(0.4f, 0.4f, 0.4f);
-    private static readonly Color ObstacleTileColor = new Color(0.8f, 0.3f, 0.3f);
-    private static readonly Color BottomObjectTileColor = new Color(0.3f, 0.5f, 0.9f);
-    private static readonly Color GridLineColor = new Color(0.1f, 0.1f, 0.1f);
-    private static readonly Color HoverColor = new Color(1f, 1f, 1f, 0.3f);
-    
+    private const float PreviewCellSize = 14f;
+
     public override void OnInspectorGUI()
     {
-        serializedObject.Update();
+        var level = (SOMatch3Level)target;
 
-        SOMatch3Level level = (SOMatch3Level)target;
-        
-        SerializedProperty levelNameProp = serializedObject.FindProperty("levelName");
-        SerializedProperty gridShapeProp = serializedObject.FindProperty("gridShape");
-        SerializedProperty matchObjectsProp = serializedObject.FindProperty("matchObjects");
-        SerializedProperty objectivesProp = serializedObject.FindProperty("objectives");
-        SerializedProperty loseConditionsProp = serializedObject.FindProperty("loseConditions");
-        SerializedProperty tileObjectsProp = serializedObject.FindProperty("tileObjects");
+        if (GUILayout.Button("Open in Level Editor", GUILayout.Height(30)))
+        {
+            Match3LevelEditorWindow.Open(level);
+        }
 
-        EditorGUILayout.PropertyField(levelNameProp);
+        EditorGUILayout.Space(8);
 
-        EditorGUILayout.PropertyField(matchObjectsProp);
-        EditorGUILayout.PropertyField(objectivesProp);
-        EditorGUILayout.PropertyField(loseConditionsProp);
-        
-        EditorGUILayout.Space(10);
-        EditorGUILayout.LabelField("Level Grid:", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(gridShapeProp);
-        
-        DrawTileObjectPainter(level, tileObjectsProp, gridShapeProp);
+        using (new EditorGUI.DisabledScope(true))
+        {
+            EditorGUILayout.LabelField("Level Name", level.LevelName);
+            EditorGUILayout.ObjectField("Grid Shape", level.GridShape, typeof(SOGridShape), false);
+        }
 
-        serializedObject.ApplyModifiedProperties();
+        EditorGUILayout.Space(8);
+
+        DrawObjectives(level);
+        DrawLoseConditions(level);
+        DrawGridPreview(level);
+        DrawValidation(level);
     }
-    
-    private void DrawTileObjectPainter(SOMatch3Level level, SerializedProperty tileObjectsProp, SerializedProperty gridShapeProp)
+
+    private void DrawValidation(SOMatch3Level level)
     {
-        if (gridShapeProp.objectReferenceValue == null)
+        var issues = Match3LevelValidation.Validate(level);
+        if (issues.Count == 0) return;
+
+        EditorGUILayout.Space(8);
+        EditorGUILayout.LabelField("Validation", EditorStyles.boldLabel);
+
+        foreach (var issue in issues)
         {
-            EditorGUILayout.HelpBox("Assign a Grid Shape to paint tile objects.", MessageType.Info);
+            var type = issue.Severity == Match3LevelValidation.Severity.Error ? MessageType.Error : MessageType.Warning;
+            EditorGUILayout.HelpBox(issue.Message, type);
+        }
+    }
+
+    private void DrawObjectives(SOMatch3Level level)
+    {
+        EditorGUILayout.LabelField("Objectives", EditorStyles.boldLabel);
+
+        if (level.Objectives == null || level.Objectives.Count == 0)
+        {
+            EditorGUILayout.LabelField("   None", EditorStyles.miniLabel);
             return;
         }
-
-        SOGridShape gridShape = (SOGridShape)gridShapeProp.objectReferenceValue;
-        Grid grid = gridShape.Grid;
-
-        if (grid == null)
-        {
-            EditorGUILayout.HelpBox("Grid Shape has no valid grid.", MessageType.Warning);
-            return;
-        }
-
-        int width = grid.Width;
-        int height = grid.Height;
-        int requiredSize = width * height;
-
-        if (tileObjectsProp.arraySize != requiredSize)
-        {
-            tileObjectsProp.arraySize = requiredSize;
-            serializedObject.ApplyModifiedProperties();
-        }
-
-
-        int obstacleCount = level.CountObjectsOfType(Match3TileObjectType.Obstacle);
-        int bottomObjectCount = level.CountObjectsOfType(Match3TileObjectType.Bottom);
-        int matchableCount = level.GridShape.Grid.ActiveCellCount - obstacleCount - bottomObjectCount;
-        int obstacleNeeded = 0;
-        int bottomObjectNeeded = 0;
-        
 
         foreach (var objective in level.Objectives)
         {
-            if (objective is DestroyObstaclesObjective clearObstaclesObjective)
-            {
-                obstacleNeeded += clearObstaclesObjective.RequiredAmount;
-            }
-            else if (objective is ReachBottomObjective reachBottomObjective)
-            {
-                bottomObjectNeeded += reachBottomObjective.RequiredAmount;
-            }
-        }
-
-        string obstacleText = $"Obstacles: {obstacleCount} / {obstacleNeeded}";
-        if (obstacleNeeded > 0)
-        {
-             obstacleText = obstacleCount == obstacleNeeded 
-                ? $"<color=green>Obstacles: {obstacleCount} / {obstacleNeeded}</color>" 
-                : $"<color=red>Obstacles: {obstacleCount} / {obstacleNeeded}</color>";
-        }
-        
-        string bottomText = $"Bottom: {bottomObjectCount} / {bottomObjectNeeded}";
-        if (bottomObjectNeeded > 0)
-        {
-            bottomText = bottomObjectCount == bottomObjectNeeded 
-                ? $"<color=green>Bottom: {bottomObjectCount} / {bottomObjectNeeded}</color>" 
-                : $"<color=red>Bottom: {bottomObjectCount} / {bottomObjectNeeded}</color>";
-        }
-
-        EditorGUILayout.LabelField($"Matchable: {matchableCount} | {obstacleText} | {bottomText}", new GUIStyle(EditorStyles.label) { richText = true });
-        
-        EditorGUILayout.Space(5);
-        
-
-        float gridWidth = width * CellSize;
-        float gridHeight = height * CellSize;
-        Rect gridRect = GUILayoutUtility.GetRect(gridWidth, gridHeight);
-        gridRect.x += (EditorGUIUtility.currentViewWidth - gridWidth) / 2 - 20;
-
-        DrawGrid(gridRect, grid, tileObjectsProp);
-        
-        EditorGUILayout.Space(5);
-        
-        EditorGUILayout.BeginHorizontal();
-        
-        // GUI.backgroundColor = _currentPaintMode == Match3TileObjectType.Matchable ? Color.yellow : Color.white;
-        // if (GUILayout.Button("None", GUILayout.Height(30)))
-        // {
-        //     _currentPaintMode = Match3TileObjectType.Matchable;
-        // }
-        //
-        GUI.backgroundColor = _currentPaintMode == Match3TileObjectType.Obstacle ? Color.yellow : Color.white;
-        if (GUILayout.Button("Obstacles", GUILayout.Height(30)))
-        {
-            _currentPaintMode = _currentPaintMode == Match3TileObjectType.Obstacle ? Match3TileObjectType.Matchable : Match3TileObjectType.Obstacle;
-        }
-        
-        GUI.backgroundColor = _currentPaintMode == Match3TileObjectType.Bottom ? Color.yellow : Color.white;
-        if (GUILayout.Button("Bottom", GUILayout.Height(30)))
-        {
-            _currentPaintMode = _currentPaintMode == Match3TileObjectType.Bottom ? Match3TileObjectType.Matchable : Match3TileObjectType.Bottom;
-        }
-        
-        GUI.backgroundColor = Color.white;
-        EditorGUILayout.EndHorizontal();
-        
-        EditorGUILayout.Space(5);
-        
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Clear All"))
-        {
-            ClearAll(tileObjectsProp);
-        }
-        if (GUILayout.Button("Clear Obstacles"))
-        {
-            ClearType(tileObjectsProp, grid, Match3TileObjectType.Obstacle);
-        }
-        if (GUILayout.Button("Clear Bottom"))
-        {
-            ClearType(tileObjectsProp, grid, Match3TileObjectType.Bottom);
-        }
-        EditorGUILayout.EndHorizontal();
-    }
-    
-    private void DrawGrid(Rect gridRect, Grid grid, SerializedProperty tileObjectsProp)
-    {
-        Event e = Event.current;
-        int width = grid.Width;
-        int height = grid.Height;
-
-        float preciseWidth = width * CellSize;
-        float preciseHeight = height * CellSize;
-
-
-        Rect backgroundRect = new Rect(gridRect.x, gridRect.y, preciseWidth, preciseHeight);
-        EditorGUI.DrawRect(backgroundRect, BackgroundColor);
-
-        if (e.type == EventType.MouseDown && gridRect.Contains(e.mousePosition))
-        {
-            int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
-            int visualY = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
-            int y = height - 1 - visualY;
-
-            if (x >= 0 && x < width && y >= 0 && y < height && grid.IsCellActive(x, y))
-            {
-                _isDragging = true;
-                int index = y * width + x;
-                
-                Match3TileObjectType currentTileType = (Match3TileObjectType)tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex;
-                Match3TileObjectType newType = currentTileType == _currentPaintMode 
-                    ? Match3TileObjectType.Matchable 
-                    : _currentPaintMode;
-        
-                tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex = (int)newType;
-                tileObjectsProp.serializedObject.ApplyModifiedProperties();
-                GUI.changed = true;
-                e.Use();
-            }
-        }
-        else if (e.type == EventType.MouseDrag && _isDragging && gridRect.Contains(e.mousePosition))
-        {
-            int x = Mathf.FloorToInt((e.mousePosition.x - gridRect.x) / CellSize);
-            int visualY = Mathf.FloorToInt((e.mousePosition.y - gridRect.y) / CellSize);
-            int y = height - 1 - visualY;
-
-            if (x >= 0 && x < width && y >= 0 && y < height && grid.IsCellActive(x, y))
-            {
-                int index = y * width + x;
-                Match3TileObjectType currentTileType = (Match3TileObjectType)tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex;
-                Match3TileObjectType newType = currentTileType == _currentPaintMode 
-                    ? Match3TileObjectType.Matchable 
-                    : _currentPaintMode;
-                
-                
-                tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex = (int)newType;
-                tileObjectsProp.serializedObject.ApplyModifiedProperties();
-                GUI.changed = true;
-                e.Use();
-            }
-        }
-        else if (e.type == EventType.MouseUp)
-        {
-            _isDragging = false;
-        }
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                int index = y * width + x;
-                if (index >= tileObjectsProp.arraySize) continue;
-
-                bool isActive = grid.IsCellActive(x, y);
-                Match3TileObjectType tileObjectType = (Match3TileObjectType)tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex;
-
-                int visualY = height - 1 - y;
-                Rect cellRect = new Rect(
-                    gridRect.x + x * CellSize,
-                    gridRect.y + visualY * CellSize,
-                    CellSize - CellBorder,
-                    CellSize - CellBorder
-                );
-
-                Color cellColor;
-                if (!isActive)
-                {
-                    cellColor = InactiveTileColor;
-                }
-                else
-                {
-                    cellColor = tileObjectType switch
-                    {
-                        Match3TileObjectType.Obstacle => ObstacleTileColor,
-                        Match3TileObjectType.Bottom => BottomObjectTileColor,
-                        _ => ActiveTileColor
-                    };
-                }
-
-                EditorGUI.DrawRect(cellRect, cellColor);
-
-                if (cellRect.Contains(Event.current.mousePosition))
-                {
-                    EditorGUI.DrawRect(cellRect, HoverColor);
-                }
-            }
-        }
-
-        Handles.color = GridLineColor;
-        float gridLineEndX = gridRect.x + width * CellSize;
-        float gridLineEndY = gridRect.y + height * CellSize;
-        
-        for (int x = 0; x <= width; x++)
-        {
-            float xPos = gridRect.x + x * CellSize;
-            Handles.DrawLine(new Vector3(xPos, gridRect.y), new Vector3(xPos, gridLineEndY));
-        }
-        for (int y = 0; y <= height; y++)
-        {
-            float yPos = gridRect.y + y * CellSize;
-            Handles.DrawLine(new Vector3(gridRect.x, yPos), new Vector3(gridLineEndX, yPos));
-        }
-
-        if (gridRect.Contains(Event.current.mousePosition))
-        {
-            HandleUtility.Repaint();
+            EditorGUILayout.LabelField(objective == null ? "   (empty)" : $"   • {objective.GetDescription()}");
         }
     }
-    
-    private void ClearAll(SerializedProperty tileObjectsProp)
+
+    private void DrawLoseConditions(SOMatch3Level level)
     {
-        for (int i = 0; i < tileObjectsProp.arraySize; i++)
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("Lose Conditions", EditorStyles.boldLabel);
+
+        if (level.LoseConditions == null || level.LoseConditions.Count == 0)
         {
-            tileObjectsProp.GetArrayElementAtIndex(i).enumValueIndex = (int)Match3TileObjectType.Matchable;
+            EditorGUILayout.LabelField("   None", EditorStyles.miniLabel);
+            return;
         }
-        tileObjectsProp.serializedObject.ApplyModifiedProperties();
-        GUI.changed = true;
+
+        foreach (var condition in level.LoseConditions)
+        {
+            EditorGUILayout.LabelField(condition == null ? "   (empty)" : $"   • {condition.GetDescription()}");
+        }
     }
-    
-    private void ClearType(SerializedProperty tileObjectsProp, Grid grid, Match3TileObjectType typeToRemove)
+
+    private void DrawGridPreview(SOMatch3Level level)
     {
-        int width = grid.Width;
-        for (int y = 0; y < grid.Height; y++)
+        EditorGUILayout.Space(8);
+        EditorGUILayout.LabelField("Grid", EditorStyles.boldLabel);
+
+        if (!level.GridShape || level.GridShape.Grid == null)
         {
-            for (int x = 0; x < grid.Width; x++)
-            {
-                if (grid.IsCellActive(x, y))
-                {
-                    int index = y * width + x;
-                    if ((Match3TileObjectType)tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex == typeToRemove)
-                    {
-                        tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex = (int)Match3TileObjectType.Matchable;
-                    }
-                }
-            }
+            EditorGUILayout.HelpBox("No Grid Shape assigned.", MessageType.Info);
+            return;
         }
-        tileObjectsProp.serializedObject.ApplyModifiedProperties();
-        GUI.changed = true;
+
+        Grid grid = level.GridShape.Grid;
+        var tileObjectsProp = serializedObject.FindProperty("tileObjects");
+
+        // A level whose grid shape changed since it was last opened has a stale array, and the
+        // preview must not resize it — that is the editor window's job, on an explicit edit
+        if (tileObjectsProp.arraySize != grid.Width * grid.Height)
+        {
+            EditorGUILayout.HelpBox("Tile data does not match the grid shape. Open the Level Editor to rebuild it.", MessageType.Warning);
+            return;
+        }
+
+        EditorGUILayout.LabelField(Match3LevelGridGUI.BuildCountsLabel(level), Match3LevelGridGUI.RichLabel);
+        EditorGUILayout.Space(4);
+
+        float gridWidth = grid.Width * PreviewCellSize;
+        Rect gridRect = GUILayoutUtility.GetRect(gridWidth, grid.Height * PreviewCellSize, GUILayout.ExpandWidth(true));
+        gridRect.x += Mathf.Max(0f, (gridRect.width - gridWidth) / 2f);
+        gridRect.width = gridWidth;
+
+        Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, PreviewCellSize, false);
     }
 }
-
 #endif

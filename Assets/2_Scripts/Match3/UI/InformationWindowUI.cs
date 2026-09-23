@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -25,6 +26,7 @@ public class InformationWindowUI : MonoBehaviour
     private Sequence _toggleSequence;
     private float _backButtonDefaultYPosition;
     private float _backgroundStartAlpha;
+    private Action _onClosed;
 
 
     private void Awake()
@@ -46,7 +48,23 @@ public class InformationWindowUI : MonoBehaviour
     public void Initialize()
     {
         SetupButtons();
-        PopulateTutorials();
+        PopulateAllTutorials();
+    }
+
+    /// <summary>Opens the window showing every tutorial, which is what the info button does.</summary>
+    public void ShowAllTutorials()
+    {
+        _onClosed = null;
+        PopulateAllTutorials();
+        Toggle(true);
+    }
+
+    /// <summary>Opens the window showing only the given cards, used for contextual hints.</summary>
+    public void ShowTutorials(IReadOnlyList<SOMatch3Tutorial> tutorials, Action onClosed = null)
+    {
+        _onClosed = onClosed;
+        PopulateTutorials(tutorials);
+        Toggle(true);
     }
 
     private void SetupButtons()
@@ -58,21 +76,33 @@ public class InformationWindowUI : MonoBehaviour
             Toggle(false);
             topBarUI?.Toggle(true);
             bottomBarUI?.Toggle(true);
+
+            var onClosed = _onClosed;
+            _onClosed = null;
+            onClosed?.Invoke();
         });
     }
 
-    private void PopulateTutorials()
+    private void PopulateAllTutorials()
+    {
+        PopulateTutorials(GameManager.Instance ? GameManager.Instance.Match3GeneralTutorials : null);
+    }
+
+    private void PopulateTutorials(IReadOnlyList<SOMatch3Tutorial> tutorials)
     {
         if (!tutorialElementsParent || !tutorialElementPrefab) return;
-        
+
         foreach (Transform child in tutorialElementsParent)
         {
             Destroy(child.gameObject);
         }
-        
-        var tutorials = GameManager.Instance.Match3GeneralTutorials;
+
+        if (tutorials == null) return;
+
         foreach (var tutorial in tutorials)
         {
+            if (!tutorial) continue;
+
             var tutorialElement = Instantiate(tutorialElementPrefab, tutorialElementsParent);
             tutorialElement.Setup(tutorial.TutorialSprite, tutorial.TutorialTitle, tutorial.TutorialText);
         }

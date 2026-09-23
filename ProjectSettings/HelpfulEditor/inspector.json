@@ -1,0 +1,67 @@
+{
+    "moduleEnabled": true,
+    "headerBarEnabled": true,
+    "headerBarButtonHeight": 22.0,
+    "fieldSearchEnabled": true,
+    "excludedComponentTypes": [],
+    "isolationPersistsAcrossSelection": false,
+    "betterTransformEnabled": true,
+    "betterRectTransformEnabled": true,
+    "scaleLockDefaultOn": false,
+    "resetMenuItemsEnabled": true,
+    "worldFieldsEnabled": true,
+    "uiPreviewEnabled": true,
+    "particlePreviewEnabled": true,
+    "particlePreviewAutoPlay": true,
+    "uiPreviewBackground": {
+        "r": 0.1599999964237213,
+        "g": 0.1599999964237213,
+        "b": 0.1599999964237213,
+        "a": 1.0
+    },
+    "particlePreviewBackground": {
+        "r": 0.12999999523162842,
+        "g": 0.12999999523162842,
+        "b": 0.14000000059604645,
+        "a": 1.0
+    },
+    "saveInPlayModeEnabled": true,
+    "saveInPlayModeBlacklist": [
+        "UnityEngine.Canvas",
+        "UnityEngine.CanvasRenderer",
+        "UnityEngine.Animator",
+        "UnityEngine.UI.CanvasScaler",
+        "UnityEngine.SignalReceiver"
+    ],
+    "cameraAlignButtonsEnabled": true,
+    "graphicResetColorEnabled": true,
+    "textMeshProDuplicateMaterialEnabled": true,
+    "componentDraggerEnabled": true,
+    "altInvertsMoveCopyDefault": false,
+    "transferDependencies": true,
+    "dependencyWhitelist": [],
+    "expandCollapseKey": {
+        "key": 101,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    },
+    "collapseAllKey": {
+        "key": 101,
+        "ctrl": true,
+        "alt": false,
+        "shift": true
+    },
+    "toggleEnabledKey": {
+        "key": 97,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    },
+    "focusSearchKey": {
+        "key": 0,
+        "ctrl": false,
+        "alt": false,
+        "shift": false
+    }
+}

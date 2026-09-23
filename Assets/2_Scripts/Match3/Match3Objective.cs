@@ -9,11 +9,11 @@ public abstract class Match3Objective
     [SerializeField] protected Sprite objectiveSprite;
     [SerializeField, HideInInspector] protected SOGridShape gridShape;
     
-    protected bool Completed;
+    protected bool _completed;
     
     public Sprite ObjectiveSprite => objectiveSprite;
     public SOGridShape GridShape => gridShape;
-    public bool IsCompleted => Completed;
+    public bool IsCompleted => _completed;
     
     public abstract bool AllowOnlyOneObjectiveOfThisType { get; }
     public abstract void Setup();
@@ -25,18 +25,27 @@ public abstract class Match3Objective
     public abstract string GetRequirementText();
     public abstract (int, int) GetProgress();
 
-    public event Action progressChanged;
-    public event Action complete;
+    public event Action ProgressChanged;
+    public event Action Completed;
     
     
     protected void InvokeProgressChanged()
     {
-        progressChanged?.Invoke();
+        ProgressChanged?.Invoke();
     }
     
     protected void InvokeComplete()
     {
-        complete?.Invoke();
+        Completed?.Invoke();
+    }
+
+    /// <summary>Runtime copy of the authored objective, so playing a level never mutates the level asset.</summary>
+    public Match3Objective Clone()
+    {
+        var clone = (Match3Objective)MemberwiseClone();
+        clone.ProgressChanged = null;
+        clone.Completed = null;
+        return clone;
     }
     
     public void SetGridShape(SOGridShape shape)
@@ -56,7 +65,7 @@ public class GetMatches : Match3Objective
     public override void Setup()
     {
         _currentAmount = 0;
-        Completed = false;
+        _completed = false;
     }
 
     public override void OnMatchMade(List<Match3Tile> matchedTiles)
@@ -68,7 +77,7 @@ public class GetMatches : Match3Objective
 
         if (_currentAmount >= requiredAmount)
         {
-            Completed = true;
+            _completed = true;
             InvokeComplete();
         }
         else
@@ -87,7 +96,7 @@ public class GetMatches : Match3Objective
 
     public override string GetRequirementText()
     {
-        return $"Matches:";
+        return $"Pieces:";
     }
     
 
@@ -99,12 +108,12 @@ public class GetMatches : Match3Objective
 
     public override string GetName()
     {
-        return "Get Matches";
+        return "Collect Pieces";
     }
 
     public override string GetDescription()
     {
-        return $"Get {requiredAmount} Matches";
+        return $"Collect {requiredAmount} Pieces";
     }
 }
 
@@ -120,7 +129,7 @@ public class GetSpecificItemMatches : Match3Objective
     public override void Setup()
     {
         _currentAmount = 0;
-        Completed = false;
+        _completed = false;
     }
 
     public override void OnMatchMade(List<Match3Tile> matchedTiles)
@@ -140,7 +149,7 @@ public class GetSpecificItemMatches : Match3Objective
 
         if (_currentAmount >= requiredAmount)
         {
-            Completed = true;
+            _completed = true;
             InvokeComplete();
         }
     }
@@ -166,12 +175,12 @@ public class GetSpecificItemMatches : Match3Objective
 
     public override string GetName()
     {
-        return $"Get {targetItem.Label} Matches";
+        return $"Collect {(targetItem ? targetItem.Label : "Items")} Pieces";
     }
     
     public override string GetDescription()
     {
-        return $"Get {requiredAmount} Matches of {targetItem.Label}";
+        return $"Collect {requiredAmount} {(targetItem ? targetItem.Label : "Items")} Pieces";
     }
 }
 
@@ -187,7 +196,7 @@ public class DestroyObstaclesObjective : Match3Objective
     public override void Setup()
     {
         _currentAmount = 0;
-        Completed = false;
+        _completed = false;
     }
 
     public override void OnMatchMade(List<Match3Tile> matchedTiles)
@@ -203,7 +212,7 @@ public class DestroyObstaclesObjective : Match3Objective
 
         if (_currentAmount >= requiredAmount)
         {
-            Completed = true;
+            _completed = true;
             InvokeComplete();
         }
         else
@@ -248,7 +257,7 @@ public class ReachBottomObjective : Match3Objective
     public override void Setup()
     {
         _currentAmount = 0;
-        Completed = false;
+        _completed = false;
     }
 
     public override void OnMatchMade(List<Match3Tile> matchedTiles)
@@ -267,7 +276,7 @@ public class ReachBottomObjective : Match3Objective
 
         if (_currentAmount >= requiredAmount)
         {
-            Completed = true;
+            _completed = true;
             InvokeComplete();
         }
         else

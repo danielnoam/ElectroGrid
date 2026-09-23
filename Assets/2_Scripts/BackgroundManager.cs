@@ -1,12 +1,13 @@
 using System.Collections.Generic;
-using DNExtensions;
-using DNExtensions.Button;
+using DNExtensions.Utilities;
+using DNExtensions.Utilities.Button;
 using UnityEngine;
 using PrimeTween;
 
 public class BackgroundManager : MonoBehaviour
 {
     [Header("Mouse Interaction")]
+    [SerializeField] private bool mouseInteractionEffect = true;
     [SerializeField] private float maxScaleMultiplier = 1f;
     [SerializeField] private float minScaleMultiplier = 0.8f;
     [SerializeField] private float effectRadius = 3f;
@@ -26,6 +27,7 @@ public class BackgroundManager : MonoBehaviour
     private Camera _camera;
     private TouchInputReader _inputReader;
     private float _pulseTimer;
+    private Vector2 _lastPointerPosition = Vector2.positiveInfinity;
 
     private void Awake()
     {
@@ -83,21 +85,26 @@ public class BackgroundManager : MonoBehaviour
 
     private void UpdateTiles()
     {
-        if (!_camera || !_inputReader) return;
-    
-        Vector2 mousePos = _inputReader.MousePosition;
-        Vector3 mouseWorldPos = _camera.ScreenToWorldPoint(mousePos);
-        mouseWorldPos.z = 0;
+        if (!mouseInteractionEffect || !_camera || !_inputReader || backgroundTiles.Count == 0) return;
+
+        // The pointer only moves while a finger is down, so without this the whole grid is
+        // recalculated and rewritten every frame to produce exactly the same picture
+        Vector2 pointerPosition = _inputReader.MousePosition;
+        if (pointerPosition == _lastPointerPosition) return;
+        _lastPointerPosition = pointerPosition;
+
+        Vector3 pointerWorldPosition = _camera.ScreenToWorldPoint(pointerPosition);
+        pointerWorldPosition.z = 0;
 
         foreach (var tile in backgroundTiles)
         {
             if (!tile) continue;
 
-            Vector3 tilePos = tile.transform.position;
-            float distance = Vector2.Distance(new Vector2(mouseWorldPos.x, mouseWorldPos.y), new Vector2(tilePos.x, tilePos.y));
-        
-            float scaleMultiplier = CalculateScaleMultiplier(distance);
-            tile.transform.localScale = Vector3.one * scaleMultiplier;
+            float distance = Vector2.Distance(pointerWorldPosition, tile.transform.position);
+            var scale = Vector3.one * CalculateScaleMultiplier(distance);
+
+            // Assigning an identical scale still dirties the transform, so only write real changes
+            if (tile.transform.localScale != scale) tile.transform.localScale = scale;
         }
     }
 

@@ -5,6 +5,7 @@ using System.IO;
 using UnityEditor;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using SingularityGroup.HotReload.Editor.Localization;
 using SingularityGroup.HotReload.Newtonsoft.Json;
 using UnityEditor.Compilation;
 
@@ -14,12 +15,12 @@ namespace SingularityGroup.HotReload.Editor {
     internal static class AssemblyOmission {
         // [MenuItem("Window/Hot Reload Dev/List omitted projects")]
         private static void Check() {
-            Log.Info("To compile C# files same as a Player build, we must omit projects which aren't part of the selected Player build.");
+            Log.Info(Translations.Errors.InfoOmitProjectsForPlayerBuild);
             var omitted = GetOmittedProjects(EditorUserBuildSettings.activeScriptCompilationDefines);
-            Log.Info("---------");
+            Log.Info(Translations.Errors.InfoSeparator);
 
             foreach (var name in omitted) {
-                Log.Info("omitted editor/other project named: {0}", name);
+                Log.Info(Translations.Errors.InfoOmittedEditorProject, name);
             }
         }
         
@@ -65,41 +66,51 @@ namespace SingularityGroup.HotReload.Editor {
 
             // Note: other platform player assemblies are also returned here, but I haven't seen it cause issues
             //   when using Hot Reload with IdleGame Android build. 
-            var playerAssemblies = GetPlayerAssemblies().ToArray();
+            var playerAssemblies = GetPlayerAssemblies();
 
             if (verboseLogs) {
                 foreach (var name in editorAssemblies) {
-                    Log.Info("found project named {0}", name);
+                    Log.Info(Translations.Errors.InfoFoundProjectNamed, name);
                 }
                 foreach (var playerAssemblyName in playerAssemblies) {
-                    Log.Debug("player assembly named {0}", playerAssemblyName);
+                    Log.Debug(string.Format(Translations.Utility.PlayerAssemblyDebug, playerAssemblyName));
                 }
             }
             // leaves the editor assemblies that are not built into player assemblies (e.g. editor and test assemblies)
-            var toOmit = editorAssemblies.Except(playerAssemblies.Select(asm => asm.name));
+            var toOmit = editorAssemblies.Except(playerAssemblies);
             var unique = new HashSet<string>(toOmit);
             return unique.OrderBy(s => s).ToArray();
         }
 
         // main thread only
         public static List<string> GetEditorAssemblies() {
-            return CompilationPipeline
+            var cached = HotReloadState.EditorAssemblyNames;
+            if (!string.IsNullOrEmpty(cached)) {
+                return cached.Split('\n').ToList();
+            }
+            var names = CompilationPipeline
                 .GetAssemblies(AssembliesType.Editor)
                 .Select(asm => asm.name)
                 .ToList();
+            HotReloadState.EditorAssemblyNames = string.Join("\n", names);
+            return names;
         }
 
-        public static Assembly[] GetPlayerAssemblies() {
-            var playerAssemblyNames = CompilationPipeline
+        public static string[] GetPlayerAssemblies() {
+            var cached = HotReloadState.PlayerAssemblyNames;
+            if (!string.IsNullOrEmpty(cached)) {
+                return cached.Split('\n').ToArray();
+            }
+            var names = CompilationPipeline
                 #if UNITY_2019_3_OR_NEWER
                 .GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies) // since Unity 2019.3
                 #else
                 .GetAssemblies(AssembliesType.Player)
                 #endif
+                .Select(asm => asm.name)
                 .ToArray();
-            
-
-            return playerAssemblyNames;
+            HotReloadState.PlayerAssemblyNames = string.Join("\n", names);
+            return names;
         }
         
         internal static class DefineConstraints {
@@ -113,12 +124,18 @@ namespace SingularityGroup.HotReload.Editor {
             /// Find any asmdef files where the define constraints evaluate to false.
             /// </remarks>
             public static string[] GetOmittedAssemblies(string[] defineSymbols) {
+                var cached = HotReloadState.OmittedAssemblies;
+                if (!string.IsNullOrEmpty(cached)) {
+                    return cached.Split('\n').ToArray();
+                }
                 var guids = AssetDatabase.FindAssets("t:asmdef");
                 var asmdefFiles = guids.Select(AssetDatabase.GUIDToAssetPath);
                 var shouldOmit = new List<string>();
                 foreach (var asmdefFile in asmdefFiles) {
                     var asmdef = ReadDefineConstraints(asmdefFile);
-                    if (asmdef == null) continue;
+                    if (asmdef == null) {
+                        continue;
+                    }
                     if (asmdef.defineConstraints == null || asmdef.defineConstraints.Length == 0) {
                         // Hot Reload already handles assemblies correctly if they have no define symbols.
                         continue;
@@ -129,7 +146,7 @@ namespace SingularityGroup.HotReload.Editor {
                         shouldOmit.Add(asmdef.name);
                     }
                 }
-
+                HotReloadState.OmittedAssemblies = string.Join("\n", shouldOmit);
                 return shouldOmit.ToArray();
             }
 
