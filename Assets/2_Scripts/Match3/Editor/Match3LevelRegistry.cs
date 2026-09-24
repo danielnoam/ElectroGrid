@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -103,4 +102,3 @@ internal static class Match3LevelRegistry
         return new SerializedObject(Prefab).FindProperty(ScenePathProperty)?.stringValue ?? string.Empty;
     }
 }
-#endif

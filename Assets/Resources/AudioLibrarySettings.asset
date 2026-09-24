@@ -16,9 +16,10 @@ MonoBehaviour:
   limitPoolSize:
     isSet: 1
     hideWhenUnchecked: 0
-    value: 30
+    value: 64
   preWarm:
     isSet: 1
     hideWhenUnchecked: 0
-    value: 15
-  audioCategories: []
+    value: 24
+  audioCategories:
+  - {fileID: 11400000, guid: 97b884fefdcb1d2459320a8e6c1e0a32, type: 2}

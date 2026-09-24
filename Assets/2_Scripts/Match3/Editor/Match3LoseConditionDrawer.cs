@@ -1,8 +1,7 @@
-#if UNITY_EDITOR
 using UnityEditor;
 
 [CustomPropertyDrawer(typeof(Match3LoseCondition), true)]
-public class Match3LoseConditionDrawer : ManagedReferenceTypeDrawer<Match3LoseCondition>
+internal class Match3LoseConditionDrawer : ManagedReferenceTypeDrawer<Match3LoseCondition>
 {
     protected override string TypeLabel => "Lose Condition";
 
@@ -13,4 +12,3 @@ public class Match3LoseConditionDrawer : ManagedReferenceTypeDrawer<Match3LoseCo
         return typeName;
     }
 }
-#endif

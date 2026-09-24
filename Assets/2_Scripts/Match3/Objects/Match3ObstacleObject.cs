@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using DNExtensions.Systems.AudioLibrary;
 using PrimeTween;
 using UnityEngine;
 
@@ -79,7 +80,7 @@ public class Match3ObstacleObject : Match3Object
         if (spawning)
         {
             _movementSequence.Group(Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f));
-            _movementSequence.ChainCallback(() => { spawnSfx?.Play(audioSource); });
+            _movementSequence.ChainCallback(() => { AudioLibrary.Play(spawnSfx); });
         }
         else
         {

@@ -27,7 +27,6 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private Image gridCellPrefab;
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private Button backButton;
-    [SerializeField] private AudioSource audioSource;
 
     private SOMatch3Level _selectedLevel;
 
@@ -72,18 +71,12 @@ public class LevelSelectionScreen : MenuScreen
     {
         if (levelStartButton)
         {
-            SelectableFeedback selectableFeedback = levelStartButton.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
-
             levelStartButton.onClick.RemoveAllListeners();
             levelStartButton.onClick.AddListener(OnStartButtonClicked);
         }
 
         if (backButton)
         {
-            SelectableFeedback selectableFeedback = backButton.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
-            
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(OnBackButtonClicked);
         }
@@ -134,9 +127,6 @@ public class LevelSelectionScreen : MenuScreen
             {
                 buttonText.text = unlocked ? (levelIndex + 1).ToString() : lockedLevelLabel;
             }
-
-            SelectableFeedback selectableFeedback = levelButton.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
 
             levelButton.interactable = unlocked;
             if (!unlocked) continue;

@@ -400,7 +400,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectableFeedback
   mouseSelectsSelectable: 1
-  selectSfx: {fileID: 11400000, guid: 5cc75ba5af4069240917685cc9975553, type: 2}
-  submitSfx: {fileID: 11400000, guid: 4110f1894f6f21a45950420380c1f305, type: 2}
+  selectSfx: ButtonSelect
+  submitSfx: ButtonSubmit
   audioSource: {fileID: 0}
   selectable: {fileID: 3208736288784191921}

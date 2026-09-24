@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -149,4 +148,3 @@ internal static class Match3LevelGridGUI
 
     public static GUIStyle RichLabel => _richLabel ??= new GUIStyle(EditorStyles.label) { richText = true };
 }
-#endif

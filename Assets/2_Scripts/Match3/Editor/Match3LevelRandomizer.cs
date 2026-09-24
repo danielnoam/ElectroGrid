@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -190,4 +189,3 @@ internal static class Match3LevelRandomizer
         }
     }
 }
-#endif

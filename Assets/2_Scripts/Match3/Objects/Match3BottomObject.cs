@@ -1,5 +1,6 @@
 using DNExtensions.Utilities.Button;
 using DNExtensions.Systems.ObjectPooling;
+using DNExtensions.Systems.AudioLibrary;
 using PrimeTween;
 using UnityEngine;
 
@@ -53,7 +54,7 @@ public class Match3BottomObject : Match3Object
             transform.localPosition = endPosition;
             transform.localScale = Vector3.zero;
             _movementSequence.Group(Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f));
-            _movementSequence.ChainCallback(() => { spawnSfx?.Play(audioSource); });
+            _movementSequence.ChainCallback(() => { AudioLibrary.Play(spawnSfx); });
         }
         else
         {
@@ -69,7 +70,7 @@ public class Match3BottomObject : Match3Object
 
         var bellowCellPosition = _gridHandler.Grid.GetCellWorldPosition(_currentTile.GridPosition.x, -1);
         var endPosition = new Vector3(bellowCellPosition.x, bellowCellPosition.y, transform.localPosition.z);
-        if (destroySfx) destroySfx.Play(audioSource);
+        AudioLibrary.Play(destroySfx);
         
         _movementSequence.Stop();
         _movementSequence = Sequence.Create();

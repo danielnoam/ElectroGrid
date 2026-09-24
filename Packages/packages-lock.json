@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.danielnoam.components": {
-      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.components#9fc76a6e5c284fed195ced9b75732b7abde1419a",
+      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.components#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
       "depth": 0,
       "source": "git",
       "dependencies": {
@@ -9,17 +9,17 @@
         "com.unity.inputsystem": "1.19.0",
         "com.unity.ugui": "2.0.0"
       },
-      "hash": "9fc76a6e5c284fed195ced9b75732b7abde1419a"
+      "hash": "78e379c52438e0ac4ac2b6a300813f7c50ff4649"
     },
     "com.danielnoam.helpfuleditor": {
-      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.helpfuleditor#9fc76a6e5c284fed195ced9b75732b7abde1419a",
+      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.helpfuleditor#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9fc76a6e5c284fed195ced9b75732b7abde1419a"
+      "hash": "78e379c52438e0ac4ac2b6a300813f7c50ff4649"
     },
     "com.danielnoam.systems": {
-      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.systems#9fc76a6e5c284fed195ced9b75732b7abde1419a",
+      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.systems#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
       "depth": 0,
       "source": "git",
       "dependencies": {
@@ -32,17 +32,17 @@
         "com.unity.ugui": "2.0.0",
         "com.unity.visualeffectgraph": "17.5.0"
       },
-      "hash": "9fc76a6e5c284fed195ced9b75732b7abde1419a"
+      "hash": "78e379c52438e0ac4ac2b6a300813f7c50ff4649"
     },
     "com.danielnoam.utilities": {
-      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.utilities#9fc76a6e5c284fed195ced9b75732b7abde1419a",
+      "version": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.utilities#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.mathematics": "1.4.0",
         "com.unity.ugui": "2.0.0"
       },
-      "hash": "9fc76a6e5c284fed195ced9b75732b7abde1419a"
+      "hash": "78e379c52438e0ac4ac2b6a300813f7c50ff4649"
     },
     "com.kyrylokuzyk.primetween": {
       "version": "file:../Assets/Plugins/PrimeTween/internal/com.kyrylokuzyk.primetween.tgz",

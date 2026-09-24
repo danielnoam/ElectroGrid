@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -939,4 +938,3 @@ internal class Match3LevelEditorWindow : EditorWindow
         Repaint();
     }
 }
-#endif

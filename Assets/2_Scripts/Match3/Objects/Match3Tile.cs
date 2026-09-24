@@ -24,7 +24,6 @@ public class Match3Tile : MonoBehaviour, IPoolable
     [SerializeField] private float squashDuration = 0.15f;
     
     [Header("References")]
-    [SerializeField] private AudioSource audioSource;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Transform trashSprite;
 

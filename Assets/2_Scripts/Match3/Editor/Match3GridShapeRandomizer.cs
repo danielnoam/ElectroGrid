@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
@@ -199,4 +198,3 @@ internal static class Match3GridShapeRandomizer
         return count;
     }
 }
-#endif

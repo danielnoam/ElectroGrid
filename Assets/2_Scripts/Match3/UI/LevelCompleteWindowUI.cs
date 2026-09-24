@@ -1,5 +1,5 @@
 using System;
-using DNExtensions.Systems.Scriptables;
+using DNExtensions.Systems.AudioLibrary;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -15,9 +15,8 @@ public class LevelCompleteWindowUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelCompleteTitle;
     [SerializeField] private Button levelButton;
     [SerializeField] private Button quitButton;
-    [SerializeField] private SOAudioEvent levelCompleteWinSfx;
-    [SerializeField] private SOAudioEvent levelCompleteFailSfx;
-    [SerializeField] private AudioSource audioSource;
+    [SerializeField, AudioLibraryID] private string levelCompleteWinSfx;
+    [SerializeField, AudioLibraryID] private string levelCompleteFailSfx;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
     
     private Match3GameManager _match3Manager;
@@ -103,7 +102,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
     {
         if (levelData == null) return;
         
-        levelCompleteWinSfx?.Play(audioSource);
+        AudioLibrary.Play(levelCompleteWinSfx);
         
         UpdateLevelButton(true);
         UpdateLevelCompleteStats(levelData);
@@ -114,7 +113,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
     {
         if (levelData == null) return;
         
-        levelCompleteFailSfx.Play(audioSource);
+        AudioLibrary.Play(levelCompleteFailSfx);
         
         UpdateLevelButton(false);
         UpdateLevelCompleteStats(levelData);

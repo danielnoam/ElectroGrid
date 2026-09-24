@@ -1,4 +1,4 @@
-using DNExtensions.Systems.Scriptables;
+using DNExtensions.Systems.AudioLibrary;
 using PrimeTween;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ public abstract class Match3SwappableObject : Match3Object
     [SerializeField] private float heldDuration = 0.2f;
     [SerializeField] private float heldScaleMultiplier = 0.8f;
     [SerializeField] private Color heldColor;
-    [SerializeField] private SOAudioEvent swapSfx;
+    [SerializeField, AudioLibraryID] private string swapSfx;
 
     private Color _baseColor;
     private bool _held;
@@ -49,12 +49,12 @@ public abstract class Match3SwappableObject : Match3Object
         {
             if (spawning)
             {
-                if (spawnSfx) spawnSfx.Play(audioSource);
+                AudioLibrary.Play(spawnSfx);
                 _currentTile?.SquashTile();
             }
             else
             {
-                if (swapSfx) swapSfx.Play(audioSource);
+                AudioLibrary.Play(swapSfx);
             }
         });
 

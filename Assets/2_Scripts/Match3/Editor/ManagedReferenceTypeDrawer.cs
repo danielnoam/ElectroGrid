@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using UnityEngine;
 /// Draws a [SerializeReference] field as a type picker plus a foldout of the chosen type's fields.
 /// Shared by the objective and lose condition drawers, which differ only in their base type and naming.
 /// </summary>
-public abstract class ManagedReferenceTypeDrawer<TBase> : PropertyDrawer where TBase : class
+internal abstract class ManagedReferenceTypeDrawer<TBase> : PropertyDrawer where TBase : class
 {
     private const float FoldoutWidth = 15f;
 
@@ -151,4 +150,3 @@ public abstract class ManagedReferenceTypeDrawer<TBase> : PropertyDrawer where T
         return ObjectNames.NicifyVariableName(TrimTypeName(typeName));
     }
 }
-#endif

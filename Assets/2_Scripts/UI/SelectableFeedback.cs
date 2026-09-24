@@ -1,4 +1,4 @@
-using DNExtensions.Systems.Scriptables;
+using DNExtensions.Systems.AudioLibrary;
 using DNExtensions.Utilities;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -14,11 +14,10 @@ public class SelectableFeedback : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private bool mouseSelectsSelectable;
-    [SerializeField] private SOAudioEvent selectSfx;
-    [SerializeField] private SOAudioEvent submitSfx;
+    [SerializeField, AudioLibraryID] private string selectSfx;
+    [SerializeField, AudioLibraryID] private string submitSfx;
 
     [Header("References")]
-    public AudioSource audioSource;
     [SerializeField, ReadOnly] private Selectable selectable;
 
 
@@ -46,7 +45,7 @@ public class SelectableFeedback : MonoBehaviour
     {
         if (!eventData.selectedObject.activeSelf || !selectable.interactable) return;
 
-        selectSfx?.Play(audioSource);
+        AudioLibrary.Play(selectSfx);
     }
 
     private void OnSubmit(BaseEventData eventData)
@@ -54,7 +53,7 @@ public class SelectableFeedback : MonoBehaviour
         // EventTrigger delivers clicks even when the Selectable is not interactable
         if (!selectable.interactable) return;
 
-        submitSfx?.Play(audioSource);
+        AudioLibrary.Play(submitSfx);
     }
 
     private void OnPointerEnter(BaseEventData eventData)

@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System.Collections.Generic;
 
 /// <summary>
@@ -215,4 +214,3 @@ internal static class Match3LevelValidation
         }
     }
 }
-#endif

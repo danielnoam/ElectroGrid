@@ -311,12 +311,15 @@ needed no new fields and no level asset was retuned.
         Objects", renamed from "Randomize"), then validation.
       Still to check by hand in the editor: the three "check it" items under
       Features.
-- [ ] **Fix `PoolableAutoReturn` counting down on scaled time.** It lives in the
-      DNExtensions package (`lifeTime -= Time.deltaTime`), and `Prefab_OneShotSFX`
-      uses it. This game drops the timescale to 0.3 for line breaks and to 0 while a
-      window is open, so the SFX objects are held far too long, and indefinitely
-      while a window is up. Either add an unscaled option upstream in DNExtensions
-      or replace it with a game-side component that uses `Time.unscaledDeltaTime`.
+- [x] **Pooling timing fixed upstream** (DNExtensions `78e379c`, now pinned).
+      `AudioLibrary` returns sources and fades in real time, so a paused game no
+      longer starves its pool. `PoolableAudioSource` and `AudioTrack` fades are
+      unscaled, `PoolableParticleSystem` follows the particle system's own time
+      mode, and `PoolableAutoReturn` gained a `useUnscaledTime` option. It also had
+      a second bug: it counted its own `lifeTime` down to 0, so every reuse after
+      the first returned on the next frame. It now keeps the configured value.
+      `PoolableDecal` and `PoolableVisualEffect` still use scaled time, which is
+      right for world effects.
 - [ ] **Fix `VFXManager` losing its camera upstream in DNExtensions.** It is a
       `DontDestroyOnLoad` singleton, so after a scene change its canvas still points
       at the previous scene's camera, which has been destroyed. A Screen Space -
@@ -325,18 +328,25 @@ needed no new fields and no level asset was retuned.
       The game works around it in `CameraManager.BindVFXCanvas`. Upstream, remember
       the configured render mode in `Awake` and rebind whenever `worldCamera` is
       null. Then remove the workaround.
-- [ ] **Move all audio to the AudioLibrary.** DNExtensions now ships an ID-based
-      `AudioLibrary` (`SOAudioLibrarySettings`, `SOAudioCategory`, `AudioPlayer`,
-      `SelectableAudioPlayer`). The game still plays everything through
-      `SOAudioEvent` assets and its own `AudioManager`. Moving over would:
-      - replace `SelectableFeedback`'s SFX with `SelectableAudioPlayer`
-      - give volume control to the library's categories instead of
-        `AudioManager.SetMusicVolume` / `SetSfxVolume` (re-point `SettingsWindowUI`)
-      - retire `SOAudioEvent.PlayAtPoint`, which no longer pools and allocates an
-        AudioSource GameObject for every destroyed piece
-
-      `Assets/Resources/AudioLibrarySettings.asset` and `AudioTrackSettings.asset`
-      were auto-created by the package and are the starting point.
+- [x] **SFX moved to the AudioLibrary.** The 9 `SOAudioEvent` assets became
+      `SOAudioProfile` assets in `Assets/3_Data/AudioLibrary`, mapped by the same
+      names in one `SFX` category routed to the SFX mixer group. Every script now
+      calls `AudioLibrary.Play(id)` with an `[AudioLibraryID]` string field.
+      `SelectableFeedback` was kept, as it has the interactable guard and hover
+      select that `SelectableAudioPlayer` lacks. The pool is 64 sources, 24 pre-warmed.
+      Removed: the per-object and per-screen AudioSources nothing plays through any
+      more, the stale `audioSource` scene overrides, `OneShotSfx.cs`, and the
+      `OneShotSFX` pool and prefab, which nothing spawned from but which pre-warmed 50
+      objects per scene.
+      **Music stays on `AudioManager`.** The package's `AudioTrack` is for layered
+      stems: it starts every track at load and keeps them all playing at volume 0,
+      which would mean eight streaming decoders running at once on a phone, and it
+      cannot pick a random track. `AudioManager` is now music and mixer volume only;
+      the sliders still work because the library routes through the same SFX group.
+      **Playtest:** button sounds (including many taps with the settings window
+      open), piece spawn, swap and destroy, Plus destroy, screen switch, level
+      win/fail, and a big cascade.
+      `AudioTrackSettings.asset` is unused and disabled.
 
 ### Ships broken on modern phones — do these first
 

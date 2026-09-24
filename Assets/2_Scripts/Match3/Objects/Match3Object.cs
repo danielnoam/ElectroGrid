@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DNExtensions.Systems.Scriptables;
+using DNExtensions.Systems.AudioLibrary;
 using DNExtensions.Systems.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
@@ -12,10 +12,9 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
     [SerializeField] protected float destroyScaleMultiplier = 1.2f;
     
     [Header("References")]
-    [SerializeField] protected AudioSource audioSource;
     [SerializeField] protected SpriteRenderer itemRenderer;
-    [SerializeField] protected SOAudioEvent spawnSfx;
-    [SerializeField] protected SOAudioEvent destroySfx;
+    [SerializeField, AudioLibraryID] protected string spawnSfx;
+    [SerializeField, AudioLibraryID] protected string destroySfx;
     [SerializeField] protected OneShotParticle destroyParticle;
 
     protected Vector3 _baseScale;
@@ -94,7 +93,7 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
         {
             MobileHaptics.Vibrate(50);
             CameraManager.Instance?.ShakeCamera(0.2f);
-            destroySfx?.PlayAtPoint(transform.position);
+            AudioLibrary.Play(destroySfx);
 
             SpawnDestroyParticle();
         });

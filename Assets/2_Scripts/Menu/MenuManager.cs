@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DNExtensions.Systems.Scriptables;
+using DNExtensions.Systems.AudioLibrary;
 using DNExtensions.Systems.VFXManager;
 using UnityEngine;
 
@@ -10,8 +10,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private MainMenuScreen mainMenuScreen;
     [SerializeField] private LevelSelectionScreen levelSelectionScreen;
     [SerializeField] private CreditsScreen creditsScreen;
-    [SerializeField] private AudioSource audioSource;
-    [SerializeField] private SOAudioEvent screenSwitchSfx;
+    [SerializeField, AudioLibraryID] private string screenSwitchSfx;
     [SerializeField] private EffectSequence gameStartEffect;
     [SerializeField] private EffectSequence startLevelEffect;
     [SerializeField] private EffectSequence endLevelEffect;
@@ -46,7 +45,7 @@ public class MenuManager : MonoBehaviour
             return;
         }
         
-        screenSwitchSfx?.Play(audioSource);
+        AudioLibrary.Play(screenSwitchSfx);
         
         if (_currentScreen != null)
         {

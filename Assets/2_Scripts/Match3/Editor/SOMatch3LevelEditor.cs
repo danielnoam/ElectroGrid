@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -9,7 +8,7 @@ using UnityEngine;
 /// so there is one place where a level can be changed rather than two that can disagree.
 /// </summary>
 [CustomEditor(typeof(SOMatch3Level))]
-public class SOMatch3LevelEditor : UnityEditor.Editor
+internal class SOMatch3LevelEditor : UnityEditor.Editor
 {
     private const float PreviewCellSize = 14f;
 
@@ -94,4 +93,3 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
         Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, PreviewCellSize, false);
     }
 }
-#endif

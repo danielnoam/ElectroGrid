@@ -11,7 +11,6 @@ public class MainMenuScreen : MenuScreen
     [SerializeField] private Button match3Button;
     [SerializeField] private Button creditsButton;
     [SerializeField] private Button quitButton;
-    [SerializeField] private AudioSource audioSource;
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private InformationWindowUI informationWindowUI;
     [SerializeField] private Button infoButton;
@@ -43,9 +42,6 @@ public class MainMenuScreen : MenuScreen
         // Nothing to continue into on a fresh save, so the button is hidden rather than shown disabled
         continueButton.gameObject.SetActive(level);
         if (!level) return;
-
-        SelectableFeedback selectableFeedback = continueButton.GetComponent<SelectableFeedback>();
-        if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
 
         continueButton.onClick.RemoveAllListeners();
         continueButton.onClick.AddListener(() =>
@@ -121,9 +117,6 @@ public class MainMenuScreen : MenuScreen
     {
         if (match3Button)
         {
-            SelectableFeedback selectableFeedback = match3Button.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
-            
             match3Button.onClick.RemoveAllListeners();
             match3Button.onClick.AddListener(() =>
             {
@@ -134,9 +127,6 @@ public class MainMenuScreen : MenuScreen
         
         if (quitButton)
         {
-            SelectableFeedback selectableFeedback = quitButton.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
-            
             quitButton.onClick.RemoveAllListeners();
             quitButton.onClick.AddListener(() =>
             {
@@ -158,9 +148,6 @@ public class MainMenuScreen : MenuScreen
 
         if (creditsButton)
         {
-            SelectableFeedback selectableFeedback = creditsButton.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
-
             creditsButton.onClick.RemoveAllListeners();
             creditsButton.onClick.AddListener(() =>
             {

@@ -652,7 +652,6 @@ MonoBehaviour:
   match3Button: {fileID: 456130910}
   creditsButton: {fileID: 1789813293}
   quitButton: {fileID: 2050356814}
-  audioSource: {fileID: 1256740631}
   menuManager: {fileID: 1256740630}
   informationWindowUI: {fileID: 642942039}
   infoButton: {fileID: 1573511879}
@@ -2124,7 +2123,6 @@ MonoBehaviour:
     _useFixedUpdate: 0
     _updateType: 0
   menuManager: {fileID: 1256740630}
-  audioSource: {fileID: 1256740631}
   backButton: {fileID: 603169920}
 --- !u!1 &40759554
 GameObject:
@@ -2163,7 +2161,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -100.00012}
+  m_AnchoredPosition: {x: 0, y: -100.00014}
   m_SizeDelta: {x: -400, y: -1399.9998}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &40759556
@@ -13252,10 +13250,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8070639938617703997, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -16987,10 +16981,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8070639938617703997, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -18045,10 +18035,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4899179487853092231, guid: 497803a164b4aad468c43d5bd165bf32, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 1256740631}
     - target: {fileID: 5245138320424899879, guid: 497803a164b4aad468c43d5bd165bf32, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -22353,10 +22339,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8070639938617703997, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -23049,10 +23031,6 @@ PrefabInstance:
     - target: {fileID: 5544082587813058189, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8070639938617703997, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
-      propertyPath: audioSource
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -30083,10 +30061,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3094902058959810678, guid: e324b35a5fd58a840b339c749bc28e98, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 1256740631}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -36692,7 +36666,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1256740629}
-  - component: {fileID: 1256740631}
   - component: {fileID: 1256740630}
   - component: {fileID: 1256740632}
   m_Layer: 0
@@ -36736,109 +36709,11 @@ MonoBehaviour:
   mainMenuScreen: {fileID: 14556594}
   levelSelectionScreen: {fileID: 1916505948}
   creditsScreen: {fileID: 39986809}
-  audioSource: {fileID: 1256740631}
-  screenSwitchSfx: {fileID: 11400000, guid: b042ba361980fd442be7ea080b584675, type: 2}
+  screenSwitchSfx: ScreenSwitch
   gameStartEffect: {fileID: 11400000, guid: a8e1731b0a423d14d9092c8e0c9de2be, type: 2}
   startLevelEffect: {fileID: 11400000, guid: c2f69f0253062a64ab8b2766a9cc2758, type: 2}
   endLevelEffect: {fileID: 11400000, guid: 4782391fb82941c42850019135143b65, type: 2}
   backgroundManager: {fileID: 122557090}
---- !u!82 &1256740631
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1256740628}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &1256740632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44268,10 +44143,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Prefab_ButtonInfo
       objectReference: {fileID: 0}
-    - target: {fileID: 3918873388796129852, guid: 7f1d107fde7580148a70d4419247566a, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 1256740631}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -49439,14 +49310,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Prefab_SettingsWindow
       objectReference: {fileID: 0}
-    - target: {fileID: 1740583776239497212, guid: bdce3758b7a64f244b983cec956caece, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 1256740631}
-    - target: {fileID: 4899179487853092231, guid: bdce3758b7a64f244b983cec956caece, type: 3}
-      propertyPath: audioSource
-      value: 
-      objectReference: {fileID: 1256740631}
     - target: {fileID: 5312188147448270709, guid: bdce3758b7a64f244b983cec956caece, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -49992,10 +49855,6 @@ PrefabInstance:
     - target: {fileID: 5544082587813058189, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8070639938617703997, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
-      propertyPath: audioSource
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -53024,7 +52883,6 @@ MonoBehaviour:
   gridCellPrefab: {fileID: 6725453058231453612, guid: acdfb062e70f7ea4b97cf97139c4b45b, type: 3}
   menuManager: {fileID: 1256740630}
   backButton: {fileID: 802757717}
-  audioSource: {fileID: 1256740631}
 --- !u!224 &1916505953
 RectTransform:
   m_ObjectHideFlags: 0
@@ -56353,10 +56211,6 @@ PrefabInstance:
     - target: {fileID: 5544082587813058189, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8070639938617703997, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
-      propertyPath: audioSource
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

@@ -11,7 +11,6 @@ public class CreditsScreen : MenuScreen
     
     [Header("References")]
     [SerializeField] private MenuManager menuManager;
-    [SerializeField] private AudioSource audioSource;
     [SerializeField] private Button backButton;
     
 
@@ -39,9 +38,6 @@ public class CreditsScreen : MenuScreen
 
         if (backButton)
         {
-            SelectableFeedback selectableFeedback = backButton.GetComponent<SelectableFeedback>();
-            if (selectableFeedback && audioSource) selectableFeedback.audioSource = audioSource;
-            
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(() =>
             {

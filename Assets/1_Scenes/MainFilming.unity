@@ -37374,7 +37374,7 @@ MonoBehaviour:
   levelSelectionScreen: {fileID: 0}
   creditsScreen: {fileID: 0}
   audioSource: {fileID: 1256740631}
-  screenSwitchSfx: {fileID: 11400000, guid: b042ba361980fd442be7ea080b584675, type: 2}
+  screenSwitchSfx: ScreenSwitch
   gameStartEffect: {fileID: 11400000, guid: a8e1731b0a423d14d9092c8e0c9de2be, type: 2}
   startLevelEffect: {fileID: 11400000, guid: c2f69f0253062a64ab8b2766a9cc2758, type: 2}
   endLevelEffect: {fileID: 11400000, guid: 4782391fb82941c42850019135143b65, type: 2}

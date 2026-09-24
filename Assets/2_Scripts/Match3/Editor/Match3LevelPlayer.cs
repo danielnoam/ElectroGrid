@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -95,4 +94,3 @@ internal static class Match3LevelPlayer
         EditorSceneManager.SaveScene(scene);
     }
 }
-#endif

@@ -9,12 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f091914f821aeddd7b3676db7383e3d7, type: 3}
-  m_Name: ScreenSwitch
-  m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.SOAudioEvent
+  m_Script: {fileID: 11500000, guid: 1ee7d95efa184de2b18dfff76533a189, type: 3}
+  m_Name: ButtonSelect
+  m_EditorClassIdentifier: DNExtensions.Systems::DNExtensions.Systems.AudioLibrary.SOAudioProfile
   clips:
-  - {fileID: 8300000, guid: 01d5cf5f121a0ee46b8ec01121c56cc4, type: 3}
-  mixerGroup: {fileID: 4447098254742166681, guid: 0a905c746b303df4c84e988af473a914, type: 2}
+  - {fileID: 8300000, guid: 7e62d3e166cdd524194883aed374995c, type: 3}
   volume:
     minValue: 1
     maxValue: 1
@@ -31,8 +30,6 @@ MonoBehaviour:
   set3DSettings: 0
   dopplerLevel: 1
   spread: 0
-  rolloffMode: 0
   minDistance: 1
   maxDistance: 500
-  useObjectPooler: 1
-  oneShotPrefab: {fileID: 2798804331580920947, guid: c3744de143866d64593b46bab5769c97, type: 3}
+  rolloffMode: 0
