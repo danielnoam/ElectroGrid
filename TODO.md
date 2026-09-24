@@ -535,10 +535,10 @@ needed no new fields and no level asset was retuned.
       and then settles. It moves a runtime parent (`CameraTiltRig`), so it adds to
       the shake instead of fighting it. A **Tilt** toggle sits under Screen Shake
       in settings (default on; row spacing 60 → 50 to fit), and turning it off
-      disables the sensor. In levels, `Match3EffectManager` parents the pooled
-      background tiles under a runtime "Background Parallax Layer" (depth 0.6,
-      set by `backgroundParallaxDepth`) and hands each back to its pool holder
-      before returning it.
+      disables the sensor. In levels there is deliberately no parallax: the
+      board cells and background tiles form one continuous grid, so they sway
+      together with the camera. A background layer sliding separately pulled the
+      grid apart and was removed.
       **Playtest:** feel on a phone (strength, settle speed), the mouse on PC,
       shake during tilt, the toggle, and clicks still landing on the right piece.
       The original notes:
