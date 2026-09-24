@@ -21,6 +21,7 @@ public class SettingsData
     public bool hapticsEnabled = true;
     public bool screenShakeEnabled = true;
     public bool highFrameRate;
+    public bool tiltEnabled = true;
 }
 
 [Serializable]

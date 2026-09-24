@@ -5,7 +5,6 @@ using DNExtensions.Utilities.Button;
 using DNExtensions.Systems.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Gyroscope = UnityEngine.InputSystem.Gyroscope;
 
 
 public class TouchInputReader : InputReaderBase
@@ -17,7 +16,6 @@ public class TouchInputReader : InputReaderBase
     [SerializeField, Range(0,1)] private float swipeDeadzone = 0.3f;
     
     [Separator]
-    [SerializeField, ReadOnly] private Vector3 gyroRotation;
     [SerializeField, ReadOnly] private Vector2 mousePosition;
     [SerializeField, ReadOnly] private bool isPressing;
     [SerializeField, ReadOnly] private Vector2 pressStartPosition;
@@ -31,7 +29,6 @@ public class TouchInputReader : InputReaderBase
 
 
 
-    public Vector3 GyroRotation => gyroRotation;
     public Vector2 MousePosition => mousePosition;
     public float SwipeDeadzone => swipeDeadzone;
     
@@ -71,11 +68,6 @@ public class TouchInputReader : InputReaderBase
         UnsubscribeFromAction(_mousePositionAction, OnMousePositionAction);
     }
 
-    private void Update()
-    {
-        UpdateGyroRotation();
-    }
-
     private void OnSelectAction(InputAction.CallbackContext callbackContext)
     {
         if (callbackContext.started)
@@ -109,17 +101,6 @@ public class TouchInputReader : InputReaderBase
 
     }
 
-    private void UpdateGyroRotation()
-    {
-        if (!IsTouch || !IsMobile) return;
-
-        // Null on hardware without the sensor, which plenty of budget Android phones lack.
-        // Input System devices are plain classes, so this is a real null check, not the Unity object one
-        var gyroscope = Gyroscope.current;
-        if (gyroscope == null) return;
-
-        gyroRotation = gyroscope.angularVelocity.value;
-    }
     
     
     // Resubscribe to actions in case of reloading the scene

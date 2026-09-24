@@ -18,6 +18,7 @@ public class SettingsWindowUI : MonoBehaviour
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Toggle hapticsToggle;
     [SerializeField] private Toggle screenShakeToggle;
+    [SerializeField] private Toggle tiltToggle;
     [SerializeField] private Toggle highFrameRateToggle;
     [Tooltip("Hidden on displays that cannot refresh faster than 60Hz")]
     [SerializeField] private GameObject highFrameRateRow;
@@ -125,6 +126,12 @@ public class SettingsWindowUI : MonoBehaviour
             screenShakeToggle.onValueChanged.AddListener(OnScreenShakeChanged);
         }
 
+        if (tiltToggle)
+        {
+            tiltToggle.onValueChanged.RemoveAllListeners();
+            tiltToggle.onValueChanged.AddListener(OnTiltChanged);
+        }
+
         if (highFrameRateToggle)
         {
             var row = highFrameRateRow ? highFrameRateRow : highFrameRateToggle.gameObject;
@@ -187,6 +194,7 @@ public class SettingsWindowUI : MonoBehaviour
         if (sfxVolumeSlider) sfxVolumeSlider.SetValueWithoutNotify(settings.sfxVolume);
         if (hapticsToggle) hapticsToggle.SetIsOnWithoutNotify(settings.hapticsEnabled);
         if (screenShakeToggle) screenShakeToggle.SetIsOnWithoutNotify(settings.screenShakeEnabled);
+        if (tiltToggle) tiltToggle.SetIsOnWithoutNotify(settings.tiltEnabled);
         if (highFrameRateToggle) highFrameRateToggle.SetIsOnWithoutNotify(settings.highFrameRate);
 
         _applyingValues = false;
@@ -222,6 +230,13 @@ public class SettingsWindowUI : MonoBehaviour
 
         if (SaveManager.Instance) SaveManager.Instance.Settings.screenShakeEnabled = value;
         if (value) CameraManager.Instance?.ShakeCamera(0.2f);
+    }
+
+    private void OnTiltChanged(bool value)
+    {
+        if (_applyingValues) return;
+
+        if (SaveManager.Instance) SaveManager.Instance.Settings.tiltEnabled = value;
     }
 
     private void OnHighFrameRateChanged(bool value)

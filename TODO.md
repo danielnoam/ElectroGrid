@@ -404,10 +404,9 @@ needed no new fields and no level asset was retuned.
 
 - [x] **Gyroscope null dereference fixed.** `UpdateGyroRotation` now checks
       `Gyroscope.current` before reading it, so it no longer throws every frame on
-      Android hardware without the sensor. **Still open:** the value is consumed
-      nowhere in the project, and Input System sensors are disabled by default
-      (`InputSystem.EnableDevice`) so it would read zero regardless — the whole
-      gyro path can probably be deleted. Original finding:
+      Android hardware without the sensor. The unused gyro path in
+      `TouchInputReader` has since been deleted; the camera tilt feature reads
+      its own sensor. Original finding:
 - [ ] ~~**The gyroscope is read every frame and used by nothing, and can throw.**~~
       `TouchInputReader.Update` calls `UpdateGyroRotation` every frame, which does
       `Gyroscope.current.angularVelocity.value` on mobile. `GyroRotation` is
@@ -526,9 +525,23 @@ needed no new fields and no level asset was retuned.
 
 ### Features
 
-- [ ] **Small gyro tilt on the camera.** Would give the gyro read a purpose — it
-      is currently consumed nowhere — and adds depth to a flat board for very
-      little work. Four things to get right:
+- [x] **Camera tilt.** `CameraTilt` on the CameraManager prefab sways the camera
+      by up to 4% of the orthographic size. The camera is orthographic, so a real
+      rotation would barely show; the sway plus `ParallaxLayer` (the menu
+      background follows 60% of it) is what gives depth. Input is the mouse
+      position on desktop and the device's tilt on mobile: `GravitySensor`,
+      falling back to `Accelerometer`, measured against a resting angle that
+      drifts toward however the phone is held, so it reacts to a change of angle
+      and then settles. It moves a runtime parent (`CameraTiltRig`), so it adds to
+      the shake instead of fighting it. A **Tilt** toggle sits under Screen Shake
+      in settings (default on; row spacing 60 → 50 to fit), and turning it off
+      disables the sensor. In levels, `Match3EffectManager` parents the pooled
+      background tiles under a runtime "Background Parallax Layer" (depth 0.6,
+      set by `backgroundParallaxDepth`) and hands each back to its pool holder
+      before returning it.
+      **Playtest:** feel on a phone (strength, settle speed), the mouse on PC,
+      shake during tilt, the toggle, and clicks still landing on the right piece.
+      The original notes:
 
       - **`angularVelocity` is the wrong signal.** It is rotation *rate* in rad/s,
         so driving a tilt from it makes the camera react to the phone being

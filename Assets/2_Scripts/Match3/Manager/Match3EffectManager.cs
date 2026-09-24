@@ -27,6 +27,10 @@ public class Match3EffectManager : MonoBehaviour
     [SerializeField] private float effectRadius = 2.5f;
     [SerializeField] private AnimationCurve effectOffsetCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
+    [Header("Parallax")]
+    [Tooltip("How much of the camera tilt the background tiles follow, which makes them read as further back than the board")]
+    [SerializeField, Range(0f, 1f)] private float backgroundParallaxDepth = 0.6f;
+
     [Header("References")]
     [SerializeField] private Match3GameManager gameManager;
     [SerializeField] private Match3GridHandler gridHandler;
@@ -38,6 +42,8 @@ public class Match3EffectManager : MonoBehaviour
     private Sequence _lineBreakSequence;
     private TouchInputReader _inputReader;
     private readonly Dictionary<Vector2Int, Match3BackgroundTile> _backgroundTiles = new Dictionary<Vector2Int, Match3BackgroundTile>();
+    private readonly Dictionary<Match3BackgroundTile, Transform> _tilePoolHolders = new Dictionary<Match3BackgroundTile, Transform>();
+    private Transform _backgroundLayer;
     
     public EffectSequence StartLevelSequence => startLevelSequence;
     public EffectSequence EndLevelSequence => endLevelSequence;
@@ -51,6 +57,10 @@ public class Match3EffectManager : MonoBehaviour
         }
 
         Instance = this;
+
+        // At the origin, so a tile placed at a local position lands on its grid world position plus the tilt offset
+        _backgroundLayer = new GameObject("Background Parallax Layer").transform;
+        _backgroundLayer.gameObject.AddComponent<ParallaxLayer>().Depth = backgroundParallaxDepth;
     }
 
     private void Start()
@@ -199,10 +209,12 @@ public class Match3EffectManager : MonoBehaviour
         foreach (Match3BackgroundTile tile in tilesToClear)
         {
             if (!tile) continue;
+            if (_tilePoolHolders.TryGetValue(tile, out var holder)) tile.transform.SetParent(holder, true);
             ObjectPooler.ReturnObjectToPool(tile.gameObject);
         }
     
         _backgroundTiles.Clear();
+        _tilePoolHolders.Clear();
     }
 
     private void OnGridCreated(Grid grid)
@@ -387,6 +399,11 @@ public class Match3EffectManager : MonoBehaviour
     {
         var tileGo = ObjectPooler.GetObjectFromPool(backgroundTilePrefab.gameObject, position, Quaternion.identity);
         var tile = tileGo.GetComponent<Match3BackgroundTile>();
+
+        // The pool only parents on creation, so the holder is remembered and restored before the tile goes back
+        _tilePoolHolders[tile] = tileGo.transform.parent;
+        tileGo.transform.SetParent(_backgroundLayer, false);
+        tileGo.transform.localPosition = position;
         
         return tile;
     }

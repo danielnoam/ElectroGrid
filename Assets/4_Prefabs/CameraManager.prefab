@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4109152611936495486}
   - component: {fileID: 6936379504454340599}
   - component: {fileID: 1392710791518950674}
+  - component: {fileID: 2728056238539427730}
   m_Layer: 0
   m_Name: CameraManager
   m_TagString: MainCamera
@@ -153,3 +154,19 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5877768698988452645}
   m_Enabled: 1
+--- !u!114 &2728056238539427730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5877768698988452645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5cb3647ac09e124aa475a14f008e21d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraTilt
+  maxOffset: 0.04
+  tiltForFullOffset: 0.3
+  smoothing: 6
+  restAdaptSpeed: 0.5
