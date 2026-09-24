@@ -20,6 +20,7 @@ public class SettingsData
     public float sfxVolume = 1f;
     public bool hapticsEnabled = true;
     public bool screenShakeEnabled = true;
+    public bool highFrameRate;
 }
 
 [Serializable]

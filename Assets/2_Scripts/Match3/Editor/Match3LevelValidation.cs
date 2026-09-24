@@ -42,18 +42,33 @@ internal static class Match3LevelValidation
         return false;
     }
 
-    /// <summary>Null when the level is clean. Used for the status dot next to each level in the browser.</summary>
-    public static Severity? WorstSeverity(SOMatch3Level level)
+    /// <summary>Null when the list is empty. Used for the status dot next to each level in the browser.</summary>
+    public static Severity? WorstSeverity(List<Issue> issues)
     {
         Severity? worst = null;
 
-        foreach (var issue in Validate(level))
+        foreach (var issue in issues)
         {
             if (issue.Severity == Severity.Error) return Severity.Error;
             worst = Severity.Warning;
         }
 
         return worst;
+    }
+
+    /// <summary>How many Double Stars and Square Stars the level's objectives ask for in total.</summary>
+    public static void GetRequiredCounts(SOMatch3Level level, out int obstaclesNeeded, out int bottomsNeeded)
+    {
+        obstaclesNeeded = 0;
+        bottomsNeeded = 0;
+
+        if (!level || level.Objectives == null) return;
+
+        foreach (var objective in level.Objectives)
+        {
+            if (objective is DestroyObstaclesObjective destroyObstacles) obstaclesNeeded += destroyObstacles.RequiredAmount;
+            else if (objective is ReachBottomObjective reachBottom) bottomsNeeded += reachBottom.RequiredAmount;
+        }
     }
 
     public static List<Issue> Validate(SOMatch3Level level)
@@ -99,7 +114,6 @@ internal static class Match3LevelValidation
 
             realObjectives++;
 
-            // AllowOnlyOneObjectiveOfThisType has always been declared but never enforced anywhere
             if (objective.AllowOnlyOneObjectiveOfThisType && !seenExclusiveTypes.Add(objective.GetType()))
             {
                 issues.Add(new Issue(Severity.Warning, $"More than one {objective.GetType().Name}. They will compete for the same row in the top bar."));
@@ -188,14 +202,7 @@ internal static class Match3LevelValidation
             issues.Add(new Issue(Severity.Warning, $"Only {matchable} cells for matchable pieces. The board may not find enough possible matches."));
         }
 
-        int obstaclesNeeded = 0;
-        int bottomsNeeded = 0;
-
-        foreach (var objective in level.Objectives)
-        {
-            if (objective is DestroyObstaclesObjective destroyObstacles) obstaclesNeeded += destroyObstacles.RequiredAmount;
-            else if (objective is ReachBottomObjective reachBottom) bottomsNeeded += reachBottom.RequiredAmount;
-        }
+        GetRequiredCounts(level, out int obstaclesNeeded, out int bottomsNeeded);
 
         if (obstaclesNeeded > obstacles)
         {

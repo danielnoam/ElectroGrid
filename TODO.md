@@ -173,7 +173,7 @@ pooling.
 
 ---
 
-## 6. In a terminal: finish the Git LFS conversion
+## 6. In a terminal: finish the Git LFS conversion — done
 
 `.gitattributes` was broken until this branch — every pattern was missing its
 glob (`.png` instead of `*.png`), so it only matched a file literally named
@@ -201,9 +201,15 @@ Expect **642 files, ~297 MB**: png, mp3, wav, dll, ttf, psd and the native
 libraries. No text assets are affected — verified that no `.cs`, `.unity`,
 `.asset`, `.prefab` or `.meta` is caught by the patterns.
 
-- [ ] Run it.
-- [ ] `git lfs ls-files | wc -l` should be far more than 2.
-- [ ] `git lfs fsck` should stop reporting "should have been a pointer".
+- [x] Run it. Committed locally as `d06837d` (632 files, ~276 MB). Do **not** use
+      `git add --renormalize .` as written above: with `core.autocrlf=true` and
+      `-text` on Unity YAML it also stages ~1,100 `.meta`/YAML files as CRLF-only
+      churn. Renormalize only the paths whose `filter` attribute is `lfs`.
+- [x] `git lfs ls-files | wc -l` is 670.
+- [x] `git lfs fsck` no longer reports "should have been a pointer".
+- [x] **Pushed.** 605 LFS objects, 292 MB, as-is (no OGG conversion first). LFS
+      is now ~600 MB of GitHub's free 1 GB. All Firebase libraries are kept, by
+      choice.
 
 **Quota:** LFS holds 319 MB today, which is just the two Firebase libraries
 (124 MB + 194 MB). This adds ~297 MB, so roughly 616 MB against GitHub's free
@@ -289,11 +295,22 @@ needed no new fields and no level asset was retuned.
 
 ### Up next
 
-- [ ] **Clean up the level editor.** `Match3LevelEditorWindow` and its helpers grew
-      over several passes: play-order registration, Play This Level, Validate All,
-      the shape randomiser and constrained randomisation. Tidy the layout, remove
-      duplication between the window and the drawers, and check it against the
-      "check it" items under Features.
+- [x] **Level editor cleaned up.** No behaviour change intended; compiles, and
+      validation over all 12 levels gives the same result. What changed:
+      - The objective and lose condition drawers were two ~160-line copies; both
+        are now thin subclasses of `ManagedReferenceTypeDrawer<T>`.
+      - Objective requirement counting (was in three places) is
+        `Match3LevelValidation.GetRequiredCounts`. Issue drawing and grid centring
+        are shared by the window and inspector via `Match3LevelGridGUI`.
+      - The window defers GUI-changing actions one way (`Defer`) instead of three
+        (an enum, an Action and a pending-selection flag). `Validate All` validates
+        each level once instead of twice. Clear buttons share `ResetCells`.
+      - Layout: sidebar actions are paired into rows. In the level pane the paint
+        grid now comes straight after the Grid Shape field, followed by the two
+        randomiser foldouts ("Randomize Grid Shape", then "Randomize Tile
+        Objects", renamed from "Randomize"), then validation.
+      Still to check by hand in the editor: the three "check it" items under
+      Features.
 - [ ] **Fix `PoolableAutoReturn` counting down on scaled time.** It lives in the
       DNExtensions package (`lifeTime -= Time.deltaTime`), and `Prefab_OneShotSFX`
       uses it. This game drops the timescale to 0.3 for line breaks and to 0 while a
@@ -346,11 +363,9 @@ needed no new fields and no level asset was retuned.
       conditions and becomes unwinnable, and it will only show up on device, never
       in the editor. Cheap insurance is a `link.xml` preserving the assembly, or
       `[Preserve]` on those six classes.
-- [ ] **Frame rate is hardcoded to 120 on Android** (`GameManager.cs:47`, inside
-      the `RuntimePlatform.Android` check). Superseded by the settings item in
-      Features below — the value should come from the player's choice rather than
-      being baked in. For a match-3, 120 is a lot of battery and heat for very
-      little benefit, and thermal throttling makes it inconsistent anyway.
+- [x] **Frame rate is no longer hardcoded to 120.** `GameManager.ApplyFrameRate`
+      now defaults to 60 on mobile and reads `SettingsData.highFrameRate`. See the
+      frame rate item in Features for the one editor step still open.
 - [x] **Music clips moved to Streaming.** ~~All eight music tracks were Decompress
       On Load.~~ Done: `loadType` is now Streaming and `loadInBackground` is on for
       all eight, which fixes the resident-PCM and blocking-decompress problems.
@@ -490,16 +505,15 @@ needed no new fields and no level asset was retuned.
       these. On levels built around Double Stars and Square Stars they are the
       numbers that describe how the level went. Surface them in both places or
       delete them.
-- [ ] **Tidy the inert autorotate flags.** `allowedAutorotateToPortrait`,
-      `PortraitUpsideDown`, `LandscapeRight` and `LandscapeLeft` are all `1` while
-      `defaultScreenOrientation` is `0` (Portrait), so they do nothing. Setting the
-      three non-portrait ones to `0` changes no behaviour but stops the settings
-      contradicting each other, and means a future switch to AutoRotation does not
-      silently allow landscape. Cosmetic, not urgent.
-- [ ] **Quitting mid-level fires no analytics event.** The bottom bar's quit
-      button returns to the menu silently, so abandonment does not appear in the
-      funnel — only starts, completions and failures do. A `level_quit` event
-      carrying the level name and progress so far would close that.
+- [x] **Autorotate flags tidied.** `PortraitUpsideDown`, `LandscapeRight` and
+      `LandscapeLeft` are now `0`, matching the Portrait default. No behaviour
+      change; a future switch to AutoRotation will not silently allow landscape.
+- [x] **Quitting mid-level logs `level_quit`.** The bottom bar's quit button calls
+      `Match3GameManager.LogLevelQuit`, which sends the level name,
+      `matches_made`, `moves_made`, `time_spent_seconds` and
+      `objective_progress_percent` (the average across objectives). It is skipped
+      once the level has already been won or lost. Restart is not logged; it is
+      also an abandonment if the funnel ever needs it.
 
 ### Features
 
@@ -563,11 +577,16 @@ needed no new fields and no level asset was retuned.
       single match in a game that is otherwise very loud. Rising audio pitch per
       cascade step, a combo counter, escalating shake. The loop to hook into
       already exists; this is the biggest gap in feel.
-- [ ] **Frame rate modes in settings, 60 and 120.** `GameManager.Awake` currently
-      forces `Application.targetFrameRate = 120` on Android. That becomes a stored
-      preference instead: add a field to `SettingsData`, a control to
-      `SettingsWindowUI` alongside the existing sliders and toggles, and have
-      `GameManager` read the saved value rather than hardcoding it.
+- [x] **Frame rate modes in settings.** `SettingsData.highFrameRate` (default off,
+      so 60) is read by `GameManager.ApplyFrameRate`. When it is on, the game runs
+      at the display's refresh rate, capped at 120. `Prefab_SettingsWindow` has a
+      new **High Frame Rate Row** under Screen Shake, a copy of that row, assigned to
+      `highFrameRateToggle` and `highFrameRateRow`. The whole row hides on displays
+      of 60Hz or less, and the change applies immediately. Playtest: check the row
+      looks right in both scenes and the window still fits; on a 60Hz monitor in
+      the editor the row will be hidden, which is expected.
+
+      Original notes:
 
       Two things worth getting right:
 

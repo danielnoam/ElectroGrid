@@ -1,7 +1,11 @@
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 internal class Match3LevelEditorWindow : EditorWindow
 {
@@ -9,6 +13,8 @@ internal class Match3LevelEditorWindow : EditorWindow
     private const string DefaultFolder = "Assets/3_Data/Levels";
     private const float SidebarWidth = 270f;
     private const float CellSize = Match3LevelGridGUI.DefaultCellSize;
+    private static readonly Vector2 MinWindowSize = new Vector2(620f, 420f);
+    private static readonly Color SelectedLevelColor = new Color(0.4f, 0.7f, 1f);
 
     // Serialized so it survives an assembly reload, and mirrored into EditorPrefs so it survives a restart
     [SerializeField] private string _levelsFolder;
@@ -20,25 +26,18 @@ internal class Match3LevelEditorWindow : EditorWindow
     private List<SOMatch3Level> _playOrder = new List<SOMatch3Level>();
     private SerializedObject _serializedLevel;
 
+    // Anything that selects, creates or reorders assets changes the layout, so it runs after the GUI pass
+    private Action _deferredAction;
+
+    private Vector2 _sidebarScroll;
+    private Vector2 _orderScroll;
+    private Vector2 _editorScroll;
+    private bool _orderFoldout;
+    private GUIStyle _levelButtonStyle;
+    private GUIStyle _selectedLevelButtonStyle;
+
     private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
     private bool _isDragging;
-    private Vector2 _sidebarScroll;
-    private Vector2 _editorScroll;
-    private Vector2 _orderScroll;
-    private SOMatch3Level _pendingSelection;
-    private bool _hasPendingSelection;
-    private PendingAction _pendingAction;
-
-    // Play order edits and play mode carry an index or a level, which the enum above cannot
-    private System.Action _pendingOperation;
-    private bool _orderFoldout;
-
-    private bool _randomizeFoldout;
-    private int _obstacleCount = 1;
-    private int _bottomCount = 1;
-    private int _seed;
-    private int _minObstacleSpacing;
-    private bool _keepObstaclesFromUnderBottoms = true;
 
     private bool _shapeFoldout;
     private int _shapeWidth = 8;
@@ -50,33 +49,29 @@ internal class Match3LevelEditorWindow : EditorWindow
     private bool _shapeRemoveIsolated = true;
     private bool _shapeKeepLargestRegion = true;
 
-    private enum PendingAction
-    {
-        None,
-        CreateLevel,
-        DuplicateLevel,
-        RandomizeShapeInPlace,
-        RandomizeShapeIntoNew
-    }
+    private bool _tileObjectsFoldout;
+    private int _obstacleCount = 1;
+    private int _bottomCount = 1;
+    private int _seed;
+    private int _minObstacleSpacing;
+    private bool _keepObstaclesFromUnderBottoms = true;
 
     [MenuItem("ElectroGrid/Level Editor")]
     public static void Open()
     {
-        var window = GetWindow<Match3LevelEditorWindow>("Level Editor");
-        window.minSize = new Vector2(620f, 420f);
-        window.Show();
+        Open(null);
     }
 
     public static void Open(SOMatch3Level level)
     {
         var window = GetWindow<Match3LevelEditorWindow>("Level Editor");
-        window.minSize = new Vector2(620f, 420f);
+        window.minSize = MinWindowSize;
         window.Show();
 
         if (!level) return;
 
         // Follow the level that was opened, otherwise the sidebar would not list it
-        string folder = System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(level))?.Replace('\\', '/');
+        string folder = GetAssetFolder(level);
         if (!string.IsNullOrEmpty(folder) && folder != window._levelsFolder)
         {
             window.SetFolder(folder);
@@ -112,50 +107,38 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        if (_hasPendingSelection)
-        {
-            _hasPendingSelection = false;
-            SelectLevel(_pendingSelection);
-            _pendingSelection = null;
-            Repaint();
-        }
+        if (_deferredAction == null) return;
 
-        // Asset creation invalidates the GUI, so it waits until the pass is finished
-        switch (_pendingAction)
-        {
-            case PendingAction.CreateLevel:
-                _pendingAction = PendingAction.None;
-                CreateLevel();
-                break;
+        var action = _deferredAction;
+        _deferredAction = null;
+        action();
+        Repaint();
+    }
 
-            case PendingAction.DuplicateLevel:
-                _pendingAction = PendingAction.None;
-                DuplicateSelectedLevel();
-                break;
-
-            case PendingAction.RandomizeShapeInPlace:
-                _pendingAction = PendingAction.None;
-                RandomizeShape(false);
-                break;
-
-            case PendingAction.RandomizeShapeIntoNew:
-                _pendingAction = PendingAction.None;
-                RandomizeShape(true);
-                break;
-        }
-
-        if (_pendingOperation != null)
-        {
-            var operation = _pendingOperation;
-            _pendingOperation = null;
-            operation();
-        }
+    private void Defer(Action action)
+    {
+        _deferredAction = action;
     }
 
     private void DrawSidebar()
     {
         EditorGUILayout.BeginVertical(GUILayout.Width(SidebarWidth), GUILayout.ExpandHeight(true));
 
+        DrawFolderField();
+
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField($"Levels ({_levels.Count})", EditorStyles.boldLabel);
+        DrawLevelList();
+
+        EditorGUILayout.Space(4);
+        DrawLevelActions();
+        DrawPlayOrder();
+
+        EditorGUILayout.EndVertical();
+    }
+
+    private void DrawFolderField()
+    {
         EditorGUILayout.LabelField("Levels Folder", EditorStyles.boldLabel);
 
         var folderAsset = string.IsNullOrEmpty(_levelsFolder)
@@ -168,20 +151,17 @@ internal class Match3LevelEditorWindow : EditorWindow
         {
             string path = picked ? AssetDatabase.GetAssetPath(picked) : string.Empty;
 
-            if (string.IsNullOrEmpty(path) || AssetDatabase.IsValidFolder(path))
-            {
-                SetFolder(path);
-            }
-            else
-            {
-                Debug.LogWarning($"{path} is not a folder");
-            }
+            if (string.IsNullOrEmpty(path) || AssetDatabase.IsValidFolder(path)) SetFolder(path);
+            else Debug.LogWarning($"{path} is not a folder");
         }
 
         EditorGUILayout.LabelField(string.IsNullOrEmpty(_levelsFolder) ? "No folder set" : _levelsFolder, EditorStyles.miniLabel);
+    }
 
-        EditorGUILayout.Space(4);
-        EditorGUILayout.LabelField($"Levels ({_levels.Count})", EditorStyles.boldLabel);
+    private void DrawLevelList()
+    {
+        _levelButtonStyle ??= new GUIStyle(EditorStyles.miniButton) { alignment = TextAnchor.MiddleLeft, richText = true };
+        _selectedLevelButtonStyle ??= new GUIStyle(_levelButtonStyle) { fontStyle = FontStyle.Bold };
 
         _sidebarScroll = EditorGUILayout.BeginScrollView(_sidebarScroll);
 
@@ -196,45 +176,47 @@ internal class Match3LevelEditorWindow : EditorWindow
 
             bool isSelected = level == _selectedLevel;
 
-            var style = new GUIStyle(EditorStyles.miniButton)
-            {
-                alignment = TextAnchor.MiddleLeft,
-                fontStyle = isSelected ? FontStyle.Bold : FontStyle.Normal,
-                richText = true
-            };
-
             Color previousBackground = GUI.backgroundColor;
-            if (isSelected) GUI.backgroundColor = new Color(0.4f, 0.7f, 1f);
+            if (isSelected) GUI.backgroundColor = SelectedLevelColor;
 
             int order = _playOrder.IndexOf(level);
             string position = order >= 0 ? $"{order + 1}." : "·";
             string label = $"{(isSelected ? "▸" : " ")} {ValidationDot(level)} {position} {level.name}";
 
-            if (GUILayout.Button(label, style, GUILayout.Height(22f)))
+            if (GUILayout.Button(label, isSelected ? _selectedLevelButtonStyle : _levelButtonStyle, GUILayout.Height(22f)))
             {
-                // Applied after the GUI pass, changing it here would unbalance the layout groups
-                _pendingSelection = level;
-                _hasPendingSelection = true;
+                Defer(() => SelectLevel(level));
             }
 
             GUI.backgroundColor = previousBackground;
         }
 
         EditorGUILayout.EndScrollView();
+    }
 
-        EditorGUILayout.Space(4);
-
+    private void DrawLevelActions()
+    {
         bool hasFolder = !string.IsNullOrEmpty(_levelsFolder) && AssetDatabase.IsValidFolder(_levelsFolder);
+
+        EditorGUILayout.BeginHorizontal();
 
         using (new EditorGUI.DisabledScope(!hasFolder))
         {
-            if (GUILayout.Button("New Level")) _pendingAction = PendingAction.CreateLevel;
+            if (GUILayout.Button("New Level")) Defer(CreateLevel);
         }
 
         using (new EditorGUI.DisabledScope(!_selectedLevel))
         {
-            if (GUILayout.Button("Duplicate Selected")) _pendingAction = PendingAction.DuplicateLevel;
-            if (GUILayout.Button("Ping Selected")) EditorGUIUtility.PingObject(_selectedLevel);
+            if (GUILayout.Button("Duplicate")) Defer(DuplicateSelectedLevel);
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+
+        using (new EditorGUI.DisabledScope(!_selectedLevel))
+        {
+            if (GUILayout.Button("Ping")) EditorGUIUtility.PingObject(_selectedLevel);
         }
 
         if (GUILayout.Button("Refresh"))
@@ -243,26 +225,22 @@ internal class Match3LevelEditorWindow : EditorWindow
             RefreshLevels();
         }
 
-        EditorGUILayout.Space(4);
+        EditorGUILayout.EndHorizontal();
 
         using (new EditorGUI.DisabledScope(_levels.Count == 0))
         {
-            if (GUILayout.Button("Validate All")) _pendingOperation = ValidateAll;
+            if (GUILayout.Button("Validate All")) Defer(ValidateAll);
         }
-
-        DrawPlayOrder();
-
-        EditorGUILayout.EndVertical();
     }
 
     private string ValidationDot(SOMatch3Level level)
     {
-        if (!_validation.TryGetValue(level, out var severity)) return "<color=#808080>\u25CF</color>";
-        if (severity == null) return "<color=#6FCF6F>\u25CF</color>";
+        if (!_validation.TryGetValue(level, out var severity)) return "<color=#808080>●</color>";
+        if (severity == null) return "<color=#6FCF6F>●</color>";
 
         return severity == Match3LevelValidation.Severity.Error
-            ? "<color=#FF5252>\u25CF</color>"
-            : "<color=#FFC107>\u25CF</color>";
+            ? "<color=#FF5252>●</color>"
+            : "<color=#FFC107>●</color>";
     }
 
     /// <summary>
@@ -294,24 +272,15 @@ internal class Match3LevelEditorWindow : EditorWindow
 
             using (new EditorGUI.DisabledScope(i == 0))
             {
-                if (GUILayout.Button("\u25B2", EditorStyles.miniButtonLeft, GUILayout.Width(22f)))
-                {
-                    _pendingOperation = () => MoveInPlayOrder(index, -1);
-                }
+                if (GUILayout.Button("▲", EditorStyles.miniButtonLeft, GUILayout.Width(22f))) Defer(() => MoveInPlayOrder(index, -1));
             }
 
             using (new EditorGUI.DisabledScope(i == _playOrder.Count - 1))
             {
-                if (GUILayout.Button("\u25BC", EditorStyles.miniButtonMid, GUILayout.Width(22f)))
-                {
-                    _pendingOperation = () => MoveInPlayOrder(index, 1);
-                }
+                if (GUILayout.Button("▼", EditorStyles.miniButtonMid, GUILayout.Width(22f))) Defer(() => MoveInPlayOrder(index, 1));
             }
 
-            if (GUILayout.Button("\u2715", EditorStyles.miniButtonRight, GUILayout.Width(22f)))
-            {
-                _pendingOperation = () => RemoveFromPlayOrder(index);
-            }
+            if (GUILayout.Button("✕", EditorStyles.miniButtonRight, GUILayout.Width(22f))) Defer(() => RemoveFromPlayOrder(index));
 
             EditorGUILayout.EndHorizontal();
         }
@@ -324,7 +293,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         {
             if (GUILayout.Button(unregistered == 1 ? "Add 1 Unlisted Level" : $"Add {unregistered} Unlisted Levels"))
             {
-                _pendingOperation = AddUnregisteredToPlayOrder;
+                Defer(AddUnregisteredToPlayOrder);
             }
         }
     }
@@ -380,24 +349,29 @@ internal class Match3LevelEditorWindow : EditorWindow
     {
         Match3LevelRegistry.SetLevels(_playOrder);
         _playOrder = Match3LevelRegistry.GetLevels();
-        Repaint();
     }
 
     private void ValidateAll()
     {
-        CacheValidation();
+        _validation.Clear();
 
         int errors = 0;
         int warnings = 0;
 
         foreach (var level in _levels)
         {
-            if (!level || !_validation.TryGetValue(level, out var severity) || severity == null) continue;
+            if (!level) continue;
+
+            var issues = Match3LevelValidation.Validate(level);
+            var severity = Match3LevelValidation.WorstSeverity(issues);
+            _validation[level] = severity;
+
+            if (severity == null) continue;
 
             if (severity == Match3LevelValidation.Severity.Error) errors++;
             else warnings++;
 
-            foreach (var issue in Match3LevelValidation.Validate(level))
+            foreach (var issue in issues)
             {
                 string message = $"{level.name}: {issue.Message}";
 
@@ -409,8 +383,6 @@ internal class Match3LevelEditorWindow : EditorWindow
         Debug.Log(errors == 0 && warnings == 0
             ? $"Level Editor: all {_levels.Count} levels are clean."
             : $"Level Editor: {errors} level(s) with errors and {warnings} with warnings, out of {_levels.Count}.");
-
-        Repaint();
     }
 
     private void CacheValidation()
@@ -425,7 +397,7 @@ internal class Match3LevelEditorWindow : EditorWindow
 
     private void CacheValidation(SOMatch3Level level)
     {
-        if (level) _validation[level] = Match3LevelValidation.WorstSeverity(level);
+        if (level) _validation[level] = Match3LevelValidation.WorstSeverity(Match3LevelValidation.Validate(level));
     }
 
     private void DrawEditor()
@@ -453,33 +425,9 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         _editorScroll = EditorGUILayout.BeginScrollView(_editorScroll);
 
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField(_selectedLevel.name, EditorStyles.boldLabel);
-
-        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
-        {
-            if (GUILayout.Button("Play This Level", GUILayout.Width(120f)))
-            {
-                var levelToPlay = _selectedLevel;
-                _pendingOperation = () => Match3LevelPlayer.Play(levelToPlay);
-            }
-        }
-
-        EditorGUILayout.EndHorizontal();
-
-        if (!_playOrder.Contains(_selectedLevel))
-        {
-            EditorGUILayout.HelpBox("Not in the GameManager play order, so the game can never reach it.", MessageType.Warning);
-
-            if (GUILayout.Button("Add To Play Order"))
-            {
-                var levelToAdd = _selectedLevel;
-                _pendingOperation = () => AddToPlayOrder(levelToAdd);
-            }
-        }
+        DrawLevelHeader();
 
         EditorGUILayout.Space(4);
-
         EditorGUILayout.PropertyField(_serializedLevel.FindProperty("levelName"));
         EditorGUILayout.PropertyField(_serializedLevel.FindProperty("matchObjects"));
         EditorGUILayout.PropertyField(_serializedLevel.FindProperty("objectives"));
@@ -491,9 +439,12 @@ internal class Match3LevelEditorWindow : EditorWindow
         var gridShapeProp = _serializedLevel.FindProperty("gridShape");
         EditorGUILayout.PropertyField(gridShapeProp);
 
-        DrawShapeRandomizer(gridShapeProp);
-        DrawTileObjectPainter(gridShapeProp);
-        DrawRandomizer(gridShapeProp);
+        var shape = (SOGridShape)gridShapeProp.objectReferenceValue;
+        var grid = shape ? shape.Grid : null;
+
+        DrawTileObjectPainter(shape, grid);
+        DrawShapeRandomizer(shape);
+        DrawTileObjectRandomizer(grid);
         DrawValidation();
 
         EditorGUILayout.EndScrollView();
@@ -503,15 +454,41 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
-    private void DrawTileObjectPainter(SerializedProperty gridShapeProp)
+    private void DrawLevelHeader()
     {
-        if (gridShapeProp.objectReferenceValue == null)
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField(_selectedLevel.name, EditorStyles.boldLabel);
+
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+        {
+            if (GUILayout.Button("Play This Level", GUILayout.Width(120f)))
+            {
+                var levelToPlay = _selectedLevel;
+                Defer(() => Match3LevelPlayer.Play(levelToPlay));
+            }
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        if (_playOrder.Contains(_selectedLevel)) return;
+
+        EditorGUILayout.HelpBox("Not in the GameManager play order, so the game can never reach it.", MessageType.Warning);
+
+        if (GUILayout.Button("Add To Play Order"))
+        {
+            var levelToAdd = _selectedLevel;
+            Defer(() => AddToPlayOrder(levelToAdd));
+        }
+    }
+
+    private void DrawTileObjectPainter(SOGridShape shape, Grid grid)
+    {
+        if (!shape)
         {
             EditorGUILayout.HelpBox("Assign a Grid Shape to paint tile objects.", MessageType.Info);
             return;
         }
 
-        Grid grid = ((SOGridShape)gridShapeProp.objectReferenceValue).Grid;
         if (grid == null)
         {
             EditorGUILayout.HelpBox("Grid Shape has no valid grid.", MessageType.Warning);
@@ -530,10 +507,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUILayout.LabelField(Match3LevelGridGUI.BuildCountsLabel(_selectedLevel), Match3LevelGridGUI.RichLabel);
         EditorGUILayout.Space(5);
 
-        float gridWidth = grid.Width * CellSize;
-        Rect gridRect = GUILayoutUtility.GetRect(gridWidth, grid.Height * CellSize, GUILayout.ExpandWidth(true));
-        gridRect.x += Mathf.Max(0f, (gridRect.width - gridWidth) / 2f);
-        gridRect.width = gridWidth;
+        Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, CellSize);
 
         HandlePainting(gridRect, grid, tileObjectsProp);
         Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, CellSize, true);
@@ -550,282 +524,10 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Clear All")) ClearAll(tileObjectsProp);
-        if (GUILayout.Button("Clear Obstacles")) ClearType(tileObjectsProp, grid, Match3TileObjectType.Obstacle);
-        if (GUILayout.Button("Clear Bottom")) ClearType(tileObjectsProp, grid, Match3TileObjectType.Bottom);
+        if (GUILayout.Button("Clear All")) ResetCells(tileObjectsProp, grid, (_, _, _) => true);
+        if (GUILayout.Button("Clear Obstacles")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Obstacle);
+        if (GUILayout.Button("Clear Bottom")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Bottom);
         EditorGUILayout.EndHorizontal();
-    }
-
-    private void DrawShapeRandomizer(SerializedProperty gridShapeProp)
-    {
-        EditorGUILayout.Space(6);
-        _shapeFoldout = EditorGUILayout.Foldout(_shapeFoldout, "Randomize Grid Shape", true, EditorStyles.foldoutHeader);
-        if (!_shapeFoldout) return;
-
-        EditorGUI.indentLevel++;
-
-        var currentShape = (SOGridShape)gridShapeProp.objectReferenceValue;
-        int usedBy = CountLevelsUsingShape(currentShape);
-
-        if (currentShape && currentShape.Grid != null && GUILayout.Button("Copy size from current shape"))
-        {
-            _shapeWidth = currentShape.Grid.Width;
-            _shapeHeight = currentShape.Grid.Height;
-        }
-
-        _shapeWidth = Mathf.Clamp(EditorGUILayout.IntField("Width", _shapeWidth), 2, 32);
-        _shapeHeight = Mathf.Clamp(EditorGUILayout.IntField("Height", _shapeHeight), 2, 32);
-        _shapeDensity = EditorGUILayout.Slider("Density", _shapeDensity, 0.2f, 0.9f);
-        _shapeSymmetry = (Match3GridShapeRandomizer.SymmetryMode)EditorGUILayout.EnumPopup("Symmetry", _shapeSymmetry);
-        _shapeSmoothing = Mathf.Clamp(EditorGUILayout.IntField("Smoothing Passes", _shapeSmoothing), 0, 8);
-        _shapeRemoveIsolated = EditorGUILayout.Toggle("Remove Isolated Cells", _shapeRemoveIsolated);
-        _shapeKeepLargestRegion = EditorGUILayout.Toggle("Keep Largest Region", _shapeKeepLargestRegion);
-
-        EditorGUILayout.BeginHorizontal();
-        _shapeSeed = EditorGUILayout.IntField("Seed", _shapeSeed);
-        if (GUILayout.Button("New", GUILayout.Width(60))) _shapeSeed = Random.Range(int.MinValue, int.MaxValue);
-        EditorGUILayout.EndHorizontal();
-
-        if (usedBy > 1)
-        {
-            EditorGUILayout.HelpBox(
-                $"{currentShape.name} is used by {usedBy} levels. Randomizing it in place changes all of them.",
-                MessageType.Warning);
-        }
-
-        EditorGUILayout.HelpBox(
-            "Changing the shape resets tile objects that end up on inactive cells, and can strand Square Stars in columns that no longer reach row 0. Check the validation below afterwards.",
-            MessageType.None);
-
-        EditorGUILayout.BeginHorizontal();
-
-        using (new EditorGUI.DisabledScope(!currentShape))
-        {
-            if (GUILayout.Button(usedBy > 1 ? "Randomize In Place (affects all)" : "Randomize In Place"))
-            {
-                _pendingAction = PendingAction.RandomizeShapeInPlace;
-            }
-        }
-
-        if (GUILayout.Button("Randomize Into New Shape")) _pendingAction = PendingAction.RandomizeShapeIntoNew;
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUI.indentLevel--;
-    }
-
-    private static int CountLevelsUsingShape(SOGridShape shape)
-    {
-        if (!shape) return 0;
-
-        int count = 0;
-        foreach (string guid in AssetDatabase.FindAssets($"t:{nameof(SOMatch3Level)}"))
-        {
-            var level = AssetDatabase.LoadAssetAtPath<SOMatch3Level>(AssetDatabase.GUIDToAssetPath(guid));
-            if (level && level.GridShape == shape) count++;
-        }
-
-        return count;
-    }
-
-    private void RandomizeShape(bool intoNewAsset)
-    {
-        if (!_selectedLevel || _serializedLevel == null) return;
-
-        var gridShapeProp = _serializedLevel.FindProperty("gridShape");
-        var shape = (SOGridShape)gridShapeProp.objectReferenceValue;
-
-        if (intoNewAsset)
-        {
-            string folder = shape
-                ? System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(shape))?.Replace('\\', '/')
-                : System.IO.Path.GetDirectoryName(AssetDatabase.GetAssetPath(_selectedLevel))?.Replace('\\', '/');
-
-            if (string.IsNullOrEmpty(folder)) return;
-
-            string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{_selectedLevel.name} Shape.asset");
-            var created = CreateInstance<SOGridShape>();
-            AssetDatabase.CreateAsset(created, path);
-
-            shape = created;
-            gridShapeProp.objectReferenceValue = created;
-            _serializedLevel.ApplyModifiedProperties();
-        }
-
-        if (!shape) return;
-
-        var cells = Match3GridShapeRandomizer.Generate(new Match3GridShapeRandomizer.Options
-        {
-            Width = _shapeWidth,
-            Height = _shapeHeight,
-            Seed = _shapeSeed,
-            Density = _shapeDensity,
-            Symmetry = _shapeSymmetry,
-            SmoothingPasses = _shapeSmoothing,
-            RemoveIsolatedCells = _shapeRemoveIsolated,
-            KeepLargestRegionOnly = _shapeKeepLargestRegion
-        });
-
-        WriteShape(shape, cells, _shapeWidth, _shapeHeight);
-        ClearTileObjectsOnInactiveCells(shape);
-
-        AssetDatabase.SaveAssets();
-        RefreshLevels();
-        Repaint();
-    }
-
-    private static void WriteShape(SOGridShape shape, bool[] cells, int width, int height)
-    {
-        var serializedShape = new SerializedObject(shape);
-
-        serializedShape.FindProperty("grid.size").vector2IntValue = new Vector2Int(width, height);
-
-        var cellsProp = serializedShape.FindProperty("grid.cells");
-        cellsProp.arraySize = cells.Length;
-
-        for (int i = 0; i < cells.Length; i++)
-        {
-            cellsProp.GetArrayElementAtIndex(i).boolValue = cells[i];
-        }
-
-        serializedShape.ApplyModifiedProperties();
-    }
-
-    /// <summary>
-    /// Tile objects are stored for every cell, active or not. A painted object left on a cell the
-    /// new shape deactivated never spawns but still counts, which would make the tally lie.
-    /// </summary>
-    private void ClearTileObjectsOnInactiveCells(SOGridShape shape)
-    {
-        if (!shape || shape.Grid == null) return;
-
-        _serializedLevel.Update();
-
-        var tileObjectsProp = _serializedLevel.FindProperty("tileObjects");
-        Grid grid = shape.Grid;
-        int required = grid.Width * grid.Height;
-
-        if (tileObjectsProp.arraySize != required) tileObjectsProp.arraySize = required;
-
-        for (int y = 0; y < grid.Height; y++)
-        {
-            for (int x = 0; x < grid.Width; x++)
-            {
-                if (grid.IsCellActive(x, y)) continue;
-
-                int index = y * grid.Width + x;
-                if (index < tileObjectsProp.arraySize)
-                {
-                    tileObjectsProp.GetArrayElementAtIndex(index).enumValueIndex = (int)Match3TileObjectType.Matchable;
-                }
-            }
-        }
-
-        _serializedLevel.ApplyModifiedProperties();
-    }
-
-    private void DrawValidation()
-    {
-        EditorGUILayout.Space(10);
-        EditorGUILayout.LabelField("Validation", EditorStyles.boldLabel);
-
-        var issues = Match3LevelValidation.Validate(_selectedLevel);
-
-        if (issues.Count == 0)
-        {
-            EditorGUILayout.HelpBox("No problems found.", MessageType.Info);
-            return;
-        }
-
-        foreach (var issue in issues)
-        {
-            var type = issue.Severity == Match3LevelValidation.Severity.Error ? MessageType.Error : MessageType.Warning;
-            EditorGUILayout.HelpBox(issue.Message, type);
-        }
-    }
-
-    private void DrawRandomizer(SerializedProperty gridShapeProp)
-    {
-        if (gridShapeProp.objectReferenceValue == null) return;
-
-        Grid grid = ((SOGridShape)gridShapeProp.objectReferenceValue).Grid;
-        if (grid == null) return;
-
-        EditorGUILayout.Space(10);
-        _randomizeFoldout = EditorGUILayout.Foldout(_randomizeFoldout, "Randomize", true, EditorStyles.foldoutHeader);
-        if (!_randomizeFoldout) return;
-
-        EditorGUI.indentLevel++;
-
-        GetRequiredCounts(out int obstaclesNeeded, out int bottomsNeeded);
-
-        EditorGUILayout.BeginHorizontal();
-        _obstacleCount = Mathf.Max(0, EditorGUILayout.IntField("Double Stars", _obstacleCount));
-        using (new EditorGUI.DisabledScope(obstaclesNeeded <= 0))
-        {
-            if (GUILayout.Button($"From objectives ({obstaclesNeeded})", GUILayout.Width(150))) _obstacleCount = obstaclesNeeded;
-        }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        _bottomCount = Mathf.Max(0, EditorGUILayout.IntField("Square Stars", _bottomCount));
-        using (new EditorGUI.DisabledScope(bottomsNeeded <= 0))
-        {
-            if (GUILayout.Button($"From objectives ({bottomsNeeded})", GUILayout.Width(150))) _bottomCount = bottomsNeeded;
-        }
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-        _seed = EditorGUILayout.IntField("Seed", _seed);
-        if (GUILayout.Button("New", GUILayout.Width(60))) _seed = Random.Range(int.MinValue, int.MaxValue);
-        EditorGUILayout.EndHorizontal();
-
-        _minObstacleSpacing = Mathf.Max(0, EditorGUILayout.IntField("Min Obstacle Spacing", _minObstacleSpacing));
-        _keepObstaclesFromUnderBottoms = EditorGUILayout.Toggle("Keep Clear Under Square Stars", _keepObstaclesFromUnderBottoms);
-
-        EditorGUILayout.HelpBox(
-            "Square Stars are only placed in columns that reach row 0, and never on row 0 itself. Undo reverts a roll, so reroll freely.",
-            MessageType.None);
-
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Randomize All")) ApplyRandomize(grid, true, true);
-        if (GUILayout.Button("Double Stars")) ApplyRandomize(grid, true, false);
-        if (GUILayout.Button("Square Stars")) ApplyRandomize(grid, false, true);
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUI.indentLevel--;
-    }
-
-    private void GetRequiredCounts(out int obstaclesNeeded, out int bottomsNeeded)
-    {
-        obstaclesNeeded = 0;
-        bottomsNeeded = 0;
-
-        foreach (var objective in _selectedLevel.Objectives)
-        {
-            if (objective is DestroyObstaclesObjective destroyObstacles) obstaclesNeeded += destroyObstacles.RequiredAmount;
-            else if (objective is ReachBottomObjective reachBottom) bottomsNeeded += reachBottom.RequiredAmount;
-        }
-    }
-
-    private void ApplyRandomize(Grid grid, bool obstacles, bool bottoms)
-    {
-        var tileObjectsProp = _serializedLevel.FindProperty("tileObjects");
-
-        Match3LevelRandomizer.Randomize(tileObjectsProp, grid, new Match3LevelRandomizer.Options
-        {
-            ObstacleCount = _obstacleCount,
-            BottomCount = _bottomCount,
-            Seed = _seed,
-            MinObstacleSpacing = _minObstacleSpacing,
-            KeepObstaclesFromUnderBottoms = _keepObstaclesFromUnderBottoms,
-            RandomizeObstacles = obstacles,
-            RandomizeBottoms = bottoms
-        });
-
-        // Goes through SerializedProperty so the whole roll is one undo step
-        _serializedLevel.ApplyModifiedProperties();
-        GUI.changed = true;
     }
 
     private void DrawPaintModeButton(string label, Match3TileObjectType mode)
@@ -872,38 +574,262 @@ internal class Match3LevelEditorWindow : EditorWindow
         e.Use();
     }
 
-    private void ClearAll(SerializedProperty tileObjectsProp)
+    /// <summary>Sets every cell the predicate accepts back to a plain matchable piece.</summary>
+    private static void ResetCells(SerializedProperty tileObjectsProp, Grid grid, Func<int, int, Match3TileObjectType, bool> shouldReset)
     {
-        for (int i = 0; i < tileObjectsProp.arraySize; i++)
+        for (int y = 0; y < grid.Height; y++)
         {
-            tileObjectsProp.GetArrayElementAtIndex(i).enumValueIndex = (int)Match3TileObjectType.Matchable;
+            for (int x = 0; x < grid.Width; x++)
+            {
+                int index = y * grid.Width + x;
+                if (index >= tileObjectsProp.arraySize) continue;
+
+                var element = tileObjectsProp.GetArrayElementAtIndex(index);
+                if (!shouldReset(x, y, (Match3TileObjectType)element.enumValueIndex)) continue;
+
+                element.enumValueIndex = (int)Match3TileObjectType.Matchable;
+            }
         }
 
         tileObjectsProp.serializedObject.ApplyModifiedProperties();
         GUI.changed = true;
     }
 
-    private void ClearType(SerializedProperty tileObjectsProp, Grid grid, Match3TileObjectType typeToRemove)
+    private void DrawShapeRandomizer(SOGridShape currentShape)
     {
-        for (int y = 0; y < grid.Height; y++)
+        EditorGUILayout.Space(10);
+        _shapeFoldout = EditorGUILayout.Foldout(_shapeFoldout, "Randomize Grid Shape", true, EditorStyles.foldoutHeader);
+        if (!_shapeFoldout) return;
+
+        EditorGUI.indentLevel++;
+
+        int usedBy = CountLevelsUsingShape(currentShape);
+
+        if (currentShape && currentShape.Grid != null && GUILayout.Button("Copy size from current shape"))
         {
-            for (int x = 0; x < grid.Width; x++)
+            _shapeWidth = currentShape.Grid.Width;
+            _shapeHeight = currentShape.Grid.Height;
+        }
+
+        _shapeWidth = Mathf.Clamp(EditorGUILayout.IntField("Width", _shapeWidth), 2, 32);
+        _shapeHeight = Mathf.Clamp(EditorGUILayout.IntField("Height", _shapeHeight), 2, 32);
+        _shapeDensity = EditorGUILayout.Slider("Density", _shapeDensity, 0.2f, 0.9f);
+        _shapeSymmetry = (Match3GridShapeRandomizer.SymmetryMode)EditorGUILayout.EnumPopup("Symmetry", _shapeSymmetry);
+        _shapeSmoothing = Mathf.Clamp(EditorGUILayout.IntField("Smoothing Passes", _shapeSmoothing), 0, 8);
+        _shapeRemoveIsolated = EditorGUILayout.Toggle("Remove Isolated Cells", _shapeRemoveIsolated);
+        _shapeKeepLargestRegion = EditorGUILayout.Toggle("Keep Largest Region", _shapeKeepLargestRegion);
+        _shapeSeed = DrawSeedField(_shapeSeed);
+
+        if (usedBy > 1)
+        {
+            EditorGUILayout.HelpBox(
+                $"{currentShape.name} is used by {usedBy} levels. Randomizing it in place changes all of them.",
+                MessageType.Warning);
+        }
+
+        EditorGUILayout.HelpBox(
+            "Changing the shape resets tile objects that end up on inactive cells, and can strand Square Stars in columns that no longer reach row 0. Check the validation below afterwards.",
+            MessageType.None);
+
+        EditorGUILayout.BeginHorizontal();
+
+        using (new EditorGUI.DisabledScope(!currentShape))
+        {
+            if (GUILayout.Button(usedBy > 1 ? "Randomize In Place (affects all)" : "Randomize In Place"))
             {
-                if (!grid.IsCellActive(x, y)) continue;
-
-                int index = y * grid.Width + x;
-                if (index >= tileObjectsProp.arraySize) continue;
-
-                var element = tileObjectsProp.GetArrayElementAtIndex(index);
-                if ((Match3TileObjectType)element.enumValueIndex == typeToRemove)
-                {
-                    element.enumValueIndex = (int)Match3TileObjectType.Matchable;
-                }
+                Defer(() => RandomizeShape(false));
             }
         }
 
-        tileObjectsProp.serializedObject.ApplyModifiedProperties();
+        if (GUILayout.Button("Randomize Into New Shape")) Defer(() => RandomizeShape(true));
+
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel--;
+    }
+
+    private static int DrawSeedField(int seed)
+    {
+        EditorGUILayout.BeginHorizontal();
+        seed = EditorGUILayout.IntField("Seed", seed);
+        if (GUILayout.Button("New", GUILayout.Width(60))) seed = Random.Range(int.MinValue, int.MaxValue);
+        EditorGUILayout.EndHorizontal();
+
+        return seed;
+    }
+
+    private static int CountLevelsUsingShape(SOGridShape shape)
+    {
+        if (!shape) return 0;
+
+        int count = 0;
+        foreach (string guid in AssetDatabase.FindAssets($"t:{nameof(SOMatch3Level)}"))
+        {
+            var level = AssetDatabase.LoadAssetAtPath<SOMatch3Level>(AssetDatabase.GUIDToAssetPath(guid));
+            if (level && level.GridShape == shape) count++;
+        }
+
+        return count;
+    }
+
+    private void RandomizeShape(bool intoNewAsset)
+    {
+        if (!_selectedLevel || _serializedLevel == null) return;
+
+        var gridShapeProp = _serializedLevel.FindProperty("gridShape");
+        var shape = (SOGridShape)gridShapeProp.objectReferenceValue;
+
+        if (intoNewAsset)
+        {
+            string folder = GetAssetFolder(shape ? shape : _selectedLevel);
+            if (string.IsNullOrEmpty(folder)) return;
+
+            string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{_selectedLevel.name} Shape.asset");
+            var created = CreateInstance<SOGridShape>();
+            AssetDatabase.CreateAsset(created, path);
+
+            shape = created;
+            gridShapeProp.objectReferenceValue = created;
+            _serializedLevel.ApplyModifiedProperties();
+        }
+
+        if (!shape) return;
+
+        var cells = Match3GridShapeRandomizer.Generate(new Match3GridShapeRandomizer.Options
+        {
+            Width = _shapeWidth,
+            Height = _shapeHeight,
+            Seed = _shapeSeed,
+            Density = _shapeDensity,
+            Symmetry = _shapeSymmetry,
+            SmoothingPasses = _shapeSmoothing,
+            RemoveIsolatedCells = _shapeRemoveIsolated,
+            KeepLargestRegionOnly = _shapeKeepLargestRegion
+        });
+
+        WriteShape(shape, cells, _shapeWidth, _shapeHeight);
+        ClearTileObjectsOnInactiveCells(shape);
+
+        AssetDatabase.SaveAssets();
+        RefreshLevels();
+    }
+
+    private static void WriteShape(SOGridShape shape, bool[] cells, int width, int height)
+    {
+        var serializedShape = new SerializedObject(shape);
+
+        serializedShape.FindProperty("grid.size").vector2IntValue = new Vector2Int(width, height);
+
+        var cellsProp = serializedShape.FindProperty("grid.cells");
+        cellsProp.arraySize = cells.Length;
+
+        for (int i = 0; i < cells.Length; i++)
+        {
+            cellsProp.GetArrayElementAtIndex(i).boolValue = cells[i];
+        }
+
+        serializedShape.ApplyModifiedProperties();
+    }
+
+    /// <summary>
+    /// Tile objects are stored for every cell, active or not. A painted object left on a cell the
+    /// new shape deactivated never spawns but still counts, which would make the tally lie.
+    /// </summary>
+    private void ClearTileObjectsOnInactiveCells(SOGridShape shape)
+    {
+        if (!shape || shape.Grid == null) return;
+
+        _serializedLevel.Update();
+
+        var tileObjectsProp = _serializedLevel.FindProperty("tileObjects");
+        Grid grid = shape.Grid;
+        int required = grid.Width * grid.Height;
+
+        if (tileObjectsProp.arraySize != required) tileObjectsProp.arraySize = required;
+
+        ResetCells(tileObjectsProp, grid, (x, y, _) => !grid.IsCellActive(x, y));
+    }
+
+    private void DrawTileObjectRandomizer(Grid grid)
+    {
+        if (grid == null) return;
+
+        EditorGUILayout.Space(6);
+        _tileObjectsFoldout = EditorGUILayout.Foldout(_tileObjectsFoldout, "Randomize Tile Objects", true, EditorStyles.foldoutHeader);
+        if (!_tileObjectsFoldout) return;
+
+        EditorGUI.indentLevel++;
+
+        Match3LevelValidation.GetRequiredCounts(_selectedLevel, out int obstaclesNeeded, out int bottomsNeeded);
+
+        _obstacleCount = DrawCountField("Double Stars", _obstacleCount, obstaclesNeeded);
+        _bottomCount = DrawCountField("Square Stars", _bottomCount, bottomsNeeded);
+        _seed = DrawSeedField(_seed);
+        _minObstacleSpacing = Mathf.Max(0, EditorGUILayout.IntField("Min Obstacle Spacing", _minObstacleSpacing));
+        _keepObstaclesFromUnderBottoms = EditorGUILayout.Toggle("Keep Clear Under Square Stars", _keepObstaclesFromUnderBottoms);
+
+        EditorGUILayout.HelpBox(
+            "Square Stars are only placed in columns that reach row 0, and never on row 0 itself. Undo reverts a roll, so reroll freely.",
+            MessageType.None);
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Randomize All")) ApplyRandomize(grid, true, true);
+        if (GUILayout.Button("Double Stars")) ApplyRandomize(grid, true, false);
+        if (GUILayout.Button("Square Stars")) ApplyRandomize(grid, false, true);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUI.indentLevel--;
+    }
+
+    private static int DrawCountField(string label, int value, int needed)
+    {
+        EditorGUILayout.BeginHorizontal();
+        value = Mathf.Max(0, EditorGUILayout.IntField(label, value));
+
+        using (new EditorGUI.DisabledScope(needed <= 0))
+        {
+            if (GUILayout.Button($"From objectives ({needed})", GUILayout.Width(150))) value = needed;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        return value;
+    }
+
+    private void ApplyRandomize(Grid grid, bool obstacles, bool bottoms)
+    {
+        var tileObjectsProp = _serializedLevel.FindProperty("tileObjects");
+
+        Match3LevelRandomizer.Randomize(tileObjectsProp, grid, new Match3LevelRandomizer.Options
+        {
+            ObstacleCount = _obstacleCount,
+            BottomCount = _bottomCount,
+            Seed = _seed,
+            MinObstacleSpacing = _minObstacleSpacing,
+            KeepObstaclesFromUnderBottoms = _keepObstaclesFromUnderBottoms,
+            RandomizeObstacles = obstacles,
+            RandomizeBottoms = bottoms
+        });
+
+        // Goes through SerializedProperty so the whole roll is one undo step
+        _serializedLevel.ApplyModifiedProperties();
         GUI.changed = true;
+    }
+
+    private void DrawValidation()
+    {
+        EditorGUILayout.Space(10);
+        EditorGUILayout.LabelField("Validation", EditorStyles.boldLabel);
+
+        var issues = Match3LevelValidation.Validate(_selectedLevel);
+
+        if (issues.Count == 0)
+        {
+            EditorGUILayout.HelpBox("No problems found.", MessageType.Info);
+            return;
+        }
+
+        Match3LevelGridGUI.DrawIssues(issues);
     }
 
     private void CreateLevel()
@@ -918,10 +844,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        RefreshLevels();
-        SelectLevel(level);
-        EditorGUIUtility.PingObject(level);
-        Repaint();
+        ShowNewLevel(level);
     }
 
     private void DuplicateSelectedLevel()
@@ -948,10 +871,14 @@ internal class Match3LevelEditorWindow : EditorWindow
         ApplyAssetNameToLevelName(copy);
         AssetDatabase.SaveAssets();
 
+        ShowNewLevel(copy);
+    }
+
+    private void ShowNewLevel(SOMatch3Level level)
+    {
         RefreshLevels();
-        SelectLevel(copy);
-        EditorGUIUtility.PingObject(copy);
-        Repaint();
+        SelectLevel(level);
+        EditorGUIUtility.PingObject(level);
     }
 
     /// <summary>Keeps the in-game level name in step with the asset, which is what a new or copied level needs.</summary>
@@ -962,6 +889,11 @@ internal class Match3LevelEditorWindow : EditorWindow
         var serialized = new SerializedObject(level);
         serialized.FindProperty("levelName").stringValue = level.name;
         serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static string GetAssetFolder(Object asset)
+    {
+        return Path.GetDirectoryName(AssetDatabase.GetAssetPath(asset))?.Replace('\\', '/');
     }
 
     private void SetFolder(string folder)

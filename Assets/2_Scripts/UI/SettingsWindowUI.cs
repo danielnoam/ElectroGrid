@@ -18,6 +18,9 @@ public class SettingsWindowUI : MonoBehaviour
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Toggle hapticsToggle;
     [SerializeField] private Toggle screenShakeToggle;
+    [SerializeField] private Toggle highFrameRateToggle;
+    [Tooltip("Hidden on displays that cannot refresh faster than 60Hz")]
+    [SerializeField] private GameObject highFrameRateRow;
 
     [Header("Reset Progress")]
     [SerializeField] private Button resetProgressButton;
@@ -122,6 +125,14 @@ public class SettingsWindowUI : MonoBehaviour
             screenShakeToggle.onValueChanged.AddListener(OnScreenShakeChanged);
         }
 
+        if (highFrameRateToggle)
+        {
+            var row = highFrameRateRow ? highFrameRateRow : highFrameRateToggle.gameObject;
+            row.SetActive(GameManager.SupportsHighFrameRate);
+            highFrameRateToggle.onValueChanged.RemoveAllListeners();
+            highFrameRateToggle.onValueChanged.AddListener(OnHighFrameRateChanged);
+        }
+
         if (resetProgressButton)
         {
             resetProgressButton.onClick.RemoveAllListeners();
@@ -176,6 +187,7 @@ public class SettingsWindowUI : MonoBehaviour
         if (sfxVolumeSlider) sfxVolumeSlider.SetValueWithoutNotify(settings.sfxVolume);
         if (hapticsToggle) hapticsToggle.SetIsOnWithoutNotify(settings.hapticsEnabled);
         if (screenShakeToggle) screenShakeToggle.SetIsOnWithoutNotify(settings.screenShakeEnabled);
+        if (highFrameRateToggle) highFrameRateToggle.SetIsOnWithoutNotify(settings.highFrameRate);
 
         _applyingValues = false;
     }
@@ -210,6 +222,14 @@ public class SettingsWindowUI : MonoBehaviour
 
         if (SaveManager.Instance) SaveManager.Instance.Settings.screenShakeEnabled = value;
         if (value) CameraManager.Instance?.ShakeCamera(0.2f);
+    }
+
+    private void OnHighFrameRateChanged(bool value)
+    {
+        if (_applyingValues) return;
+
+        if (SaveManager.Instance) SaveManager.Instance.Settings.highFrameRate = value;
+        GameManager.ApplyFrameRate();
     }
 
     private void Close()

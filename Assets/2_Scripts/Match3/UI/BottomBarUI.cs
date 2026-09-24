@@ -79,6 +79,8 @@ public class BottomBarUI : MonoBehaviour
         quitButton.onClick.RemoveAllListeners();
         quitButton.onClick.AddListener(() =>
         {
+            _match3Manager.LogLevelQuit();
+
             if (VFXManager.Instance)
             {
                 CameraManager.Instance.ShakeCamera(0.1f);

@@ -1,4 +1,6 @@
 #if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -30,10 +32,27 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
 
         EditorGUILayout.Space(8);
 
-        DrawObjectives(level);
-        DrawLoseConditions(level);
+        DrawEntries("Objectives", level.Objectives, objective => objective.GetDescription());
+        EditorGUILayout.Space(4);
+        DrawEntries("Lose Conditions", level.LoseConditions, condition => condition.GetDescription());
         DrawGridPreview(level);
         DrawValidation(level);
+    }
+
+    private static void DrawEntries<T>(string header, List<T> entries, Func<T, string> describe) where T : class
+    {
+        EditorGUILayout.LabelField(header, EditorStyles.boldLabel);
+
+        if (entries == null || entries.Count == 0)
+        {
+            EditorGUILayout.LabelField("   None", EditorStyles.miniLabel);
+            return;
+        }
+
+        foreach (var entry in entries)
+        {
+            EditorGUILayout.LabelField(entry == null ? "   (empty)" : $"   • {describe(entry)}");
+        }
     }
 
     private void DrawValidation(SOMatch3Level level)
@@ -43,45 +62,7 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
 
         EditorGUILayout.Space(8);
         EditorGUILayout.LabelField("Validation", EditorStyles.boldLabel);
-
-        foreach (var issue in issues)
-        {
-            var type = issue.Severity == Match3LevelValidation.Severity.Error ? MessageType.Error : MessageType.Warning;
-            EditorGUILayout.HelpBox(issue.Message, type);
-        }
-    }
-
-    private void DrawObjectives(SOMatch3Level level)
-    {
-        EditorGUILayout.LabelField("Objectives", EditorStyles.boldLabel);
-
-        if (level.Objectives == null || level.Objectives.Count == 0)
-        {
-            EditorGUILayout.LabelField("   None", EditorStyles.miniLabel);
-            return;
-        }
-
-        foreach (var objective in level.Objectives)
-        {
-            EditorGUILayout.LabelField(objective == null ? "   (empty)" : $"   • {objective.GetDescription()}");
-        }
-    }
-
-    private void DrawLoseConditions(SOMatch3Level level)
-    {
-        EditorGUILayout.Space(4);
-        EditorGUILayout.LabelField("Lose Conditions", EditorStyles.boldLabel);
-
-        if (level.LoseConditions == null || level.LoseConditions.Count == 0)
-        {
-            EditorGUILayout.LabelField("   None", EditorStyles.miniLabel);
-            return;
-        }
-
-        foreach (var condition in level.LoseConditions)
-        {
-            EditorGUILayout.LabelField(condition == null ? "   (empty)" : $"   • {condition.GetDescription()}");
-        }
+        Match3LevelGridGUI.DrawIssues(issues);
     }
 
     private void DrawGridPreview(SOMatch3Level level)
@@ -109,11 +90,7 @@ public class SOMatch3LevelEditor : UnityEditor.Editor
         EditorGUILayout.LabelField(Match3LevelGridGUI.BuildCountsLabel(level), Match3LevelGridGUI.RichLabel);
         EditorGUILayout.Space(4);
 
-        float gridWidth = grid.Width * PreviewCellSize;
-        Rect gridRect = GUILayoutUtility.GetRect(gridWidth, grid.Height * PreviewCellSize, GUILayout.ExpandWidth(true));
-        gridRect.x += Mathf.Max(0f, (gridRect.width - gridWidth) / 2f);
-        gridRect.width = gridWidth;
-
+        Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, PreviewCellSize);
         Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, PreviewCellSize, false);
     }
 }

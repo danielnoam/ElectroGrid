@@ -43,10 +43,26 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         PrimeTweenConfig.SetTweensCapacity(1600);
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            Application.targetFrameRate = 120;
-        }
+        ApplyFrameRate();
+    }
+
+    /// <summary>
+    /// True when the display refreshes fast enough for the high frame rate option to mean anything.
+    /// </summary>
+    public static bool SupportsHighFrameRate => Screen.currentResolution.refreshRateRatio.value > 61;
+
+    /// <summary>
+    /// 60 by default, which matters for battery on long puzzle sessions. Players can opt into the
+    /// panel's refresh rate, capped at 120, from the settings window.
+    /// </summary>
+    public static void ApplyFrameRate()
+    {
+        if (!Application.isMobilePlatform) return;
+
+        var highFrameRate = SaveManager.Instance && SaveManager.Instance.Settings.highFrameRate && SupportsHighFrameRate;
+        Application.targetFrameRate = highFrameRate
+            ? Mathf.Min(120, Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value))
+            : 60;
     }
 
     public void SelectMatch3Level(SOMatch3Level level)

@@ -177,6 +177,36 @@ public class FirebaseManager : MonoBehaviour
 
     }
 
+    public void LogLevelQuit(Match3LevelData levelData)
+    {
+        if (!firebaseInitialized) return;
+
+        FirebaseAnalytics.LogEvent(
+            "level_quit",
+            new Parameter[] {
+                new(FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName),
+                new("matches_made", levelData.PiecesCleared),
+                new("moves_made", levelData.MovesMade),
+                new("time_spent_seconds", (int)levelData.TimeSpent),
+                new("objective_progress_percent", GetObjectiveProgressPercent(levelData))
+            }
+        );
+    }
+
+    private static int GetObjectiveProgressPercent(Match3LevelData levelData)
+    {
+        if (levelData.CurrentObjectives.Count == 0) return 0;
+
+        float total = 0f;
+        foreach (var objective in levelData.CurrentObjectives)
+        {
+            var (current, required) = objective.GetProgress();
+            total += required > 0 ? Mathf.Clamp01((float)current / required) : 1f;
+        }
+
+        return Mathf.RoundToInt(total / levelData.CurrentObjectives.Count * 100f);
+    }
+
     public void LogLineBreak()
     {
         FirebaseAnalytics.LogEvent("Line_Break");

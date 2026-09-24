@@ -225,6 +225,16 @@ public class Match3GameManager : MonoBehaviour
     }
     
 
+    /// <summary>
+    /// Called when the player leaves a level before it ends, so abandonment shows up in the funnel.
+    /// </summary>
+    public void LogLevelQuit()
+    {
+        if (levelComplete || _currentLevelData == null) return;
+
+        FirebaseManager.Instance?.LogLevelQuit(_currentLevelData);
+    }
+
     private IEnumerator CompleteLevel()
     {
         levelComplete = true;

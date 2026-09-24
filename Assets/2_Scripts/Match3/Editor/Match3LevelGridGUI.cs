@@ -1,10 +1,11 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Grid drawing shared by the level editor window and the read-only inspector preview,
-/// so the two can never drift apart.
+/// Grid and validation drawing shared by the level editor window and the read-only inspector
+/// preview, so the two can never drift apart.
 /// </summary>
 internal static class Match3LevelGridGUI
 {
@@ -112,22 +113,28 @@ internal static class Match3LevelGridGUI
         int bottomObjectCount = level.CountObjectsOfType(Match3TileObjectType.Bottom);
         int matchableCount = level.GridShape.Grid.ActiveCellCount - obstacleCount - bottomObjectCount;
 
-        int obstacleNeeded = 0;
-        int bottomObjectNeeded = 0;
-
-        foreach (var objective in level.Objectives)
-        {
-            if (objective is DestroyObstaclesObjective destroyObstacles)
-            {
-                obstacleNeeded += destroyObstacles.RequiredAmount;
-            }
-            else if (objective is ReachBottomObjective reachBottom)
-            {
-                bottomObjectNeeded += reachBottom.RequiredAmount;
-            }
-        }
+        Match3LevelValidation.GetRequiredCounts(level, out int obstacleNeeded, out int bottomObjectNeeded);
 
         return $"Matchable: {matchableCount} | {Tally("Obstacles", obstacleCount, obstacleNeeded)} | {Tally("Bottom", bottomObjectCount, bottomObjectNeeded)}";
+    }
+
+    /// <summary>Reserves layout space for the grid and centres it horizontally in the available width.</summary>
+    public static Rect GetCenteredGridRect(Grid grid, float cellSize)
+    {
+        float gridWidth = grid.Width * cellSize;
+        Rect gridRect = GUILayoutUtility.GetRect(gridWidth, grid.Height * cellSize, GUILayout.ExpandWidth(true));
+        gridRect.x += Mathf.Max(0f, (gridRect.width - gridWidth) / 2f);
+        gridRect.width = gridWidth;
+        return gridRect;
+    }
+
+    public static void DrawIssues(List<Match3LevelValidation.Issue> issues)
+    {
+        foreach (var issue in issues)
+        {
+            var type = issue.Severity == Match3LevelValidation.Severity.Error ? MessageType.Error : MessageType.Warning;
+            EditorGUILayout.HelpBox(issue.Message, type);
+        }
     }
 
     private static string Tally(string label, int placed, int needed)
@@ -138,6 +145,8 @@ internal static class Match3LevelGridGUI
         return placed == needed ? $"<color=green>{text}</color>" : $"<color=red>{text}</color>";
     }
 
-    public static GUIStyle RichLabel => new GUIStyle(EditorStyles.label) { richText = true };
+    private static GUIStyle _richLabel;
+
+    public static GUIStyle RichLabel => _richLabel ??= new GUIStyle(EditorStyles.label) { richText = true };
 }
 #endif
