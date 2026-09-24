@@ -320,14 +320,13 @@ needed no new fields and no level asset was retuned.
       the first returned on the next frame. It now keeps the configured value.
       `PoolableDecal` and `PoolableVisualEffect` still use scaled time, which is
       right for world effects.
-- [ ] **Fix `VFXManager` losing its camera upstream in DNExtensions.** It is a
-      `DontDestroyOnLoad` singleton, so after a scene change its canvas still points
-      at the previous scene's camera, which has been destroyed. A Screen Space -
-      Camera canvas with no camera renders as an overlay, and `OnActiveSceneChanged`
-      only rebinds while `renderMode == ScreenSpaceCamera`, so it never recovers.
-      The game works around it in `CameraManager.BindVFXCanvas`. Upstream, remember
-      the configured render mode in `Awake` and rebind whenever `worldCamera` is
-      null. Then remove the workaround.
+- [x] **`VFXManager` camera fixed upstream** (DNExtensions `f9aff38`, now pinned).
+      It remembers the canvas's configured render mode in `Awake` and rebinds to
+      `Camera.main` whenever the canvas has no camera, checked each `LateUpdate`,
+      instead of only on `activeSceneChanged`, which can fire before the new scene's
+      camera exists. The game's `CameraManager.BindVFXCanvas` workaround is removed.
+      **Playtest:** the fullscreen fade still sits under the menu UI after going
+      menu → level → menu → level.
 - [x] **SFX moved to the AudioLibrary.** The 9 `SOAudioEvent` assets became
       `SOAudioProfile` assets in `Assets/3_Data/AudioLibrary`, mapped by the same
       names in one `SFX` category routed to the SFX mixer group. Every script now

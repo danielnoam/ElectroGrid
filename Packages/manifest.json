@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "com.danielnoam.components": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.components#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
-    "com.danielnoam.helpfuleditor": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.helpfuleditor#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
-    "com.danielnoam.systems": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.systems#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
-    "com.danielnoam.utilities": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.utilities#78e379c52438e0ac4ac2b6a300813f7c50ff4649",
+    "com.danielnoam.components": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.components#f9aff38583156b43900030ded311acbff436053a",
+    "com.danielnoam.helpfuleditor": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.helpfuleditor#f9aff38583156b43900030ded311acbff436053a",
+    "com.danielnoam.systems": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.systems#f9aff38583156b43900030ded311acbff436053a",
+    "com.danielnoam.utilities": "https://github.com/danielnoam/DNExtensions.git?path=/Packages/com.danielnoam.utilities#f9aff38583156b43900030ded311acbff436053a",
     "com.kyrylokuzyk.primetween": "file:../Assets/Plugins/PrimeTween/internal/com.kyrylokuzyk.primetween.tgz",
     "com.unity.ai.navigation": "2.0.14",
     "com.unity.cinemachine": "6.6.0",
