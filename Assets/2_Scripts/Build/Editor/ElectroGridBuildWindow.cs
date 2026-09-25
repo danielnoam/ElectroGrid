@@ -139,7 +139,6 @@ internal class ElectroGridBuildWindow : EditorWindow
         }
         EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.LabelField($"→ {Path.Combine(folder, ElectroGridBuild.Version)}{(overridden ? "   (this computer)" : "   (project default)")}", EditorStyles.miniLabel);
         EditorGUILayout.PropertyField(_serializedConfig.FindProperty("zipWindowsBuild"));
 
         using (new EditorGUI.DisabledScope(!Directory.Exists(folder)))
@@ -205,31 +204,12 @@ internal class ElectroGridBuildWindow : EditorWindow
     {
         Header("Uploads");
 
-        var github = _serializedConfig.FindProperty("uploadToGitHub");
-        EditorGUILayout.PropertyField(github, new GUIContent("GitHub Release"));
+        DrawCopyToFolder();
+        DrawGitHubRelease();
+    }
 
-        if (github.boolValue)
-        {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(_serializedConfig.FindProperty("githubDraft"), new GUIContent("Draft"));
-            EditorGUILayout.PropertyField(_serializedConfig.FindProperty("githubPrerelease"), new GUIContent("Prerelease"));
-            EditorGUILayout.PropertyField(_serializedConfig.FindProperty("replaceExistingRelease"), new GUIContent("Replace Existing Release"));
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.HelpBox(_ghStatus, _ghReady ? MessageType.Info : MessageType.Warning);
-            if (GUILayout.Button("Refresh", GUILayout.Width(60f), GUILayout.Height(38f))) RefreshGitHubStatus();
-            EditorGUILayout.EndHorizontal();
-
-            _notesFoldout = EditorGUILayout.Foldout(_notesFoldout, "Release Notes Preview", true);
-            if (_notesFoldout)
-            {
-                if (_notesPreview == null || GUILayout.Button("Regenerate", EditorStyles.miniButton)) _notesPreview = ElectroGridBuild.BuildReleaseNotes();
-                EditorGUILayout.HelpBox(_notesPreview, MessageType.None);
-            }
-
-            EditorGUI.indentLevel--;
-        }
-
+    private void DrawCopyToFolder()
+    {
         var copy = _serializedConfig.FindProperty("copyToFolder");
         EditorGUILayout.PropertyField(copy, new GUIContent("Copy To Folder"));
 
@@ -247,6 +227,32 @@ internal class ElectroGridBuildWindow : EditorWindow
             if (!string.IsNullOrEmpty(picked)) BuildMachineSettings.CopyFolder = picked;
         }
         EditorGUILayout.EndHorizontal();
+    }
+
+    private void DrawGitHubRelease()
+    {
+        var github = _serializedConfig.FindProperty("uploadToGitHub");
+        EditorGUILayout.PropertyField(github, new GUIContent("GitHub Release"));
+
+        if (!github.boolValue) return;
+
+        EditorGUI.indentLevel++;
+        EditorGUILayout.PropertyField(_serializedConfig.FindProperty("githubReleaseType"), new GUIContent("Release As"));
+        EditorGUILayout.PropertyField(_serializedConfig.FindProperty("replaceExistingRelease"), new GUIContent("Replace Existing Release"));
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.HelpBox(_ghStatus, _ghReady ? MessageType.Info : MessageType.Warning);
+        if (GUILayout.Button("Refresh", GUILayout.Width(60f), GUILayout.Height(38f))) RefreshGitHubStatus();
+        EditorGUILayout.EndHorizontal();
+
+        _notesFoldout = EditorGUILayout.Foldout(_notesFoldout, "Release Notes Preview", true);
+        if (_notesFoldout)
+        {
+            if (_notesPreview == null || GUILayout.Button("Regenerate", EditorStyles.miniButton)) _notesPreview = ElectroGridBuild.BuildReleaseNotes();
+            EditorGUILayout.HelpBox(_notesPreview, MessageType.None);
+        }
+
+        EditorGUI.indentLevel--;
     }
 
     private void DrawIssues()
@@ -336,8 +342,8 @@ internal class ElectroGridBuildWindow : EditorWindow
 
     private IEnumerable<string> UploadNames()
     {
-        if (_config.uploadToGitHub) yield return _config.githubDraft ? "GitHub (draft release)" : "GitHub (public release)";
         if (_config.copyToFolder) yield return "the copy folder";
+        if (_config.uploadToGitHub) yield return $"GitHub ({_config.githubReleaseType.ToString().ToLowerInvariant()} release)";
     }
 
     private void RefreshGitHubStatus()

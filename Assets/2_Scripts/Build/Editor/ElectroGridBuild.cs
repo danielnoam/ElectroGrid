@@ -463,8 +463,8 @@ internal static class ElectroGridBuild
         arguments.Append($" --title {BuildProcess.Quote($"ElectroGrid {Version}")}");
         arguments.Append($" --notes-file {BuildProcess.Quote(notesPath)}");
         if (!string.IsNullOrEmpty(commit)) arguments.Append($" --target {commit}");
-        if (config.githubDraft) arguments.Append(" --draft");
-        if (config.githubPrerelease) arguments.Append(" --prerelease");
+        if (config.githubReleaseType == SOBuildConfig.ReleaseType.Draft) arguments.Append(" --draft");
+        if (config.githubReleaseType == SOBuildConfig.ReleaseType.Prerelease) arguments.Append(" --prerelease");
 
         return BuildProcess.Gh(arguments.ToString(), 30 * 60);
     }

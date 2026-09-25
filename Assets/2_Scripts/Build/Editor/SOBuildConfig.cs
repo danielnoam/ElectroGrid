@@ -13,6 +13,13 @@ internal class SOBuildConfig : ScriptableObject
 {
     public const string AssetPath = "Assets/Settings/Build/BuildConfig.asset";
 
+    public enum ReleaseType
+    {
+        Draft,
+        Prerelease,
+        Published
+    }
+
     public enum TargetKind
     {
         AndroidApk,
@@ -45,9 +52,9 @@ internal class SOBuildConfig : ScriptableObject
     public bool requireValidLevels = true;
 
     public bool uploadToGitHub;
-    [Tooltip("Create the release as a draft, to review before it goes public")]
-    public bool githubDraft = true;
-    public bool githubPrerelease;
+    [Tooltip("Draft: only you can see it, to test before publishing. Prerelease: public but marked as a test build. " +
+             "Published: public. The in-game updater only offers Published releases.")]
+    public ReleaseType githubReleaseType = ReleaseType.Draft;
     [Tooltip("If this version was already released, replace its files and move its tag to the current commit instead of stopping. " +
              "It stays draft or published as it was. Players already on this version are not offered the new build.")]
     public bool replaceExistingRelease;
