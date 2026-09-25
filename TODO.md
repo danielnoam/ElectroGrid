@@ -356,13 +356,19 @@ needed no new fields and no level asset was retuned.
 
 ### Ships broken on modern phones — do these first
 
-- [ ] **No safe-area handling.** Nothing in the project references
-      `Screen.safeArea`. This is a portrait game with a top bar and a bottom bar,
-      so on any notched or punch-hole Android phone, or an iPhone with a Dynamic
-      Island, both bars sit partly under the cutout and the home indicator. The
-      fix is a small component that insets a `RectTransform` by
-      `Screen.safeArea`, applied to the top and bottom bar containers in both
-      scenes.
+- [x] **Safe area handled.** `SafeAreaMargin` keeps edge-anchored UI clear of
+      cutouts and the home indicator, but only moves an element when the unsafe
+      area reaches it: distance from the edge = max(designed margin, inset + 16
+      − content clearance). Unity's built-in uGUI `SafeArea` would have added the
+      full inset on top of the existing margins, dropping the Match3 top bar
+      about 150 units on an iPhone for nothing. It is on the Match3 top bar, the
+      menu's bottom corner buttons (clearance 105), and the Credits and Level
+      Select back bars. `BottomBarUI` resolves its shown position through the
+      same method, since it animates its own position. The windows were checked
+      and already clear the home indicator.
+      **Playtest in the Device Simulator:** an iPhone with a Dynamic Island, a
+      notched or punch-hole Android, and a phone without a cutout (nothing
+      should move).
 - [ ] **`AndroidTargetSdkVersion` is 0**, meaning "Automatic (highest
       installed)". The API level a build targets then depends on whichever SDK
       happens to be installed on the machine doing the build, so it can change

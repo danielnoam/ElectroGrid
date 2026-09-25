@@ -121,8 +121,10 @@ public class BottomBarUI : MonoBehaviour
 
         _bottomBarSequence.Stop();
         
-        var startYPosition = show ? -_rectTransform.sizeDelta.y : _bottomBarDefaultYPosition;
-        var endYPosition = show ? _bottomBarDefaultYPosition : -_rectTransform.sizeDelta.y;
+        // Resolved on every toggle, the safe area can change between levels (rotation, simulator)
+        float shownYPosition = SafeAreaMargin.ResolveDistance(_rectTransform, SafeAreaMargin.Edge.Bottom, _bottomBarDefaultYPosition);
+        var startYPosition = show ? -_rectTransform.sizeDelta.y : shownYPosition;
+        var endYPosition = show ? shownYPosition : -_rectTransform.sizeDelta.y;
         
         _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, startYPosition);
         
