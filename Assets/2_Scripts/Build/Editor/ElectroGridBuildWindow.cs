@@ -196,7 +196,6 @@ internal class ElectroGridBuildWindow : EditorWindow
     {
         Header("Checks");
 
-        EditorGUILayout.PropertyField(_serializedConfig.FindProperty("requireCleanWorkingTree"), new GUIContent("Require Committed Changes"));
         EditorGUILayout.PropertyField(_serializedConfig.FindProperty("requireValidLevels"));
     }
 

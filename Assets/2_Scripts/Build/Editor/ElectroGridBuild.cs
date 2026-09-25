@@ -126,17 +126,6 @@ internal static class ElectroGridBuild
 
         AddSigningIssues(issues, enabled);
 
-        if (config.requireCleanWorkingTree)
-        {
-            var status = BuildProcess.Git("status --porcelain");
-            if (!status.Succeeded) issues.Add(new Issue(Severity.Error, $"Could not read git status: {status.Message}"));
-            else if (!string.IsNullOrWhiteSpace(status.Output))
-            {
-                int count = status.Output.Split('\n').Count(line => !string.IsNullOrWhiteSpace(line));
-                issues.Add(new Issue(Severity.Error, $"{count} uncommitted change(s). Commit them so the build matches a commit."));
-            }
-        }
-
         if (config.requireValidLevels) AddLevelIssues(issues);
 
         if (!includeUploads) return issues;

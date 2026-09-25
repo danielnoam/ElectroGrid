@@ -25,8 +25,7 @@ MonoBehaviour:
   zipWindowsBuild: 1
   requireCleanWorkingTree: 1
   requireValidLevels: 1
-  uploadToGitHub: 0
-  githubDraft: 1
-  githubPrerelease: 0
+  uploadToGitHub: 1
+  githubReleaseType: 0
   replaceExistingRelease: 0
   copyToFolder: 0

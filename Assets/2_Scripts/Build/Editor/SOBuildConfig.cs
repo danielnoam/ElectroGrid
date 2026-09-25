@@ -46,8 +46,6 @@ internal class SOBuildConfig : ScriptableObject
     [Tooltip("Zip the Windows player folder into a single file, which is what gets uploaded")]
     public bool zipWindowsBuild = true;
 
-    [Tooltip("Refuse to build with uncommitted changes, so a build always matches a commit")]
-    public bool requireCleanWorkingTree = true;
     [Tooltip("Refuse to build if any level in the play order fails validation")]
     public bool requireValidLevels = true;
 

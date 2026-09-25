@@ -540,7 +540,7 @@ needed no new fields and no level asset was retuned.
       Output goes to `Builds/<version>/`, which git ignores. The active platform
       builds first and is restored after. Version bump buttons; the Android
       version code is derived from the version (1.2.3 → 10203). Checks before
-      building: committed changes, level validation, and for GitHub `gh`
+      building: level validation, and for GitHub `gh`
       installed and signed in, the tag not already released, and HEAD pushed.
       Uploads: GitHub Release through `gh` (draft by default, notes from commit
       subjects since the last tag) and Copy To Folder. **Replace Existing Release**
