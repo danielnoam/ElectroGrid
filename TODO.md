@@ -373,7 +373,8 @@ needed no new fields and no level asset was retuned.
       `[InitializeOnLoad]` editor script that reapplies it on every script
       reload, so switching back to Automatic does not stick. Change
       `AndroidSdkPin.TargetSdk` to move it. The installed SDK has 34, 36 and 37;
-      bump it when Google Play's August deadline moves. Min SDK stays 23.
+      bump it when Google Play's August deadline moves. Min SDK is 26 (Android 8),
+      raised from 23 by Unity 6.6 when it upgraded the project settings.
 - [x] **`Assets/link.xml` keeps `Assembly-CSharp` from IL2CPP stripping**, so the
       `[SerializeReference]` objectives, lose conditions and grid converters, which
       only ever come into being through the deserialiser, survive any stripping
