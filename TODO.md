@@ -537,6 +537,57 @@ needed no new fields and no level asset was retuned.
 
 ### Features
 
+- [x] **Build window (`ElectroGrid > Build`).** Builds the enabled targets one
+      after another from Unity 6 Build Profiles: Android APK and Windows, zipped.
+      Output goes to `Builds/<version>/`, which git ignores. The active platform
+      builds first and is restored after. Version bump buttons; the Android
+      version code is derived from the version (1.2.3 → 10203). Checks before
+      building: committed changes, level validation, and for GitHub `gh`
+      installed and signed in, the tag not already released, and HEAD pushed.
+      Uploads: GitHub Release through `gh` (draft by default, notes from commit
+      subjects since the last tag) and Copy To Folder. The same pipeline runs
+      headless with `-executeMethod ElectroGridBuild.BuildFromCommandLine`
+      (add `-noUpload` to only build). Config: `Assets/Settings/Build/BuildConfig.asset`.
+      **First use:** install `gh` (`winget install --id GitHub.cli`), run
+      `gh auth login`, then click the two Create Profile buttons in the window.
+      **Not yet run end to end:** it compiles, but no build or upload has
+      actually been made with it.
+      Android signing: release APKs must be signed with the release keystore at
+      `%USERPROFILE%.android-keystoreslectrogrid.keystore` (alias `electrogrid`),
+      outside the repo and backed up. The password is session-only in the window,
+      or `ELECTROGRID_KEYSTORE_PASSWORD` for headless builds. It is applied for the
+      build only, then ProjectSettings is restored. The build folder can be any
+      folder (Browse). First release is v1.0.0 (Android code 10000).
+      Later: AAB for Google Play, WebGL (needs Firebase compiled out),
+      itch.io through butler, Firebase App Distribution.
+
+- [ ] **In-game updater for the APK and Windows builds.** Check GitHub Releases
+      for a newer version, then download and install it from inside the game.
+      Builds on the build window's GitHub upload: the release tag `v<version>`
+      and the attached `ElectroGrid-<version>.apk` and
+      `ElectroGrid-<version>-Windows.zip`. Things to get right:
+
+      - **Checking:** `GET api.github.com/repos/danielnoam/ElectroGrid/releases/latest`
+        and compare its tag with `Application.version`. Only works while the repo
+        is **public**. A private repo would need a token baked into the game,
+        which can't be shipped. Draft and prerelease releases are skipped by
+        `latest`, which is the right behaviour. Unauthenticated calls are limited
+        to 60 an hour per IP, so check once per launch at most.
+      - **Android:** download the APK to `persistentDataPath`, then hand it to the
+        system installer through a `FileProvider` intent. That needs the
+        `REQUEST_INSTALL_PACKAGES` permission and the user approving "install
+        unknown apps" once. **Updates only install over an APK signed with the same
+        key**, so this needs the release keystore first: debug keys differ per
+        machine. Google Play forbids self-updating apps, so the updater must be off
+        in any Play build (a define or build profile flag).
+      - **Windows:** the running exe can't overwrite itself. Download the zip, then
+        launch a small helper (a script or tiny exe) that waits for the game to
+        exit, extracts over the install folder, and relaunches.
+      - **UI:** a non-blocking "Update available (vX)" prompt on the main menu with
+        download progress, and never interrupting a level.
+      - **Safety:** verify the download size, and ideally a SHA-256 published in
+        the release notes, before installing.
+
 - [x] **Camera tilt.** `CameraManager` sways the camera
       by up to 4% of the orthographic size. The camera is orthographic, so a real
       rotation would barely show; the sway plus `ParallaxLayer` (the menu
