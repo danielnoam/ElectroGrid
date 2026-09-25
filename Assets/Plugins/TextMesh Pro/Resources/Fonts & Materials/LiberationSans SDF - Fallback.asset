@@ -236,35 +236,35 @@ MonoBehaviour:
   m_FontFeatureTable:
     m_MultipleSubstitutionRecords: []
     m_LigatureSubstitutionRecords:
-    - m_ComponentGlyphIDs: 19050000fa040000f4040000
+    - m_ComponentGlyphIDs: 19050000fa040000f4040000u
       m_LigatureGlyphID: 2262
-    - m_ComponentGlyphIDs: 19050000f4040000fa040000
+    - m_ComponentGlyphIDs: 19050000f4040000fa040000u
       m_LigatureGlyphID: 2262
-    - m_ComponentGlyphIDs: 19050000f9040000f4040000
+    - m_ComponentGlyphIDs: 19050000f9040000f4040000u
       m_LigatureGlyphID: 2261
-    - m_ComponentGlyphIDs: 19050000f4040000f9040000
+    - m_ComponentGlyphIDs: 19050000f4040000f9040000u
       m_LigatureGlyphID: 2261
-    - m_ComponentGlyphIDs: 19050000f4040000
+    - m_ComponentGlyphIDs: 19050000f4040000u
       m_LigatureGlyphID: 2285
-    - m_ComponentGlyphIDs: 19050000fa040000
+    - m_ComponentGlyphIDs: 19050000fa040000u
       m_LigatureGlyphID: 2260
-    - m_ComponentGlyphIDs: 19050000f9040000
+    - m_ComponentGlyphIDs: 19050000f9040000u
       m_LigatureGlyphID: 2259
-    - m_ComponentGlyphIDs: 03050000f4040000
+    - m_ComponentGlyphIDs: 03050000f4040000u
       m_LigatureGlyphID: 2268
-    - m_ComponentGlyphIDs: 02050000f4040000
+    - m_ComponentGlyphIDs: 02050000f4040000u
       m_LigatureGlyphID: 2267
-    - m_ComponentGlyphIDs: 05050000f1040000
+    - m_ComponentGlyphIDs: 05050000f1040000u
       m_LigatureGlyphID: 2287
-    - m_ComponentGlyphIDs: 05050000f4040000
+    - m_ComponentGlyphIDs: 05050000f4040000u
       m_LigatureGlyphID: 2270
-    - m_ComponentGlyphIDs: 000500000c050000
+    - m_ComponentGlyphIDs: 000500000c050000u
       m_LigatureGlyphID: 2291
-    - m_ComponentGlyphIDs: 00050000f4040000
+    - m_ComponentGlyphIDs: 00050000f4040000u
       m_LigatureGlyphID: 2582
-    - m_ComponentGlyphIDs: 00050000f0040000
+    - m_ComponentGlyphIDs: 00050000f0040000u
       m_LigatureGlyphID: 2264
-    - m_ComponentGlyphIDs: 00050000ef040000
+    - m_ComponentGlyphIDs: 00050000ef040000u
       m_LigatureGlyphID: 2263
     m_GlyphPairAdjustmentRecords:
     - m_FirstAdjustmentRecord:

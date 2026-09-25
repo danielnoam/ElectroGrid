@@ -326,10 +326,14 @@ internal static class ElectroGridBuild
             }
 
             step.ArtifactPath = playerPath;
+            DeleteDoNotShipFolders(platformFolder);
 
             if (target.kind == SOBuildConfig.TargetKind.Windows && config.zipWindowsBuild)
             {
                 step.ArtifactPath = ZipWindowsBuild(Path.GetDirectoryName(playerPath), outputFolder);
+
+                // The zip is what gets uploaded and copied, the loose folder would only be a second copy
+                Directory.Delete(platformFolder, true);
             }
 
             step.Succeeded = true;
@@ -360,14 +364,24 @@ internal static class ElectroGridBuild
         foreach (string file in Directory.GetFiles(playerFolder, "*", SearchOption.AllDirectories))
         {
             string relative = Path.GetRelativePath(playerFolder, file).Replace('\\', '/');
-
-            // Debug symbols Unity writes next to the player and explicitly marks as not for shipping
-            if (relative.Contains("_DoNotShip")) continue;
-
             archive.CreateEntryFromFile(file, $"{ExecutableName}/{relative}", System.IO.Compression.CompressionLevel.Optimal);
         }
 
         return zipPath;
+    }
+
+    /// <summary>
+    /// Burst's debug symbols, which Unity writes next to the player and names so they are not shipped. They only
+    /// help decode a native crash's call stack, so they are removed rather than left to be copied or uploaded.
+    /// </summary>
+    private static void DeleteDoNotShipFolders(string folder)
+    {
+        if (!Directory.Exists(folder)) return;
+
+        foreach (string directory in Directory.GetDirectories(folder, "*_DoNotShip", SearchOption.AllDirectories))
+        {
+            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+        }
     }
 
     private static void RestorePlatform(BuildProfile previousProfile, BuildTarget previousTarget)

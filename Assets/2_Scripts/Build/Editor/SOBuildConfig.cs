@@ -43,7 +43,7 @@ internal class SOBuildConfig : ScriptableObject
 
     [Tooltip("The project default, relative to the project folder. Each machine can pick its own folder in the build window. Each run goes into <folder>/<version>/")]
     public string outputRoot = "Builds";
-    [Tooltip("Zip the Windows player folder into a single file, which is what gets uploaded")]
+    [Tooltip("Zip the Windows player folder into a single file, which is what gets uploaded, and delete the unzipped folder")]
     public bool zipWindowsBuild = true;
 
     [Tooltip("Refuse to build if any level in the play order fails validation")]
