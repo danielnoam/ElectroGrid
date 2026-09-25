@@ -369,22 +369,19 @@ needed no new fields and no level asset was retuned.
       **Playtest in the Device Simulator:** an iPhone with a Dynamic Island, a
       notched or punch-hole Android, and a phone without a cutout (nothing
       should move).
-- [ ] **`AndroidTargetSdkVersion` is 0**, meaning "Automatic (highest
-      installed)". The API level a build targets then depends on whichever SDK
-      happens to be installed on the machine doing the build, so it can change
-      silently between machines or after an SDK update. Google Play also enforces
-      a minimum target API for new uploads. Pin it to a specific level.
-- [ ] **Verify a device build still loads levels, before trusting IL2CPP
-      stripping.** Android builds with IL2CPP, there is no `link.xml` and no
-      `[Preserve]` anywhere, and the `[SerializeReference]` subclasses
-      (`GetMatches`, `MoveLimit`, `TimeLimit`, `DestroyObstaclesObjective`,
-      `ReachBottomObjective`, `GetSpecificItemMatches`) are never constructed in
-      runtime code — they only ever come into being through Unity's deserialiser.
-      Types reachable only through serialised data are the classic thing managed
-      stripping removes. If it happens, every level loads with null objectives and
-      conditions and becomes unwinnable, and it will only show up on device, never
-      in the editor. Cheap insurance is a `link.xml` preserving the assembly, or
-      `[Preserve]` on those six classes.
+- [x] **Android target API pinned to 36** (Android 16) by `AndroidSdkPin`, an
+      `[InitializeOnLoad]` editor script that reapplies it on every script
+      reload, so switching back to Automatic does not stick. Change
+      `AndroidSdkPin.TargetSdk` to move it. The installed SDK has 34, 36 and 37;
+      bump it when Google Play's August deadline moves. Min SDK stays 23.
+- [x] **`Assets/link.xml` keeps `Assembly-CSharp` from IL2CPP stripping**, so the
+      `[SerializeReference]` objectives, lose conditions and grid converters, which
+      only ever come into being through the deserialiser, survive any stripping
+      level. It preserves the whole assembly rather than a list, so a new
+      objective type cannot be forgotten. The project sets no stripping level, so
+      Unity's default applies; this keeps game code safe whatever it is raised to.
+      **Still confirm on device:** the first release APK loads a level with its
+      objectives and lose conditions showing.
 - [x] **Frame rate is no longer hardcoded to 120.** `GameManager.ApplyFrameRate`
       now defaults to 60 on mobile and reads `SettingsData.highFrameRate`. See the
       frame rate item in Features for the one editor step still open.

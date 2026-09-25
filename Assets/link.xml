@@ -1,0 +1,16 @@
+<!--
+    Keeps the game's own code out of IL2CPP managed code stripping.
+
+    Level objectives (GetMatches, GetSpecificItemMatches, DestroyObstaclesObjective, ReachBottomObjective),
+    lose conditions (MoveLimit, TimeLimit) and grid converters (VerticalConvertor, HorizontalConvertor) are
+    stored with [SerializeReference]. Nothing in runtime code ever constructs them; they only exist because
+    Unity's deserialiser creates them from level data. That is exactly what the stripper cannot see, so at a
+    higher stripping level they would be removed and every level would load with no objectives, which only
+    shows up on device, never in the editor.
+
+    The whole assembly is preserved rather than a list of those types, because a list silently breaks the
+    first time a new objective or condition is added. Game code is small, so the size cost is negligible.
+-->
+<linker>
+    <assembly fullname="Assembly-CSharp" preserve="all"/>
+</linker>

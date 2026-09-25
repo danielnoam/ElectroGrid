@@ -15,11 +15,11 @@ MonoBehaviour:
   targets:
   - enabled: 1
     kind: 0
-    profile: {fileID: 0}
+    profile: {fileID: 11400000, guid: fbf15251d34a56a4e93ddc7cecd78f7e, type: 2}
     developmentBuild: 0
   - enabled: 1
     kind: 1
-    profile: {fileID: 0}
+    profile: {fileID: 11400000, guid: 646d99eb6e221fa4c9f592cc8b54d1e4, type: 2}
     developmentBuild: 0
   outputRoot: Builds
   zipWindowsBuild: 1

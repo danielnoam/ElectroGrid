@@ -48,6 +48,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
   gridPadding: 2
+  tiltMaxOffset: 0.01
+  tiltForFullOffset: 1
+  tiltSmoothing: 6
+  tiltRestAdaptSpeed: 0.5
   cam: {fileID: 4109152611936495486}
   gridSize: {x: 10, y: 10}
 --- !u!20 &4109152611936495486
