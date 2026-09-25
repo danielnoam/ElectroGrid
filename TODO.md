@@ -459,17 +459,15 @@ needed no new fields and no level asset was retuned.
       minimum give it the same switch; better, skip the write when the scale has
       not meaningfully changed, or only recompute when the pointer actually moved.
 
-- [ ] **The menu background pulse creates ~576 tweens every 0.45s.**
-      `BackgroundManager.PulseFromCenter` runs on a `pulseInterval` of 0.45 in the
-      Main scene and calls `SquashTile` on all 288 tiles. Each of those builds a
-      PrimeTween `Sequence` of two tweens, so the menu sustains roughly 1,300
-      tween allocations a second while just sitting there. That is very likely why
-      `GameManager` raises the capacity to 1,600.
-
-      Unlike the hover effect this is a deliberate visual, so it was left alone.
-      Options if it shows up in a profile: pulse a subset rather than the whole
-      grid, drive it from one shared tween evaluated per tile, or lengthen the
-      interval.
+- [x] **Menu background pulse is one tween per pulse.** It used to build a
+      two-tween sequence on each of the 288 tiles every 0.45s (~1,300 tweens a
+      second). Now `BackgroundManager` caches each tile's ring delay once, and
+      a single `Tween.Custom` per pulse calls `Match3BackgroundTile.EvaluateSquash`
+      with the same curve (linear down over 30%, `OutSine` back up over 70%).
+      Tiles at rest are skipped. The look is meant to be identical, so compare it
+      by eye. `GameManager` still raises the tween capacity to 1,600, since the
+      Match3 line break still squashes background tiles one tween each; lower it
+      only after profiling.
 
 > **The pooling and audio systems are being replaced by the DNExtensions update
 > (section 5).** The three items below live entirely inside code that is going
@@ -513,7 +511,8 @@ needed no new fields and no level asset was retuned.
 - [x] **`AllowOnlyOneObjectiveOfThisType` now does something.** It was declared
       and read by nothing; the level validator uses it to warn when a level has
       two objectives of a type that only allows one.
-- [ ] **`ObstaclesBroken` and `BottomObjectsReached` are write-only.**
+- [x] ~~**`ObstaclesBroken` and `BottomObjectsReached` are write-only.**~~
+      *Won't do: not a problem as they are.*
       Incremented in `Match3LevelData` and read by nothing. Firebase logs
       `matches_made`, `moves_made` and `time_spent_seconds` but not these, and
       the level complete window shows Pieces Cleared and Moves Made but not

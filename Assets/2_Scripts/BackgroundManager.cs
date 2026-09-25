@@ -6,6 +6,8 @@ using PrimeTween;
 
 public class BackgroundManager : MonoBehaviour
 {
+    private const float PulseRingDelay = 0.02f;
+
     [Header("Mouse Interaction")]
     [SerializeField] private bool mouseInteractionEffect = true;
     [SerializeField] private float maxScaleMultiplier = 1f;
@@ -27,6 +29,9 @@ public class BackgroundManager : MonoBehaviour
     private Camera _camera;
     private TouchInputReader _inputReader;
     private float _pulseTimer;
+    private float[] _pulseDelays;
+    private float _pulseLength;
+    private Tween _pulseTween;
     private Vector2 _lastPointerPosition = Vector2.positiveInfinity;
 
     private void Awake()
@@ -42,6 +47,11 @@ public class BackgroundManager : MonoBehaviour
         }
         
         _pulseTimer = pulseInterval;
+    }
+
+    private void OnDestroy()
+    {
+        _pulseTween.Stop();
     }
 
     private void Update()
@@ -65,21 +75,49 @@ public class BackgroundManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// One tween per pulse drives every tile, rather than a two-tween sequence per tile, which on the menu grid
+    /// was around 576 tweens every pulse. Each tile's ring delay is fixed, so it is worked out once up front.
+    /// </summary>
     private void PulseFromCenter()
     {
         if (backgroundTiles.Count == 0) return;
-        
-        var centerOfGrid = new Vector2(grid.Width / 2f, grid.Height / 2f);
+        if (_pulseDelays == null || _pulseDelays.Length != backgroundTiles.Count) CachePulseDelays();
 
-        foreach (var tile in backgroundTiles)
+        _pulseTween.Stop();
+        _pulseTween = Tween.Custom(this, 0f, _pulseLength, _pulseLength, (manager, time) => manager.ApplyPulse(time), Ease.Linear);
+    }
+
+    private void CachePulseDelays()
+    {
+        var centerOfGrid = new Vector2(grid.Width / 2f, grid.Height / 2f);
+        _pulseDelays = new float[backgroundTiles.Count];
+        float longestDelay = 0f;
+        float squashDuration = 0f;
+
+        for (int i = 0; i < backgroundTiles.Count; i++)
         {
+            var tile = backgroundTiles[i];
             if (!tile) continue;
-            
+
             var tileGridPosition = grid.GetCell(tile.transform.position);
             float distanceFromCenter = Vector2.Distance(tileGridPosition, centerOfGrid);
-            int delayMultiplier = Mathf.RoundToInt(distanceFromCenter);
-            
-            tile.SquashTile(delayMultiplier);
+
+            // Whole rings, so a ring of tiles squashes together rather than as a smooth gradient
+            _pulseDelays[i] = PulseRingDelay * Mathf.RoundToInt(distanceFromCenter);
+            longestDelay = Mathf.Max(longestDelay, _pulseDelays[i]);
+            squashDuration = Mathf.Max(squashDuration, tile.SquashDuration);
+        }
+
+        _pulseLength = longestDelay + squashDuration;
+    }
+
+    private void ApplyPulse(float time)
+    {
+        for (int i = 0; i < backgroundTiles.Count; i++)
+        {
+            var tile = backgroundTiles[i];
+            if (tile) tile.EvaluateSquash(time - _pulseDelays[i]);
         }
     }
 
@@ -123,6 +161,9 @@ public class BackgroundManager : MonoBehaviour
     [Button]
     private void ClearBackground()
     {
+        _pulseTween.Stop();
+        _pulseDelays = null;
+
         var tilesToClear = new List<Match3BackgroundTile>(backgroundTiles);
     
         foreach (Match3BackgroundTile tile in tilesToClear)
