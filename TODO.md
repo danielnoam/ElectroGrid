@@ -305,7 +305,14 @@ needed no new fields and no level asset was retuned.
       - The window defers GUI-changing actions one way (`Defer`) instead of three
         (an enum, an Action and a pending-selection flag). `Validate All` validates
         each level once instead of twice. Clear buttons share `ResetCells`.
-      - Layout: sidebar actions are paired into rows. In the level pane the paint
+      - Sidebar (reworked again): one drag-to-reorder list that is the play
+        order (number, validation dot, name), right-click for Ping, Duplicate,
+        Remove From Play Order and Delete (to trash, confirmed). Levels in the
+        folder but not in the play order sit under "Not In Game" with Add and
+        Add All. Toolbar: New, Duplicate, Validate All. Refresh is automatic on
+        project changes, and the folder field sits at the bottom as "New Levels
+        Folder".
+      - Layout: in the level pane the paint
         grid now comes straight after the Grid Shape field, followed by the two
         randomiser foldouts ("Randomize Grid Shape", then "Randomize Tile
         Objects", renamed from "Randomize"), then validation.
@@ -525,15 +532,16 @@ needed no new fields and no level asset was retuned.
 
 ### Features
 
-- [x] **Camera tilt.** `CameraTilt` on the CameraManager prefab sways the camera
+- [x] **Camera tilt.** `CameraManager` sways the camera
       by up to 4% of the orthographic size. The camera is orthographic, so a real
       rotation would barely show; the sway plus `ParallaxLayer` (the menu
       background follows 60% of it) is what gives depth. Input is the mouse
       position on desktop and the device's tilt on mobile: `GravitySensor`,
       falling back to `Accelerometer`, measured against a resting angle that
       drifts toward however the phone is held, so it reacts to a change of angle
-      and then settles. It moves a runtime parent (`CameraTiltRig`), so it adds to
-      the shake instead of fighting it. A **Tilt** toggle sits under Screen Shake
+      and then settles. The shake now shakes offsets (`Tween.ShakeCustom`) rather
+      than the transform, and `CameraManager` writes resting position + tilt +
+      shake each LateUpdate, so the two add up with no extra objects. A **Tilt** toggle sits under Screen Shake
       in settings (default on; row spacing 60 → 50 to fit), and turning it off
       disables the sensor. In levels there is deliberately no parallax: the
       board cells and background tiles form one continuous grid, so they sway

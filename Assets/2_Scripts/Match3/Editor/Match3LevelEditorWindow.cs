@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -13,7 +14,6 @@ internal class Match3LevelEditorWindow : EditorWindow
     private const float SidebarWidth = 270f;
     private const float CellSize = Match3LevelGridGUI.DefaultCellSize;
     private static readonly Vector2 MinWindowSize = new Vector2(620f, 420f);
-    private static readonly Color SelectedLevelColor = new Color(0.4f, 0.7f, 1f);
 
     // Serialized so it survives an assembly reload, and mirrored into EditorPrefs so it survives a restart
     [SerializeField] private string _levelsFolder;
@@ -29,11 +29,12 @@ internal class Match3LevelEditorWindow : EditorWindow
     private Action _deferredAction;
 
     private Vector2 _sidebarScroll;
-    private Vector2 _orderScroll;
     private Vector2 _editorScroll;
-    private bool _orderFoldout;
-    private GUIStyle _levelButtonStyle;
-    private GUIStyle _selectedLevelButtonStyle;
+    private ReorderableList _orderList;
+    private readonly List<SOMatch3Level> _unlisted = new List<SOMatch3Level>();
+    private bool _unlistedFoldout = true;
+    private GUIStyle _rowStyle;
+    private GUIStyle _selectedRowStyle;
 
     private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
     private bool _isDragging;
@@ -97,6 +98,12 @@ internal class Match3LevelEditorWindow : EditorWindow
         RefreshLevels();
     }
 
+    private void OnProjectChange()
+    {
+        if (!Match3LevelRegistry.Prefab) Match3LevelRegistry.ClearCache();
+        RefreshLevels();
+    }
+
     private void OnGUI()
     {
         EditorGUILayout.BeginHorizontal();
@@ -121,24 +128,185 @@ internal class Match3LevelEditorWindow : EditorWindow
 
     private void DrawSidebar()
     {
+        _rowStyle ??= new GUIStyle(EditorStyles.label) { richText = true };
+        _selectedRowStyle ??= new GUIStyle(_rowStyle) { fontStyle = FontStyle.Bold };
+
         EditorGUILayout.BeginVertical(GUILayout.Width(SidebarWidth), GUILayout.ExpandHeight(true));
 
+        DrawSidebarToolbar();
+
+        _sidebarScroll = EditorGUILayout.BeginScrollView(_sidebarScroll);
+
+        if (Match3LevelRegistry.Prefab)
+        {
+            GetOrderList().DoLayoutList();
+        }
+        else
+        {
+            EditorGUILayout.HelpBox("No GameManager prefab found, so the play order cannot be shown or edited.", MessageType.Warning);
+        }
+
+        DrawUnlistedLevels();
+
+        EditorGUILayout.EndScrollView();
+
         DrawFolderField();
-
-        EditorGUILayout.Space(4);
-        EditorGUILayout.LabelField($"Levels ({_levels.Count})", EditorStyles.boldLabel);
-        DrawLevelList();
-
-        EditorGUILayout.Space(4);
-        DrawLevelActions();
-        DrawPlayOrder();
 
         EditorGUILayout.EndVertical();
     }
 
+    private void DrawSidebarToolbar()
+    {
+        bool hasFolder = !string.IsNullOrEmpty(_levelsFolder) && AssetDatabase.IsValidFolder(_levelsFolder);
+
+        EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
+
+        using (new EditorGUI.DisabledScope(!hasFolder))
+        {
+            if (GUILayout.Button("New", EditorStyles.toolbarButton)) Defer(CreateLevel);
+        }
+
+        using (new EditorGUI.DisabledScope(!_selectedLevel))
+        {
+            if (GUILayout.Button("Duplicate", EditorStyles.toolbarButton)) Defer(() => DuplicateLevel(_selectedLevel));
+        }
+
+        GUILayout.FlexibleSpace();
+
+        using (new EditorGUI.DisabledScope(_playOrder.Count == 0 && _levels.Count == 0))
+        {
+            if (GUILayout.Button("Validate All", EditorStyles.toolbarButton)) Defer(ValidateAll);
+        }
+
+        EditorGUILayout.EndHorizontal();
+    }
+
+    /// <summary>
+    /// The GameManager array is the play order, not just a bag of levels — Match3GameManager walks it
+    /// by index — so this list is the progression itself, and dragging a row reorders the game.
+    /// </summary>
+    private ReorderableList GetOrderList()
+    {
+        if (_orderList != null && _orderList.list == _playOrder) return _orderList;
+
+        _orderList = new ReorderableList(_playOrder, typeof(SOMatch3Level), true, true, false, false)
+        {
+            elementHeight = EditorGUIUtility.singleLineHeight + 4f,
+            drawHeaderCallback = rect => EditorGUI.LabelField(rect, $"Play Order ({_playOrder.Count})", EditorStyles.boldLabel),
+            drawElementCallback = DrawOrderRow,
+            onReorderCallback = _ => Defer(CommitPlayOrder),
+            onSelectCallback = list =>
+            {
+                var level = list.index >= 0 && list.index < _playOrder.Count ? _playOrder[list.index] : null;
+                if (level) Defer(() => SelectLevel(level));
+            }
+        };
+
+        _orderList.index = _playOrder.IndexOf(_selectedLevel);
+
+        return _orderList;
+    }
+
+    private void DrawOrderRow(Rect rect, int index, bool isActive, bool isFocused)
+    {
+        if (index < 0 || index >= _playOrder.Count) return;
+
+        var level = _playOrder[index];
+        rect.y += 2f;
+        rect.height = EditorGUIUtility.singleLineHeight;
+
+        string name = level ? level.name : "(missing)";
+        string dot = level ? ValidationDot(level) : "<color=#FF5252>●</color>";
+        var style = level == _selectedLevel ? _selectedRowStyle : _rowStyle;
+        EditorGUI.LabelField(rect, $"{index + 1,2}.  {dot}  {name}", style);
+
+        Event e = Event.current;
+        if (e.type != EventType.ContextClick || !rect.Contains(e.mousePosition)) return;
+
+        ShowLevelMenu(level, index);
+        e.Use();
+    }
+
+    private void ShowLevelMenu(SOMatch3Level level, int orderIndex)
+    {
+        var menu = new GenericMenu();
+
+        if (level)
+        {
+            menu.AddItem(new GUIContent("Ping"), false, () => EditorGUIUtility.PingObject(level));
+            menu.AddItem(new GUIContent("Duplicate"), false, () => Defer(() => DuplicateLevel(level)));
+        }
+
+        if (orderIndex >= 0)
+        {
+            menu.AddItem(new GUIContent("Remove From Play Order"), false, () => Defer(() => RemoveFromPlayOrder(orderIndex)));
+        }
+        else if (level)
+        {
+            menu.AddItem(new GUIContent("Add To Play Order"), false, () => Defer(() => AddToPlayOrder(level)));
+        }
+
+        if (level)
+        {
+            menu.AddSeparator("");
+            menu.AddItem(new GUIContent("Delete Level..."), false, () => Defer(() => DeleteLevel(level)));
+        }
+
+        menu.ShowAsContext();
+    }
+
+    /// <summary>Levels in the folder that the game can never reach, because nothing puts them in the play order.</summary>
+    private void DrawUnlistedLevels()
+    {
+        _unlisted.Clear();
+        foreach (var level in _levels)
+        {
+            if (level && !_playOrder.Contains(level)) _unlisted.Add(level);
+        }
+
+        if (_unlisted.Count == 0) return;
+
+        EditorGUILayout.Space(6);
+        EditorGUILayout.BeginHorizontal();
+        _unlistedFoldout = EditorGUILayout.Foldout(_unlistedFoldout, $"Not In Game ({_unlisted.Count})", true, EditorStyles.foldoutHeader);
+
+        using (new EditorGUI.DisabledScope(!Match3LevelRegistry.Prefab))
+        {
+            if (GUILayout.Button("Add All", EditorStyles.miniButton, GUILayout.Width(60f))) Defer(AddUnregisteredToPlayOrder);
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        if (!_unlistedFoldout) return;
+
+        foreach (var level in _unlisted)
+        {
+            EditorGUILayout.BeginHorizontal();
+
+            var style = level == _selectedLevel ? _selectedRowStyle : _rowStyle;
+            if (GUILayout.Button($"{ValidationDot(level)}  {level.name}", style)) Defer(() => SelectLevel(level));
+
+            Rect rowRect = GUILayoutUtility.GetLastRect();
+            Event e = Event.current;
+            if (e.type == EventType.ContextClick && rowRect.Contains(e.mousePosition))
+            {
+                ShowLevelMenu(level, -1);
+                e.Use();
+            }
+
+            using (new EditorGUI.DisabledScope(!Match3LevelRegistry.Prefab))
+            {
+                if (GUILayout.Button("Add", EditorStyles.miniButton, GUILayout.Width(40f))) Defer(() => AddToPlayOrder(level));
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+    }
+
     private void DrawFolderField()
     {
-        EditorGUILayout.LabelField("Levels Folder", EditorStyles.boldLabel);
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("New Levels Folder", EditorStyles.miniBoldLabel);
 
         var folderAsset = string.IsNullOrEmpty(_levelsFolder)
             ? null
@@ -146,90 +314,12 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         EditorGUI.BeginChangeCheck();
         var picked = (DefaultAsset)EditorGUILayout.ObjectField(folderAsset, typeof(DefaultAsset), false);
-        if (EditorGUI.EndChangeCheck())
-        {
-            string path = picked ? AssetDatabase.GetAssetPath(picked) : string.Empty;
+        if (!EditorGUI.EndChangeCheck()) return;
 
-            if (string.IsNullOrEmpty(path) || AssetDatabase.IsValidFolder(path)) SetFolder(path);
-            else Debug.LogWarning($"{path} is not a folder");
-        }
+        string path = picked ? AssetDatabase.GetAssetPath(picked) : string.Empty;
 
-        EditorGUILayout.LabelField(string.IsNullOrEmpty(_levelsFolder) ? "No folder set" : _levelsFolder, EditorStyles.miniLabel);
-    }
-
-    private void DrawLevelList()
-    {
-        _levelButtonStyle ??= new GUIStyle(EditorStyles.miniButton) { alignment = TextAnchor.MiddleLeft, richText = true };
-        _selectedLevelButtonStyle ??= new GUIStyle(_levelButtonStyle) { fontStyle = FontStyle.Bold };
-
-        _sidebarScroll = EditorGUILayout.BeginScrollView(_sidebarScroll);
-
-        if (_levels.Count == 0)
-        {
-            EditorGUILayout.HelpBox("No levels in this folder.", MessageType.Info);
-        }
-
-        foreach (var level in _levels)
-        {
-            if (!level) continue;
-
-            bool isSelected = level == _selectedLevel;
-
-            Color previousBackground = GUI.backgroundColor;
-            if (isSelected) GUI.backgroundColor = SelectedLevelColor;
-
-            int order = _playOrder.IndexOf(level);
-            string position = order >= 0 ? $"{order + 1}." : "·";
-            string label = $"{(isSelected ? "▸" : " ")} {ValidationDot(level)} {position} {level.name}";
-
-            if (GUILayout.Button(label, isSelected ? _selectedLevelButtonStyle : _levelButtonStyle, GUILayout.Height(22f)))
-            {
-                Defer(() => SelectLevel(level));
-            }
-
-            GUI.backgroundColor = previousBackground;
-        }
-
-        EditorGUILayout.EndScrollView();
-    }
-
-    private void DrawLevelActions()
-    {
-        bool hasFolder = !string.IsNullOrEmpty(_levelsFolder) && AssetDatabase.IsValidFolder(_levelsFolder);
-
-        EditorGUILayout.BeginHorizontal();
-
-        using (new EditorGUI.DisabledScope(!hasFolder))
-        {
-            if (GUILayout.Button("New Level")) Defer(CreateLevel);
-        }
-
-        using (new EditorGUI.DisabledScope(!_selectedLevel))
-        {
-            if (GUILayout.Button("Duplicate")) Defer(DuplicateSelectedLevel);
-        }
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-
-        using (new EditorGUI.DisabledScope(!_selectedLevel))
-        {
-            if (GUILayout.Button("Ping")) EditorGUIUtility.PingObject(_selectedLevel);
-        }
-
-        if (GUILayout.Button("Refresh"))
-        {
-            Match3LevelRegistry.ClearCache();
-            RefreshLevels();
-        }
-
-        EditorGUILayout.EndHorizontal();
-
-        using (new EditorGUI.DisabledScope(_levels.Count == 0))
-        {
-            if (GUILayout.Button("Validate All")) Defer(ValidateAll);
-        }
+        if (string.IsNullOrEmpty(path) || AssetDatabase.IsValidFolder(path)) SetFolder(path);
+        else Debug.LogWarning($"{path} is not a folder");
     }
 
     private string ValidationDot(SOMatch3Level level)
@@ -240,82 +330,6 @@ internal class Match3LevelEditorWindow : EditorWindow
         return severity == Match3LevelValidation.Severity.Error
             ? "<color=#FF5252>●</color>"
             : "<color=#FFC107>●</color>";
-    }
-
-    /// <summary>
-    /// The GameManager array is the play order, not just a bag of levels — Match3GameManager walks it
-    /// by index — so reordering here is the same edit as reordering the progression.
-    /// </summary>
-    private void DrawPlayOrder()
-    {
-        EditorGUILayout.Space(4);
-        _orderFoldout = EditorGUILayout.Foldout(_orderFoldout, $"Play Order ({_playOrder.Count})", true, EditorStyles.foldoutHeader);
-        if (!_orderFoldout) return;
-
-        if (!Match3LevelRegistry.Prefab)
-        {
-            EditorGUILayout.HelpBox("No GameManager prefab found, so the play order cannot be edited.", MessageType.Warning);
-            return;
-        }
-
-        // Pinned under the action buttons, so it needs its own scroll rather than the sidebar's
-        _orderScroll = EditorGUILayout.BeginScrollView(_orderScroll, GUILayout.MaxHeight(160f));
-
-        for (int i = 0; i < _playOrder.Count; i++)
-        {
-            int index = i;
-            var level = _playOrder[i];
-
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField($"{i + 1}. {(level ? level.name : "(missing)")}", EditorStyles.miniLabel);
-
-            using (new EditorGUI.DisabledScope(i == 0))
-            {
-                if (GUILayout.Button("▲", EditorStyles.miniButtonLeft, GUILayout.Width(22f))) Defer(() => MoveInPlayOrder(index, -1));
-            }
-
-            using (new EditorGUI.DisabledScope(i == _playOrder.Count - 1))
-            {
-                if (GUILayout.Button("▼", EditorStyles.miniButtonMid, GUILayout.Width(22f))) Defer(() => MoveInPlayOrder(index, 1));
-            }
-
-            if (GUILayout.Button("✕", EditorStyles.miniButtonRight, GUILayout.Width(22f))) Defer(() => RemoveFromPlayOrder(index));
-
-            EditorGUILayout.EndHorizontal();
-        }
-
-        EditorGUILayout.EndScrollView();
-
-        int unregistered = CountUnregistered();
-
-        using (new EditorGUI.DisabledScope(unregistered == 0))
-        {
-            if (GUILayout.Button(unregistered == 1 ? "Add 1 Unlisted Level" : $"Add {unregistered} Unlisted Levels"))
-            {
-                Defer(AddUnregisteredToPlayOrder);
-            }
-        }
-    }
-
-    private int CountUnregistered()
-    {
-        int count = 0;
-
-        foreach (var level in _levels)
-        {
-            if (level && !_playOrder.Contains(level)) count++;
-        }
-
-        return count;
-    }
-
-    private void MoveInPlayOrder(int index, int offset)
-    {
-        int target = index + offset;
-        if (index < 0 || index >= _playOrder.Count || target < 0 || target >= _playOrder.Count) return;
-
-        (_playOrder[index], _playOrder[target]) = (_playOrder[target], _playOrder[index]);
-        CommitPlayOrder();
     }
 
     private void RemoveFromPlayOrder(int index)
@@ -846,11 +860,11 @@ internal class Match3LevelEditorWindow : EditorWindow
         ShowNewLevel(level);
     }
 
-    private void DuplicateSelectedLevel()
+    private void DuplicateLevel(SOMatch3Level source)
     {
-        if (!_selectedLevel) return;
+        if (!source) return;
 
-        string sourcePath = AssetDatabase.GetAssetPath(_selectedLevel);
+        string sourcePath = AssetDatabase.GetAssetPath(source);
         if (string.IsNullOrEmpty(sourcePath)) return;
 
         string path = AssetDatabase.GenerateUniqueAssetPath(sourcePath);
@@ -871,6 +885,22 @@ internal class Match3LevelEditorWindow : EditorWindow
         AssetDatabase.SaveAssets();
 
         ShowNewLevel(copy);
+    }
+
+    /// <summary>Takes the level out of the play order first, then moves the asset to the OS trash so it can be recovered.</summary>
+    private void DeleteLevel(SOMatch3Level level)
+    {
+        if (!level) return;
+
+        string path = AssetDatabase.GetAssetPath(level);
+        if (!EditorUtility.DisplayDialog("Delete Level", $"Delete {level.name}?\n\n{path}\n\nIt is moved to the trash and removed from the play order.", "Delete", "Cancel")) return;
+
+        if (_playOrder.Remove(level)) CommitPlayOrder();
+        if (level == _selectedLevel) SelectLevel(null);
+
+        if (!AssetDatabase.MoveAssetToTrash(path)) Debug.LogError($"Could not delete {path}");
+
+        RefreshLevels();
     }
 
     private void ShowNewLevel(SOMatch3Level level)
@@ -908,6 +938,8 @@ internal class Match3LevelEditorWindow : EditorWindow
         _serializedLevel = level ? new SerializedObject(level) : null;
         _isDragging = false;
         _editorScroll = Vector2.zero;
+
+        if (_orderList != null) _orderList.index = level ? _playOrder.IndexOf(level) : -1;
     }
 
     private void RefreshLevels()

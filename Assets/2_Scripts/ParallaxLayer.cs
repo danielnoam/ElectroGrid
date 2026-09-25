@@ -1,7 +1,7 @@
 using UnityEngine;
 
 /// <summary>
-/// Follows part of the <see cref="CameraTilt"/> offset. An orthographic camera has no depth of its own, so a layer
+/// Follows part of the <see cref="CameraManager"/> tilt offset. An orthographic camera has no depth of its own, so a layer
 /// that moves with the camera appears to slide less on screen, which reads as further back.
 /// </summary>
 [DisallowMultipleComponent]
@@ -30,6 +30,7 @@ public class ParallaxLayer : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.localPosition = _basePosition + CameraTilt.Offset * depth;
+        Vector3 offset = CameraManager.Instance ? CameraManager.Instance.TiltOffset : Vector3.zero;
+        transform.localPosition = _basePosition + offset * depth;
     }
 }
