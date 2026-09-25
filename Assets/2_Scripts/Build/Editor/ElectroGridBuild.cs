@@ -282,7 +282,7 @@ internal static class ElectroGridBuild
     {
         var step = new StepResult { Name = $"Build {target.kind}{(target.developmentBuild ? " (development)" : "")}" };
         var timer = Stopwatch.StartNew();
-        AndroidSigning.Snapshot? signing = null;
+        bool signed = false;
 
         try
         {
@@ -296,7 +296,11 @@ internal static class ElectroGridBuild
                 EditorUserBuildSettings.buildAppBundle = false;
 
                 // Release builds were already refused without the key; a development build uses it when it is available
-                if (AndroidSigning.Verify(out _)) signing = AndroidSigning.Apply();
+                if (AndroidSigning.Verify(out _))
+                {
+                    AndroidSigning.Apply();
+                    signed = true;
+                }
             }
             else
             {
@@ -337,7 +341,7 @@ internal static class ElectroGridBuild
             }
 
             step.Succeeded = true;
-            step.Message = $"{FormatSize(SizeOf(step.ArtifactPath))}{(signing.HasValue ? ", release-signed" : "")} → {step.ArtifactPath}";
+            step.Message = $"{FormatSize(SizeOf(step.ArtifactPath))}{(signed ? ", release-signed" : "")} → {step.ArtifactPath}";
             return step;
         }
         catch (Exception e)
@@ -349,7 +353,7 @@ internal static class ElectroGridBuild
         }
         finally
         {
-            if (signing.HasValue) AndroidSigning.Restore(signing.Value);
+            if (signed) AndroidSigning.Clear();
             step.Seconds = timer.Elapsed.TotalSeconds;
         }
     }

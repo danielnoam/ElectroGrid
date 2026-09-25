@@ -81,40 +81,25 @@ internal static class AndroidSigning
         return result.Succeeded;
     }
 
-    public readonly struct Snapshot
+    /// <summary>Points the Android player settings at the release key for one build. Always followed by <see cref="Clear"/>.</summary>
+    public static void Apply()
     {
-        public readonly bool UseCustomKeystore;
-        public readonly string KeystoreName;
-        public readonly string KeyaliasName;
-
-        public Snapshot(bool useCustomKeystore, string keystoreName, string keyaliasName)
-        {
-            UseCustomKeystore = useCustomKeystore;
-            KeystoreName = keystoreName;
-            KeyaliasName = keyaliasName;
-        }
-    }
-
-    /// <summary>Points the Android player settings at the release key for one build. Returns what to restore afterwards.</summary>
-    public static Snapshot Apply()
-    {
-        var snapshot = new Snapshot(PlayerSettings.Android.useCustomKeystore, PlayerSettings.Android.keystoreName, PlayerSettings.Android.keyaliasName);
-
         PlayerSettings.Android.useCustomKeystore = true;
         PlayerSettings.Android.keystoreName = KeystorePath;
         PlayerSettings.Android.keystorePass = Password;
         PlayerSettings.Android.keyaliasName = Alias;
         PlayerSettings.Android.keyaliasPass = Password;
-
-        return snapshot;
     }
 
-    /// <summary>Puts the settings back, so the machine-specific keystore path never ends up committed in ProjectSettings.</summary>
-    public static void Restore(Snapshot snapshot)
+    /// <summary>
+    /// Leaves no keystore in the player settings. They are saved in ProjectSettings.asset, which is committed to a
+    /// public repository, and the keystore path is machine-specific and personal, so it lives in EditorPrefs instead.
+    /// </summary>
+    public static void Clear()
     {
-        PlayerSettings.Android.useCustomKeystore = snapshot.UseCustomKeystore;
-        PlayerSettings.Android.keystoreName = snapshot.KeystoreName;
-        PlayerSettings.Android.keyaliasName = snapshot.KeyaliasName;
+        PlayerSettings.Android.useCustomKeystore = false;
+        PlayerSettings.Android.keystoreName = string.Empty;
+        PlayerSettings.Android.keyaliasName = string.Empty;
         PlayerSettings.Android.keystorePass = string.Empty;
         PlayerSettings.Android.keyaliasPass = string.Empty;
     }
@@ -123,5 +108,35 @@ internal static class AndroidSigning
     {
         using var reader = new StringReader(text ?? string.Empty);
         return reader.ReadLine() ?? string.Empty;
+    }
+}
+
+/// <summary>
+/// Unity's Keystore Manager and Publishing Settings save the chosen keystore into ProjectSettings.asset. This moves
+/// it into this machine's build window settings and clears it from the project, on every script reload.
+/// </summary>
+[InitializeOnLoad]
+internal static class AndroidSigningMigration
+{
+    static AndroidSigningMigration()
+    {
+        // Deferred, player settings are not reliably writable while the domain is still loading
+        EditorApplication.delayCall += Migrate;
+    }
+
+    private static void Migrate()
+    {
+        string keystore = PlayerSettings.Android.keystoreName;
+        if (string.IsNullOrEmpty(keystore) && !PlayerSettings.Android.useCustomKeystore) return;
+
+        if (!string.IsNullOrEmpty(keystore) && !AndroidSigning.KeystoreExists)
+        {
+            AndroidSigning.KeystorePath = keystore;
+            if (!string.IsNullOrEmpty(PlayerSettings.Android.keyaliasName)) AndroidSigning.Alias = PlayerSettings.Android.keyaliasName;
+        }
+
+        AndroidSigning.Clear();
+        AssetDatabase.SaveAssets();
+        UnityEngine.Debug.Log("[Build] Moved the Android keystore out of Project Settings into this computer's build settings (ElectroGrid > Build).");
     }
 }
