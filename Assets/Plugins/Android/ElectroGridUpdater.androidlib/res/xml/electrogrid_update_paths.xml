@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Downloads land in Application.persistentDataPath/Updates, which is the external files dir when available and the internal one otherwise -->
+<paths>
+    <external-files-path name="updates_external" path="Updates/" />
+    <files-path name="updates_internal" path="Updates/" />
+</paths>

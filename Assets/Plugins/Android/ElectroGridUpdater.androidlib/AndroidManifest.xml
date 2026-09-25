@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    In-game updater (Assets/2_Scripts/Update). Merged into the app manifest at build time.
+    REQUEST_INSTALL_PACKAGES lets the game hand a downloaded APK to the system installer; Google Play restricts it,
+    so this plugin must be left out of any Play build.
+    The provider shares the downloaded APK with the installer. Its authority must match
+    UpdateInstaller.ProviderAuthority: <applicationId>.electrogrid.updates
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.danielnoam.electrogrid.updater">
+
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.electrogrid.updates"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/electrogrid_update_paths" />
+        </provider>
+    </application>
+</manifest>

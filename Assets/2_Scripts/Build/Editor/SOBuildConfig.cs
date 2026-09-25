@@ -34,7 +34,7 @@ internal class SOBuildConfig : ScriptableObject
         new Target { kind = TargetKind.Windows }
     };
 
-    [Tooltip("A folder inside the project is stored relative to it, anything else as an absolute path. Each run goes into <folder>/<version>/")]
+    [Tooltip("The project default, relative to the project folder. Each machine can pick its own folder in the build window. Each run goes into <folder>/<version>/")]
     public string outputRoot = "Builds";
     [Tooltip("Zip the Windows player folder into a single file, which is what gets uploaded")]
     public bool zipWindowsBuild = true;
@@ -48,10 +48,11 @@ internal class SOBuildConfig : ScriptableObject
     [Tooltip("Create the release as a draft, to review before it goes public")]
     public bool githubDraft = true;
     public bool githubPrerelease;
+    [Tooltip("If this version was already released, replace its files and move its tag to the current commit instead of stopping. " +
+             "It stays draft or published as it was. Players already on this version are not offered the new build.")]
+    public bool replaceExistingRelease;
 
     public bool copyToFolder;
-    [Tooltip("Absolute path, e.g. a synced Google Drive folder. Each run is copied into <folder>/<version>/")]
-    public string copyFolder = string.Empty;
 
     public static SOBuildConfig LoadOrCreate()
     {

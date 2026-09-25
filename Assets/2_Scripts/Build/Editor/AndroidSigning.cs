@@ -58,11 +58,6 @@ internal static class AndroidSigning
         }
     }
 
-    /// <summary>The PowerShell command that creates the keystore. keytool asks for the password itself, so it is never typed into a file.</summary>
-    public static string CreateCommand =>
-        $"New-Item -ItemType Directory -Force \"{Path.GetDirectoryName(KeystorePath)}\" | Out-Null; & \"{KeytoolExecutable}\" -genkeypair -v -keystore \"{KeystorePath}\" -alias {Alias} " +
-        "-keyalg RSA -keysize 2048 -validity 10000 -dname \"CN=Daniel Noam, O=Daniel's Games\"";
-
     /// <summary>Opens the keystore with the current password and alias, which proves both before a build relies on them.</summary>
     public static bool Verify(out string message)
     {

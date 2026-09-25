@@ -543,7 +543,14 @@ needed no new fields and no level asset was retuned.
       building: committed changes, level validation, and for GitHub `gh`
       installed and signed in, the tag not already released, and HEAD pushed.
       Uploads: GitHub Release through `gh` (draft by default, notes from commit
-      subjects since the last tag) and Copy To Folder. The same pipeline runs
+      subjects since the last tag) and Copy To Folder. **Replace Existing Release**
+      re-uploads a version that already exists, draft or published: it replaces
+      the files, moves the tag to the current commit, and keeps its draft or
+      published state. Players already on that version are not offered it.
+      Machine-specific paths (build folder, copy folder, keystore path and alias)
+      live in EditorPrefs via `BuildMachineSettings` and `AndroidSigning`, never in
+      git; the project only holds the default build folder `Builds`. Create the
+      keystore with Unity's Keystore Manager and point the build window at it. The same pipeline runs
       headless with `-executeMethod ElectroGridBuild.BuildFromCommandLine`
       (add `-noUpload` to only build). Config: `Assets/Settings/Build/BuildConfig.asset`.
       **First use:** install `gh` (`winget install --id GitHub.cli`), run
@@ -559,32 +566,30 @@ needed no new fields and no level asset was retuned.
       Later: AAB for Google Play, WebGL (needs Firebase compiled out),
       itch.io through butler, Firebase App Distribution.
 
-- [ ] **In-game updater for the APK and Windows builds.** Check GitHub Releases
-      for a newer version, then download and install it from inside the game.
-      Builds on the build window's GitHub upload: the release tag `v<version>`
-      and the attached `ElectroGrid-<version>.apk` and
-      `ElectroGrid-<version>-Windows.zip`. Things to get right:
-
-      - **Checking:** `GET api.github.com/repos/danielnoam/ElectroGrid/releases/latest`
-        and compare its tag with `Application.version`. Only works while the repo
-        is **public**. A private repo would need a token baked into the game,
-        which can't be shipped. Draft and prerelease releases are skipped by
-        `latest`, which is the right behaviour. Unauthenticated calls are limited
-        to 60 an hour per IP, so check once per launch at most.
-      - **Android:** download the APK to `persistentDataPath`, then hand it to the
-        system installer through a `FileProvider` intent. That needs the
-        `REQUEST_INSTALL_PACKAGES` permission and the user approving "install
-        unknown apps" once. **Updates only install over an APK signed with the same
-        key**, so this needs the release keystore first: debug keys differ per
-        machine. Google Play forbids self-updating apps, so the updater must be off
-        in any Play build (a define or build profile flag).
-      - **Windows:** the running exe can't overwrite itself. Download the zip, then
-        launch a small helper (a script or tiny exe) that waits for the game to
-        exit, extracts over the install folder, and relaunches.
-      - **UI:** a non-blocking "Update available (vX)" prompt on the main menu with
-        download progress, and never interrupting a level.
-      - **Safety:** verify the download size, and ideally a SHA-256 published in
-        the release notes, before installing.
+- [x] **In-game updater.** `GameUpdater` (bootstrapped like `SaveManager`)
+      checks `api.github.com/repos/danielnoam/ElectroGrid/releases/latest` once per
+      launch. It needs the repo public, which it is. It compares the tag with
+      `Application.version` and picks this platform's asset (`.apk` or
+      `-Windows.zip`, as the build window names them). Drafts and prereleases are
+      never offered. It downloads to `persistentDataPath/Updates` and checks the
+      size and GitHub's `sha256:` asset digest; old downloads are cleared on
+      launch. A failed check is silent.
+      `UpdateInstaller`: Android hands the APK to the system installer through
+      `FileProvider` (`ElectroGridUpdater.androidlib` adds the provider and
+      `REQUEST_INSTALL_PACKAGES`), opening "install unknown apps" the first time.
+      Windows extracts the zip, and a generated `apply-update.cmd` waits for the
+      game to exit, robocopies over the install folder and relaunches. A
+      read-only install folder (Program Files) falls back to the release page.
+      `Prefab_UpdateWindow` (copied from the settings window: same animation,
+      pauses the game) sits on the main menu. It offers the update 1.5s after
+      the menu opens, once per launch, with release notes, progress and
+      Later / Update → Install or Restart, and Open Page as the fallback.
+      **Playtest:** publish a release newer than an installed build and run the
+      whole flow on a phone (including the permission prompt) and on Windows.
+      **Before any Google Play build:** remove the androidlib, since Play
+      forbids `REQUEST_INSTALL_PACKAGES` for self-updating.
+      Later: pull the animation shared by the settings, information and update
+      windows into one base class.
 
 - [x] **Camera tilt.** `CameraManager` sways the camera
       by up to 4% of the orthographic size. The camera is orthographic, so a real

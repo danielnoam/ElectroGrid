@@ -28,5 +28,5 @@ MonoBehaviour:
   uploadToGitHub: 0
   githubDraft: 1
   githubPrerelease: 0
+  replaceExistingRelease: 0
   copyToFolder: 0
-  copyFolder: 

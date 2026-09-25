@@ -141,9 +141,9 @@ internal static class ElectroGridBuild
 
         if (!includeUploads) return issues;
 
-        if (config.uploadToGitHub) AddGitHubIssues(issues);
+        if (config.uploadToGitHub) AddGitHubIssues(issues, config);
 
-        if (config.copyToFolder && string.IsNullOrWhiteSpace(config.copyFolder))
+        if (config.copyToFolder && string.IsNullOrWhiteSpace(BuildMachineSettings.CopyFolder))
         {
             issues.Add(new Issue(Severity.Error, "Copy To Folder is on but no folder is set."));
         }
@@ -189,7 +189,7 @@ internal static class ElectroGridBuild
         }
     }
 
-    private static void AddGitHubIssues(List<Issue> issues)
+    private static void AddGitHubIssues(List<Issue> issues, SOBuildConfig config)
     {
         var version = BuildProcess.Gh("--version");
         if (!version.Succeeded)
@@ -205,9 +205,13 @@ internal static class ElectroGridBuild
             return;
         }
 
-        if (BuildProcess.Gh($"release view {ReleaseTag}").Succeeded)
+        var existing = FindExistingRelease();
+        if (existing.HasValue)
         {
-            issues.Add(new Issue(Severity.Error, $"A GitHub release {ReleaseTag} already exists. Bump the version."));
+            string state = existing.Value ? "draft" : "published";
+            issues.Add(config.replaceExistingRelease
+                ? new Issue(Severity.Warning, $"Replacing the files of the existing {state} release {ReleaseTag}. Players already on {Version} will not be offered the new build.")
+                : new Issue(Severity.Error, $"A {state} GitHub release {ReleaseTag} already exists. Bump the version, or turn on Replace Existing Release."));
         }
 
         // The release tag is created on GitHub at this commit, so it has to be there already
@@ -230,7 +234,7 @@ internal static class ElectroGridBuild
         var result = new RunResult
         {
             Version = Version,
-            OutputFolder = Path.Combine(BuildProcess.ProjectFolder, config.outputRoot, Version)
+            OutputFolder = Path.Combine(BuildMachineSettings.ResolveOutputRoot(config), Version)
         };
 
         PlayerSettings.Android.bundleVersionCode = AndroidVersionCode(Version);
@@ -397,7 +401,7 @@ internal static class ElectroGridBuild
 
         try
         {
-            string destination = Path.Combine(config.copyFolder, Version);
+            string destination = Path.Combine(BuildMachineSettings.CopyFolder, Version);
             Directory.CreateDirectory(destination);
 
             foreach (string artifact in artifacts)
@@ -427,22 +431,71 @@ internal static class ElectroGridBuild
         File.WriteAllText(notesPath, BuildReleaseNotes());
 
         var head = BuildProcess.Git("rev-parse HEAD");
-        var arguments = new StringBuilder($"release create {ReleaseTag}");
-        foreach (string artifact in artifacts) arguments.Append(' ').Append(BuildProcess.Quote(artifact));
-        arguments.Append($" --title {BuildProcess.Quote($"ElectroGrid {Version}")}");
-        arguments.Append($" --notes-file {BuildProcess.Quote(notesPath)}");
-        if (head.Succeeded) arguments.Append($" --target {head.Output.Trim()}");
-        if (config.githubDraft) arguments.Append(" --draft");
-        if (config.githubPrerelease) arguments.Append(" --prerelease");
+        string commit = head.Succeeded ? head.Output.Trim() : string.Empty;
+        var existing = FindExistingRelease();
 
         EditorUtility.DisplayProgressBar("ElectroGrid Build", $"Uploading {ReleaseTag} to GitHub", 1f);
-        var release = BuildProcess.Gh(arguments.ToString(), 30 * 60);
+        var release = existing.HasValue && config.replaceExistingRelease
+            ? ReplaceRelease(existing.Value, artifacts, notesPath, commit)
+            : CreateRelease(config, artifacts, notesPath, commit);
         EditorUtility.ClearProgressBar();
 
+        step.Name = existing.HasValue ? "GitHub Release (replaced)" : "GitHub Release";
         step.Succeeded = release.Succeeded;
         step.Message = release.Succeeded ? release.Output.Trim() : release.Message;
         step.Seconds = timer.Elapsed.TotalSeconds;
         return step;
+    }
+
+    /// <summary>Whether a release already exists for this version: null if not, otherwise whether it is a draft.</summary>
+    private static bool? FindExistingRelease()
+    {
+        var view = BuildProcess.Gh($"release view {ReleaseTag} --json isDraft --jq .isDraft");
+        if (!view.Succeeded) return null;
+
+        return view.Output.Trim() == "true";
+    }
+
+    private static BuildProcess.Result CreateRelease(SOBuildConfig config, List<string> artifacts, string notesPath, string commit)
+    {
+        var arguments = new StringBuilder($"release create {ReleaseTag}");
+        foreach (string artifact in artifacts) arguments.Append(' ').Append(BuildProcess.Quote(artifact));
+        arguments.Append($" --title {BuildProcess.Quote($"ElectroGrid {Version}")}");
+        arguments.Append($" --notes-file {BuildProcess.Quote(notesPath)}");
+        if (!string.IsNullOrEmpty(commit)) arguments.Append($" --target {commit}");
+        if (config.githubDraft) arguments.Append(" --draft");
+        if (config.githubPrerelease) arguments.Append(" --prerelease");
+
+        return BuildProcess.Gh(arguments.ToString(), 30 * 60);
+    }
+
+    /// <summary>
+    /// Swaps the files and notes of an existing release and points it at the commit just built, leaving it draft or
+    /// published as it was. A draft has no git tag until it is published, only a target, so the two are moved differently.
+    /// </summary>
+    private static BuildProcess.Result ReplaceRelease(bool isDraft, List<string> artifacts, string notesPath, string commit)
+    {
+        if (!string.IsNullOrEmpty(commit))
+        {
+            var retarget = isDraft
+                ? BuildProcess.Gh($"release edit {ReleaseTag} --target {commit}")
+                : BuildProcess.Gh($"api -X PATCH repos/{{owner}}/{{repo}}/git/refs/tags/{ReleaseTag} -f sha={commit} -F force=true");
+            if (!retarget.Succeeded) return retarget;
+
+            // Keeps the local tag in step, so the next release's notes start from the right commit
+            if (!isDraft) BuildProcess.Git("fetch --tags --force --quiet", 120);
+        }
+
+        var upload = new StringBuilder($"release upload {ReleaseTag} --clobber");
+        foreach (string artifact in artifacts) upload.Append(' ').Append(BuildProcess.Quote(artifact));
+        var uploaded = BuildProcess.Gh(upload.ToString(), 30 * 60);
+        if (!uploaded.Succeeded) return uploaded;
+
+        var edit = BuildProcess.Gh($"release edit {ReleaseTag} --title {BuildProcess.Quote($"ElectroGrid {Version}")} --notes-file {BuildProcess.Quote(notesPath)}");
+        if (!edit.Succeeded) return edit;
+
+        var url = BuildProcess.Gh($"release view {ReleaseTag} --json url --jq .url");
+        return new BuildProcess.Result(0, url.Succeeded ? url.Output : $"Replaced {ReleaseTag}", string.Empty);
     }
 
     /// <summary>
@@ -451,7 +504,8 @@ internal static class ElectroGridBuild
     /// </summary>
     public static string BuildReleaseNotes()
     {
-        var previousTag = BuildProcess.Git("describe --tags --abbrev=0");
+        // The tag being released or replaced is skipped, so the notes start from the release before it
+        var previousTag = BuildProcess.Git($"describe --tags --abbrev=0 --exclude {ReleaseTag}");
         string range = previousTag.Succeeded ? $"{previousTag.Output.Trim()}..HEAD" : "-n 30 HEAD";
 
         var log = BuildProcess.Git($"log --no-merges --pretty=format:\"- %s\" {range}");

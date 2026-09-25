@@ -30,6 +30,7 @@ internal class ElectroGridBuildWindow : EditorWindow
     private void OnEnable()
     {
         _config = SOBuildConfig.LoadOrCreate();
+        BuildMachineSettings.MigrateFromConfig(_config);
         _serializedConfig = new SerializedObject(_config);
         RefreshGitHubStatus();
     }
@@ -118,36 +119,33 @@ internal class ElectroGridBuildWindow : EditorWindow
     {
         Header("Output");
 
-        var outputRoot = _serializedConfig.FindProperty("outputRoot");
-        string folder = Path.GetFullPath(Path.Combine(BuildProcess.ProjectFolder, outputRoot.stringValue));
+        string folder = BuildMachineSettings.ResolveOutputRoot(_config);
+        bool overridden = !string.IsNullOrWhiteSpace(BuildMachineSettings.OutputFolderOverride);
 
         EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.PropertyField(outputRoot, new GUIContent("Build Folder"));
+        EditorGUILayout.LabelField(new GUIContent("Build Folder", "Saved for this computer only, so each machine can use its own folder"), GUILayout.Width(EditorGUIUtility.labelWidth - 4f));
+        EditorGUILayout.SelectableLabel(folder, EditorStyles.textField, GUILayout.Height(EditorGUIUtility.singleLineHeight));
         if (GUILayout.Button("Browse", GUILayout.Width(60f)))
         {
             string picked = EditorUtility.OpenFolderPanel("Build into", Directory.Exists(folder) ? folder : BuildProcess.ProjectFolder, string.Empty);
-            if (!string.IsNullOrEmpty(picked)) outputRoot.stringValue = ToStoredPath(picked);
+            if (!string.IsNullOrEmpty(picked)) BuildMachineSettings.OutputFolderOverride = picked;
+        }
+        using (new EditorGUI.DisabledScope(!overridden))
+        {
+            if (GUILayout.Button(new GUIContent("Reset", $"Back to the project default ({_config.outputRoot})"), GUILayout.Width(50f)))
+            {
+                BuildMachineSettings.OutputFolderOverride = string.Empty;
+            }
         }
         EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.LabelField($"→ {Path.Combine(folder, ElectroGridBuild.Version)}", EditorStyles.miniLabel);
+        EditorGUILayout.LabelField($"→ {Path.Combine(folder, ElectroGridBuild.Version)}{(overridden ? "   (this computer)" : "   (project default)")}", EditorStyles.miniLabel);
         EditorGUILayout.PropertyField(_serializedConfig.FindProperty("zipWindowsBuild"));
 
         using (new EditorGUI.DisabledScope(!Directory.Exists(folder)))
         {
             if (GUILayout.Button("Open Build Folder", EditorStyles.miniButton)) EditorUtility.RevealInFinder(folder);
         }
-    }
-
-    /// <summary>Relative to the project when the folder is inside it, so the setting works on any machine; absolute otherwise.</summary>
-    private static string ToStoredPath(string picked)
-    {
-        string project = Path.GetFullPath(BuildProcess.ProjectFolder).TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
-        string full = Path.GetFullPath(picked);
-
-        return full.StartsWith(project, System.StringComparison.OrdinalIgnoreCase)
-            ? full.Substring(project.Length).Replace('\\', '/')
-            : full.Replace('\\', '/');
     }
 
     private void DrawSigning()
@@ -192,15 +190,7 @@ internal class ElectroGridBuildWindow : EditorWindow
 
         if (AndroidSigning.KeystoreExists) return;
 
-        EditorGUILayout.HelpBox(
-            "No release keystore yet. Create it once with the command below (keytool asks for the password), then back the file up somewhere safe: " +
-            "if it is lost, installed copies can never be updated again.",
-            MessageType.Warning);
-
-        if (GUILayout.Button("Copy Create Command", EditorStyles.miniButton))
-        {
-            EditorGUIUtility.systemCopyBuffer = AndroidSigning.CreateCommand;
-        }
+        EditorGUILayout.HelpBox("No keystore at this path. Pick your keystore file with Browse (create one in Player Settings > Publishing Settings > Keystore Manager).", MessageType.Warning);
     }
 
     private void DrawChecks()
@@ -223,6 +213,7 @@ internal class ElectroGridBuildWindow : EditorWindow
             EditorGUI.indentLevel++;
             EditorGUILayout.PropertyField(_serializedConfig.FindProperty("githubDraft"), new GUIContent("Draft"));
             EditorGUILayout.PropertyField(_serializedConfig.FindProperty("githubPrerelease"), new GUIContent("Prerelease"));
+            EditorGUILayout.PropertyField(_serializedConfig.FindProperty("replaceExistingRelease"), new GUIContent("Replace Existing Release"));
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.HelpBox(_ghStatus, _ghReady ? MessageType.Info : MessageType.Warning);
@@ -244,15 +235,16 @@ internal class ElectroGridBuildWindow : EditorWindow
 
         if (!copy.boolValue) return;
 
-        var folder = _serializedConfig.FindProperty("copyFolder");
         EditorGUILayout.BeginHorizontal();
         EditorGUI.indentLevel++;
-        EditorGUILayout.PropertyField(folder, GUIContent.none);
+        EditorGUI.BeginChangeCheck();
+        string copyFolder = EditorGUILayout.TextField(new GUIContent(" ", "Saved for this computer only"), BuildMachineSettings.CopyFolder);
+        if (EditorGUI.EndChangeCheck()) BuildMachineSettings.CopyFolder = copyFolder;
         EditorGUI.indentLevel--;
         if (GUILayout.Button("Browse", GUILayout.Width(60f)))
         {
-            string picked = EditorUtility.OpenFolderPanel("Copy builds to", folder.stringValue, string.Empty);
-            if (!string.IsNullOrEmpty(picked)) folder.stringValue = picked;
+            string picked = EditorUtility.OpenFolderPanel("Copy builds to", BuildMachineSettings.CopyFolder, string.Empty);
+            if (!string.IsNullOrEmpty(picked)) BuildMachineSettings.CopyFolder = picked;
         }
         EditorGUILayout.EndHorizontal();
     }
