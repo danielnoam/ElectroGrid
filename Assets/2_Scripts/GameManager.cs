@@ -49,7 +49,25 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// True when the display refreshes fast enough for the high frame rate option to mean anything.
     /// </summary>
-    public static bool SupportsHighFrameRate => Screen.currentResolution.refreshRateRatio.value > 61;
+    public static bool SupportsHighFrameRate => MaxRefreshRate > 61;
+
+    /// <summary>
+    /// The fastest refresh rate the display supports, not the one it is running at. Phones with 90/120Hz panels drop
+    /// to 60Hz while an app asks for 60, so the current rate alone would hide the option that raises it.
+    /// </summary>
+    private static int MaxRefreshRate
+    {
+        get
+        {
+            double max = Screen.currentResolution.refreshRateRatio.value;
+            foreach (var resolution in Screen.resolutions)
+            {
+                if (resolution.refreshRateRatio.value > max) max = resolution.refreshRateRatio.value;
+            }
+
+            return Mathf.RoundToInt((float)max);
+        }
+    }
 
     /// <summary>
     /// 60 by default, which matters for battery on long puzzle sessions. Players can opt into the
@@ -60,9 +78,8 @@ public class GameManager : MonoBehaviour
         if (!Application.isMobilePlatform) return;
 
         var highFrameRate = SaveManager.Instance && SaveManager.Instance.Settings.highFrameRate && SupportsHighFrameRate;
-        Application.targetFrameRate = highFrameRate
-            ? Mathf.Min(120, Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value))
-            : 60;
+        // On Android the target frame rate is also what asks the display to switch to its faster mode
+        Application.targetFrameRate = highFrameRate ? Mathf.Min(120, MaxRefreshRate) : 60;
     }
 
     public void SelectMatch3Level(SOMatch3Level level)

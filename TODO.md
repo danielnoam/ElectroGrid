@@ -535,6 +535,36 @@ needed no new fields and no level asset was retuned.
 
 ### Features
 
+- [ ] **Continue shows "New Game" for a first-time player.** Today the Continue
+      button hides itself when the save has no last played level. Instead, show
+      it as **New Game** and start the first level, so the menu always has a
+      clear first action. Once a level has been started it becomes Continue.
+- [ ] **Automatic tutorials get their own variant of the info window.** The
+      tutorial that pops up the first time a mechanic appears currently reuses the
+      information window, which is the list opened from the info button. The
+      automatic one should look distinct, for example a "New!" title, only that
+      card, and a single "Got it" button, so it reads as a one-off introduction
+      rather than the help screen.
+- [ ] **Phones rendered differently from PC after the Unity upgrade; Mobile now
+      matches PC, confirm on the phone.** Phones looked right before the jump
+      from 6000.2.9 to 6000.6.2. Ruled out as the cause: the CRT pass (on for
+      Mobile since 2025-11), the CRT shader and material (unchanged, only the
+      shader's GUID moved), Render Graph (already on before), and the new Bloom
+      `filter` (Gaussian, the old algorithm). So it's a URP behaviour change.
+      The PC look is the one wanted, so the Mobile settings now match PC:
+      `FullscreenCRT` pass **off** in `Mobile_Renderer` (PC gets its CRT look from
+      the volume's lens distortion, grain, vignette and chromatic aberration),
+      render scale **0.8 → 1.0**, fast sRGB/Linear conversion **off**. Only
+      SSAO and Forward+ still differ, which don't affect sprites.
+      **Check:** a new build on the phone looks like PC and still runs smoothly.
+      If performance drops, try render scale 0.9. To preview the phone look in
+      the editor, switch Quality to Mobile (Edit > Project Settings > Quality).
+- [x] **High Frame Rate row missing on 120Hz phones, fixed.** The check read the
+      display's *current* refresh rate, and phones drop to 60Hz while the game
+      asks for 60, so the row hid itself. It now uses the highest rate in
+      `Screen.resolutions`. **Confirm on the phone** that the row appears and
+      the game runs smoother with it on.
+
 - [x] **Build window (`ElectroGrid > Build`).** Builds the enabled targets one
       after another from Unity 6 Build Profiles: Android APK and Windows, zipped.
       Output goes to `Builds/<version>/`, which git ignores. The active platform
