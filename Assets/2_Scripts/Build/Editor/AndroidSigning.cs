@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 using UnityEditor;
 
 /// <summary>
@@ -7,8 +9,9 @@ using UnityEditor;
 /// signed with the same key, so this key is what lets a newer build replace an older one.
 /// </summary>
 /// <remarks>
-/// The keystore lives outside the repository, and the password is never written to disk: it is held for the
-/// current editor session only, or read from <see cref="PasswordEnvironmentVariable"/> for headless builds.
+/// The keystore lives outside the repository, and the password never goes near it: it is held for the current
+/// editor session, saved encrypted for this Windows user when <see cref="RememberPassword"/> is on, or read from
+/// <see cref="PasswordEnvironmentVariable"/> for headless builds.
 /// The path and alias are per machine, in EditorPrefs, so no absolute path lands in the project.
 /// </remarks>
 internal static class AndroidSigning
@@ -34,15 +37,69 @@ internal static class AndroidSigning
         set => EditorPrefs.SetString(AliasKey, value ?? string.Empty);
     }
 
-    /// <summary>Kept in SessionState, which survives script reloads but is cleared when the editor closes.</summary>
+    /// <summary>
+    /// Kept in SessionState, which survives script reloads but is cleared when the editor closes. With
+    /// <see cref="RememberPassword"/> it is also saved for this Windows user, encrypted.
+    /// </summary>
     public static string Password
     {
         get
         {
             string session = SessionState.GetString(PasswordSessionKey, string.Empty);
-            return !string.IsNullOrEmpty(session) ? session : Environment.GetEnvironmentVariable(PasswordEnvironmentVariable) ?? string.Empty;
+            if (!string.IsNullOrEmpty(session)) return session;
+
+            string remembered = RememberedPassword;
+            if (!string.IsNullOrEmpty(remembered))
+            {
+                SessionState.SetString(PasswordSessionKey, remembered);
+                return remembered;
+            }
+
+            return Environment.GetEnvironmentVariable(PasswordEnvironmentVariable) ?? string.Empty;
         }
-        set => SessionState.SetString(PasswordSessionKey, value ?? string.Empty);
+        set
+        {
+            SessionState.SetString(PasswordSessionKey, value ?? string.Empty);
+            if (RememberPassword) RememberedPassword = value;
+        }
+    }
+
+    /// <summary>
+    /// Saves the password in EditorPrefs, encrypted with Windows DPAPI for the current Windows user, so only this
+    /// user on this computer can read it back. It never touches the project folder.
+    /// </summary>
+    public static bool RememberPassword
+    {
+        get => EditorPrefs.HasKey(RememberedPasswordKey);
+        set
+        {
+            if (value == RememberPassword) return;
+
+            if (value) RememberedPassword = SessionState.GetString(PasswordSessionKey, string.Empty);
+            else EditorPrefs.DeleteKey(RememberedPasswordKey);
+        }
+    }
+
+    private const string RememberedPasswordKey = "ElectroGrid.Build.KeystorePasswordProtected";
+
+    private static string RememberedPassword
+    {
+        get
+        {
+            string stored = EditorPrefs.GetString(RememberedPasswordKey, string.Empty);
+            if (string.IsNullOrEmpty(stored)) return string.Empty;
+
+            try
+            {
+                return Encoding.UTF8.GetString(WindowsDataProtection.Unprotect(Convert.FromBase64String(stored)));
+            }
+            catch (Exception)
+            {
+                // Saved by another Windows user or a reinstalled system, it cannot be decrypted here
+                return string.Empty;
+            }
+        }
+        set => EditorPrefs.SetString(RememberedPasswordKey, Convert.ToBase64String(WindowsDataProtection.Protect(Encoding.UTF8.GetBytes(value ?? string.Empty))));
     }
 
     public static bool KeystoreExists => File.Exists(KeystorePath);
@@ -108,6 +165,56 @@ internal static class AndroidSigning
     {
         using var reader = new StringReader(text ?? string.Empty);
         return reader.ReadLine() ?? string.Empty;
+    }
+}
+
+/// <summary>Windows DPAPI for the current user, called directly since Unity's .NET profile has no ProtectedData.</summary>
+internal static class WindowsDataProtection
+{
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DataBlob
+    {
+        public int Size;
+        public IntPtr Data;
+    }
+
+    private const int UiForbidden = 0x1;
+
+    [DllImport("crypt32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern bool CryptProtectData(ref DataBlob input, string description, IntPtr entropy, IntPtr reserved, IntPtr prompt, int flags, out DataBlob output);
+
+    [DllImport("crypt32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern bool CryptUnprotectData(ref DataBlob input, IntPtr description, IntPtr entropy, IntPtr reserved, IntPtr prompt, int flags, out DataBlob output);
+
+    [DllImport("kernel32.dll")]
+    private static extern IntPtr LocalFree(IntPtr memory);
+
+    public static byte[] Protect(byte[] data) => Transform(data, true);
+    public static byte[] Unprotect(byte[] data) => Transform(data, false);
+
+    private static byte[] Transform(byte[] data, bool protect)
+    {
+        var input = new DataBlob { Size = data.Length, Data = Marshal.AllocHGlobal(Math.Max(1, data.Length)) };
+        var output = new DataBlob();
+
+        try
+        {
+            Marshal.Copy(data, 0, input.Data, data.Length);
+
+            bool ok = protect
+                ? CryptProtectData(ref input, "ElectroGrid keystore", IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, UiForbidden, out output)
+                : CryptUnprotectData(ref input, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, UiForbidden, out output);
+            if (!ok) throw new InvalidOperationException($"DPAPI failed with error {Marshal.GetLastWin32Error()}");
+
+            var result = new byte[output.Size];
+            Marshal.Copy(output.Data, result, 0, output.Size);
+            return result;
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(input.Data);
+            if (output.Data != IntPtr.Zero) LocalFree(output.Data);
+        }
     }
 }
 

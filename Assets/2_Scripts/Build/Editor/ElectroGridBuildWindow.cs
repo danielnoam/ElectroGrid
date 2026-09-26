@@ -170,7 +170,7 @@ internal class ElectroGridBuildWindow : EditorWindow
 
         EditorGUILayout.BeginHorizontal();
         EditorGUI.BeginChangeCheck();
-        string password = EditorGUILayout.PasswordField(new GUIContent("Password", "Kept for this editor session only, never saved"), AndroidSigning.Password);
+        string password = EditorGUILayout.PasswordField(new GUIContent("Password", "Kept for this editor session, or saved encrypted for this Windows user with Remember"), AndroidSigning.Password);
         if (EditorGUI.EndChangeCheck())
         {
             AndroidSigning.Password = password;
@@ -181,6 +181,10 @@ internal class ElectroGridBuildWindow : EditorWindow
             _signingOk = AndroidSigning.Verify(out _signingStatus);
         }
         EditorGUILayout.EndHorizontal();
+
+        AndroidSigning.RememberPassword = EditorGUILayout.Toggle(new GUIContent("Remember Password",
+            "Save the password on this computer, encrypted so only your Windows user can read it. Off: it is asked for again after Unity restarts."),
+            AndroidSigning.RememberPassword);
 
         if (!string.IsNullOrEmpty(_signingStatus))
         {

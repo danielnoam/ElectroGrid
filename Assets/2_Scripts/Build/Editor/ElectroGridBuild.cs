@@ -309,7 +309,7 @@ internal static class ElectroGridBuild
             }
 
             // A rebuild of the same version must not leave files from the previous one behind
-            if (Directory.Exists(platformFolder)) Directory.Delete(platformFolder, true);
+            DeleteFolder(platformFolder);
             Directory.CreateDirectory(Path.GetDirectoryName(playerPath) ?? platformFolder);
 
             var options = new BuildPlayerWithProfileOptions
@@ -336,8 +336,16 @@ internal static class ElectroGridBuild
             {
                 step.ArtifactPath = ZipWindowsBuild(Path.GetDirectoryName(playerPath), outputFolder);
 
-                // The zip is what gets uploaded and copied, the loose folder would only be a second copy
-                Directory.Delete(platformFolder, true);
+                // The zip is what gets uploaded and copied, the loose folder would only be a second copy. Leaving it
+                // behind is harmless, the next build of this version deletes it first
+                try
+                {
+                    DeleteFolder(platformFolder);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[Build] Could not delete the unzipped Windows folder: {e.Message}");
+                }
             }
 
             step.Succeeded = true;
@@ -384,7 +392,36 @@ internal static class ElectroGridBuild
 
         foreach (string directory in Directory.GetDirectories(folder, "*_DoNotShip", SearchOption.AllDirectories))
         {
-            if (Directory.Exists(directory)) Directory.Delete(directory, true);
+            DeleteFolder(directory);
+        }
+    }
+
+    /// <summary>
+    /// Deletes a folder even inside a synced folder such as Google Drive, which marks folders read-only and briefly
+    /// locks files it is uploading. Read-only flags are cleared first, and a locked file gets a few retries.
+    /// </summary>
+    private static void DeleteFolder(string folder)
+    {
+        for (int attempt = 1; ; attempt++)
+        {
+            if (!Directory.Exists(folder)) return;
+
+            try
+            {
+                var root = new DirectoryInfo(folder);
+                root.Attributes = FileAttributes.Directory;
+                foreach (var entry in root.EnumerateFileSystemInfos("*", SearchOption.AllDirectories))
+                {
+                    entry.Attributes = entry is DirectoryInfo ? FileAttributes.Directory : FileAttributes.Normal;
+                }
+
+                Directory.Delete(folder, true);
+                return;
+            }
+            catch (Exception e) when ((e is IOException || e is UnauthorizedAccessException) && attempt < 5)
+            {
+                System.Threading.Thread.Sleep(1000);
+            }
         }
     }
 
