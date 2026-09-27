@@ -691,11 +691,32 @@ needed no new fields and no level asset was retuned.
       deliberately refuses to resize stale tile data and tells you to open the
       window instead.
 
-- [ ] **Combo and cascade feedback.** `HandleMatchesAndRepopulate` already loops
-      cascades but nothing counts them, so a four-chain feels identical to a
-      single match in a game that is otherwise very loud. Rising audio pitch per
-      cascade step, a combo counter, escalating shake. The loop to hook into
-      already exists; this is the biggest gap in feel.
+- [ ] **Combo bar.** `HandleMatchesAndRepopulate` already loops cascades but
+      nothing counts them, so a four-chain feels identical to a single match in
+      a game that is otherwise very loud. The idea: every match fills a combo bar
+      on the right side of the screen. The combo resets if the next match doesn't
+      come in time, and the window gets shorter as the combo grows. A full bar
+      triggers an ability (in Endless: extra time). The feel pass comes along
+      with it: pitch rising per step, a counter, shake getting stronger.
+      **Decide first:**
+      - **What counts as a step.** Cascades happen without the player doing
+        anything, so if they count, luck fills the bar. Suggested: a player swap
+        that matches adds a step, each extra cascade step adds a smaller bonus,
+        and the countdown timer pauses while the board is resolving. Otherwise
+        a long cascade animation can reset a combo the player earned.
+      - **Where it lives.** A `Match3ComboTracker` that listens to the match
+        loop and raises events (`StepAdded`, `Reset`, `Filled`), which the bar UI
+        and the ability read. Keep it out of `Match3GameManager` so Endless and
+        normal levels share it.
+      - **The ability in normal levels.** "More time" only makes sense for
+        `TimeLimit`. `MoveLimit` levels need something else (extra moves, clear
+        a row, spawn a Plus), or the bar only exists in Endless. Pick one before
+        building the UI, because a bar that fills and does nothing will feel
+        broken.
+      - **Portrait width.** A vertical bar on the right takes space from a
+        board that already fills the width on phones. Check it against the
+        widest grid shape and the safe area.
+
 - [x] **Frame rate modes in settings.** `SettingsData.highFrameRate` (default off,
       so 60) is read by `GameManager.ApplyFrameRate`. When it is on, the game runs
       at the display's refresh rate, capped at 120. `Prefab_SettingsWindow` has a
@@ -761,6 +782,128 @@ needed no new fields and no level asset was retuned.
 - [ ] **No tests**, despite `com.unity.test-framework` being installed. Match
       detection, objective progress and `SaveManager` are all testable without a
       scene, and the reshuffle has no safety net.
+
+- [ ] **In-game UI rework.** Swap the text quit and restart buttons for icons
+      (the settings button already uses `White Gear 1`, so match its style), and
+      look at other match-3 games for ideas. Worth studying: how Royal Match,
+      Candy Crush and Two Dots keep the goal and moves/time readable at a glance
+      at the top, what they push into a pause menu instead of keeping on screen,
+      and how they confirm a restart (a restart tapped by accident costs the
+      whole level, so it needs a confirm or should live in the pause menu). Do
+      this before the combo bar and Endless, since both add HUD elements and
+      the layout should be planned once.
+
+- [ ] **Level selection rework.** Not specified yet. Write down what's wrong
+      with the current one before starting: is it the look, the number of
+      levels per screen, not seeing best stats (see Playtest > Best stats), or
+      no place for an Endless entry? With 12 levels a map or scrolling path is
+      probably more than needed. A tidy grid with stars/best stats plus an
+      Endless button may be enough.
+
+- [ ] **Endless mode.** Score as high as you can while a timer counts down.
+      Matches score points, Plus destroys and a full combo bar add time. Square
+      Stars and Double Stars spawn at random as bonuses. What already exists and
+      what doesn't:
+      - **Time exists.** `TimeLimit` counts down, and `OnHelperObjectDestroyed`
+        already adds 5s per Plus destroyed. But `AddTime` caps at `allowedTime`,
+        which Endless can't use: gaining time would do nothing at the start.
+        Endless needs its own lose condition (or a flag) without the cap.
+      - **Score does not exist.** There is no score anywhere in the code. It
+        needs a scoring rule (per piece, match size bonus, cascade/combo
+        multiplier, bonus for Stars), a HUD readout, and a best score in
+        `SaveData` (bump `version`).
+      - **Structure.** Endless isn't really a level with objectives, it's a
+        level with none that never ends by winning. The least invasive route is
+        probably an `SOMatch3Level` with an Endless flag or an `EndlessObjective`
+        that never completes, so `Match3GameManager`, the board and the tutorials
+        are reused instead of forking them.
+      - **Random Stars.** Square Stars only score when they reach row 0, so
+        spawn them in columns where that's possible (same rule the validator
+        uses). Cap how many can be on the board at once, or they fill the board.
+      - **Tuning is the real work.** Starting time, time per Plus, how much
+        spawns. Expect several playtest passes. Log final score and duration to
+        analytics so there's real data to tune with.
+      - **Unlock.** Decide whether it's available from the start or after level
+        N. After the tutorial levels is the usual answer, since Endless assumes
+        the player already knows Plus and Stars.
+
+- [ ] **Separate public repo for releases, so this repo can go private.**
+      Makes sense, but the order matters or every installed copy stops updating:
+      1. Create the public repo (e.g. `danielnoam/ElectroGrid-Releases`), with
+         just a README and maybe a changelog.
+      2. Point `GameUpdater` at it (the URL is currently
+         `api.github.com/repos/danielnoam/ElectroGrid/releases/latest`).
+         Put the owner/repo in `BuildConfig` so the updater and build window read
+         the same value.
+      3. Point the build window's upload at it: `gh release create --repo
+         <releases repo>`. The tag no longer lives in the repo where the commit is,
+         so the "tag already released" check, the "HEAD pushed" check and the
+         release notes from commit subjects need to handle that. **Replace
+         Existing Release** moving the tag to the current commit no longer works
+         the same way, because the commit doesn't exist in the releases repo.
+         Tag the source repo yourself, and in the releases repo point the tag at
+         its own default branch.
+      4. **Ship one release to both repos** built with the new URL, and wait
+         until players have actually updated.
+      5. Only then make this repo private. Installed builds older than step 4
+         still point here and will quietly stop seeing updates, since a failed
+         check is silent. That's acceptable for a small player base, but it's
+         permanent for those installs.
+      Also check: the README links and anything else that points players at
+      this repo's releases page (the updater's Open Page fallback).
+
+- [ ] **Free-to-play Steam release — what it takes.** Research, not started.
+      Known requirements and the costs people tend to miss:
+      - **Steam Direct fee: $100 per app**, paid even for a free game, and
+        (as far as known) only paid back after $1,000 gross revenue, which a free
+        game with no purchases never reaches. So budget it as a cost. Tax and
+        bank info in Steamworks are required even for a free app.
+      - **Timeline.** The store page has to be public as "Coming Soon" for at
+        least two weeks before launch, and both the store page and the build go
+        through Valve review (a few business days each). There has also been a
+        waiting period between paying the fee and being able to release; check
+        the current rule in the Steamworks docs.
+      - **Store assets.** Several capsule images in exact sizes, at least 5
+        screenshots, and ideally a trailer. It's real work.
+      - **Portrait on desktop is the big design question.** The game is locked
+        portrait at 540x960 with a fixed-size window (`resizableWindow: 0`).
+        On a 16:9 monitor that's a narrow strip, and on Steam Deck (1280x800,
+        landscape only) it would be a small column in the middle. Options:
+        letterbox portrait with decorative art on the sides, or a landscape
+        layout for the HUD. Decide this before the store screenshots, since they
+        show it. Decide too whether to go for Steam Deck compatibility (controller
+        input on a touch-only UI is work too).
+      - **Turn off the updater in Steam builds.** Steam handles updates, and
+        `apply-update.cmd` robocopying over the Steam install folder would
+        leave files Steam doesn't know about. Use a scripting define for a Steam
+        build profile.
+      - **Steamworks integration.** Steamworks.NET or Facepunch.Steamworks
+        for achievements, leaderboards and overlay. `steam_appid.txt` for local
+        testing, SteamPipe (`steamcmd` + depot scripts) for uploads. The build
+        window could gain a Steam upload step the same way it has GitHub.
+      - **Privacy.** Firebase Analytics on PC collects data from players, so
+        the store page should link a privacy policy.
+      - **Free-to-play on Steam usually means some monetisation.** If there's
+        truly nothing to buy, it's just a "Free" game. Fine, but say so, since
+        it changes nothing about the $100 and it affects whether trading cards
+        or DLC ever make sense.
+
+- [ ] **Steam leaderboard for Endless.** Depends on Endless (score must exist)
+      and on the Steam integration above. `FindOrCreateLeaderboard` + upload
+      the score with `KeepBest`, show top 10 and the player's own rank next to
+      them on the Endless results screen. Things to know:
+      - **Android players are left out.** Steam leaderboards only work in the
+        Steam build. If mobile players should compete too, that's Google Play
+        Games or a backend (Firebase is already there), and then the two sources
+        should share one board, which is a bigger job. Decide whether a
+        Steam-only board is enough.
+      - **Cheating.** The score is computed on the client, so anyone can upload
+        any number. Steam has no server check for that. For a small free game
+        that's usually accepted; at least clamp obviously impossible scores and
+        upload the run duration as extra detail so outliers can be spotted.
+      - **Scoring changes invalidate the board.** Once there's a leaderboard,
+        rebalancing the score resets fairness. Use a new board name per scoring
+        version (`endless_v1`).
 
 ### Content, not engineering
 
