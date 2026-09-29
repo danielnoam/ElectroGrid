@@ -2,6 +2,7 @@ using System;
 using DNExtensions.Systems.VFXManager;
 using UnityEngine.Serialization;
 using PrimeTween;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,6 +18,7 @@ public class MainMenuScreen : MenuScreen
     [FormerlySerializedAs("muteButton")]
     [SerializeField] private Button settingsButton;
     [SerializeField] private SettingsWindowUI settingsWindowUI;
+    [SerializeField] private CreditsWindowUI creditsWindowUI;
     [SerializeField] private Button continueButton;
 
     private void Start()
@@ -24,6 +26,7 @@ public class MainMenuScreen : MenuScreen
         SetupButtons();
         informationWindowUI?.Initialize();
         settingsWindowUI?.Initialize();
+        creditsWindowUI?.Initialize();
 
         if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
     }
@@ -37,11 +40,16 @@ public class MainMenuScreen : MenuScreen
     {
         if (!continueButton) return;
 
+        // A fresh save has nothing to continue, so the same button starts the first level instead
         var level = ResolveLastPlayedLevel();
+        bool isNewGame = !level;
+        if (isNewGame) level = ResolveFirstLevel();
 
-        // Nothing to continue into on a fresh save, so the button is hidden rather than shown disabled
         continueButton.gameObject.SetActive(level);
         if (!level) return;
+
+        var label = continueButton.GetComponentInChildren<TMP_Text>(true);
+        if (label) label.text = isNewGame ? "New Game" : "Continue";
 
         continueButton.onClick.RemoveAllListeners();
         continueButton.onClick.AddListener(() =>
@@ -65,6 +73,18 @@ public class MainMenuScreen : MenuScreen
         foreach (var level in GameManager.Instance.Match3Levels)
         {
             if (level && level.name == lastPlayed) return level;
+        }
+
+        return null;
+    }
+
+    private static SOMatch3Level ResolveFirstLevel()
+    {
+        if (!GameManager.Instance) return null;
+
+        foreach (var level in GameManager.Instance.Match3Levels)
+        {
+            if (level) return level;
         }
 
         return null;
@@ -152,7 +172,7 @@ public class MainMenuScreen : MenuScreen
             creditsButton.onClick.AddListener(() =>
             {
                 CameraManager.Instance?.ShakeCamera(0.1f);
-                menuManager?.ShowCredits();
+                creditsWindowUI?.Show();
                 FirebaseManager.Instance?.LogCreditsClicked();
             });
         }

@@ -120,6 +120,6 @@ public class Match3TutorialPresenter : MonoBehaviour
         _topBarUI?.Toggle(false);
         _bottomBarUI?.Toggle(false);
 
-        _informationWindow.ShowTutorials(new[] { tutorial }, () => _showing = null);
+        _informationWindow.ShowIntroduction(tutorial, () => _showing = null);
     }
 }

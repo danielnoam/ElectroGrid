@@ -12,6 +12,10 @@ public class BottomBarUI : MonoBehaviour
     [Header("References")]
     [SerializeField] private Button quitButton;
     [SerializeField] private Button restartButton;
+    [SerializeField] private Button infoButton;
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private InformationWindowUI informationWindowUI;
+    [SerializeField] private SettingsWindowUI settingsWindowUI;
     [SerializeField] private Match3EffectManager match3EffectManager;
     [SerializeField] private TopBarUI topBarUI;
     
@@ -113,6 +117,35 @@ public class BottomBarUI : MonoBehaviour
                 _match3Manager.StartNewGame();
             }
         });
+
+        if (settingsButton)
+        {
+            settingsButton.onClick.RemoveAllListeners();
+            settingsButton.onClick.AddListener(() =>
+            {
+                CameraManager.Instance.ShakeCamera(0.1f);
+                Toggle(false);
+                topBarUI?.Toggle(false);
+                settingsWindowUI?.Show(() =>
+                {
+                    Toggle(true);
+                    topBarUI?.Toggle(true);
+                });
+            });
+        }
+
+        if (infoButton)
+        {
+            infoButton.onClick.RemoveAllListeners();
+            infoButton.onClick.AddListener(() =>
+            {
+                CameraManager.Instance.ShakeCamera(0.1f);
+                Toggle(false);
+                topBarUI?.Toggle(false);
+                informationWindowUI?.ShowAllTutorials();
+                FirebaseManager.Instance?.LogInformationClicked();
+            });
+        }
     }
 
     public void Toggle(bool show)

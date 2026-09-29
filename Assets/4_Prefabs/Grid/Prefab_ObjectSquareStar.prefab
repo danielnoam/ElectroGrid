@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 1179882405457458318}
   - component: {fileID: 8633085351261850407}
   m_Layer: 6
-  m_Name: Prefab_ObjectSquareStart
+  m_Name: Prefab_ObjectSquareStar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

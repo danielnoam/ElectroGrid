@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class TopBarUI : MonoBehaviour
 {
@@ -17,13 +15,7 @@ public class TopBarUI : MonoBehaviour
     [SerializeField] private RectTransform topBar;
     [SerializeField] private RectTransform levelName;
     [SerializeField] private TextMeshProUGUI levelNameText;
-    [SerializeField] private Button infoButton;
-    [FormerlySerializedAs("muteButton")]
-    [SerializeField] private Button settingsButton;
-    [SerializeField] private SettingsWindowUI settingsWindowUI;
     [SerializeField] private Match3UIElement match3UIElementPrefab;
-    [SerializeField] private InformationWindowUI informationWindowUI;
-    [SerializeField] private BottomBarUI bottomBarUI;
     
     private readonly Dictionary<Match3Objective, Match3UIElement> _currentObjectives = new Dictionary<Match3Objective, Match3UIElement>();
     private readonly Dictionary<Match3LoseCondition, Match3UIElement> _currentLoseConditions = new Dictionary<Match3LoseCondition, Match3UIElement>();
@@ -35,11 +27,7 @@ public class TopBarUI : MonoBehaviour
     
     private Match3GameManager _match3Manager;
     private float _levelNameDefaultPositionY;
-    private float _settingsButtonDefaultPositionY;
-    private float _infoButtonDefaultPositionY;
     private Vector2 _levelNameDefaultSize;
-    private Vector2 _settingsButtonDefaultSize;
-    private Vector2 _infoButtonDefaultSize;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
 
@@ -52,23 +40,12 @@ public class TopBarUI : MonoBehaviour
         _levelNameDefaultSize = levelName.sizeDelta;
         levelName.sizeDelta = Vector2.zero;
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, 0f);
-        
-        _settingsButtonDefaultSize = settingsButton.GetComponent<RectTransform>().sizeDelta;
-        settingsButton.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, settingsButton.GetComponent<RectTransform>().sizeDelta.y);
-        _settingsButtonDefaultPositionY = settingsButton.transform.localPosition.y;
-        settingsButton.transform.localPosition = new Vector3(settingsButton.transform.localPosition.x, 0f, settingsButton.transform.localPosition.z);
-        
-        _infoButtonDefaultSize = infoButton.GetComponent<RectTransform>().sizeDelta;
-        infoButton.GetComponent<RectTransform>().sizeDelta = new Vector2(0f, infoButton.GetComponent<RectTransform>().sizeDelta.y);
-        _infoButtonDefaultPositionY = infoButton.transform.localPosition.y;
-        infoButton.transform.localPosition = new Vector3(infoButton.transform.localPosition.x, 0f, infoButton.transform.localPosition.z);
     }
 
     public void Initialize(Match3GameManager match3Manager)
     {
         _match3Manager = match3Manager;
-        
-        SetupButtons();
+
         SubscribeToEvents();
     }
 
@@ -111,32 +88,6 @@ public class TopBarUI : MonoBehaviour
         Toggle(false);
     }
 
-    private void SetupButtons()
-    {
-        settingsButton.onClick.RemoveAllListeners();
-        settingsButton.onClick.AddListener(() =>
-        {
-            CameraManager.Instance.ShakeCamera(0.1f);
-            Toggle(false);
-            bottomBarUI?.Toggle(false);
-            settingsWindowUI?.Show(() =>
-            {
-                Toggle(true);
-                bottomBarUI?.Toggle(true);
-            });
-        });
-    
-        infoButton.onClick.RemoveAllListeners();
-        infoButton.onClick.AddListener(() =>
-        {
-            CameraManager.Instance.ShakeCamera(0.1f);
-            Toggle(false);
-            bottomBarUI?.Toggle(false);
-            informationWindowUI?.ShowAllTutorials();
-            FirebaseManager.Instance?.LogInformationClicked();
-        });
-    }
-
     private void SetupLevel(Match3LevelData levelData)
     {
         if (levelData == null) return;
@@ -174,35 +125,15 @@ public class TopBarUI : MonoBehaviour
         var nameEndPosition = show ? _levelNameDefaultPositionY : 0f;
         var nameStartSize = show ? Vector2.zero : _levelNameDefaultSize;
         var nameEndSize = show ? _levelNameDefaultSize : Vector2.zero;
-        var infoButtonStartPosition = show ? 0 : _infoButtonDefaultPositionY;
-        var infoButtonEndPosition = show ? _infoButtonDefaultPositionY : 0;
-        var infoButtonStartSize = show ? Vector2.zero : _infoButtonDefaultSize;
-        var infoButtonEndSize = show ? _infoButtonDefaultSize : Vector2.zero;
-        var settingsButtonStartPosition = show ? 0 : _settingsButtonDefaultPositionY;
-        var settingsButtonEndPosition = show ? _settingsButtonDefaultPositionY : 0;
-        var settingsButtonStartSize = show ? Vector2.zero : _settingsButtonDefaultSize;
-        var settingsButtonEndSize = show ? _settingsButtonDefaultSize : Vector2.zero;
-        
+
         topBar.sizeDelta = barStartSize;
         levelName.sizeDelta = nameStartSize;
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, nameStartPosition);
-        
-        var settingsButtonRectTransform = settingsButton.GetComponent<RectTransform>();
-        settingsButtonRectTransform.sizeDelta = settingsButtonStartSize;
-        settingsButtonRectTransform.anchoredPosition = new Vector2(settingsButtonRectTransform.anchoredPosition.x, settingsButtonStartPosition);
-        
-        var infoButtonRectTransform = infoButton.GetComponent<RectTransform>();
-        infoButtonRectTransform.sizeDelta = infoButtonStartSize;
-        infoButtonRectTransform.anchoredPosition = new Vector2(infoButtonRectTransform.anchoredPosition.x, infoButtonStartPosition);
-        
+
         _topBarSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))
             .Group(Tween.UISizeDelta(levelName, nameEndSize, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UISizeDelta(settingsButton.transform as RectTransform, settingsButtonEndSize, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UIAnchoredPositionY(settingsButton.transform as RectTransform, settingsButtonEndPosition, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UISizeDelta(infoButton.transform as RectTransform, infoButtonEndSize, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UIAnchoredPositionY(infoButton.transform as RectTransform, infoButtonEndPosition, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
+            .Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
     }
 
     private void SetupUIElements(List<Match3Objective> objectives, List<Match3LoseCondition> loseConditions)

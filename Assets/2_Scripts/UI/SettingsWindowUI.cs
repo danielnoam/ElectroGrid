@@ -2,6 +2,7 @@ using System;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -100,6 +101,13 @@ public class SettingsWindowUI : MonoBehaviour
         {
             backButton.onClick.RemoveAllListeners();
             backButton.onClick.AddListener(Close);
+        }
+
+        if (backgroundImage)
+        {
+            var backgroundRelay = PointerClickRelay.On(backgroundImage);
+            backgroundRelay.Clicked -= OnBackgroundClicked;
+            backgroundRelay.Clicked += OnBackgroundClicked;
         }
 
         if (musicVolumeSlider)
@@ -245,6 +253,12 @@ public class SettingsWindowUI : MonoBehaviour
 
         if (SaveManager.Instance) SaveManager.Instance.Settings.highFrameRate = value;
         GameManager.ApplyFrameRate();
+    }
+
+    private void OnBackgroundClicked(PointerEventData eventData)
+    {
+        var title = titleText ? titleText.rectTransform : null;
+        if (PointerClickRelay.IsOutside(eventData, windowRectTransform, title, _backButtonRectTransform)) Close();
     }
 
     private void Close()
