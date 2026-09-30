@@ -5,6 +5,7 @@ using DNExtensions.Utilities;
 using UnityEngine;
 using Firebase;
 using Firebase.Analytics;
+using Firebase.Crashlytics;
 using Firebase.RemoteConfig;
 
 public class FirebaseManager : MonoBehaviour
@@ -72,6 +73,12 @@ public class FirebaseManager : MonoBehaviour
 
     private IEnumerator SetupFirebase()
     {
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+        // Crashlytics only reports from phones. An uncaught C# exception rarely kills a Unity app, so without
+        // this it would only show as a non-fatal and be easy to miss in the console.
+        Crashlytics.ReportUncaughtExceptionsAsFatal = true;
+#endif
+
         FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
         FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventAppOpen);
 
@@ -140,6 +147,11 @@ public class FirebaseManager : MonoBehaviour
             FirebaseAnalytics.EventLevelStart,
             FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName
         );
+
+#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+        // Attached to any crash report that follows, so a crash says which level it happened in
+        Crashlytics.SetCustomKey("level", levelData.Level.name);
+#endif
     }
 
     public void LogLevelCompleted(Match3LevelData levelData)

@@ -391,8 +391,8 @@ public class Match3PlayHandler : MonoBehaviour
                 var currentMatchable = tile.CurrentMatch3Object as Match3MatchableObject;
                 var neighborMatchable = neighborTile.CurrentMatch3Object as Match3MatchableObject;
         
-                if (WouldCreateMatch(neighborPos, currentMatchable.ItemData, gridShape) || 
-                    WouldCreateMatch(tile.GridPosition, neighborMatchable.ItemData, gridShape))
+                if (WouldCreateMatch(neighborPos, currentMatchable.ItemData, gridShape, tile.GridPosition) || 
+                    WouldCreateMatch(tile.GridPosition, neighborMatchable.ItemData, gridShape, neighborPos))
                 {
                     possibleMatchTiles.Add(tile);
                     possibleMatchTiles.Add(neighborTile);
@@ -403,12 +403,16 @@ public class Match3PlayHandler : MonoBehaviour
         return new List<Match3Tile>(possibleMatchTiles);
     }
 
-    public bool WouldCreateMatch(Vector2Int position, SOItemData itemData, SOGridShape gridShape)
+    /// <summary>Whether placing <paramref name="itemData"/> at <paramref name="position"/> lines up a match.</summary>
+    /// <param name="movedFrom">For a swap, the cell the piece leaves. It holds the other piece afterwards, so it never counts.</param>
+    public bool WouldCreateMatch(Vector2Int position, SOItemData itemData, SOGridShape gridShape, Vector2Int? movedFrom = null)
     {
         int horizontalCount = 1;
         for (int x = position.x - 1; x >= 0; x--)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(x, position.y));
+            var checkPosition = new Vector2Int(x, position.y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile) || !checkTile.HasObject || 
                 !(checkTile.CurrentMatch3Object is Match3MatchableObject checkMatchable) ||
                 checkMatchable.ItemData != itemData)
@@ -417,7 +421,9 @@ public class Match3PlayHandler : MonoBehaviour
         }
         for (int x = position.x + 1; x < gridShape.Grid.Width; x++)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(x, position.y));
+            var checkPosition = new Vector2Int(x, position.y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile) || !checkTile.HasObject || 
                 !(checkTile.CurrentMatch3Object is Match3MatchableObject checkMatchable) ||
                 checkMatchable.ItemData != itemData)
@@ -430,7 +436,9 @@ public class Match3PlayHandler : MonoBehaviour
         int verticalCount = 1;
         for (int y = position.y - 1; y >= 0; y--)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(position.x, y));
+            var checkPosition = new Vector2Int(position.x, y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile) || !checkTile.HasObject || 
                 !(checkTile.CurrentMatch3Object is Match3MatchableObject checkMatchable) ||
                 checkMatchable.ItemData != itemData)
@@ -439,7 +447,9 @@ public class Match3PlayHandler : MonoBehaviour
         }
         for (int y = position.y + 1; y < gridShape.Grid.Height; y++)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(position.x, y));
+            var checkPosition = new Vector2Int(position.x, y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile) || !checkTile.HasObject || 
                 !(checkTile.CurrentMatch3Object is Match3MatchableObject checkMatchable) ||
                 checkMatchable.ItemData != itemData)
@@ -1062,8 +1072,8 @@ public class Match3PlayHandler : MonoBehaviour
                 var currentItemData = layout[tile];
                 var neighborItemData = layout[neighborTile];
         
-                if (WouldCreateMatchInLayout(neighborPos, currentItemData, layout, gridShape) || 
-                    WouldCreateMatchInLayout(tile.GridPosition, neighborItemData, layout, gridShape))
+                if (WouldCreateMatchInLayout(neighborPos, currentItemData, layout, gridShape, tile.GridPosition) || 
+                    WouldCreateMatchInLayout(tile.GridPosition, neighborItemData, layout, gridShape, neighborPos))
                 {
                     possibleMatchTiles.Add(tile);
                     possibleMatchTiles.Add(neighborTile);
@@ -1075,12 +1085,14 @@ public class Match3PlayHandler : MonoBehaviour
     }
 
     private bool WouldCreateMatchInLayout(Vector2Int position, SOItemData itemData, 
-        Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape)
+        Dictionary<Match3Tile, SOItemData> layout, SOGridShape gridShape, Vector2Int movedFrom)
     {
         int horizontalCount = 1;
         for (int x = position.x - 1; x >= 0; x--)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(x, position.y));
+            var checkPosition = new Vector2Int(x, position.y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile)) break;
             if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
             if (checkItemData != itemData) break;
@@ -1088,7 +1100,9 @@ public class Match3PlayHandler : MonoBehaviour
         }
         for (int x = position.x + 1; x < gridShape.Grid.Width; x++)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(x, position.y));
+            var checkPosition = new Vector2Int(x, position.y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile)) break;
             if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
             if (checkItemData != itemData) break;
@@ -1100,7 +1114,9 @@ public class Match3PlayHandler : MonoBehaviour
         int verticalCount = 1;
         for (int y = position.y - 1; y >= 0; y--)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(position.x, y));
+            var checkPosition = new Vector2Int(position.x, y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile)) break;
             if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
             if (checkItemData != itemData) break;
@@ -1108,7 +1124,9 @@ public class Match3PlayHandler : MonoBehaviour
         }
         for (int y = position.y + 1; y < gridShape.Grid.Height; y++)
         {
-            var checkTile = gridHandler.GetTile(new Vector2Int(position.x, y));
+            var checkPosition = new Vector2Int(position.x, y);
+            if (checkPosition == movedFrom) break;
+            var checkTile = gridHandler.GetTile(checkPosition);
             if (!gridHandler.IsValidTile(checkTile)) break;
             if (!layout.TryGetValue(checkTile, out var checkItemData)) break;
             if (checkItemData != itemData) break;

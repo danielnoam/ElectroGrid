@@ -57,7 +57,10 @@ public class SaveManager : MonoBehaviour
     /// <summary>Raised when progress is wiped, so menus showing unlock state can rebuild.</summary>
     public event Action SaveReset;
 
-    private static string SavePath => Path.Combine(Application.persistentDataPath, FileName);
+    /// <summary>Tests point this at a temp folder so they never touch the real save.</summary>
+    internal static string DirectoryOverride;
+
+    private static string SavePath => Path.Combine(DirectoryOverride ?? Application.persistentDataPath, FileName);
     private static string TempPath => SavePath + ".tmp";
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -185,7 +188,7 @@ public class SaveManager : MonoBehaviour
         }
     }
 
-    private void Load()
+    internal void Load()
     {
         try
         {

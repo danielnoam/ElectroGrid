@@ -632,3 +632,50 @@ of as a new blob per edit.
       overrides and all 1,556 references into them held, and the credits window
       in Main is now a prefab instance. The buttons row sits 50 higher (-800),
       set once in the base.
+
+## Before a wider release
+
+- [x] **Crashlytics.** `FirebaseCrashlytics.unitypackage` 13.6.0, matching
+      the other Firebase plugins. The files were copied in by hand rather than
+      through Import Package: the `.pdb` files and the tvOS libraries were left
+      out like the rest of the Firebase install, and existing files were kept
+      (they differed only in line endings, apart from a `.pom` that EDM4U had
+      already rewritten). The Android Resolver added `firebase-crashlytics-unity`
+      and `firebase-crashlytics-ndk` to `mainTemplate.gradle`. `FirebaseManager`
+      turns on `ReportUncaughtExceptionsAsFatal`, because an uncaught C#
+      exception rarely kills a Unity app and would otherwise only show as a
+      non-fatal. It also sets a `level` custom key on level start, so a crash
+      report says which level it came from. Both calls only compile for Android
+      and iOS players, not the editor.
+      **Still to do by hand:**
+      - Open Crashlytics in the Firebase console once. It stays empty until
+        the first report arrives.
+      - Build to a phone and force a test exception to confirm reports arrive.
+        They are sent on the next launch, not at the moment of the crash.
+      - Android is IL2CPP, so native crashes need symbols to be readable. Turn
+        on *Create symbols.zip* in the Android build settings and upload with
+        `firebase crashlytics:symbols:upload --app=<android app id> <symbols dir>`.
+        C# exceptions already come with readable stack traces without this.
+
+- [x] **EditMode tests**, 49 of them, in `Assets/2_Scripts/Tests/Editor`.
+      They live in the predefined `Assembly-CSharp-Editor`, which already
+      references NUnit, so no asmdef was needed and the game code stays in
+      `Assembly-CSharp`. Run them from Window > General > Test Runner > EditMode.
+      - `MatchDetectionTests`: immediate matches, matches through a given tile,
+        and possible moves. Boards are written as text (`"AAB"`, `'#'` for no
+        cell, `'*'` for an obstacle). `Match3TestBoard` builds real tiles and
+        pieces from that without a scene, the pooler or tweens.
+      - `ObjectiveTests`: every objective and lose condition, cloning, and
+        `Match3LevelData` (completion, refunds from a destroyed Plus, below half).
+      - `SaveManagerTests`: round trip, corrupt and partial files, best-stat
+        merging, unlock order, records keyed by asset name, and resetting
+        progress while keeping settings. They write to a temp folder through
+        `SaveManager.DirectoryOverride` and never touch the real save.
+        `InternalsVisibleTo` in `AssemblyInfo.cs` exposes that override and
+        `Load` to the tests.
+      **Bug found by them:** `FindPossibleMatches` counted the piece being
+      swapped as still sitting in the cell it was leaving. With A, B, A in a
+      column, swapping the top A down was reported as a move, but the result is
+      B, A, A. A dead board could therefore skip its reshuffle and leave the
+      player stuck. The layout version used while filling the board had the same
+      bug. Both now stop scanning at the cell the piece moves out of.

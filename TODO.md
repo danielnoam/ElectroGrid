@@ -7,14 +7,18 @@ Last full check against the code: 2026-09-29.
 
 ## 1. Before a wider release
 
-- [ ] **No crash reporting.** The Firebase plugins are Analytics, App, Platform,
-      RemoteConfig and TaskExtension — Crashlytics is not installed. With no test
-      coverage and a lot of recently changed code, a crash in the wild is
-      currently invisible.
+Crashlytics and the first tests are in (see DONE.md). What is left:
 
-- [ ] **No tests**, despite `com.unity.test-framework` being installed. Match
-      detection, objective progress and `SaveManager` are all testable without a
-      scene, and the reshuffle has no safety net.
+- [ ] **Windows builds still report no crashes.** Crashlytics for Unity only
+      reports from Android and iOS. Options: Unity Cloud Diagnostics, Sentry's
+      Unity SDK (free tier, works on desktop), or writing
+      `Application.logMessageReceived` exceptions to a file next to the save.
+      Worth deciding before Steam, where PC is the only platform.
+
+- [ ] **No PlayMode tests.** The EditMode tests cover the logic. Still untested:
+      the coroutine flow in `Match3GameManager`, meaning a swap, the cascade
+      loop and the reshuffle running end to end. That needs a PlayMode test that
+      loads the Match3 scene.
 
 ---
 
