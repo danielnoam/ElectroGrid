@@ -25,12 +25,12 @@ public class Match3MatchableObject : Match3SwappableObject
         if (!destroyParticle) return;
 
         var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-        var oneShotParticle = particleGo.GetComponent<OneShotParticle>();
-        var mainModule = oneShotParticle.particle.main;
-        var textureSheetModule = oneShotParticle.particle.textureSheetAnimation;
+        var poolableParticle = particleGo.GetComponent<PoolableParticleSystem>();
+        var mainModule = poolableParticle.particle.main;
+        var textureSheetModule = poolableParticle.particle.textureSheetAnimation;
         mainModule.startColor = itemRenderer.color;
         textureSheetModule.SetSprite(0, itemRenderer.sprite);
-        oneShotParticle.Play(transform.position);
+        poolableParticle.Play(transform.position);
     }
 
     private void UpdateEmissionMask(Texture2D emissionMask)

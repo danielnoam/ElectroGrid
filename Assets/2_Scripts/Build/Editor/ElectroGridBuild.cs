@@ -218,6 +218,9 @@ internal static class ElectroGridBuild
 
     private static string ReleaseTag => "v" + Version;
 
+    // Named on every release call, so gh does not fall back to whichever repository this checkout's remote is
+    private static string RepoArgument => $" --repo {ReleaseRepository.Name}";
+
     public static RunResult Run(SOBuildConfig config, bool upload)
     {
         var result = new RunResult
@@ -494,7 +497,7 @@ internal static class ElectroGridBuild
     /// <summary>Whether a release already exists for this version: null if not, otherwise whether it is a draft.</summary>
     private static bool? FindExistingRelease()
     {
-        var view = BuildProcess.Gh($"release view {ReleaseTag} --json isDraft --jq .isDraft");
+        var view = BuildProcess.Gh($"release view {ReleaseTag}{RepoArgument} --json isDraft --jq .isDraft");
         if (!view.Succeeded) return null;
 
         return view.Output.Trim() == "true";
@@ -502,7 +505,7 @@ internal static class ElectroGridBuild
 
     private static BuildProcess.Result CreateRelease(SOBuildConfig config, List<string> artifacts, string notesPath, string commit)
     {
-        var arguments = new StringBuilder($"release create {ReleaseTag}");
+        var arguments = new StringBuilder($"release create {ReleaseTag}{RepoArgument}");
         foreach (string artifact in artifacts) arguments.Append(' ').Append(BuildProcess.Quote(artifact));
         arguments.Append($" --title {BuildProcess.Quote($"ElectroGrid {Version}")}");
         arguments.Append($" --notes-file {BuildProcess.Quote(notesPath)}");
@@ -522,23 +525,23 @@ internal static class ElectroGridBuild
         if (!string.IsNullOrEmpty(commit))
         {
             var retarget = isDraft
-                ? BuildProcess.Gh($"release edit {ReleaseTag} --target {commit}")
-                : BuildProcess.Gh($"api -X PATCH repos/{{owner}}/{{repo}}/git/refs/tags/{ReleaseTag} -f sha={commit} -F force=true");
+                ? BuildProcess.Gh($"release edit {ReleaseTag}{RepoArgument} --target {commit}")
+                : BuildProcess.Gh($"api -X PATCH repos/{ReleaseRepository.Name}/git/refs/tags/{ReleaseTag} -f sha={commit} -F force=true");
             if (!retarget.Succeeded) return retarget;
 
             // Keeps the local tag in step, so the next release's notes start from the right commit
             if (!isDraft) BuildProcess.Git("fetch --tags --force --quiet", 120);
         }
 
-        var upload = new StringBuilder($"release upload {ReleaseTag} --clobber");
+        var upload = new StringBuilder($"release upload {ReleaseTag}{RepoArgument} --clobber");
         foreach (string artifact in artifacts) upload.Append(' ').Append(BuildProcess.Quote(artifact));
         var uploaded = BuildProcess.Gh(upload.ToString(), 30 * 60);
         if (!uploaded.Succeeded) return uploaded;
 
-        var edit = BuildProcess.Gh($"release edit {ReleaseTag} --title {BuildProcess.Quote($"ElectroGrid {Version}")} --notes-file {BuildProcess.Quote(notesPath)}");
+        var edit = BuildProcess.Gh($"release edit {ReleaseTag}{RepoArgument} --title {BuildProcess.Quote($"ElectroGrid {Version}")} --notes-file {BuildProcess.Quote(notesPath)}");
         if (!edit.Succeeded) return edit;
 
-        var url = BuildProcess.Gh($"release view {ReleaseTag} --json url --jq .url");
+        var url = BuildProcess.Gh($"release view {ReleaseTag}{RepoArgument} --json url --jq .url");
         return new BuildProcess.Result(0, url.Succeeded ? url.Output : $"Replaced {ReleaseTag}", string.Empty);
     }
 

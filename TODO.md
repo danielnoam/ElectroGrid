@@ -9,11 +9,12 @@ Last full check against the code: 2026-09-29.
 
 Crashlytics and the first tests are in (see DONE.md). What is left:
 
-- [ ] **Windows builds still report no crashes.** Crashlytics for Unity only
-      reports from Android and iOS. Options: Unity Cloud Diagnostics, Sentry's
-      Unity SDK (free tier, works on desktop), or writing
-      `Application.logMessageReceived` exceptions to a file next to the save.
-      Worth deciding before Steam, where PC is the only platform.
+- [ ] **Windows builds still report no crashes to a dashboard.** Crashlytics for
+      Unity only reports from Android and iOS. Exceptions now go to `crash.log`
+      next to the save (see DONE.md), but that only helps when a player sends
+      it in. Sentry's Unity SDK (free tier, catches native crashes on desktop
+      too) is the pick, deferred for now. Do it before Steam, where PC is the
+      only platform. Limit it to Windows so phones don't report twice.
 
 - [ ] **No PlayMode tests.** The EditMode tests cover the logic. Still untested:
       the coroutine flow in `Match3GameManager`, meaning a swap, the cascade
@@ -150,12 +151,10 @@ leaderboard needs Endless.
       Makes sense, but the order matters or every installed copy stops updating:
       1. Create the public repo (e.g. `danielnoam/ElectroGrid-Releases`), with
          just a README and maybe a changelog.
-      2. Point `GameUpdater` at it (the URL is currently
-         `api.github.com/repos/danielnoam/ElectroGrid/releases/latest`).
-         Put the owner/repo in `BuildConfig` so the updater and build window read
-         the same value.
-      3. Point the build window's upload at it: `gh release create --repo
-         <releases repo>`. The tag no longer lives in the repo where the commit is,
+      2. Change `ReleaseRepository.Name` to it. The updater, its Open Page
+         fallback and every `gh release` call in the build window already read
+         that one value and pass it as `--repo` (see DONE.md).
+      3. Make the build window's upload work across repos. The tag no longer lives in the repo where the commit is,
          so the "tag already released" check, the "HEAD pushed" check and the
          release notes from commit subjects need to handle that. **Replace
          Existing Release** moving the tag to the current commit no longer works
@@ -227,18 +226,6 @@ leaderboard needs Endless.
 ---
 
 ## 4. Later
-
-- [ ] **`OneShotParticle` still returns to the pool on scaled time.** Waiting on
-      a fix in DNExtensions first. The three pooling items in DONE.md > Loose
-      ends were marked superseded, but only `OneShotSfx` was replaced.
-      `OneShotParticle` is still game code, used by `Match3Object`,
-      `Match3MatchableObject` and `Match3EffectManager` on six particle prefabs.
-      Still true today: `ReturnAfter` waits with `WaitForSeconds`, so a line
-      break (time scale 0.3) or an open window (0) holds particles out of the
-      pool, and `DestroyAfter` is dead code that would break the pool if called.
-      Fix: `WaitForSecondsRealtime`, delete `DestroyAfter`. The curve-mode
-      lifetime worry does not apply: all six prefabs use Constant or Random
-      Between Two Constants.
 
 - [ ] **Music Vorbis quality is still 100%.** Needs listening, so later. The
       loading problems are fixed (see DONE.md > Music clips moved to Streaming).

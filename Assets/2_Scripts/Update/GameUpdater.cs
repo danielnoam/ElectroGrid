@@ -16,8 +16,6 @@ using UnityEngine.Networking;
 [DisallowMultipleComponent]
 public class GameUpdater : MonoBehaviour
 {
-    private const string Repository = "danielnoam/ElectroGrid";
-    private const string LatestReleaseUrl = "https://api.github.com/repos/" + Repository + "/releases/latest";
     private const string UpdatesFolderName = "Updates";
     private const int RequestTimeoutSeconds = 20;
 
@@ -119,14 +117,14 @@ public class GameUpdater : MonoBehaviour
     public void OpenReleasePage()
     {
         string url = LatestRelease?.html_url;
-        Application.OpenURL(string.IsNullOrEmpty(url) ? $"https://github.com/{Repository}/releases/latest" : url);
+        Application.OpenURL(string.IsNullOrEmpty(url) ? ReleaseRepository.LatestReleasePageUrl : url);
     }
 
     private IEnumerator CheckForUpdate()
     {
         SetState(State.Checking);
 
-        using var request = UnityWebRequest.Get(LatestReleaseUrl);
+        using var request = UnityWebRequest.Get(ReleaseRepository.LatestReleaseApiUrl);
         request.timeout = RequestTimeoutSeconds;
         request.SetRequestHeader("Accept", "application/vnd.github+json");
 

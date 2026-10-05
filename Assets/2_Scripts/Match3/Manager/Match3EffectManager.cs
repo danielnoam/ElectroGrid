@@ -13,8 +13,8 @@ public class Match3EffectManager : MonoBehaviour
     [Header("Effects")]
     [SerializeField] private EffectSequence startLevelSequence;
     [SerializeField] private EffectSequence endLevelSequence;
-    [SerializeField] private OneShotParticle matchableBgParticlePrefab;
-    [SerializeField] private OneShotParticle helperBgParticlePrefab;
+    [SerializeField] private PoolableParticleSystem matchableBgParticlePrefab;
+    [SerializeField] private PoolableParticleSystem helperBgParticlePrefab;
     
     [Header("LineBreak")]
     [SerializeField] private bool lineBreakPulseGrid = true;
@@ -397,9 +397,9 @@ public class Match3EffectManager : MonoBehaviour
         if (!matchableBgParticlePrefab || !itemData) return;
     
         var particle = ObjectPooler.GetObjectFromPool(matchableBgParticlePrefab.gameObject, position, Quaternion.identity);
-        var particleOneShot = particle.GetComponent<OneShotParticle>();
-        var textureSheetModule = particleOneShot.particle.textureSheetAnimation;
-        var colorOverLifetimeModule = particleOneShot.particle.colorOverLifetime;
+        var poolableParticle = particle.GetComponent<PoolableParticleSystem>();
+        var textureSheetModule = poolableParticle.particle.textureSheetAnimation;
+        var colorOverLifetimeModule = poolableParticle.particle.colorOverLifetime;
     
         var startColor = itemData.Color;
         startColor.a = 0.3f;
@@ -422,7 +422,7 @@ public class Match3EffectManager : MonoBehaviour
     
         colorOverLifetimeModule.color = new ParticleSystem.MinMaxGradient(gradient);
         textureSheetModule.SetSprite(0, itemData.Sprite);
-        particleOneShot.Play();
+        poolableParticle.Play();
     }
     
     [Button]
@@ -431,8 +431,8 @@ public class Match3EffectManager : MonoBehaviour
         if (!helperBgParticlePrefab) return;
 
         var particle = ObjectPooler.GetObjectFromPool(helperBgParticlePrefab.gameObject, position, Quaternion.identity);
-        var particleOneShot = particle.GetComponent<OneShotParticle>();
-        particleOneShot.Play();
+        var poolableParticle = particle.GetComponent<PoolableParticleSystem>();
+        poolableParticle.Play();
     }
 
 }
