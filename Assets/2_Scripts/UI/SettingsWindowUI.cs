@@ -37,6 +37,7 @@ public class SettingsWindowUI : MonoBehaviour
     [SerializeField] private RectTransform windowRectTransform;
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private Image backgroundImage;
+    [SerializeField] private TextMeshProUGUI versionText;
 
     private CanvasGroup _canvasGroup;
     private RectTransform _backButtonRectTransform;
@@ -66,6 +67,7 @@ public class SettingsWindowUI : MonoBehaviour
         }
 
         if (titleText) titleText.alpha = 0f;
+        if (versionText) versionText.text = $"v{Application.version}";
 
         if (backgroundImage)
         {
