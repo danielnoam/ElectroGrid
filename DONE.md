@@ -366,8 +366,8 @@ of as a new blob per edit.
 > replaces them — particularly the time scale one, which is the kind of thing a
 > general purpose pooling system also gets wrong.
 >
-> **Update:** only `OneShotSfx` was actually replaced. See TODO.md > Later >
-> `OneShotParticle` for what is still live.
+> **Update:** only `OneShotSfx` was replaced at the time. `OneShotParticle` followed
+> later, see the last entry in this file.
 
 - ~~**Pooled one-shots return on scaled time, and this game manipulates the
       global time scale a lot.**~~ *(superseded by the DNExtensions update)* `OneShotParticle.ReturnAfter` and
@@ -679,3 +679,20 @@ of as a new blob per edit.
       B, A, A. A dead board could therefore skip its reshuffle and leave the
       player stuck. The layout version used while filling the board had the same
       bug. Both now stop scanning at the cell the piece moves out of.
+
+- [x] **`OneShotParticle` replaced by DNExtensions' `PoolableParticleSystem`.**
+      The six particle prefabs and the three scripts that spawn them use the
+      package component now, and `OneShotParticle.cs` is gone (`DestroyAfter`
+      with it). The fix itself went into DNExtensions first, which is pinned to
+      that commit.
+      - **Particles still return on scaled time, on purpose.** The earlier note
+        said to switch to `WaitForSecondsRealtime`, but every particle here
+        simulates on scaled time. During a line break (0.3) a particle plays
+        3.3x slower, so a real-time return would pull it back to the pool
+        mid-animation, and at 0 behind a window it would vanish while frozen.
+        `PoolableParticleSystem` waits in whichever time mode the particle
+        system uses, so the return lines up with what's on screen.
+      - **Upstream fix:** the wait now includes start delay, divides by
+        simulation speed, and reads curve-mode lifetimes correctly instead of
+        `constantMax`. None of the six prefabs needed that today, but they
+        would break silently the first time one did.

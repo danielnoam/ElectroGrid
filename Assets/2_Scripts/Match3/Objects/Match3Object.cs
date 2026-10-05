@@ -15,7 +15,7 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
     [SerializeField] protected SpriteRenderer itemRenderer;
     [SerializeField, AudioLibraryID] protected string spawnSfx;
     [SerializeField, AudioLibraryID] protected string destroySfx;
-    [SerializeField] protected OneShotParticle destroyParticle;
+    [SerializeField] protected PoolableParticleSystem destroyParticle;
 
     protected Vector3 _baseScale;
     protected Match3Tile _currentTile;
@@ -105,8 +105,8 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
         if (!destroyParticle) return;
 
         var particleGo = ObjectPooler.GetObjectFromPool(destroyParticle.gameObject, transform.position, Quaternion.identity);
-        var oneShotParticle = particleGo.GetComponent<OneShotParticle>();
-        oneShotParticle.Play(transform.position);
+        var poolableParticle = particleGo.GetComponent<PoolableParticleSystem>();
+        poolableParticle.Play(transform.position);
     }
 
     protected bool IsAdjacentToAnyMatch(List<Match3Tile> matches)

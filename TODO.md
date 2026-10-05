@@ -228,18 +228,6 @@ leaderboard needs Endless.
 
 ## 4. Later
 
-- [ ] **`OneShotParticle` still returns to the pool on scaled time.** Waiting on
-      a fix in DNExtensions first. The three pooling items in DONE.md > Loose
-      ends were marked superseded, but only `OneShotSfx` was replaced.
-      `OneShotParticle` is still game code, used by `Match3Object`,
-      `Match3MatchableObject` and `Match3EffectManager` on six particle prefabs.
-      Still true today: `ReturnAfter` waits with `WaitForSeconds`, so a line
-      break (time scale 0.3) or an open window (0) holds particles out of the
-      pool, and `DestroyAfter` is dead code that would break the pool if called.
-      Fix: `WaitForSecondsRealtime`, delete `DestroyAfter`. The curve-mode
-      lifetime worry does not apply: all six prefabs use Constant or Random
-      Between Two Constants.
-
 - [ ] **Music Vorbis quality is still 100%.** Needs listening, so later. The
       loading problems are fixed (see DONE.md > Music clips moved to Streaming).
       Dropping quality to 0.5-0.7 would roughly halve the build size and is
