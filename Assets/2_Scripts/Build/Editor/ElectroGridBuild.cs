@@ -315,6 +315,10 @@ internal static class ElectroGridBuild
             DeleteFolder(platformFolder);
             Directory.CreateDirectory(Path.GetDirectoryName(playerPath) ?? platformFolder);
 
+            // Addressables build their content for the active platform before the player builds, and refuse when it
+            // differs from the profile being built, so the profile has to be active first
+            if (BuildProfile.GetActiveBuildProfile() != target.profile) BuildProfile.SetActiveBuildProfile(target.profile);
+
             var options = new BuildPlayerWithProfileOptions
             {
                 buildProfile = target.profile,
