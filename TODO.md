@@ -98,39 +98,20 @@ and the level select rework is where the Endless entry goes.
         N. After the tutorial levels is the usual answer, since Endless assumes
         the player already knows Plus and Stars.
 
-- [ ] **Localisation.** Not started. Scope, so it can be costed honestly:
-
-      **Volume is small.** Roughly 25 player-facing strings in code, plus 5
-      tutorial cards (title and body), 12 level names and 4 item labels in
-      ScriptableObjects, plus whatever sits in scene and prefab TMP components
-      (menu buttons, window titles). Translation cost is genuinely low.
-
-      **The work is in the plumbing, not the words.** The strings are currently
-      built by string interpolation inside `Match3Objective` and
-      `Match3LoseCondition` — `$"Collect {requiredAmount} Pieces"`,
-      `$"Destroy {requiredAmount} Double Stars"`. Those become table lookups with
-      arguments. Watch for word order: languages do not agree that the number
-      comes first, so the translator needs the placeholder, not a concatenation.
-
-      **Suggested route:** the official `com.unity.localization` package, which
-      handles TMP, ScriptableObject fields and a locale selector. Add it during
-      or after the Unity upgrade (section 4) rather than before, so the package
-      resolves against the final editor version.
-
-      **Font coverage is the trap.** TMP renders from a pre-baked atlas. Latin
-      languages with accents (Spanish, Portuguese, German, French) may already
-      be covered; Cyrillic (Russian), Greek, or any CJK will need the atlas
-      rebuilt with those ranges or they render as blank boxes. Check the font
-      asset before promising a language. Leave right-to-left (Arabic, Hebrew)
-      out of a first pass, it needs TMP's RTL handling and mirrored layouts.
-
-      **A reasonable first set** is English as the base plus Spanish,
-      Portuguese (Brazil), German and French — all Latin script, all large
-      mobile markets, no atlas surprises.
-
-      **One thing to decide:** level names are currently authored strings
-      ("Level 1"). If they stay numeric they need no translation at all, which
-      is the cheaper answer.
+- [ ] **Localisation follow-ups.** The system and five languages are in (see
+      DONE.md). What is left needs a person, not code:
+      - **Native review of the translations.** Spanish, Portuguese (Brazil),
+        German and French were written without a native speaker. Get each
+        read in game before a release that advertises them; the Content and UI
+        tables export to CSV for that (Window > Asset Management >
+        Localization Tables).
+      - **A digital font with accents.** DS-DIGI has no accented letters at
+        all, so á, ç, ö, ß and friends come from Liberation Sans through a
+        fallback. Readable, but those letters do not match the digital style.
+        Swapping DS-DIGI for a similar font with Latin-1 coverage, or
+        extending it, fixes that.
+      - **Store listing and screenshots** per language, if the stores should
+        show them.
 
 ### Content, not engineering
 

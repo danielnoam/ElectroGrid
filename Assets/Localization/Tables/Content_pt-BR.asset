@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Content_pt-BR
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: pt-BR
+  m_SharedData: {fileID: 11400000, guid: 3e9d6025d4245e94282bbdd919393591, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 816832512
+    m_Localized: "Combina\xE7\xF5es b\xE1sicas"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 833609728
+    m_Localized: "Troque pe\xE7as vizinhas para juntar 3 ou mais da mesma forma em uma linha ou coluna."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804032
+    m_Localized: Estrelas duplas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804033
+    m_Localized: "As estrelas duplas bloqueiam suas combina\xE7\xF5es. Fa\xE7a uma combina\xE7\xE3o ao lado delas ou use um quebra-linha para destru\xED-las."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804034
+    m_Localized: Quebra-linha
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804035
+    m_Localized: "Junte 4 ou mais pe\xE7as em uma linha ou coluna para destruir a linha inteira."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804036
+    m_Localized: Plus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804037
+    m_Localized: "O Plus d\xE1 movimentos ou tempo extra. Voc\xEA pode troc\xE1-lo, fazer combina\xE7\xF5es ao lado dele ou usar um quebra-linha."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192640
+    m_Localized: Estrelas quadradas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192641
+    m_Localized: "As estrelas quadradas caem quando voc\xEA faz combina\xE7\xF5es embaixo delas. Continue combinando por baixo at\xE9 elas chegarem ao fundo da grade."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192642
+    m_Localized: "C\xEDrculo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192643
+    m_Localized: "Hex\xE1gono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192644
+    m_Localized: "Pent\xE1gono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192645
+    m_Localized: "Tri\xE2ngulo"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

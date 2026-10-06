@@ -36,14 +36,14 @@ public static class UpdateInstaller
 
     public static Result Install(string path)
     {
-        if (string.IsNullOrEmpty(path) || !File.Exists(path)) return Result.Failed("The downloaded update is missing.");
+        if (string.IsNullOrEmpty(path) || !File.Exists(path)) return Result.Failed(L10n.Get("update.error.missing"));
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         return InstallAndroid(path);
 #elif UNITY_STANDALONE_WIN && !UNITY_EDITOR
         return InstallWindows(path);
 #else
-        return Result.Failed("Updates install from a build, not the editor.");
+        return Result.Failed(L10n.Get("update.error.editor"));
 #endif
     }
 
@@ -66,7 +66,7 @@ public static class UpdateInstaller
                 using var packageUri = uriClass.CallStatic<AndroidJavaObject>("parse", "package:" + Application.identifier);
                 using var settings = new AndroidJavaObject("android.content.Intent", "android.settings.MANAGE_UNKNOWN_APP_SOURCES", packageUri);
                 activity.Call("startActivity", settings);
-                return Result.NeedsPermission("Allow ElectroGrid to install apps, then come back and tap Install.");
+                return Result.NeedsPermission(L10n.Get("update.android.permission"));
             }
 
             using var context = activity.Call<AndroidJavaObject>("getApplicationContext");
@@ -82,11 +82,11 @@ public static class UpdateInstaller
             intent.Call<AndroidJavaObject>("addFlags", grantReadUriPermission | newTask).Dispose();
             activity.Call("startActivity", intent);
 
-            return Result.Started("Follow the installer to finish the update.");
+            return Result.Started(L10n.Get("update.android.started"));
         }
         catch (Exception e)
         {
-            return Result.Failed($"Could not open the installer: {e.Message}");
+            return Result.Failed(L10n.Get("update.error.installer", ("error", e.Message)));
         }
     }
 #endif
@@ -98,11 +98,11 @@ public static class UpdateInstaller
         {
             string executable = Process.GetCurrentProcess().MainModule?.FileName;
             string installFolder = Path.GetDirectoryName(executable);
-            if (string.IsNullOrEmpty(executable) || string.IsNullOrEmpty(installFolder)) return Result.Failed("Could not find the game's install folder.");
+            if (string.IsNullOrEmpty(executable) || string.IsNullOrEmpty(installFolder)) return Result.Failed(L10n.Get("update.error.nofolder"));
 
             if (!CanWriteTo(installFolder))
             {
-                return Result.Failed("The game's folder is read-only, for example under Program Files. Move the game to another folder, or update from the release page.");
+                return Result.Failed(L10n.Get("update.error.readonly"));
             }
 
             string updatesFolder = Path.GetDirectoryName(zipPath) ?? Application.persistentDataPath;
@@ -124,11 +124,11 @@ public static class UpdateInstaller
             });
 
             Application.Quit();
-            return Result.Started("Restarting to finish the update.");
+            return Result.Started(L10n.Get("update.windows.started"));
         }
         catch (Exception e)
         {
-            return Result.Failed($"Could not apply the update: {e.Message}");
+            return Result.Failed(L10n.Get("update.error.apply", ("error", e.Message)));
         }
     }
 

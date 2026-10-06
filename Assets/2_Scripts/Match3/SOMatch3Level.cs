@@ -17,7 +17,19 @@ public class SOMatch3Level : ScriptableObject
     [SerializeField, HideInInspector] private Match3TileObjectType[] tileObjects;
 
     
+    /// <summary>The authored name. Stays in English for analytics and save records, players see DisplayName.</summary>
     public string LevelName => levelName;
+
+    /// <summary>"Level 3" in the player's language, numbered by play order. Levels outside the play order show their authored name.</summary>
+    public string DisplayName
+    {
+        get
+        {
+            var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
+            int index = levels != null ? Array.IndexOf(levels, this) : -1;
+            return index >= 0 ? L10n.Get("level.name", ("number", index + 1)) : levelName;
+        }
+    }
     public SOGridShape GridShape => gridShape;
     public ChanceList<SOItemData> MatchObjects => matchObjects;
     public List<Match3Objective> Objectives => objectives;

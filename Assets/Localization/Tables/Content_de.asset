@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Content_de
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: de
+  m_SharedData: {fileID: 11400000, guid: 3e9d6025d4245e94282bbdd919393591, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 816832512
+    m_Localized: Grundlagen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 833609728
+    m_Localized: Tausche benachbarte Teile, um 3 oder mehr gleiche Formen in einer Reihe oder Spalte zu verbinden.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804032
+    m_Localized: Doppelsterne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804033
+    m_Localized: "Doppelsterne blockieren deine Kombinationen. Bilde daneben eine Kombination oder nutze einen Linienbrecher, um sie zu zerst\xF6ren."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804034
+    m_Localized: Linienbrecher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804035
+    m_Localized: "Verbinde 4 oder mehr Teile in einer Reihe oder Spalte, um die ganze Linie zu zerst\xF6ren."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804036
+    m_Localized: Plus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804037
+    m_Localized: "Plus gibt dir zus\xE4tzliche Z\xFCge oder Zeit. Du kannst es tauschen, daneben Kombinationen bilden oder einen Linienbrecher nutzen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192640
+    m_Localized: Quadratsterne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192641
+    m_Localized: Quadratsterne fallen, wenn du unter ihnen Kombinationen bildest. Kombiniere weiter darunter, bis sie den unteren Rand des Rasters erreichen.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192642
+    m_Localized: Kreis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192643
+    m_Localized: Sechseck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192644
+    m_Localized: "F\xFCnfeck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192645
+    m_Localized: Dreieck
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

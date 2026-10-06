@@ -185,7 +185,7 @@ public class GameUpdater : MonoBehaviour
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Fail($"Download failed: {request.error}");
+                Fail(L10n.Get("update.error.download", ("error", request.error)));
                 yield break;
             }
         }
@@ -195,7 +195,7 @@ public class GameUpdater : MonoBehaviour
         long size = File.Exists(path) ? new FileInfo(path).Length : 0;
         if (asset.size > 0 && size != asset.size)
         {
-            Fail($"Download is incomplete ({size} of {asset.size} bytes).");
+            Fail(L10n.Get("update.error.incomplete", ("size", size), ("expected", asset.size)));
             yield break;
         }
 
@@ -206,7 +206,7 @@ public class GameUpdater : MonoBehaviour
         if (!DigestMatches(asset.digest, hashTask.Result))
         {
             File.Delete(path);
-            Fail("Download failed its checksum. Try again.");
+            Fail(L10n.Get("update.error.checksum"));
             yield break;
         }
 

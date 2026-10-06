@@ -29,11 +29,13 @@ public class MainMenuScreen : MenuScreen
         creditsWindowUI?.Initialize();
 
         if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
+        L10n.LanguageChanged += SetupContinueButton;
     }
 
     private void OnDestroy()
     {
         if (SaveManager.Instance) SaveManager.Instance.SaveReset -= SetupContinueButton;
+        L10n.LanguageChanged -= SetupContinueButton;
     }
 
     private void SetupContinueButton()
@@ -49,7 +51,7 @@ public class MainMenuScreen : MenuScreen
         if (!level) return;
 
         var label = continueButton.GetComponentInChildren<TMP_Text>(true);
-        if (label) label.text = isNewGame ? "New Game" : "Continue";
+        if (label) label.text = L10n.Get(isNewGame ? "menu.newgame" : "menu.continue");
 
         continueButton.onClick.RemoveAllListeners();
         continueButton.onClick.AddListener(() =>

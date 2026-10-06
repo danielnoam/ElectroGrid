@@ -13,6 +13,18 @@ MonoBehaviour:
   m_Name: Shape_Pentagon
   m_EditorClassIdentifier: Assembly-CSharp::SOItemData
   label: Pentagon
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: GUID:3e9d6025d4245e94282bbdd919393591
+    m_TableEntryReference:
+      m_KeyId: 846192644
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   color: {r: 1, g: 0.76896954, b: 0, a: 1}
   sprite: {fileID: 21300000, guid: 801e06c59f0a70846b10ad123ca56f73, type: 3}
   emissionMask: {fileID: 2800000, guid: 43d04bbb550426d46b6e215b75aa8feb, type: 3}
+  references:
+    version: 2
+    RefIds: []

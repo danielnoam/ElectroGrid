@@ -89,7 +89,7 @@ public class MoveLimit : Match3LoseCondition
 
     public override string GetRequirementText()
     {
-        return $"Moves Left:";
+        return L10n.Get("lose.moves.requirement");
     }
     public override (int, int) GetProgress()
     {
@@ -103,7 +103,7 @@ public class MoveLimit : Match3LoseCondition
     
     public override string GetDescription()
     {
-        return $"Moves allowed: {allowedMoves}";
+        return L10n.Get("lose.moves.description", ("moves", allowedMoves));
     }
 }
 
@@ -158,7 +158,7 @@ public class TimeLimit : Match3LoseCondition
 
     public override string GetRequirementText()
     {
-        return $"Time Left:";
+        return L10n.Get("lose.time.requirement");
     }
     
     
@@ -177,6 +177,6 @@ public class TimeLimit : Match3LoseCondition
         int minutes = Mathf.FloorToInt(allowedTime / 60f);
         int seconds = Mathf.FloorToInt(allowedTime % 60f);
         
-        return $"Allotted Time: {minutes:00}:{seconds:00}";
+        return L10n.Get("lose.time.description", ("minutes", minutes), ("seconds", seconds));
     }
 }

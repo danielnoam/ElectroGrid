@@ -30,6 +30,7 @@ public class TopBarUI : MonoBehaviour
     private Vector2 _levelNameDefaultSize;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
+    private SOMatch3Level _currentLevel;
 
     private void Awake()
     {
@@ -61,15 +62,25 @@ public class TopBarUI : MonoBehaviour
         _match3Manager.LevelStarted += OnLevelStarted;
         _match3Manager.LevelComplete += OnLevelComplete;
         _match3Manager.LevelFailed += OnLevelFailed;
+        L10n.LanguageChanged += RefreshLabels;
     }
 
     private void UnsubscribeFromEvents()
     {
+        L10n.LanguageChanged -= RefreshLabels;
         if (_match3Manager == null) return;
-        
+
         _match3Manager.LevelStarted -= OnLevelStarted;
         _match3Manager.LevelComplete -= OnLevelComplete;
         _match3Manager.LevelFailed -= OnLevelFailed;
+    }
+
+    // The language can change from the settings window mid-level
+    private void RefreshLabels()
+    {
+        if (_currentLevel) levelNameText.text = _currentLevel.DisplayName;
+        foreach (var pair in _currentObjectives) pair.Value.SetLabel(pair.Key.GetRequirementText());
+        foreach (var pair in _currentLoseConditions) pair.Value.SetLabel(pair.Key.GetRequirementText());
     }
 
     private void OnLevelStarted(Match3LevelData levelData)
@@ -91,8 +102,9 @@ public class TopBarUI : MonoBehaviour
     private void SetupLevel(Match3LevelData levelData)
     {
         if (levelData == null) return;
-        
-        levelNameText.text = levelData.Level.LevelName;
+
+        _currentLevel = levelData.Level;
+        levelNameText.text = levelData.Level.DisplayName;
         SetupUIElements(levelData.CurrentObjectives, levelData.CurrentLoseConditions);
     }
 

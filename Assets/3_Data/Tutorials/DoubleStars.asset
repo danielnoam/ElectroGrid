@@ -12,9 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3005d39c3a4eee8331e327243b8b42, type: 3}
   m_Name: DoubleStars
   m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Tutorial
-  tutorialTitle: Double Stars
-  tutorialText: Double Stars block your matches. Create a match next to them or use
-    a line break to destroy them.
+  tutorialTitle:
+    m_TableReference:
+      m_TableCollectionName: GUID:3e9d6025d4245e94282bbdd919393591
+    m_TableEntryReference:
+      m_KeyId: 837804032
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  tutorialText:
+    m_TableReference:
+      m_TableCollectionName: GUID:3e9d6025d4245e94282bbdd919393591
+    m_TableEntryReference:
+      m_KeyId: 837804033
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   tutorialSprite: {fileID: 21300000, guid: 5aae742932ad09946ae90ddbd3346e9f, type: 3}
   showContextually: 1
   trigger: 1
+  references:
+    version: 2
+    RefIds: []

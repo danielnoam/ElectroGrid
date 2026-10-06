@@ -115,8 +115,8 @@ public class UpdateWindowUI : MonoBehaviour
         string version = updater.LatestVersion;
         bool canInstall = GameUpdater.CanInstallOnThisPlatform && updater.PlatformAsset != null;
 
-        if (titleText) titleText.text = "Update Available";
-        if (bodyText) bodyText.text = $"Version {version} is out. You have {Application.version}.\n\n{Notes(updater.LatestRelease?.body)}";
+        if (titleText) titleText.text = L10n.Get("update.title");
+        if (bodyText) bodyText.text = $"{L10n.Get("update.body", ("latest", version), ("current", Application.version))}\n\n{Notes(updater.LatestRelease?.body)}";
 
         bool downloading = updater.CurrentState == GameUpdater.State.Downloading;
         if (progressSlider)
@@ -128,24 +128,24 @@ public class UpdateWindowUI : MonoBehaviour
         switch (updater.CurrentState)
         {
             case GameUpdater.State.UpdateAvailable:
-                SetStatus(canInstall ? $"Download size {FormatSize(updater.PlatformAsset.size)}." : "Get it from the release page.");
-                SetAction(canInstall ? "Update" : "Open Page", true);
+                SetStatus(canInstall ? L10n.Get("update.size", ("size", FormatSize(updater.PlatformAsset.size))) : L10n.Get("update.releasepage"));
+                SetAction(L10n.Get(canInstall ? "update.action.update" : "update.action.openpage"), true);
                 break;
 
             case GameUpdater.State.Downloading:
                 long total = updater.PlatformAsset?.size ?? 0;
-                SetStatus(total > 0 ? $"Downloading {FormatSize((long)(total * updater.DownloadProgress))} of {FormatSize(total)}" : "Downloading...");
-                SetAction("Update", false);
+                SetStatus(total > 0 ? L10n.Get("update.downloading.progress", ("done", FormatSize((long)(total * updater.DownloadProgress))), ("total", FormatSize(total))) : L10n.Get("update.downloading"));
+                SetAction(L10n.Get("update.action.update"), false);
                 break;
 
             case GameUpdater.State.ReadyToInstall:
-                SetStatus(Application.platform == RuntimePlatform.Android ? "Downloaded. Tap Install to finish." : "Downloaded. The game restarts to finish.");
-                SetAction(Application.platform == RuntimePlatform.Android ? "Install" : "Restart", true);
+                SetStatus(L10n.Get(Application.platform == RuntimePlatform.Android ? "update.downloaded.android" : "update.downloaded.windows"));
+                SetAction(L10n.Get(Application.platform == RuntimePlatform.Android ? "update.action.install" : "update.action.restart"), true);
                 break;
 
             case GameUpdater.State.Failed:
                 SetStatus(updater.ErrorMessage);
-                SetAction("Open Page", true);
+                SetAction(L10n.Get("update.action.openpage"), true);
                 break;
         }
     }

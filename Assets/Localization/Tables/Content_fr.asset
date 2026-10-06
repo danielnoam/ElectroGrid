@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Content_fr
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: fr
+  m_SharedData: {fileID: 11400000, guid: 3e9d6025d4245e94282bbdd919393591, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 816832512
+    m_Localized: Les bases
+    m_Metadata:
+      m_Items: []
+  - m_Id: 833609728
+    m_Localized: "\xC9change des pi\xE8ces voisines pour aligner 3 formes identiques ou plus sur une ligne ou une colonne."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804032
+    m_Localized: "\xC9toiles doubles"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804033
+    m_Localized: "Les \xE9toiles doubles bloquent tes combinaisons. Fais une combinaison \xE0 c\xF4t\xE9 d'elles ou utilise un brise-ligne pour les d\xE9truire."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804034
+    m_Localized: Brise-ligne
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804035
+    m_Localized: "Aligne 4 pi\xE8ces ou plus sur une ligne ou une colonne pour d\xE9truire toute la ligne."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804036
+    m_Localized: Plus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837804037
+    m_Localized: "Le Plus te donne des coups ou du temps en plus. Tu peux l'\xE9changer, faire des combinaisons \xE0 c\xF4t\xE9 ou utiliser un brise-ligne."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192640
+    m_Localized: "\xC9toiles carr\xE9es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192641
+    m_Localized: "Les \xE9toiles carr\xE9es tombent quand tu fais des combinaisons en dessous. Continue \xE0 combiner en dessous jusqu'\xE0 ce qu'elles atteignent le bas de la grille."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192642
+    m_Localized: Cercle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192643
+    m_Localized: Hexagone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192644
+    m_Localized: Pentagone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 846192645
+    m_Localized: Triangle
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

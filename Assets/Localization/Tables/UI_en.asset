@@ -1,0 +1,383 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UI_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 22f0099db29031f4c95f1f933a9f5f9f, type: 2}
+  m_Metadata:
+    m_Items:
+    - rid: 5242841005928218761
+  m_TableData:
+  - m_Id: 1391452160
+    m_Localized: 'Pieces:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1425006592
+    m_Localized: Collect {amount} Pieces
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1429200896
+    m_Localized: Collect {amount} {item} Pieces
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589504
+    m_Localized: Items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589505
+    m_Localized: 'Double Stars:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589506
+    m_Localized: Destroy {amount} Double Stars
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589507
+    m_Localized: 'Square Star:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589508
+    m_Localized: Get {amount} Square Stars to the Bottom
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589509
+    m_Localized: 'Moves Left:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589510
+    m_Localized: 'Moves allowed: {moves}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589511
+    m_Localized: 'Time Left:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589512
+    m_Localized: 'Allotted Time: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589513
+    m_Localized: Select a Level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589514
+    m_Localized: Press any of the buttons below to select a level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589515
+    m_Localized: 'Objectives:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589516
+    m_Localized: 'Lose Conditions:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589517
+    m_Localized: 'Best:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589518
+    m_Localized: 'Moves: {moves}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589519
+    m_Localized: 'Time: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589520
+    m_Localized: 'Pieces Cleared: {pieces}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589521
+    m_Localized: '{level} Complete!'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589522
+    m_Localized: '{level} Failed!'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589523
+    m_Localized: Next Level
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589524
+    m_Localized: Finish
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589525
+    m_Localized: Try Again
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589526
+    m_Localized: 'Pieces Cleared: {pieces}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589527
+    m_Localized: 'Moves Made: {moves}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589528
+    m_Localized: New Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589529
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589530
+    m_Localized: Reset Progress
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589531
+    m_Localized: Tap again to confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589532
+    m_Localized: New!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589533
+    m_Localized: Got it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589534
+    m_Localized: Update Available
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589535
+    m_Localized: Version {latest} is out. You have {current}.
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589536
+    m_Localized: Download size {size}.
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589537
+    m_Localized: Get it from the release page.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589538
+    m_Localized: Update
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589539
+    m_Localized: Open Page
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589540
+    m_Localized: Install
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589541
+    m_Localized: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589542
+    m_Localized: Downloading...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589543
+    m_Localized: Downloading {done} of {total}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589544
+    m_Localized: Downloaded. Tap Install to finish.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589545
+    m_Localized: Downloaded. The game restarts to finish.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589546
+    m_Localized: 'Download failed: {error}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589547
+    m_Localized: Download is incomplete ({size} of {expected} bytes).
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589548
+    m_Localized: Download failed its checksum. Try again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589549
+    m_Localized: The downloaded update is missing.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589550
+    m_Localized: Updates install from a build, not the editor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589551
+    m_Localized: Allow ElectroGrid to install apps, then come back and tap Install.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589552
+    m_Localized: Follow the installer to finish the update.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589553
+    m_Localized: 'Could not open the installer: {error}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1437589554
+    m_Localized: Could not find the game's install folder.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589555
+    m_Localized: The game's folder is read-only, for example under Program Files. Move the game to another folder, or update from the release page.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589556
+    m_Localized: Restarting to finish the update.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589557
+    m_Localized: 'Could not apply the update: {error}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 2298687250432
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298737582080
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298737582081
+    m_Localized: Music
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776384
+    m_Localized: SFX
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776385
+    m_Localized: Haptics
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776386
+    m_Localized: Screen Shake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776387
+    m_Localized: Tilt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776388
+    m_Localized: High Frame Rate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776389
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776390
+    m_Localized: Assets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776391
+    m_Localized: Plugins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776392
+    m_Localized: A Game By Daniel noam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776393
+    m_Localized: Later
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776394
+    m_Localized: Information
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776395
+    m_Localized: Level Select
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776396
+    m_Localized: Quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776397
+    m_Localized: Level Selection
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776398
+    m_Localized: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776399
+    m_Localized: Main menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3823882985472
+    m_Localized: Level {number}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 49129349701632
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 5242841005928218761
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 1425006592
+        - id: 1429200896
+        - id: 1437589506
+        - id: 1437589508
+        - id: 1437589510
+        - id: 1437589512
+        - id: 1437589518
+        - id: 1437589519
+        - id: 1437589520
+        - id: 1437589521
+        - id: 1437589522
+        - id: 1437589526
+        - id: 1437589527
+        - id: 1437589535
+        - id: 1437589536
+        - id: 1437589543
+        - id: 1437589546
+        - id: 1437589547
+        - id: 1437589553
+        - id: 1437589557
+        - id: 3823882985472

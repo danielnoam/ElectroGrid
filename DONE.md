@@ -721,3 +721,31 @@ of as a new blob per edit.
       a public repo is now that one line plus the cross-repo tag handling in
       TODO.md. It's a plain runtime class rather than a `BuildConfig` field,
       because `SOBuildConfig` is editor-only and the player can't read it.
+
+- [x] **Localisation.** `com.unity.localization` (1.5, with Addressables) runs
+      every player-facing string, in English, Spanish, Portuguese (Brazil),
+      German and French, plus a pseudo-locale in development builds.
+      - **Two tables.** `UI` (78 keys) holds interface text, `Content` (14)
+        holds tutorial cards and piece names. Every key has a comment for
+        translators, and text with numbers uses Smart Strings with named
+        placeholders (`Collect {amount} Pieces`), so each language orders the
+        sentence its own way.
+      - **Code text** goes through `L10n.Get("key", ("amount", 5))`. Static
+        scene and prefab labels use `LocalizeStringEvent`; labels that code
+        rewrites (Continue/New Game, the results title) are left to the code
+        so the two never fight. Tutorials and pieces use `LocalizedString`
+        fields; level names are one `Level {number}` string by play order,
+        while the authored `levelName` stays English for analytics and saves.
+      - **Language picker** in Settings: the button shows each language's own
+        name and cycles through them. The pick is saved as
+        `SettingsData.language` and applied at startup, otherwise the system
+        language wins. `L10n.LanguageChanged` refreshes the main menu, level
+        select, top bar and settings text.
+      - **Builds:** Addressables are set to build with the player, so the
+        string tables ship on any machine. The pseudo-locale is removed at
+        startup in non-development builds.
+      - **Checked:** no empty entries across 460 locale/key pairs,
+        placeholders match English in every translation, no missing glyphs in
+        any real language, and the settings window fits in all five (row
+        labels now shrink to fit). See TODO.md for the native review and font
+        follow-ups.

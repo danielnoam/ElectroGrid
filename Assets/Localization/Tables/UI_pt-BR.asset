@@ -1,0 +1,383 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UI_pt-BR
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: pt-BR
+  m_SharedData: {fileID: 11400000, guid: 22f0099db29031f4c95f1f933a9f5f9f, type: 2}
+  m_Metadata:
+    m_Items:
+    - rid: 5242841009418141698
+  m_TableData:
+  - m_Id: 1425006592
+    m_Localized: "Colete {amount} pe\xE7as"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1429200896
+    m_Localized: "Colete {amount} pe\xE7as de {item}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589506
+    m_Localized: Destrua {amount} estrelas duplas
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589508
+    m_Localized: "Leve {amount} estrelas quadradas at\xE9 o fundo"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589510
+    m_Localized: 'Movimentos permitidos: {moves}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589512
+    m_Localized: "Tempo dispon\xEDvel: {minutes:00}:{seconds:00}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589518
+    m_Localized: 'Movimentos: {moves}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589519
+    m_Localized: 'Tempo: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589520
+    m_Localized: "Pe\xE7as eliminadas: {pieces}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589521
+    m_Localized: "{level} conclu\xEDdo!"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589522
+    m_Localized: '{level} falhou!'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589526
+    m_Localized: "Pe\xE7as eliminadas: {pieces}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589527
+    m_Localized: 'Movimentos feitos: {moves}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589535
+    m_Localized: "A vers\xE3o {latest} j\xE1 est\xE1 dispon\xEDvel. Voc\xEA tem a {current}."
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589536
+    m_Localized: 'Tamanho do download: {size}.'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589543
+    m_Localized: Baixando {done} de {total}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589546
+    m_Localized: 'Falha no download: {error}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589547
+    m_Localized: "O download est\xE1 incompleto ({size} de {expected} bytes)."
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589553
+    m_Localized: "N\xE3o foi poss\xEDvel abrir o instalador: {error}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1437589557
+    m_Localized: "N\xE3o foi poss\xEDvel aplicar a atualiza\xE7\xE3o: {error}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 3823882985472
+    m_Localized: "N\xEDvel {number}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1391452160
+    m_Localized: "Pe\xE7as:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589504
+    m_Localized: Itens
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589505
+    m_Localized: 'Estrelas duplas:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589507
+    m_Localized: 'Estrela quadrada:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589509
+    m_Localized: 'Movimentos:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589511
+    m_Localized: 'Tempo:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589513
+    m_Localized: "Escolha um n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589514
+    m_Localized: "Toque em um dos bot\xF5es abaixo para escolher um n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589515
+    m_Localized: 'Objetivos:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589516
+    m_Localized: "Condi\xE7\xF5es de derrota:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589517
+    m_Localized: 'Melhor:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589523
+    m_Localized: "Pr\xF3ximo n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589524
+    m_Localized: Concluir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589525
+    m_Localized: Tentar de novo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589528
+    m_Localized: Novo jogo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589529
+    m_Localized: Continuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589530
+    m_Localized: Apagar progresso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589531
+    m_Localized: Toque de novo para confirmar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589532
+    m_Localized: Novo!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589533
+    m_Localized: Entendi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589534
+    m_Localized: "Atualiza\xE7\xE3o dispon\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589537
+    m_Localized: "Baixe na p\xE1gina de vers\xF5es."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589538
+    m_Localized: Atualizar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589539
+    m_Localized: "Abrir p\xE1gina"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589540
+    m_Localized: Instalar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589541
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589542
+    m_Localized: Baixando...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589544
+    m_Localized: "Download conclu\xEDdo. Toque em Instalar para terminar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589545
+    m_Localized: "Download conclu\xEDdo. O jogo vai reiniciar para terminar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589548
+    m_Localized: "O download falhou na verifica\xE7\xE3o. Tente de novo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589549
+    m_Localized: "A atualiza\xE7\xE3o baixada n\xE3o foi encontrada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589550
+    m_Localized: "As atualiza\xE7\xF5es s\xE3o instaladas a partir de uma build, n\xE3o do editor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589551
+    m_Localized: Permita que o ElectroGrid instale apps, depois volte e toque em Instalar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589552
+    m_Localized: "Siga o instalador para terminar a atualiza\xE7\xE3o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589554
+    m_Localized: "N\xE3o foi poss\xEDvel encontrar a pasta de instala\xE7\xE3o do jogo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589555
+    m_Localized: "A pasta do jogo \xE9 somente leitura, por exemplo em Arquivos de Programas. Mova o jogo para outra pasta ou atualize pela p\xE1gina de vers\xF5es."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589556
+    m_Localized: "Reiniciando para terminar a atualiza\xE7\xE3o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298687250432
+    m_Localized: Voltar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298737582080
+    m_Localized: "Configura\xE7\xF5es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298737582081
+    m_Localized: "M\xFAsica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776384
+    m_Localized: Efeitos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776385
+    m_Localized: "Vibra\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776386
+    m_Localized: Tremor de tela
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776387
+    m_Localized: "Inclina\xE7\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776388
+    m_Localized: Alta taxa de quadros
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776389
+    m_Localized: "Cr\xE9ditos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776390
+    m_Localized: Recursos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776391
+    m_Localized: Plugins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776392
+    m_Localized: Um jogo de Daniel noam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776393
+    m_Localized: Depois
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776394
+    m_Localized: "Informa\xE7\xF5es"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776395
+    m_Localized: "N\xEDveis"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776396
+    m_Localized: Sair
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776397
+    m_Localized: "Sele\xE7\xE3o de n\xEDvel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776398
+    m_Localized: "Come\xE7ar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776399
+    m_Localized: Menu principal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49129349701632
+    m_Localized: Idioma
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 5242841009418141698
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 1425006592
+        - id: 1429200896
+        - id: 1437589506
+        - id: 1437589508
+        - id: 1437589510
+        - id: 1437589512
+        - id: 1437589518
+        - id: 1437589519
+        - id: 1437589520
+        - id: 1437589521
+        - id: 1437589522
+        - id: 1437589526
+        - id: 1437589527
+        - id: 1437589535
+        - id: 1437589536
+        - id: 1437589543
+        - id: 1437589546
+        - id: 1437589547
+        - id: 1437589553
+        - id: 1437589557
+        - id: 3823882985472

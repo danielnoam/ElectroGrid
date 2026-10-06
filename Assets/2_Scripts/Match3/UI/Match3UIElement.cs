@@ -29,6 +29,11 @@ public class Match3UIElement : MonoBehaviour
         amountCount.text = $"/{_totalAmount}";
     }
 
+    public void SetLabel(string text)
+    {
+        if (progressText) progressText.text = text;
+    }
+
     public void Setup(Sprite sprite, string text)
     {
         if (image)

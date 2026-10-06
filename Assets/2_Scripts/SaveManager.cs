@@ -22,6 +22,8 @@ public class SettingsData
     public bool screenShakeEnabled = true;
     public bool highFrameRate;
     public bool tiltEnabled = true;
+    // Locale code such as "en". Empty follows the system language
+    public string language;
 }
 
 [Serializable]

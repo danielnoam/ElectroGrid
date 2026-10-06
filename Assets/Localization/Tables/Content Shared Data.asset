@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Content Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Content
+  m_TableCollectionNameGuidString: 3e9d6025d4245e94282bbdd919393591
+  m_Entries:
+  - m_Id: 816832512
+    m_Key: tutorial.basicmatching.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218848
+  - m_Id: 833609728
+    m_Key: tutorial.basicmatching.text
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218849
+  - m_Id: 837804032
+    m_Key: tutorial.doublestars.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218850
+  - m_Id: 837804033
+    m_Key: tutorial.doublestars.text
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218851
+  - m_Id: 837804034
+    m_Key: tutorial.linebreak.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218852
+  - m_Id: 837804035
+    m_Key: tutorial.linebreak.text
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218853
+  - m_Id: 837804036
+    m_Key: tutorial.plus.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218854
+  - m_Id: 837804037
+    m_Key: tutorial.plus.text
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218855
+  - m_Id: 846192640
+    m_Key: tutorial.squarestars.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218856
+  - m_Id: 846192641
+    m_Key: tutorial.squarestars.text
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218857
+  - m_Id: 846192642
+    m_Key: item.circle
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218858
+  - m_Id: 846192643
+    m_Key: item.hexagon
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218859
+  - m_Id: 846192644
+    m_Key: item.pentagon
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218860
+  - m_Id: 846192645
+    m_Key: item.triangle
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218861
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5242841005928218847
+  references:
+    version: 2
+    RefIds:
+    - rid: 5242841005928218847
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1791220188755
+    - rid: 5242841005928218848
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card title, short
+    - rid: 5242841005928218849
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card body, one or two sentences
+    - rid: 5242841005928218850
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card title, short
+    - rid: 5242841005928218851
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card body, one or two sentences
+    - rid: 5242841005928218852
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card title, short
+    - rid: 5242841005928218853
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card body, one or two sentences
+    - rid: 5242841005928218854
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card title, short
+    - rid: 5242841005928218855
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card body, one or two sentences
+    - rid: 5242841005928218856
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card title, short
+    - rid: 5242841005928218857
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Tutorial card body, one or two sentences
+    - rid: 5242841005928218858
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Piece shape name, used inside objectives like "Collect 10 Circle Pieces"
+    - rid: 5242841005928218859
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Piece shape name, used inside objectives like "Collect 10 Circle Pieces"
+    - rid: 5242841005928218860
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Piece shape name, used inside objectives like "Collect 10 Circle Pieces"
+    - rid: 5242841005928218861
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Piece shape name, used inside objectives like "Collect 10 Circle Pieces"

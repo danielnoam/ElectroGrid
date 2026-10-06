@@ -1,0 +1,730 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: UI Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: UI
+  m_TableCollectionNameGuidString: 22f0099db29031f4c95f1f933a9f5f9f
+  m_Entries:
+  - m_Id: 1391452160
+    m_Key: objective.pieces.requirement
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218762
+  - m_Id: 1425006592
+    m_Key: objective.pieces.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218763
+  - m_Id: 1429200896
+    m_Key: objective.item.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218764
+  - m_Id: 1437589504
+    m_Key: objective.item.fallback
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218765
+  - m_Id: 1437589505
+    m_Key: objective.doublestar.requirement
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218766
+  - m_Id: 1437589506
+    m_Key: objective.doublestar.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218767
+  - m_Id: 1437589507
+    m_Key: objective.squarestar.requirement
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218768
+  - m_Id: 1437589508
+    m_Key: objective.squarestar.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218769
+  - m_Id: 1437589509
+    m_Key: lose.moves.requirement
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218770
+  - m_Id: 1437589510
+    m_Key: lose.moves.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218771
+  - m_Id: 1437589511
+    m_Key: lose.time.requirement
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218772
+  - m_Id: 1437589512
+    m_Key: lose.time.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218773
+  - m_Id: 1437589513
+    m_Key: levelselect.none.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218774
+  - m_Id: 1437589514
+    m_Key: levelselect.none.info
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218775
+  - m_Id: 1437589515
+    m_Key: levelselect.objectives
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218776
+  - m_Id: 1437589516
+    m_Key: levelselect.loseconditions
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218777
+  - m_Id: 1437589517
+    m_Key: levelselect.best
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218778
+  - m_Id: 1437589518
+    m_Key: levelselect.best.moves
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218779
+  - m_Id: 1437589519
+    m_Key: levelselect.best.time
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218780
+  - m_Id: 1437589520
+    m_Key: levelselect.best.pieces
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218781
+  - m_Id: 1437589521
+    m_Key: levelcomplete.won.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218782
+  - m_Id: 1437589522
+    m_Key: levelcomplete.lost.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218783
+  - m_Id: 1437589523
+    m_Key: levelcomplete.next
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218784
+  - m_Id: 1437589524
+    m_Key: levelcomplete.finish
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218785
+  - m_Id: 1437589525
+    m_Key: levelcomplete.retry
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218786
+  - m_Id: 1437589526
+    m_Key: levelcomplete.pieces
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218787
+  - m_Id: 1437589527
+    m_Key: levelcomplete.moves
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218788
+  - m_Id: 1437589528
+    m_Key: menu.newgame
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218789
+  - m_Id: 1437589529
+    m_Key: menu.continue
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218790
+  - m_Id: 1437589530
+    m_Key: settings.reset
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218791
+  - m_Id: 1437589531
+    m_Key: settings.reset.confirm
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218792
+  - m_Id: 1437589532
+    m_Key: info.new.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218793
+  - m_Id: 1437589533
+    m_Key: info.new.button
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218794
+  - m_Id: 1437589534
+    m_Key: update.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218795
+  - m_Id: 1437589535
+    m_Key: update.body
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218796
+  - m_Id: 1437589536
+    m_Key: update.size
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218797
+  - m_Id: 1437589537
+    m_Key: update.releasepage
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218798
+  - m_Id: 1437589538
+    m_Key: update.action.update
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218799
+  - m_Id: 1437589539
+    m_Key: update.action.openpage
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218800
+  - m_Id: 1437589540
+    m_Key: update.action.install
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218801
+  - m_Id: 1437589541
+    m_Key: update.action.restart
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218802
+  - m_Id: 1437589542
+    m_Key: update.downloading
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218803
+  - m_Id: 1437589543
+    m_Key: update.downloading.progress
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218804
+  - m_Id: 1437589544
+    m_Key: update.downloaded.android
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218805
+  - m_Id: 1437589545
+    m_Key: update.downloaded.windows
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218806
+  - m_Id: 1437589546
+    m_Key: update.error.download
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218807
+  - m_Id: 1437589547
+    m_Key: update.error.incomplete
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218808
+  - m_Id: 1437589548
+    m_Key: update.error.checksum
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218809
+  - m_Id: 1437589549
+    m_Key: update.error.missing
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218810
+  - m_Id: 1437589550
+    m_Key: update.error.editor
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218811
+  - m_Id: 1437589551
+    m_Key: update.android.permission
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218812
+  - m_Id: 1437589552
+    m_Key: update.android.started
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218813
+  - m_Id: 1437589553
+    m_Key: update.error.installer
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218814
+  - m_Id: 1437589554
+    m_Key: update.error.nofolder
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218815
+  - m_Id: 1437589555
+    m_Key: update.error.readonly
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218816
+  - m_Id: 1437589556
+    m_Key: update.windows.started
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218817
+  - m_Id: 1437589557
+    m_Key: update.error.apply
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218818
+  - m_Id: 2298687250432
+    m_Key: common.back
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218828
+  - m_Id: 2298737582080
+    m_Key: settings.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218829
+  - m_Id: 2298737582081
+    m_Key: settings.music
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218830
+  - m_Id: 2298741776384
+    m_Key: settings.sfx
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218831
+  - m_Id: 2298741776385
+    m_Key: settings.haptics
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218832
+  - m_Id: 2298741776386
+    m_Key: settings.screenshake
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218833
+  - m_Id: 2298741776387
+    m_Key: settings.tilt
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218834
+  - m_Id: 2298741776388
+    m_Key: settings.highframerate
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218835
+  - m_Id: 2298741776389
+    m_Key: credits.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218836
+  - m_Id: 2298741776390
+    m_Key: credits.assets
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218837
+  - m_Id: 2298741776391
+    m_Key: credits.plugins
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218838
+  - m_Id: 2298741776392
+    m_Key: credits.by
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218839
+  - m_Id: 2298741776393
+    m_Key: update.later
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218840
+  - m_Id: 2298741776394
+    m_Key: info.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218841
+  - m_Id: 2298741776395
+    m_Key: menu.levelselect
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218842
+  - m_Id: 2298741776396
+    m_Key: menu.quit
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218843
+  - m_Id: 2298741776397
+    m_Key: levelselect.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218844
+  - m_Id: 2298741776398
+    m_Key: levelselect.start
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218845
+  - m_Id: 2298741776399
+    m_Key: levelcomplete.mainmenu
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218846
+  - m_Id: 3823882985472
+    m_Key: level.name
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218862
+  - m_Id: 49129349701632
+    m_Key: settings.language
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141696
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 5242841005928218760
+  references:
+    version: 2
+    RefIds:
+    - rid: 5242841005928218760
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1791219277057
+    - rid: 5242841005928218762
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar label next to the piece counter
+    - rid: 5242841005928218763
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level objective. {amount} is a number
+    - rid: 5242841005928218764
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level objective. {amount} is a number, {item} is a piece colour or name such as Blue
+    - rid: 5242841005928218765
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Used as {item} when a level has no piece type set
+    - rid: 5242841005928218766
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar label next to the Double Star counter
+    - rid: 5242841005928218767
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level objective. {amount} is a number
+    - rid: 5242841005928218768
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar label next to the Square Star counter
+    - rid: 5242841005928218769
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level objective. {amount} is a number; the stars must reach the bottom row
+    - rid: 5242841005928218770
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar label next to the remaining moves
+    - rid: 5242841005928218771
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level rule. {moves} is a number
+    - rid: 5242841005928218772
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar label next to the countdown
+    - rid: 5242841005928218773
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level rule. Keep the mm:ss format
+    - rid: 5242841005928218774
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level select heading when nothing is picked
+    - rid: 5242841005928218775
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level select hint when nothing is picked
+    - rid: 5242841005928218776
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Heading above a level's objectives
+    - rid: 5242841005928218777
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Heading above a level's limits
+    - rid: 5242841005928218778
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Heading above the player's best results for a level
+    - rid: 5242841005928218779
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Best result. {moves} is a number
+    - rid: 5242841005928218780
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Best result. Keep the mm:ss format
+    - rid: 5242841005928218781
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Best result. {pieces} is a number
+    - rid: 5242841005928218782
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results window title. {level} is the level name
+    - rid: 5242841005928218783
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results window title. {level} is the level name
+    - rid: 5242841005928218784
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button
+    - rid: 5242841005928218785
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button after the last level
+    - rid: 5242841005928218786
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button after losing
+    - rid: 5242841005928218787
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results stat. {pieces} is a number
+    - rid: 5242841005928218788
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results stat. {moves} is a number
+    - rid: 5242841005928218789
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Main menu button on a fresh save
+    - rid: 5242841005928218790
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Main menu button when there is progress
+    - rid: 5242841005928218791
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Settings button
+    - rid: 5242841005928218792
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: The reset button's text after the first tap
+    - rid: 5242841005928218793
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Title of the card that introduces a new piece
+    - rid: 5242841005928218794
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button that closes the introduction card
+    - rid: 5242841005928218795
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Update window title
+    - rid: 5242841005928218796
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Update window. Both are version numbers like 1.0.1
+    - rid: 5242841005928218797
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: '{size} is a file size like 98 MB'
+    - rid: 5242841005928218798
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Shown where the game cannot install updates itself
+    - rid: 5242841005928218799
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button
+    - rid: 5242841005928218800
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button that opens the release page in a browser
+    - rid: 5242841005928218801
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button (Android)
+    - rid: 5242841005928218802
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button (Windows)
+    - rid: 5242841005928218803
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status while the size is unknown
+    - rid: 5242841005928218804
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Both are file sizes like 12 MB
+    - rid: 5242841005928218805
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status
+    - rid: 5242841005928218806
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status
+    - rid: 5242841005928218807
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: '{error} is a technical message from the system, left untranslated'
+    - rid: 5242841005928218808
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Both are byte counts
+    - rid: 5242841005928218809
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status
+    - rid: 5242841005928218810
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status
+    - rid: 5242841005928218811
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Developer-only status
+    - rid: 5242841005928218812
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Android asks for permission to install
+    - rid: 5242841005928218813
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status
+    - rid: 5242841005928218814
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: '{error} is a technical message'
+    - rid: 5242841005928218815
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status
+    - rid: 5242841005928218816
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status (Windows)
+    - rid: 5242841005928218817
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Status (Windows)
+    - rid: 5242841005928218818
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: '{error} is a technical message'
+    - rid: 5242841005928218828
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button that closes a window or goes back a screen
+    - rid: 5242841005928218829
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Window title
+    - rid: 5242841005928218830
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Volume slider label
+    - rid: 5242841005928218831
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Sound effects volume slider label, keep it short
+    - rid: 5242841005928218832
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Toggle for phone vibration
+    - rid: 5242841005928218833
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Toggle
+    - rid: 5242841005928218834
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Toggle for the camera tilting with the phone
+    - rid: 5242841005928218835
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Toggle for running above 60 frames per second
+    - rid: 5242841005928218836
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Window title
+    - rid: 5242841005928218837
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Credits heading above the art and sound packs used
+    - rid: 5242841005928218838
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Credits heading above the code libraries used
+    - rid: 5242841005928218839
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Credits line; keep the name as written
+    - rid: 5242841005928218840
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button that closes the update window without updating
+    - rid: 5242841005928218841
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Title of the window listing all tutorial cards
+    - rid: 5242841005928218842
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Main menu button
+    - rid: 5242841005928218843
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Main menu button
+    - rid: 5242841005928218844
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Screen title
+    - rid: 5242841005928218845
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button that starts the selected level
+    - rid: 5242841005928218846
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results window button
+    - rid: 5242841005928218862
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Level title shown in level select, the top bar and the results window. {number} is the level's position
+    - rid: 5242841009418141696
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Settings row label; the button next to it shows the language's own name

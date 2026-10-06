@@ -106,7 +106,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
         
         UpdateLevelButton(true);
         UpdateLevelCompleteStats(levelData);
-        levelCompleteTitle.text = $"{levelData.Level.LevelName} Complete!";
+        levelCompleteTitle.text = L10n.Get("levelcomplete.won.title", ("level", levelData.Level.DisplayName));
     }
 
     private void ShowLevelFailed(Match3LevelData levelData)
@@ -117,7 +117,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
         
         UpdateLevelButton(false);
         UpdateLevelCompleteStats(levelData);
-        levelCompleteTitle.text = $"{levelData.Level.LevelName} Failed!";
+        levelCompleteTitle.text = L10n.Get("levelcomplete.lost.title", ("level", levelData.Level.DisplayName));
     }
 
     private void Toggle(bool show)
@@ -155,11 +155,11 @@ public class LevelCompleteWindowUI : MonoBehaviour
         }
 
         var piecesClearedElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        piecesClearedElement.Setup(null, $"Pieces Cleared: {levelData.PiecesCleared}");
+        piecesClearedElement.Setup(null, L10n.Get("levelcomplete.pieces", ("pieces", levelData.PiecesCleared)));
         piecesClearedElement.gameObject.name = "PiecesCleared";
         
         var movesMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        movesMadeElement.Setup(null, $"Moves Made: {levelData.MovesMade}");
+        movesMadeElement.Setup(null, L10n.Get("levelcomplete.moves", ("moves", levelData.MovesMade)));
         movesMadeElement.gameObject.name = "MovesMade";
     }
 
@@ -172,17 +172,17 @@ public class LevelCompleteWindowUI : MonoBehaviour
         
         if (won && _match3Manager.HasNextLevel())
         {
-            levelButtonText.text = "Next Level";
+            levelButtonText.text = L10n.Get("levelcomplete.next");
             levelButton.onClick.AddListener(OnNextLevelPressed);
         }
         else if (won)
         {
-            levelButtonText.text = "Finish";
+            levelButtonText.text = L10n.Get("levelcomplete.finish");
             levelButton.onClick.AddListener(OnFinishPressed);
         }
         else
         {
-            levelButtonText.text = "Try Again";
+            levelButtonText.text = L10n.Get("levelcomplete.retry");
             levelButton.onClick.AddListener(OnRetryPressed);
         }
     }

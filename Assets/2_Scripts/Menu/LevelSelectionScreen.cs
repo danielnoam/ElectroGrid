@@ -38,11 +38,13 @@ public class LevelSelectionScreen : MenuScreen
         SetupButtons();
 
         if (SaveManager.Instance) SaveManager.Instance.SaveReset += OnSaveReset;
+        L10n.LanguageChanged += UpdateLevelInfo;
     }
 
     private void OnDestroy()
     {
         if (SaveManager.Instance) SaveManager.Instance.SaveReset -= OnSaveReset;
+        L10n.LanguageChanged -= UpdateLevelInfo;
     }
 
     private void OnSaveReset()
@@ -148,13 +150,13 @@ public class LevelSelectionScreen : MenuScreen
         
         if (!_selectedLevel)
         {
-            if (levelTitleText) levelTitleText.text = "Select a Level";
-            if (levelInfoText) levelInfoText.text = "Press any of the buttons below to select a level";
+            if (levelTitleText) levelTitleText.text = L10n.Get("levelselect.none.title");
+            if (levelInfoText) levelInfoText.text = L10n.Get("levelselect.none.info");
             if (levelStartButton) levelStartButton.interactable = false;
             return;
         }
 
-        if (levelTitleText) levelTitleText.text = _selectedLevel.LevelName;
+        if (levelTitleText) levelTitleText.text = _selectedLevel.DisplayName;
         if (levelInfoText) levelInfoText.text = GenerateLevelInfo(_selectedLevel);
         if (levelStartButton) levelStartButton.interactable = true;
         
@@ -167,7 +169,7 @@ public class LevelSelectionScreen : MenuScreen
         
         if (level.Objectives is { Count: > 0 })
         {
-            info.AppendLine("Objectives:");
+            info.AppendLine(L10n.Get("levelselect.objectives"));
             foreach (var objective in level.Objectives)
             {
                 if (objective != null)
@@ -180,7 +182,7 @@ public class LevelSelectionScreen : MenuScreen
 
         if (level.LoseConditions is { Count: > 0 })
         {
-            info.AppendLine("Lose Conditions:");
+            info.AppendLine(L10n.Get("levelselect.loseconditions"));
             foreach (var condition in level.LoseConditions)
             {
                 if (condition != null)
@@ -204,10 +206,10 @@ public class LevelSelectionScreen : MenuScreen
         int seconds = Mathf.FloorToInt(record.bestTime % 60f);
 
         info.AppendLine();
-        info.AppendLine("Best:");
-        info.AppendLine($"• Moves: {record.bestMoves}");
-        info.AppendLine($"• Time: {minutes:00}:{seconds:00}");
-        info.AppendLine($"• Pieces Cleared: {record.bestPiecesCleared}");
+        info.AppendLine(L10n.Get("levelselect.best"));
+        info.AppendLine($"• {L10n.Get("levelselect.best.moves", ("moves", record.bestMoves))}");
+        info.AppendLine($"• {L10n.Get("levelselect.best.time", ("minutes", minutes), ("seconds", seconds))}");
+        info.AppendLine($"• {L10n.Get("levelselect.best.pieces", ("pieces", record.bestPiecesCleared))}");
     }
 
     private void DrawGrid(Grid grid)

@@ -23,12 +23,13 @@ public class SettingsWindowUI : MonoBehaviour
     [SerializeField] private Toggle highFrameRateToggle;
     [Tooltip("Hidden on displays that cannot refresh faster than 60Hz")]
     [SerializeField] private GameObject highFrameRateRow;
+    [Tooltip("Tapping it moves to the next available language")]
+    [SerializeField] private Button languageButton;
+    [SerializeField] private TextMeshProUGUI languageLabel;
 
     [Header("Reset Progress")]
     [SerializeField] private Button resetProgressButton;
     [SerializeField] private TextMeshProUGUI resetProgressLabel;
-    [SerializeField] private string resetLabel = "Reset Progress";
-    [SerializeField] private string resetConfirmLabel = "Tap again to confirm";
     [Tooltip("How long the confirm state stays armed before reverting")]
     [SerializeField, Min(1f)] private float resetConfirmTimeout = 3f;
 
@@ -87,6 +88,31 @@ public class SettingsWindowUI : MonoBehaviour
     {
         SetupControls();
         PullValuesFromSettings();
+
+        L10n.LanguageChanged -= OnLanguageChanged;
+        L10n.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnDestroy()
+    {
+        L10n.LanguageChanged -= OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged()
+    {
+        RefreshLanguageLabel();
+        if (resetProgressLabel) resetProgressLabel.text = L10n.Get(_resetConfirmExpiry > 0f ? "settings.reset.confirm" : "settings.reset");
+    }
+
+    private void RefreshLanguageLabel()
+    {
+        if (languageLabel) languageLabel.text = L10n.LanguageName(UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale);
+    }
+
+    private void OnLanguagePressed()
+    {
+        CameraManager.Instance?.ShakeCamera(0.1f);
+        L10n.CycleLanguage();
     }
 
     public void Show(Action onClosed = null)
@@ -94,6 +120,7 @@ public class SettingsWindowUI : MonoBehaviour
         _onClosed = onClosed;
         DisarmReset();
         PullValuesFromSettings();
+        RefreshLanguageLabel();
         Toggle(true);
     }
 
@@ -150,6 +177,12 @@ public class SettingsWindowUI : MonoBehaviour
             highFrameRateToggle.onValueChanged.AddListener(OnHighFrameRateChanged);
         }
 
+        if (languageButton)
+        {
+            languageButton.onClick.RemoveAllListeners();
+            languageButton.onClick.AddListener(OnLanguagePressed);
+        }
+
         if (resetProgressButton)
         {
             resetProgressButton.onClick.RemoveAllListeners();
@@ -176,7 +209,7 @@ public class SettingsWindowUI : MonoBehaviour
         if (_resetConfirmExpiry <= 0f)
         {
             _resetConfirmExpiry = Time.unscaledTime + resetConfirmTimeout;
-            if (resetProgressLabel) resetProgressLabel.text = resetConfirmLabel;
+            if (resetProgressLabel) resetProgressLabel.text = L10n.Get("settings.reset.confirm");
             return;
         }
 
@@ -189,7 +222,7 @@ public class SettingsWindowUI : MonoBehaviour
     private void DisarmReset()
     {
         _resetConfirmExpiry = 0f;
-        if (resetProgressLabel) resetProgressLabel.text = resetLabel;
+        if (resetProgressLabel) resetProgressLabel.text = L10n.Get("settings.reset");
     }
 
     private void PullValuesFromSettings()

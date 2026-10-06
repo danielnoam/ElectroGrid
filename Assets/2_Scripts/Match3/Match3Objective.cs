@@ -96,7 +96,7 @@ public class GetMatches : Match3Objective
 
     public override string GetRequirementText()
     {
-        return $"Pieces:";
+        return L10n.Get("objective.pieces.requirement");
     }
     
 
@@ -113,7 +113,7 @@ public class GetMatches : Match3Objective
 
     public override string GetDescription()
     {
-        return $"Collect {requiredAmount} Pieces";
+        return L10n.Get("objective.pieces.description", ("amount", requiredAmount));
     }
 }
 
@@ -164,7 +164,7 @@ public class GetSpecificItemMatches : Match3Objective
 
     public override string GetRequirementText()
     {
-        string itemName = targetItem ? targetItem.Label : "Items";
+        string itemName = targetItem ? targetItem.DisplayName : L10n.Get("objective.item.fallback");
         return $"{itemName}:";
     }
     
@@ -180,7 +180,7 @@ public class GetSpecificItemMatches : Match3Objective
     
     public override string GetDescription()
     {
-        return $"Collect {requiredAmount} {(targetItem ? targetItem.Label : "Items")} Pieces";
+        return L10n.Get("objective.item.description", ("amount", requiredAmount), ("item", targetItem ? targetItem.DisplayName : L10n.Get("objective.item.fallback")));
     }
 }
 
@@ -227,7 +227,7 @@ public class DestroyObstaclesObjective : Match3Objective
 
     public override string GetRequirementText()
     {
-        return $"Double Stars:";
+        return L10n.Get("objective.doublestar.requirement");
     }
 
     public override (int, int) GetProgress()
@@ -241,7 +241,7 @@ public class DestroyObstaclesObjective : Match3Objective
     
     public override string GetDescription()
     {
-        return $"Destroy {requiredAmount} Double Stars";
+        return L10n.Get("objective.doublestar.description", ("amount", requiredAmount));
     }
 }
 
@@ -287,7 +287,7 @@ public class ReachBottomObjective : Match3Objective
 
     public override string GetRequirementText()
     {
-        return $"Square Star:";
+        return L10n.Get("objective.squarestar.requirement");
     }
 
     public override (int, int) GetProgress()
@@ -302,6 +302,6 @@ public class ReachBottomObjective : Match3Objective
     
     public override string GetDescription()
     {
-        return $"Get {requiredAmount} Square Stars to the Bottom";
+        return L10n.Get("objective.squarestar.description", ("amount", requiredAmount));
     }
 }

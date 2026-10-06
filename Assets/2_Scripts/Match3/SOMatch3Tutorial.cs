@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 public enum Match3TutorialTrigger
 {
@@ -13,8 +14,9 @@ public enum Match3TutorialTrigger
 public class SOMatch3Tutorial : ScriptableObject
 {
     [Header("Tutorial Settings")]
-    [SerializeField] private string tutorialTitle = "Tutorial";
-    [SerializeField, Multiline(5)] private string tutorialText = "Tutorial";
+    [Tooltip("Entries live in the Content string table")]
+    [SerializeField] private LocalizedString tutorialTitle;
+    [SerializeField] private LocalizedString tutorialText;
     [SerializeField] private Sprite tutorialSprite;
 
     [Header("Contextual Display")]
@@ -22,8 +24,8 @@ public class SOMatch3Tutorial : ScriptableObject
     [SerializeField] private bool showContextually = true;
     [SerializeField] private Match3TutorialTrigger trigger = Match3TutorialTrigger.AnyLevelStart;
 
-    public string TutorialTitle => tutorialTitle;
-    public string TutorialText => tutorialText;
+    public string TutorialTitle => L10n.Get(tutorialTitle);
+    public string TutorialText => L10n.Get(tutorialText);
     public Sprite TutorialSprite => tutorialSprite;
     public bool ShowContextually => showContextually;
     public Match3TutorialTrigger Trigger => trigger;

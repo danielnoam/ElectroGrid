@@ -10,9 +10,6 @@ public class InformationWindowUI : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private TweenSettings informationWindowTweenSettings;
-    [Tooltip("Title and button label used when a single card pops up the first time its mechanic appears")]
-    [SerializeField] private string introductionTitle = "New!";
-    [SerializeField] private string introductionButtonLabel = "Got it";
     [Tooltip("Backdrop alpha for the introduction, lighter than the full list so the board stays visible behind it")]
     [SerializeField, Range(0f, 1f)] private float introductionBackgroundAlpha = 0.5f;
 
@@ -37,8 +34,6 @@ public class InformationWindowUI : MonoBehaviour
     private float _backgroundOpenAlpha;
     private Action _onClosed;
     private TMP_Text _backButtonLabel;
-    private string _defaultTitle;
-    private string _defaultButtonLabel;
 
 
     private void Awake()
@@ -46,8 +41,6 @@ public class InformationWindowUI : MonoBehaviour
         _canvasGroup = GetComponent<CanvasGroup>();
         _backButtonRectTransform = backButton.GetComponent<RectTransform>();
         _backButtonLabel = backButton.GetComponentInChildren<TMP_Text>(true);
-        _defaultButtonLabel = _backButtonLabel ? _backButtonLabel.text : null;
-        _defaultTitle = titleText.text;
         _backButtonDefaultYPosition = _backButtonRectTransform.anchoredPosition.y;
         _backButtonOpenYPosition = _backButtonDefaultYPosition;
         _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, -windowRectTransform.sizeDelta.y);
@@ -73,7 +66,7 @@ public class InformationWindowUI : MonoBehaviour
     public void ShowAllTutorials()
     {
         _onClosed = null;
-        SetLabels(_defaultTitle, _defaultButtonLabel);
+        SetLabels(L10n.Get("info.title"), L10n.Get("common.back"));
         _backgroundOpenAlpha = _backgroundStartAlpha;
         PopulateAllTutorials();
         Toggle(true);
@@ -83,7 +76,7 @@ public class InformationWindowUI : MonoBehaviour
     public void ShowIntroduction(SOMatch3Tutorial tutorial, Action onClosed = null)
     {
         _onClosed = onClosed;
-        SetLabels(introductionTitle, introductionButtonLabel);
+        SetLabels(L10n.Get("info.new.title"), L10n.Get("info.new.button"));
         _backgroundOpenAlpha = introductionBackgroundAlpha;
         PopulateTutorials(new[] { tutorial });
         Toggle(true);

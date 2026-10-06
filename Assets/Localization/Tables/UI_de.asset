@@ -1,0 +1,383 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: UI_de
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: de
+  m_SharedData: {fileID: 11400000, guid: 22f0099db29031f4c95f1f933a9f5f9f, type: 2}
+  m_Metadata:
+    m_Items:
+    - rid: 5242841009418141699
+  m_TableData:
+  - m_Id: 1425006592
+    m_Localized: Sammle {amount} Teile
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1429200896
+    m_Localized: Sammle {amount} {item}-Teile
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589506
+    m_Localized: "Zerst\xF6re {amount} Doppelsterne"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589508
+    m_Localized: Bringe {amount} Quadratsterne nach unten
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589510
+    m_Localized: "Erlaubte Z\xFCge: {moves}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589512
+    m_Localized: "Verf\xFCgbare Zeit: {minutes:00}:{seconds:00}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589518
+    m_Localized: "Z\xFCge: {moves}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589519
+    m_Localized: 'Zeit: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589520
+    m_Localized: 'Entfernte Teile: {pieces}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589521
+    m_Localized: '{level} geschafft!'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589522
+    m_Localized: '{level} verloren!'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589526
+    m_Localized: 'Entfernte Teile: {pieces}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589527
+    m_Localized: "Gemachte Z\xFCge: {moves}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589535
+    m_Localized: Version {latest} ist da. Du hast {current}.
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589536
+    m_Localized: "Downloadgr\xF6\xDFe: {size}."
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589543
+    m_Localized: Lade {done} von {total}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589546
+    m_Localized: 'Download fehlgeschlagen: {error}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589547
+    m_Localized: "Der Download ist unvollst\xE4ndig ({size} von {expected} Bytes)."
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589553
+    m_Localized: "Der Installer konnte nicht ge\xF6ffnet werden: {error}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1437589557
+    m_Localized: 'Das Update konnte nicht angewendet werden: {error}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 3823882985472
+    m_Localized: Level {number}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1391452160
+    m_Localized: 'Teile:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589504
+    m_Localized: Item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589505
+    m_Localized: 'Doppelsterne:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589507
+    m_Localized: 'Quadratstern:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589509
+    m_Localized: "Z\xFCge \xFCbrig:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589511
+    m_Localized: "Zeit \xFCbrig:"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589513
+    m_Localized: "W\xE4hle ein Level"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589514
+    m_Localized: "Tippe auf einen der Kn\xF6pfe unten, um ein Level zu w\xE4hlen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589515
+    m_Localized: 'Ziele:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589516
+    m_Localized: 'Niederlagebedingungen:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589517
+    m_Localized: 'Bestwerte:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589523
+    m_Localized: "N\xE4chstes Level"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589524
+    m_Localized: Fertig
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589525
+    m_Localized: Nochmal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589528
+    m_Localized: Neues Spiel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589529
+    m_Localized: Weiter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589530
+    m_Localized: "Fortschritt l\xF6schen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589531
+    m_Localized: "Zum Best\xE4tigen erneut tippen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589532
+    m_Localized: Neu!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589533
+    m_Localized: Verstanden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589534
+    m_Localized: "Update verf\xFCgbar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589537
+    m_Localized: Hol sie dir auf der Release-Seite.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589538
+    m_Localized: Aktualisieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589539
+    m_Localized: "Seite \xF6ffnen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589540
+    m_Localized: Installieren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589541
+    m_Localized: Neu starten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589542
+    m_Localized: Wird geladen...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589544
+    m_Localized: "Geladen. Tippe auf Installieren, um abzuschlie\xDFen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589545
+    m_Localized: "Geladen. Das Spiel startet zum Abschlie\xDFen neu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589548
+    m_Localized: "Die Pr\xFCfsumme des Downloads stimmt nicht. Versuch es nochmal."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589549
+    m_Localized: Das geladene Update fehlt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589550
+    m_Localized: Updates werden aus einem Build installiert, nicht im Editor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589551
+    m_Localized: "Erlaube ElectroGrid, Apps zu installieren, komm dann zur\xFCck und tippe auf Installieren."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589552
+    m_Localized: "Folge dem Installer, um das Update abzuschlie\xDFen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589554
+    m_Localized: Der Installationsordner des Spiels wurde nicht gefunden.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589555
+    m_Localized: "Der Ordner des Spiels ist schreibgesch\xFCtzt, zum Beispiel unter Programme. Verschiebe das Spiel in einen anderen Ordner oder aktualisiere \xFCber die Release-Seite."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1437589556
+    m_Localized: "Neustart, um das Update abzuschlie\xDFen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298687250432
+    m_Localized: "Zur\xFCck"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298737582080
+    m_Localized: Einstellungen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298737582081
+    m_Localized: Musik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776384
+    m_Localized: Effekte
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776385
+    m_Localized: Vibration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776386
+    m_Localized: Bildschirmwackeln
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776387
+    m_Localized: Neigung
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776388
+    m_Localized: Hohe Bildrate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776389
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776390
+    m_Localized: Assets
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776391
+    m_Localized: Plugins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776392
+    m_Localized: Ein Spiel von Daniel noam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776393
+    m_Localized: "Sp\xE4ter"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776394
+    m_Localized: Informationen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776395
+    m_Localized: Levels
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776396
+    m_Localized: Beenden
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776397
+    m_Localized: Levelauswahl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776398
+    m_Localized: Start
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2298741776399
+    m_Localized: "Hauptmen\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49129349701632
+    m_Localized: Sprache
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 5242841009418141699
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 1425006592
+        - id: 1429200896
+        - id: 1437589506
+        - id: 1437589508
+        - id: 1437589510
+        - id: 1437589512
+        - id: 1437589518
+        - id: 1437589519
+        - id: 1437589520
+        - id: 1437589521
+        - id: 1437589522
+        - id: 1437589526
+        - id: 1437589527
+        - id: 1437589535
+        - id: 1437589536
+        - id: 1437589543
+        - id: 1437589546
+        - id: 1437589547
+        - id: 1437589553
+        - id: 1437589557
+        - id: 3823882985472
