@@ -36,14 +36,23 @@ public class Match3GameManager : MonoBehaviour
     [SerializeField] private Match3SelectionIndicator selectionIndicator;
     [SerializeField] private SOMatch3Level overrideLevel;
 
+    [Header("Combo")]
+    [SerializeField] private Match3ComboSettings comboSettings = new Match3ComboSettings();
+
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level currentLevel;
     [SerializeField, ReadOnly] private bool levelComplete;
     [SerializeField, ReadOnly] private bool finishedObjectives;
     [SerializeField, ReadOnly] private bool populatingGrid;
+    [SerializeField, ReadOnly] private int comboCount;
+    [SerializeField, ReadOnly] private float comboFill;
+    [SerializeField, ReadOnly] private float comboTimeLeft;
 
     private Match3LevelData _currentLevelData;
-    
+
+    /// <summary>The current run of quick matches. Nothing reads it yet; the bar UI and the full-bar ability will.</summary>
+    public Match3Combo Combo => _combo ??= new Match3Combo(comboSettings);
+    private Match3Combo _combo;
     public Match3LevelData CurrentLevelData => _currentLevelData;
     public Match3GridHandler GridHandler => gridHandler;
     public Match3PlayHandler PlayHandler => playHandler;
@@ -86,6 +95,16 @@ public class Match3GameManager : MonoBehaviour
         UpdateLoseConditions();
         CheckObjectives();
         CheckLoseConditions();
+        UpdateCombo();
+    }
+
+    private void UpdateCombo()
+    {
+        if (!levelComplete) Combo.Tick(Time.deltaTime);
+
+        comboCount = Combo.Count;
+        comboFill = Combo.Fill;
+        comboTimeLeft = Combo.TimeLeft;
     }
 
     private void UpdateLevelTime()
@@ -150,7 +169,8 @@ public class Match3GameManager : MonoBehaviour
         levelComplete = false;
         finishedObjectives = false;
         populatingGrid = false;
-        
+        Combo.Clear();
+
         _currentLevelData = new Match3LevelData(currentLevel);
         SaveManager.Instance?.SetLastPlayedLevel(currentLevel);
         StartCoroutine(InitialLevelSetup());
@@ -239,6 +259,7 @@ public class Match3GameManager : MonoBehaviour
     {
         levelComplete = true;
         playHandler.CanInteract = false;
+        Combo.Clear();
         
         yield return new WaitForSeconds(0.1f);
         
@@ -261,6 +282,7 @@ public class Match3GameManager : MonoBehaviour
     {
         levelComplete = true;
         playHandler.CanInteract = false;
+        Combo.Clear();
         
         yield return new WaitForSeconds(0.1f);
         
@@ -299,6 +321,10 @@ public class Match3GameManager : MonoBehaviour
         
         NotifyAMoveWasMade();
 
+        // The combo countdown stops while this swap resolves, so its cascades can't run out the clock
+        Combo.BeginResolve();
+        Combo.AddSwapStep();
+
         // Must run before the matches are handled, objectives inspect the matched tiles while they still hold their objects
         NotifyMatchesWereMade(allMatches);
 
@@ -308,7 +334,7 @@ public class Match3GameManager : MonoBehaviour
     
         yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, false));
         
-        yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches));
+        yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches, Combo.AddCascadeWave));
 
         if (!levelComplete)
         {
@@ -319,6 +345,7 @@ public class Match3GameManager : MonoBehaviour
 
             playHandler.CanInteract = true;
             populatingGrid = false;
+            Combo.EndResolve();
         }
     }
 

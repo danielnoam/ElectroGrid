@@ -45,16 +45,15 @@ and the level select rework is where the Endless entry goes.
       come in time, and the window gets shorter as the combo grows. A full bar
       triggers an ability (in Endless: extra time). The feel pass comes along
       with it: pitch rising per step, a counter, shake getting stronger.
-      **Decide first:**
-      - **What counts as a step.** Cascades happen without the player doing
-        anything, so if they count, luck fills the bar. Suggested: a player swap
-        that matches adds a step, each extra cascade step adds a smaller bonus,
-        and the countdown timer pauses while the board is resolving. Otherwise
-        a long cascade animation can reset a combo the player earned.
-      - **Where it lives.** A `Match3ComboTracker` that listens to the match
-        loop and raises events (`StepAdded`, `Reset`, `Filled`), which the bar UI
-        and the ability read. Keep it out of `Match3GameManager` so Endless and
-        normal levels share it.
+      **Groundwork is in:** `Match3Combo` (plain C#, 9 EditMode tests) is owned
+      by `Match3GameManager` as `Combo`. A swap that matches is a step (count +1,
+      fill +0.2), each cascade wave it sets off adds fill +0.05 but no step, and
+      the countdown pauses while the board resolves, restarting from a full
+      window once the player can move. The window starts at 4s and shrinks by
+      0.9 per step down to 1.5s. Events: `StepAdded`, `FillChanged`, `Filled`
+      (the bar empties, the combo keeps going) and `Reset`. All numbers live in
+      the Combo section of `Match3GameManager`'s inspector, which also shows the
+      live count, fill and time left. Nothing listens yet. Still to decide:
       - **The ability in normal levels.** "More time" only makes sense for
         `TimeLimit`. `MoveLimit` levels need something else (extra moves, clear
         a row, spawn a Plus), or the bar only exists in Endless. Pick one before

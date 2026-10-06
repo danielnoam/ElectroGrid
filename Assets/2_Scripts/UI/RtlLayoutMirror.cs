@@ -53,6 +53,9 @@ public class RtlLayoutMirror : MonoBehaviour
         foreach (var rect in _rects)
         {
             if (rect == transform || _mirrored.Contains(rect)) continue;
+            // TextMeshPro draws glyphs from fallback fonts in child sub-meshes that sit on the text's own rect;
+            // moving them shifts those glyphs (digits, bullets, colons) away from the rest of the line
+            if (rect.TryGetComponent(out TMPro.TMP_SubMeshUI _)) continue;
             if (!Owns(rect)) continue;
 
             Mirror(rect);
@@ -72,7 +75,7 @@ public class RtlLayoutMirror : MonoBehaviour
     {
         for (var t = target; t && t != transform; t = t.parent)
         {
-            if (t.GetComponent<RtlMirrorIgnore>()) return false;
+            if (t.TryGetComponent(out RtlMirrorIgnore ignore) && !(t == target && ignore.MirrorSelf)) return false;
             if (t != target && t.GetComponent<RtlLayoutMirror>()) return false;
         }
         return true;

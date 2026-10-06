@@ -542,18 +542,20 @@ public class Match3PlayHandler : MonoBehaviour
     #region Match Handling
 
     
-    public IEnumerator HandleMatchesAndRepopulate(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches)
+    /// <param name="onCascadeWave">Called once per wave of matches that falls into place, for the combo.</param>
+    public IEnumerator HandleMatchesAndRepopulate(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches, Action onCascadeWave = null)
     {
         while (true)
         {
             var immediateMatches = FindImmediateMatches(gridShape);
-        
+
             if (immediateMatches.Count == 0)
             {
                 break;
             }
-        
+
             gameManager.NotifyMatchesWereMade(immediateMatches);
+            onCascadeWave?.Invoke();
             
             yield return HandleMatches(immediateMatches);
             yield return MoveObjectsDown(gridShape);

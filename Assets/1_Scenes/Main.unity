@@ -6496,6 +6496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93c67af693727604b97de7ca78ff76c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RtlMirrorIgnore
+  mirrorSelf: 1
 --- !u!1 &183754314
 GameObject:
   m_ObjectHideFlags: 0
