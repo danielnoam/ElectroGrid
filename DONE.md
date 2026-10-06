@@ -749,3 +749,42 @@ of as a new blob per edit.
         any real language, and the settings window fits in all five (row
         labels now shrink to fit). See TODO.md for the native review and font
         follow-ups.
+
+- [x] **Hebrew and Arabic.** Both locales are in, with all 92 strings
+      translated (Hebrew to be reviewed by Daniel, Arabic needs a native
+      speaker). TextMeshPro has no bidirectional text or Arabic shaping, so:
+      - **RTLTMPro 4.0.0** is embedded in `Packages/com.nosuchstudio.rtltmpro`
+        (MIT). Its editor scripts were dropped because they do not compile
+        against com.unity.ugui 2.x, and its asmdef gained a define so
+        `RTLTextMeshPro.text` overrides `TMP_Text.text`; see `EMBEDDED.md`.
+      - **All 65 TextMeshProUGUI components** in the prefabs and both game
+        scenes are now `RTLTextMeshPro` (script swapped in place, so every
+        reference survives). LTR text is untouched; RTL text gets shaped,
+        reordered with numbers kept in Western digits, and left/right
+        alignment mirrors while it shows RTL text.
+      - **Noto Sans Arabic** (OFL, `Assets/Plugins/Fonts/NotoSansArabic`) is a
+        fallback on every game font. Hebrew comes from Liberation Sans.
+      - **Checked in Play mode:** 20 RTL labels per language, all marked RTL,
+        no missing glyphs, 644 locale/key pairs with no gaps. A screenshot of
+        the Arabic settings window showed connected, right-to-left text.
+      - **Mirrored layout.** `RtlLayoutMirror` on each canvas flips anchors,
+        pivots and positions, reverses layout groups, swaps their padding and
+        runs sliders right to left while Hebrew or Arabic is selected, and
+        flips everything back for other languages. UI created later (top bar
+        counters, level buttons, tutorial cards) is picked up the next frame.
+        `RtlMirrorIgnore` keeps the level shape preview and the counter row
+        as they are; the counter moves its label to the far side instead, so
+        "0/24" still reads left to right. The bottom bar button groups were
+        100 wide holding 230 of buttons, and a layout group only aligns
+        content that fits, so they were sized to their content.
+      - **Fonts for RTL text.** Labels showing Hebrew or Arabic switch to Noto
+        Sans Hebrew or Noto Sans Arabic (`Assets/Plugins/Fonts/Resources`)
+        and back afterwards. Borrowing the letters through the display
+        fonts' fallbacks gave missing and stacked letters. Kerning is off for
+        RTL text because TMP applies it to the reversed string, and the Noto
+        line metrics were tightened so auto-sized labels do not shrink to
+        fit space reserved for vowel marks.
+      - **Checked by screenshot** in Play mode: main menu, settings, level
+        select, the level top and bottom bars and the tutorial cards in both
+        languages, and English again afterwards. The results window was not
+        captured.

@@ -23,6 +23,24 @@ public class Match3UIElement : MonoBehaviour
         _startScale = progressCount.transform.localScale;
     }
 
+    private void OnEnable()
+    {
+        L10n.LanguageChanged += OrderForLanguage;
+        OrderForLanguage();
+    }
+
+    private void OnDisable()
+    {
+        L10n.LanguageChanged -= OrderForLanguage;
+    }
+
+    // The prefab carries an RtlMirrorIgnore: mirroring the whole row would also swap "12" and "/30". Instead the label
+    // moves to the far side of the counter, and the counter keeps reading left to right
+    private void OrderForLanguage()
+    {
+        if (progressText) progressText.transform.SetSiblingIndex(L10n.IsRightToLeft ? transform.childCount - 1 : 0);
+    }
+
     private void Update()
     {
         progressCount.text = $"{_currentProgress}";

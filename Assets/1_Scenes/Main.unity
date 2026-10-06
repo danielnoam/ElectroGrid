@@ -6457,6 +6457,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 183404681}
+  - component: {fileID: 183404682}
   m_Layer: 5
   m_Name: LevelGrid
   m_TagString: Untagged
@@ -6483,6 +6484,18 @@ RectTransform:
   m_AnchoredPosition: {x: -25, y: 0}
   m_SizeDelta: {x: 400, y: -200}
   m_Pivot: {x: 1, y: 0.5}
+--- !u!114 &183404682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 183404680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93c67af693727604b97de7ca78ff76c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RtlMirrorIgnore
 --- !u!1 &183754314
 GameObject:
   m_ObjectHideFlags: 0
@@ -12843,7 +12856,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 456130911}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &456130913
@@ -20194,6 +20207,7 @@ GameObject:
   - component: {fileID: 722603884}
   - component: {fileID: 722603883}
   - component: {fileID: 722603882}
+  - component: {fileID: 722603886}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -20286,6 +20300,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &722603886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722603881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1f3c7d219a3c44c91e64cfbfb47561, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RtlLayoutMirror
 --- !u!1 &723796181
 GameObject:
   m_ObjectHideFlags: 0
@@ -22421,7 +22447,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 802757719}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &802757721
@@ -28379,7 +28405,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 992634760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -28462,6 +28488,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: ELECTRO GRID
+  fixTags: 1
+  forceFix: 0
 --- !u!222 &992634764
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -31395,7 +31426,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1110805893}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &1110805895
@@ -34249,7 +34280,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1212558912}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -34332,6 +34363,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: Selected Level
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &1213501945
 GameObject:
   m_ObjectHideFlags: 0
@@ -41588,7 +41624,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1478323887}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -41671,6 +41707,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: Level Selection
+  fixTags: 1
+  forceFix: 0
 --- !u!222 &1478323891
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -52861,7 +52902,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1950179607}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -52944,6 +52985,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: Information about the level bla bla bla
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &1951235882
 GameObject:
   m_ObjectHideFlags: 0
@@ -55453,7 +55499,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2050356815}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &2050356817

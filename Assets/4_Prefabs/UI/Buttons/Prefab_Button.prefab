@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22c641a4da1748fa866e29dd0aa259af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableAnimator
+  resetOnDisable: 1
   positionEffectType: 0
   positionOffset: {x: 0, y: 10, z: 0}
   positionDuration: 0.15
@@ -212,8 +213,23 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   selectable: {fileID: 3208736288784191921}
-  eventTrigger: {fileID: 8890823435884068750}
   rectTransform: {fileID: 5544082587813058189}
+--- !u!114 &8070639938617703997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5302415877516245720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8deca28af3c49ff8fdcb42d3c149836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelectableFeedback
+  mouseSelectsSelectable: 1
+  selectSfx: ButtonSelect
+  submitSfx: ButtonSubmit
+  selectable: {fileID: 3208736288784191921}
 --- !u!1 &5343275625798819389
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,7 +285,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5343275625798819389}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -318,6 +334,7 @@ MonoBehaviour:
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
+  m_characterHorizontalScale: 1
   m_wordSpacing: 0
   m_lineSpacing: 0
   m_lineSpacingMax: 0
@@ -329,7 +346,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
+  m_ActiveFontFeatures: 6e72656bu
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -351,6 +368,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: Button
+  fixTags: 1
+  forceFix: 0
 --- !u!114 &2574926336027384700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,6 +386,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.MenuSystem.SelectableTextAnimator
   selectable: {fileID: 3208736288784191921}
+  resetOnDisable: 1
   positionEffectType: 2
   positionOffset: {x: 0, y: 10, z: 0}
   positionDuration: 0.15
@@ -387,20 +410,3 @@ MonoBehaviour:
   colorEase: 7
   graphic: {fileID: 3982775019398211998}
   rectTransform: {fileID: 4426503580546431240}
---- !u!114 &8070639938617703997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5302415877516245720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8deca28af3c49ff8fdcb42d3c149836, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SelectableFeedback
-  mouseSelectsSelectable: 1
-  selectSfx: ButtonSelect
-  submitSfx: ButtonSubmit
-  audioSource: {fileID: 0}
-  selectable: {fileID: 3208736288784191921}

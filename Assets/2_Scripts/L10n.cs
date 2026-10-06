@@ -35,6 +35,17 @@ public static class L10n
         return LocalizationSettings.StringDatabase.GetLocalizedString(Table, key, new object[] { values }, Locale);
     }
 
+    /// <summary>Whether the selected language reads right to left (Hebrew, Arabic). False outside Play mode.</summary>
+    public static bool IsRightToLeft
+    {
+        get
+        {
+            if (!Application.isPlaying) return false;
+            var culture = LocalizationSettings.SelectedLocale ? LocalizationSettings.SelectedLocale.Identifier.CultureInfo : null;
+            return culture != null && culture.TextInfo.IsRightToLeft;
+        }
+    }
+
     /// <summary>Raised after the player picks another language. Screens that build text in code re-read it here.</summary>
     public static event System.Action LanguageChanged;
 
@@ -64,7 +75,27 @@ public static class L10n
 
     // Domain reload is off in this project, so statics survive between Play sessions and are reset by hand
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetStatics() => LanguageChanged = null;
+    private static void ResetStatics()
+    {
+        LanguageChanged = null;
+        _hebrewFont = null;
+        _arabicFont = null;
+        RTLTMPro.RTLTextMeshPro.RtlFontSelector = SelectRtlFont;
+    }
+
+    // The game's display fonts have no Hebrew or Arabic, so right-to-left labels switch to a full font for their script
+    private static TMPro.TMP_FontAsset _hebrewFont;
+    private static TMPro.TMP_FontAsset _arabicFont;
+
+    private static TMPro.TMP_FontAsset SelectRtlFont(string text)
+    {
+        foreach (char c in text)
+        {
+            if (RTLTMPro.TextUtils.IsArabicCharacter(c)) return _arabicFont ? _arabicFont : _arabicFont = Resources.Load<TMPro.TMP_FontAsset>("NotoSansArabic-Regular SDF");
+            if (RTLTMPro.TextUtils.IsHebrewCharacter(c)) return _hebrewFont ? _hebrewFont : _hebrewFont = Resources.Load<TMPro.TMP_FontAsset>("NotoSansHebrew-Regular SDF");
+        }
+        return null;
+    }
 
     private static void OnSelectedLocaleChanged(Locale locale) => LanguageChanged?.Invoke();
 

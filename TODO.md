@@ -98,10 +98,11 @@ and the level select rework is where the Endless entry goes.
         N. After the tutorial levels is the usual answer, since Endless assumes
         the player already knows Plus and Stars.
 
-- [ ] **Localisation follow-ups.** The system and five languages are in (see
+- [ ] **Localisation follow-ups.** The system and seven languages are in (see
       DONE.md). What is left needs a person, not code:
       - **Native review of the translations.** Spanish, Portuguese (Brazil),
-        German and French were written without a native speaker. Get each
+        German, French, Hebrew and Arabic were written without a native
+        speaker. Arabic matters most: it is the hardest to get right. Get each
         read in game before a release that advertises them; the Content and UI
         tables export to CSV for that (Window > Asset Management >
         Localization Tables).

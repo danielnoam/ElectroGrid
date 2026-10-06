@@ -50,6 +50,12 @@
       "source": "local-tarball",
       "dependencies": {}
     },
+    "com.nosuchstudio.rtltmpro": {
+      "version": "file:com.nosuchstudio.rtltmpro",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.singularitygroup.hotreload": {
       "version": "file:com.singularitygroup.hotreload",
       "depth": 0,

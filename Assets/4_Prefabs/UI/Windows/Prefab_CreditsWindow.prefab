@@ -54,7 +54,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 443614529533517099}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -139,6 +139,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'HOT RELOAD
+
+    <size=80%><alpha=#CC>The Naugthy Cult'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &833308103505149950
 GameObject:
   m_ObjectHideFlags: 0
@@ -193,7 +200,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 833308103505149950}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -276,6 +283,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: "Synthwave Music - Volume\_I\n<size=80%><alpha=#CC>AD Sounds"
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &1900611241808178058
 GameObject:
   m_ObjectHideFlags: 0
@@ -402,7 +414,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2051407053752151488}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -485,6 +497,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: Plugins
+  fixTags: 1
+  forceFix: 0
 --- !u!114 &4528313363095181503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,7 +618,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2086162859183999650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -686,6 +703,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'Force Field - Sci-Fi Collection
+
+    <size=80%><alpha=#CC>Alpine Audio'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &2351561892919714879
 GameObject:
   m_ObjectHideFlags: 0
@@ -863,7 +887,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4857594467836815684}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -948,6 +972,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'Action Arcade Music Pack: Neon Pulse
+
+    <size=80%><alpha=#CC>Soma Animus'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &4990427866534023182
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,7 +1033,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4990427866534023182}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -1087,6 +1118,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'Violet Themed UI
+
+    <size=80%><alpha=#CC>Gieniel Villacote'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &5099633016906212297
 GameObject:
   m_ObjectHideFlags: 0
@@ -1296,7 +1334,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5397680457047033351}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -1381,6 +1419,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'Prime Tween
+
+    <size=80%><alpha=#CC>Kyrylo Kuzyk'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &5895226987269812642
 GameObject:
   m_ObjectHideFlags: 0
@@ -1435,7 +1480,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5895226987269812642}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -1520,6 +1565,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'Free UI Soundpack
+
+    <size=80%><alpha=#CC>Cyrex'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &6782174865182663286
 GameObject:
   m_ObjectHideFlags: 0
@@ -1638,7 +1690,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7094981538303273337}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -1721,6 +1773,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: A Game By Daniel noam
+  fixTags: 1
+  forceFix: 0
 --- !u!114 &4592330149363921386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1837,7 +1894,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7779859121478520645}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -1922,6 +1979,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'SCI-FI User Interface SFX
+
+    <size=80%><alpha=#CC>Sound Works 12'
+  fixTags: 1
+  forceFix: 0
 --- !u!1 &7979123607417564303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1978,7 +2042,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7979123607417564303}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -2061,6 +2125,11 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: Assets
+  fixTags: 1
+  forceFix: 0
 --- !u!114 &6493523618978706524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2177,7 +2246,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8353983047470419059}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
@@ -2262,6 +2331,13 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+  preserveNumbers: 1
+  farsi: 0
+  originalText: 'Free 8 Synthwave Tracks
+
+    <size=80%><alpha=#CC>Alpine Audio'
+  fixTags: 1
+  forceFix: 0
 --- !u!1001 &6469135852302630271
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2453,7 +2529,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7562105884236024479}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &2872905823874730619 stripped
@@ -2464,7 +2540,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 414291599410149800}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Script: {fileID: 11500000, guid: b9839c2d141529145a431aef4d757ff3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1 &3931734507155260148 stripped
