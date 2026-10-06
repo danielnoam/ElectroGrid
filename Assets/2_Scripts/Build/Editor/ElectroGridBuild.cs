@@ -315,9 +315,11 @@ internal static class ElectroGridBuild
             DeleteFolder(platformFolder);
             Directory.CreateDirectory(Path.GetDirectoryName(playerPath) ?? platformFolder);
 
-            // Addressables build their content for the active platform before the player builds, and refuse when it
-            // differs from the profile being built, so the profile has to be active first
+            // Addressables build their content before the player and refuse unless the editor could build this target
+            // itself. That check reads the active profile and the old selected platform group, which a profile switch
+            // leaves behind (on Android it reports Windows as needing IL2CPP), so both are set first
             if (BuildProfile.GetActiveBuildProfile() != target.profile) BuildProfile.SetActiveBuildProfile(target.profile);
+            EditorUserBuildSettings.selectedBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(ToBuildTarget(target.kind));
 
             var options = new BuildPlayerWithProfileOptions
             {
