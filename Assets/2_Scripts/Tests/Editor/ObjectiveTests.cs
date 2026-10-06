@@ -323,6 +323,24 @@ public class ObjectiveTests
     }
 
     [Test]
+    public void LevelData_ComboFilled_AddsItsOwnMovesAndTime()
+    {
+        var moves = new MoveLimit();
+        TestUtils.SetField(moves, "allowedMoves", 10);
+        var time = new TimeLimit();
+        TestUtils.SetField(time, "allowedTime", 30f);
+        var data = LevelData(new Match3Objective[0], new Match3LoseCondition[] { moves, time });
+
+        for (int i = 0; i < 5; i++) data.OnMoveMade();
+        data.CurrentLoseConditions[1].Update(10f);
+
+        data.OnComboFilled(4f, 2);
+
+        Assert.That(data.CurrentLoseConditions[0].GetProgress().Item1, Is.EqualTo(7));
+        Assert.That(data.CurrentLoseConditions[1].GetProgress().Item1, Is.EqualTo(24));
+    }
+
+    [Test]
     public void LevelData_BelowHalf_WhenAConditionIsLessThanHalfLeft()
     {
         var moves = new MoveLimit();

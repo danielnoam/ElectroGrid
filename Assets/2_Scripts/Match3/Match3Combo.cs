@@ -14,6 +14,12 @@ public class Match3ComboSettings
     [Range(0.1f, 1f)] public float windowShrink = 0.9f;
     [Tooltip("The window never gets shorter than this")]
     [Min(0.1f)] public float minWindow = 1.5f;
+
+    [Header("Full Bar")]
+    [Tooltip("Seconds added to a time limit when the bar fills")]
+    [Min(0)] public float fullBarSeconds = 5f;
+    [Tooltip("Moves added to a move limit when the bar fills")]
+    [Min(0)] public int fullBarMoves = 2;
 }
 
 /// <summary>

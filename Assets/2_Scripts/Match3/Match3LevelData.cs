@@ -103,7 +103,19 @@ public class Match3LevelData
             }
         }
     }
-    
+
+    /// <summary>A full combo bar: more time on a time limit, more moves on a move limit, like a Plus but its own amounts.</summary>
+    public void OnComboFilled(float seconds, int moves)
+    {
+        foreach (var condition in CurrentLoseConditions)
+        {
+            if (condition is not { IsConditionMet: false }) continue;
+
+            if (condition is TimeLimit timeCondition) timeCondition.AddTime(seconds);
+            else if (condition is MoveLimit movesCondition) movesCondition.AddMoves(moves);
+        }
+    }
+
     public bool HasLoseConditions()
     {
         foreach (var condition in CurrentLoseConditions)

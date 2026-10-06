@@ -53,15 +53,16 @@ and the level select rework is where the Endless entry goes.
       0.9 per step down to 1.5s. Events: `StepAdded`, `FillChanged`, `Filled`
       (the bar empties, the combo keeps going) and `Reset`. All numbers live in
       the Combo section of `Match3GameManager`'s inspector, which also shows the
-      live count, fill and time left. Nothing listens yet. Still to decide:
-      - **The ability in normal levels.** "More time" only makes sense for
-        `TimeLimit`. `MoveLimit` levels need something else (extra moves, clear
-        a row, spawn a Plus), or the bar only exists in Endless. Pick one before
-        building the UI, because a bar that fills and does nothing will feel
-        broken.
-      - **Portrait width.** A vertical bar on the right takes space from a
-        board that already fills the width on phones. Check it against the
-        widest grid shape and the safe area.
+      live count, fill and time left.
+      **Bar, feel and ability are in too** (`ComboBarUI` under the top bar):
+      the counter shows from x2 on the left of the level title, the bar and a
+      draining timer line sit on its right (mirrored for Hebrew and Arabic).
+      Each step plays ButtonSelect pitched up 0.08 per step and shakes a little
+      harder; a full bar plays PlusDestroy, shakes, and adds 5s to a time limit
+      or 2 moves to a move limit (`Match3LevelData.OnComboFilled`). All of it
+      is tunable in the inspector. Still to do: real sounds for the step and
+      the full bar, a playtest of the numbers, and the Endless version of the
+      ability (time without the allowedTime cap).
 
 - [ ] **Level selection rework.** Not specified yet. Write down what's wrong
       with the current one before starting: is it the look, the number of
@@ -96,22 +97,6 @@ and the level select rework is where the Endless entry goes.
       - **Unlock.** Decide whether it's available from the start or after level
         N. After the tutorial levels is the usual answer, since Endless assumes
         the player already knows Plus and Stars.
-
-- [ ] **Localisation follow-ups.** The system and seven languages are in (see
-      DONE.md). What is left needs a person, not code:
-      - **Native review of the translations.** Spanish, Portuguese (Brazil),
-        German, French, Hebrew and Arabic were written without a native
-        speaker. Arabic matters most: it is the hardest to get right. Get each
-        read in game before a release that advertises them; the Content and UI
-        tables export to CSV for that (Window > Asset Management >
-        Localization Tables).
-      - **A digital font with accents.** DS-DIGI has no accented letters at
-        all, so á, ç, ö, ß and friends come from Liberation Sans through a
-        fallback. Readable, but those letters do not match the digital style.
-        Swapping DS-DIGI for a similar font with Latin-1 coverage, or
-        extending it, fixes that.
-      - **Store listing and screenshots** per language, if the stores should
-        show them.
 
 ### Content, not engineering
 

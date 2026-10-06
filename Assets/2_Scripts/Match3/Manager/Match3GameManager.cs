@@ -86,7 +86,18 @@ public class Match3GameManager : MonoBehaviour
 
     private void Start()
     {
+        Combo.Filled += OnComboFilled;
         StartNewGame();
+    }
+
+    private void OnDestroy()
+    {
+        if (_combo != null) _combo.Filled -= OnComboFilled;
+    }
+
+    private void OnComboFilled()
+    {
+        _currentLevelData?.OnComboFilled(comboSettings.fullBarSeconds, comboSettings.fullBarMoves);
     }
 
     private void Update()
