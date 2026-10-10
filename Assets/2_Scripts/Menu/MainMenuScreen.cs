@@ -23,13 +23,15 @@ public class MainMenuScreen : MenuScreen
 
     private void Start()
     {
+        // Subscribed before the first lookup: that lookup can finish Localization's startup, which applies the
+        // saved language right then, and the button must hear about it
+        L10n.LanguageChanged += SetupContinueButton;
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
+
         SetupButtons();
         informationWindowUI?.Initialize();
         settingsWindowUI?.Initialize();
         creditsWindowUI?.Initialize();
-
-        if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
-        L10n.LanguageChanged += SetupContinueButton;
     }
 
     private void OnDestroy()

@@ -11,10 +11,12 @@ using UnityEngine.Localization.Settings;
 public static class L10n
 {
     public const string Table = "UI";
+    public const string ContentTable = "Content";
 
     // Outside Play mode nothing selects a locale, so editor tools like the level inspector read the project locale.
-    // Null in Play mode and builds means the selected locale.
-    private static Locale Locale => Application.isPlaying ? null : LocalizationSettings.ProjectLocale;
+    // In Play mode the selected locale is passed explicitly: leaving it null resolves through the database's own copy,
+    // which still points at the previous language while a language change is being handled
+    private static Locale Locale => Application.isPlaying ? LocalizationSettings.SelectedLocale : LocalizationSettings.ProjectLocale;
 
     public static string Get(string key)
     {
@@ -97,7 +99,20 @@ public static class L10n
         return null;
     }
 
-    private static void OnSelectedLocaleChanged(Locale locale) => LanguageChanged?.Invoke();
+    private static void OnSelectedLocaleChanged(Locale locale) => RaiseWhenLoaded(locale);
+
+    // On a device the tables load from bundles, and a lookup made before they finish falls back to English. Listeners
+    // are only told once both tables for the language are in, so the text they rebuild is the right language
+    private static void RaiseWhenLoaded(Locale locale)
+    {
+        if (!locale) return;
+
+        LocalizationSettings.StringDatabase.GetTableAsync(Table, locale).Completed += _ =>
+            LocalizationSettings.StringDatabase.GetTableAsync(ContentTable, locale).Completed += __ =>
+            {
+                if (LocalizationSettings.SelectedLocale == locale) LanguageChanged?.Invoke();
+            };
+    }
 
     // The saved language is applied once Localization has picked its startup locale, which otherwise follows the system
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -116,10 +131,11 @@ public static class L10n
             }
 
             string code = SaveManager.Instance ? SaveManager.Instance.Settings.language : null;
-            if (string.IsNullOrEmpty(code)) return;
-
-            var locale = LocalizationSettings.AvailableLocales.GetLocale(code);
+            var locale = string.IsNullOrEmpty(code) ? null : LocalizationSettings.AvailableLocales.GetLocale(code);
             if (locale && locale != LocalizationSettings.SelectedLocale) LocalizationSettings.SelectedLocale = locale;
+
+            // Text built in code during startup may have been read before the tables loaded, so it rebuilds once more
+            RaiseWhenLoaded(LocalizationSettings.SelectedLocale);
         };
     }
 }

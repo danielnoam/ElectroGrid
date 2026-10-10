@@ -32,13 +32,13 @@ public class LevelSelectionScreen : MenuScreen
 
     private void Start()
     {
+        L10n.LanguageChanged += UpdateLevelInfo;
+        if (SaveManager.Instance) SaveManager.Instance.SaveReset += OnSaveReset;
+
         GameManager.Instance?.SelectMatch3Level(null);
         CreateLevelButtons();
         UpdateLevelInfo();
         SetupButtons();
-
-        if (SaveManager.Instance) SaveManager.Instance.SaveReset += OnSaveReset;
-        L10n.LanguageChanged += UpdateLevelInfo;
     }
 
     private void OnDestroy()

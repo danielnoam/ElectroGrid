@@ -69,6 +69,7 @@ public class SettingsWindowUI : MonoBehaviour
 
         if (titleText) titleText.alpha = 0f;
         if (versionText) versionText.text = $"v{Application.version}";
+        AlignVersion();
 
         if (backgroundImage)
         {
@@ -102,6 +103,14 @@ public class SettingsWindowUI : MonoBehaviour
     {
         RefreshLanguageLabel();
         if (resetProgressLabel) resetProgressLabel.text = L10n.Get(_resetConfirmExpiry > 0f ? "settings.reset.confirm" : "settings.reset");
+        AlignVersion();
+    }
+
+    // The footer row mirrors for right-to-left languages, but the version reads left to right, so it gets its
+    // alignment from the language rather than from its text
+    private void AlignVersion()
+    {
+        if (versionText) versionText.horizontalAlignment = L10n.IsRightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
     }
 
     private void RefreshLanguageLabel()

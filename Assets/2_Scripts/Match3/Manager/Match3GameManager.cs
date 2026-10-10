@@ -231,7 +231,7 @@ public class Match3GameManager : MonoBehaviour
     public void NotifyHelperObjectDestroyed(Match3HelperObject helper)
     {
         HelperDestroyed?.Invoke(helper);
-        _currentLevelData?.OnHelperObjectDestroyed();
+        if (!levelComplete) _currentLevelData?.OnHelperObjectDestroyed();
     }
     
     private void NotifyAMoveWasMade()

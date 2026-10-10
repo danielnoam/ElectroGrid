@@ -89,17 +89,13 @@ public class Match3LevelData
     {
         foreach (var condition in CurrentLoseConditions)
         {
-            if (condition is { IsConditionMet: false })
+            if (condition is TimeLimit timeCondition)
             {
-
-                if (condition is TimeLimit timeCondition)
-                {
-                    timeCondition.AddTime(5);
-                }
-                else if (condition is MoveLimit movesCondition)
-                {
-                    movesCondition.AddMoves(3);
-                }
+                timeCondition.AddTime(5);
+            }
+            else if (condition is MoveLimit movesCondition)
+            {
+                movesCondition.AddMoves(3);
             }
         }
     }
@@ -109,8 +105,6 @@ public class Match3LevelData
     {
         foreach (var condition in CurrentLoseConditions)
         {
-            if (condition is not { IsConditionMet: false }) continue;
-
             if (condition is TimeLimit timeCondition) timeCondition.AddTime(seconds);
             else if (condition is MoveLimit movesCondition) movesCondition.AddMoves(moves);
         }

@@ -56,6 +56,10 @@ public class MoveLimit : Match3LoseCondition
         {
             _movesRemaining = allowedMoves;
         }
+
+        // The last move is spent before its matches resolve, so a Plus or a full combo bar it sets off has to be able
+        // to take the loss back; the level only checks for a loss once the board has settled
+        if (_movesRemaining > 0) _conditionMet = false;
         InvokeProgressChanged();
     }
 
@@ -121,7 +125,8 @@ public class TimeLimit : Match3LoseCondition
         {
             _timeRemaining = allowedTime;
         }
-        
+
+        if (_timeRemaining > 0f) _conditionMet = false;
         InvokeProgressChanged();
     }
 

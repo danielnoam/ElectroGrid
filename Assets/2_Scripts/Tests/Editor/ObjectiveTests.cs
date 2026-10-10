@@ -193,6 +193,21 @@ public class ObjectiveTests
     }
 
     [Test]
+    public void MoveLimit_PlusOnTheLastMove_TakesTheLossBack()
+    {
+        var moves = new MoveLimit();
+        TestUtils.SetField(moves, "allowedMoves", 1);
+        var data = LevelData(new Match3Objective[0], new Match3LoseCondition[] { moves });
+
+        data.OnMoveMade();
+        Assert.That(data.IsAnyLoseConditionMet(), Is.True, "the last move is spent as the swap is made");
+
+        data.OnHelperObjectDestroyed();
+        Assert.That(data.IsAnyLoseConditionMet(), Is.False);
+        Assert.That(data.CurrentLoseConditions[0].GetProgress().Item1, Is.EqualTo(1));
+    }
+
+    [Test]
     public void TimeLimit_MetWhenTimeRunsOut_AndClampsToZero()
     {
         var condition = new TimeLimit();
