@@ -205,9 +205,9 @@ public class SaveManagerTests
     {
         var manager = LoadedManager();
 
-        Assert.That(manager.RecordSurvivalScore(500), Is.True);
-        Assert.That(manager.RecordSurvivalScore(300), Is.False);
-        Assert.That(manager.RecordSurvivalScore(800), Is.True);
+        Assert.That(manager.RecordSurvivalRun(500, 40f, 3), Is.True);
+        Assert.That(manager.RecordSurvivalRun(300, 30f, 2), Is.False);
+        Assert.That(manager.RecordSurvivalRun(800, 50f, 4), Is.True);
 
         var reloaded = LoadedManager();
         Assert.That(reloaded.SurvivalBestScore, Is.EqualTo(800));
@@ -218,11 +218,27 @@ public class SaveManagerTests
     public void ResetProgress_ClearsTheSurvivalBest()
     {
         var manager = LoadedManager();
-        manager.RecordSurvivalScore(500);
+        manager.RecordSurvivalRun(500, 40f, 3);
 
         manager.ResetProgress();
 
-        Assert.That(LoadedManager().SurvivalBestScore, Is.Zero);
+        var reloaded = LoadedManager();
+        Assert.That(reloaded.SurvivalBestScore, Is.Zero);
+        Assert.That(reloaded.SurvivalRuns, Is.Empty);
+    }
+
+    [Test]
+    public void SurvivalRuns_KeepTheTopTenHighestFirst()
+    {
+        var manager = LoadedManager();
+        for (int i = 1; i <= 12; i++) manager.RecordSurvivalRun(i * 100, i, i);
+        manager.RecordSurvivalRun(0, 5f, 0);
+
+        var runs = LoadedManager().SurvivalRuns;
+        Assert.That(runs.Count, Is.EqualTo(SaveManager.MaxSurvivalRuns));
+        Assert.That(runs[0].score, Is.EqualTo(1200));
+        Assert.That(runs[runs.Count - 1].score, Is.EqualTo(300));
+        Assert.That(runs[0].bestCombo, Is.EqualTo(12));
     }
 
     [Test]

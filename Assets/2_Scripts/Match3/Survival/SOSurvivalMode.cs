@@ -25,7 +25,7 @@ public class Match3ScoreSettings
 public class SurvivalTimeSettings
 {
     [Tooltip("Seconds on the clock when a run starts")]
-    [Min(1)] public float startTime = 60f;
+    [Min(1)] public float startTime = 45f;
 
     [Header("Time Gains")]
     [Min(0)] public float plusTime = 5f;

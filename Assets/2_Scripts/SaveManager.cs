@@ -14,6 +14,17 @@ public class LevelRecord
 }
 
 [Serializable]
+public class SurvivalRunRecord
+{
+    public int score;
+    public float timePlayed;
+    public int bestCombo;
+    public long playedAtUtcTicks;
+
+    public DateTime PlayedAt => new DateTime(playedAtUtcTicks, DateTimeKind.Utc).ToLocalTime();
+}
+
+[Serializable]
 public class SettingsData
 {
     public float musicVolume = 1f;
@@ -37,6 +48,7 @@ public class SaveData
     public List<string> seenTutorials = new List<string>();
     public int survivalBestScore;
     public int survivalRunsPlayed;
+    public List<SurvivalRunRecord> survivalRuns = new List<SurvivalRunRecord>();
 }
 
 [DisallowMultipleComponent]
@@ -47,6 +59,7 @@ public class SaveManager : MonoBehaviour
 
     private const int CurrentVersion = 1;
     private const string FileName = "save.json";
+    public const int MaxSurvivalRuns = 10;
 
     private SaveData _data = new SaveData();
 
@@ -55,6 +68,8 @@ public class SaveManager : MonoBehaviour
     public string LastPlayedLevel => _data.lastPlayedLevel;
     public int HighestLevelUnlocked => _data.highestLevelUnlocked;
     public int SurvivalBestScore => _data.survivalBestScore;
+    /// <summary>The best Survival runs, highest score first.</summary>
+    public IReadOnlyList<SurvivalRunRecord> SurvivalRuns => _data.survivalRuns;
 
     public bool HapticsEnabled => _data.settings.hapticsEnabled;
     public bool ScreenShakeEnabled => _data.settings.screenShakeEnabled;
@@ -156,13 +171,26 @@ public class SaveManager : MonoBehaviour
         Save();
     }
 
-    /// <summary>Counts a finished Survival run and keeps its score if it is the best yet. True for a new best.</summary>
-    public bool RecordSurvivalScore(int score)
+    /// <summary>Counts a finished Survival run and keeps it if it makes the best runs list. True for a new best score.</summary>
+    public bool RecordSurvivalRun(int score, float timePlayed, int bestCombo)
     {
         _data.survivalRunsPlayed++;
 
         bool newBest = score > _data.survivalBestScore;
         if (newBest) _data.survivalBestScore = score;
+
+        if (score > 0)
+        {
+            _data.survivalRuns.Add(new SurvivalRunRecord
+            {
+                score = score,
+                timePlayed = timePlayed,
+                bestCombo = bestCombo,
+                playedAtUtcTicks = DateTime.UtcNow.Ticks
+            });
+            _data.survivalRuns.Sort((a, b) => a.score != b.score ? b.score.CompareTo(a.score) : a.playedAtUtcTicks.CompareTo(b.playedAtUtcTicks));
+            if (_data.survivalRuns.Count > MaxSurvivalRuns) _data.survivalRuns.RemoveRange(MaxSurvivalRuns, _data.survivalRuns.Count - MaxSurvivalRuns);
+        }
 
         Save();
         return newBest;
@@ -218,6 +246,7 @@ public class SaveManager : MonoBehaviour
             _data = JsonUtility.FromJson<SaveData>(File.ReadAllText(SavePath)) ?? new SaveData();
             _data.levels ??= new List<LevelRecord>();
             _data.seenTutorials ??= new List<string>();
+            _data.survivalRuns ??= new List<SurvivalRunRecord>();
             _data.settings ??= new SettingsData();
 
             // Schema changes go here, keyed off the loaded _data.version, before it is stamped forward
@@ -240,6 +269,7 @@ public class SaveManager : MonoBehaviour
         _data.lastPlayedLevel = null;
         _data.survivalBestScore = 0;
         _data.survivalRunsPlayed = 0;
+        _data.survivalRuns.Clear();
 
         Save();
         SaveReset?.Invoke();

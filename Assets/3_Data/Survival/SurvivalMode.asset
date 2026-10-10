@@ -24,7 +24,7 @@ MonoBehaviour:
     comboMultiplierPerStep: 1
     maxComboMultiplier: 10
   time:
-    startTime: 60
+    startTime: 45
     plusTime: 5
     fullComboTime: 5
     squareStarTime: 3

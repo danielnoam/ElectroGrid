@@ -185,6 +185,19 @@ public class Match3GridHandler : MonoBehaviour
         return false;
     }
 
+    public void OpenCatchers()
+    {
+        float delay = 0f;
+        for (int x = 0; x < Grid.Width; x++)
+        {
+            var catcher = GetTile(new Vector2Int(x, -1));
+            if (!catcher) continue;
+
+            catcher.OpenTrash(delay);
+            delay += 0.06f;
+        }
+    }
+
     public bool HasCatcher(int column)
     {
         return _tiles.ContainsKey(new Vector2Int(column, -1));

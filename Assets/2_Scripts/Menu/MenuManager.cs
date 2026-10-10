@@ -9,6 +9,7 @@ public class MenuManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private MainMenuScreen mainMenuScreen;
     [SerializeField] private LevelSelectionScreen levelSelectionScreen;
+    [SerializeField] private SurvivalScreen survivalScreen;
     [SerializeField, AudioLibraryID] private string screenSwitchSfx;
     [SerializeField] private EffectSequence gameStartEffect;
     [SerializeField] private EffectSequence startLevelEffect;
@@ -26,6 +27,7 @@ public class MenuManager : MonoBehaviour
         _screens.Clear();
         if (mainMenuScreen) _screens[typeof(MainMenuScreen)] = mainMenuScreen;
         if (levelSelectionScreen) _screens[typeof(LevelSelectionScreen)] = levelSelectionScreen;
+        if (survivalScreen) _screens[typeof(SurvivalScreen)] = survivalScreen;
     }
     
     private void Start()
@@ -70,6 +72,11 @@ public class MenuManager : MonoBehaviour
         ShowScreen<LevelSelectionScreen>(animated);
     }
     
+    public void ShowSurvival(bool animated = true)
+    {
+        ShowScreen<SurvivalScreen>(animated);
+    }
+
     private void HideAllScreensImmediate()
     {
         foreach (var screen in _screens.Values)

@@ -72,7 +72,10 @@ and the level select rework is where the Survival entry would go (it is on the m
       Survival button may be enough (Survival is on the main menu for now).
 
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
-      main menu, unlocked from the start. One run is a 60s clock on a fixed
+      main menu, unlocked from the start. It opens its own screen, laid out like level
+      select: rules, best score and Play on top, your 10 best runs (score,
+      time, date; `SaveData.survivalRuns`) below. One
+      run is a 45s clock on a fixed
       board (`Assets/3_Data/Survival/Survival_Board`, Grid_FullSquare). Every
       number lives on `Assets/3_Data/Survival/SurvivalMode`: swap the board
       there, and tune score, time gains and Star spawns. Score is 10 per piece

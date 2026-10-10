@@ -565,6 +565,22 @@ public class Match3PlayHandler : MonoBehaviour
 
     public IEnumerator HandleMatches(List<Match3Tile> tilesWithMatches)
     {
+        var matchColors = new Dictionary<Match3Tile, Color>();
+        foreach (var tile in tilesWithMatches)
+        {
+            if (tile && tile.CurrentMatch3Object is Match3MatchableObject matched) matchColors[tile] = matched.Color;
+        }
+
+        Color LineColor(IEnumerable<Match3Tile> line)
+        {
+            foreach (var tile in line)
+            {
+                if (matchColors.TryGetValue(tile, out var color)) return color;
+            }
+
+            return Color.white;
+        }
+
         foreach (var tile in tilesWithMatches)
         {
             if (tile && tile.CurrentMatch3Object is Match3MatchableObject matchable)
@@ -612,15 +628,22 @@ public class Match3PlayHandler : MonoBehaviour
                 
                 foreach (var column in toDestroy)
                 {
+                    var matchColor = LineColor(tilesWithMatches.Where(tile => tile.GridPosition.x == column));
                     for (var y = 0; y < gridHandler.Grid.Height; y++)
                     {
                         var tile = gridHandler.GetTile(new Vector2Int(column, y));
-                        if (!tile || !tile.CurrentMatch3Object) continue;
+                        if (!tile) continue;
+                        if (!tile.CurrentMatch3Object)
+                        {
+                            tile.PulseColor(matchColor);
+                            continue;
+                        }
                         
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
                             destroyedAObject = true;
                             if (tile.CurrentMatch3Object is Match3MatchableObject) piecesDestroyed++;
+                            tile.PulseColor(matchColor);
                             tile.CurrentMatch3Object.DestroyWithAnimation();
                             tile.PunchTile(1.5f);
                             tile.SetCurrentItem(null);
@@ -641,15 +664,22 @@ public class Match3PlayHandler : MonoBehaviour
                 
                 foreach (var row in toDestroy)
                 {
+                    var matchColor = LineColor(tilesWithMatches.Where(tile => tile.GridPosition.y == row));
                     for (var x = 0; x < gridHandler.Grid.Width; x++)
                     {
                         var tile = gridHandler.GetTile(new Vector2Int(x, row));
-                        if (!tile || !tile.CurrentMatch3Object) continue;
+                        if (!tile) continue;
+                        if (!tile.CurrentMatch3Object)
+                        {
+                            tile.PulseColor(matchColor);
+                            continue;
+                        }
                         
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
                             destroyedAObject = true;
                             if (tile.CurrentMatch3Object is Match3MatchableObject) piecesDestroyed++;
+                            tile.PulseColor(matchColor);
                             tile.CurrentMatch3Object.DestroyWithAnimation();
                             tile.PunchTile(1.5f);
                             tile.SetCurrentItem(null);

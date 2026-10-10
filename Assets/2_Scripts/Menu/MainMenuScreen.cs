@@ -79,11 +79,8 @@ public class MainMenuScreen : MenuScreen
         survivalButton.onClick.RemoveAllListeners();
         survivalButton.onClick.AddListener(() =>
         {
-            var vfxDuration = VFXManager.Instance ? VFXManager.Instance.PlaySequence(menuManager.EndLevelEffect) : 0.5f;
-            CameraManager.Instance?.ShakeCamera(vfxDuration);
-            GameManager.Instance.SelectSurvival();
-
-            HideByFade(4, () => { GameManager.Instance.Match3Scene.LoadScene(); });
+            CameraManager.Instance?.ShakeCamera(0.5f);
+            menuManager?.ShowSurvival();
         });
     }
 

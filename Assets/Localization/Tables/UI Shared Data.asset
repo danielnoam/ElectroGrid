@@ -450,6 +450,21 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841111607378059
+  - m_Id: 1732861517357056
+    m_Key: survival.noruns
+    m_Metadata:
+      m_Items:
+      - rid: 5242841113807290489
+  - m_Id: 1732861517357057
+    m_Key: survival.play
+    m_Metadata:
+      m_Items:
+      - rid: 5242841113807290490
+  - m_Id: 1735779603701760
+    m_Key: survival.runsplayed
+    m_Metadata:
+      m_Items:
+      - rid: 5242841113807290491
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
@@ -809,3 +824,15 @@ MonoBehaviour:
       type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_CommentText: Results stat. Keep the mm:ss format
+    - rid: 5242841113807290489
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Shown in the Survival window before the first run
+    - rid: 5242841113807290490
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Button in the Survival window that starts a run
+    - rid: 5242841113807290491
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Survival screen. {runs} is the number of runs finished

@@ -391,6 +391,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141699
+  - m_Id: 1732861517357056
+    m_Localized: "Noch keine L\xE4ufe. Tippe auf Spielen, um loszulegen!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1732861517357057
+    m_Localized: Spielen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1735779603701760
+    m_Localized: "Gespielte L\xE4ufe: {runs}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
   references:
     version: 2
     RefIds:
@@ -423,3 +436,4 @@ MonoBehaviour:
         - id: 1712789793005573
         - id: 1712789793005574
         - id: 1712789793005576
+        - id: 1735779603701760

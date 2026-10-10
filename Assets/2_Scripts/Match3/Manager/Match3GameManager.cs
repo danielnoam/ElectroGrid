@@ -341,7 +341,7 @@ public class Match3GameManager : MonoBehaviour
         if (survival != null)
         {
             survival.PreviousBest = SaveManager.Instance ? SaveManager.Instance.SurvivalBestScore : 0;
-            survival.IsNewBest = SaveManager.Instance && SaveManager.Instance.RecordSurvivalScore(survival.Score);
+            survival.IsNewBest = SaveManager.Instance && SaveManager.Instance.RecordSurvivalRun(survival.Score, _currentLevelData.TimeSpent, survival.BestCombo);
             FirebaseManager.Instance?.LogSurvivalEnded(_currentLevelData);
         }
         else
@@ -456,6 +456,7 @@ public class Match3GameManager : MonoBehaviour
             
             // Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
             yield return playHandler.SpawnGridLayout(gridLayout, true);
+            gridHandler.OpenCatchers();
             playHandler.CanInteract = true;
             populatingGrid = false;
             yield break;

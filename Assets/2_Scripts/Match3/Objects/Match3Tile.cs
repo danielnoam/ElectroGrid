@@ -19,6 +19,10 @@ public class Match3Tile : MonoBehaviour, IPoolable
     [SerializeField] private float punchScaleAmount = 1.1f;
     [SerializeField] private float punchDuration = 0.2f;
     
+    [Header("Line Break Pulse")]
+    [SerializeField] private float lineBreakPulseDuration = 0.45f;
+    [SerializeField, Range(0f, 1f)] private float lineBreakPulseAlpha = 0.8f;
+    
     [Header("Squash Settings")]
     [SerializeField] private float squashScaleAmount = 0.7f;
     [SerializeField] private float squashDuration = 0.15f;
@@ -40,6 +44,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
     private Vector3 _baseTrashScale;
     private Sequence _pulseSequence;
     private Tween _trashTween;
+    private Sequence _colorSequence;
     
     public Vector2Int GridPosition => gridPosition;
     public Match3Object CurrentMatch3Object => _currentMatch3Object;
@@ -104,10 +109,18 @@ public class Match3Tile : MonoBehaviour, IPoolable
         
         if (state)
         {
-            trashSprite.localScale = new Vector3(_baseTrashScale.x, 0f, _baseTrashScale.z);
             _trashTween.Stop();
-            _trashTween = Tween.ScaleY(trashSprite, _baseTrashScale.y, 0.5f, Ease.OutBack, startDelay: 0.5f);
+            trashSprite.localScale = new Vector3(_baseTrashScale.x, 0f, _baseTrashScale.z);
         }
+    }
+
+    /// <summary>Unfolds the catch box under the board. Catch boxes start shut and open once the board is ready.</summary>
+    public void OpenTrash(float delay = 0f)
+    {
+        if (!trashSprite.gameObject.activeSelf) return;
+
+        _trashTween.Stop();
+        _trashTween = Tween.ScaleY(trashSprite, _baseTrashScale.y, 0.35f, Ease.OutBack, startDelay: delay);
     }
 
     /// <summary>Folds the catch box under the board shut, once the last Square Star for its column has dropped in.</summary>
@@ -169,6 +182,22 @@ public class Match3Tile : MonoBehaviour, IPoolable
         UpdateVisuals();
     }
     
+    /// <summary>Flashes the cell in the colour of the piece a line break just destroyed on it, then fades back.</summary>
+    public void PulseColor(Color color)
+    {
+        if (!isActive || !spriteRenderer) return;
+
+        _colorSequence.Stop();
+        UpdateVisuals();
+        var restColor = spriteRenderer.color;
+        var pulseColor = new Color(color.r, color.g, color.b, Mathf.Max(restColor.a, lineBreakPulseAlpha));
+
+        _colorSequence = Sequence.Create()
+            .Chain(Tween.Color(spriteRenderer, pulseColor, lineBreakPulseDuration * 0.2f, Ease.OutQuad))
+            .Chain(Tween.Color(spriteRenderer, restColor, lineBreakPulseDuration * 0.8f, Ease.InQuad))
+            .ChainCallback(UpdateVisuals);
+    }
+    
     public void SquashTile()
     {
         if (!isActive) return;
@@ -194,6 +223,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
     public void OnPoolReturn()
     {
         _pulseSequence.Stop();
+        _colorSequence.Stop();
         _trashTween.Stop();
         if (_match3GridHandler) _match3GridHandler.GridDestroyed -= OnGridDestroyed;
     }

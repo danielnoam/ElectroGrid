@@ -391,6 +391,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141697
+  - m_Id: 1732861517357056
+    m_Localized: "A\xFAn no hay partidas. \xA1Pulsa Jugar para empezar!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1732861517357057
+    m_Localized: Jugar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1735779603701760
+    m_Localized: 'Partidas jugadas: {runs}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141697
   references:
     version: 2
     RefIds:
@@ -423,3 +436,4 @@ MonoBehaviour:
         - id: 1712789793005573
         - id: 1712789793005574
         - id: 1712789793005576
+        - id: 1735779603701760

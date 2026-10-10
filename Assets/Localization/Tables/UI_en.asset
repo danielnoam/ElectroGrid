@@ -391,6 +391,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841005928218761
+  - m_Id: 1732861517357056
+    m_Localized: No runs yet. Press Play to start your first one!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1732861517357057
+    m_Localized: Play
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1735779603701760
+    m_Localized: 'Runs Played: {runs}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
   references:
     version: 2
     RefIds:
@@ -423,3 +436,4 @@ MonoBehaviour:
         - id: 1712789793005573
         - id: 1712789793005574
         - id: 1712789793005576
+        - id: 1735779603701760
