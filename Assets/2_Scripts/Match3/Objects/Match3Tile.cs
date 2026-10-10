@@ -39,6 +39,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
     private Vector3 _baseScale;
     private Vector3 _baseTrashScale;
     private Sequence _pulseSequence;
+    private Tween _trashTween;
     
     public Vector2Int GridPosition => gridPosition;
     public Match3Object CurrentMatch3Object => _currentMatch3Object;
@@ -104,9 +105,18 @@ public class Match3Tile : MonoBehaviour, IPoolable
         if (state)
         {
             trashSprite.localScale = new Vector3(_baseTrashScale.x, 0f, _baseTrashScale.z);
-            var animationSequence = Sequence.Create();
-            animationSequence.Group(Tween.ScaleY(trashSprite, _baseTrashScale.y, 0.5f, Ease.OutBack, startDelay: 0.5f));
+            _trashTween.Stop();
+            _trashTween = Tween.ScaleY(trashSprite, _baseTrashScale.y, 0.5f, Ease.OutBack, startDelay: 0.5f);
         }
+    }
+
+    /// <summary>Folds the catch box under the board shut, once the last Square Star for its column has dropped in.</summary>
+    public void CloseTrash()
+    {
+        if (!trashSprite.gameObject.activeSelf) return;
+
+        _trashTween.Stop();
+        _trashTween = Tween.ScaleY(trashSprite, 0f, 0.35f, Ease.InBack);
     }
 
     public void SetCurrentItem(Match3Object match3Object)
@@ -184,6 +194,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
     public void OnPoolReturn()
     {
         _pulseSequence.Stop();
+        _trashTween.Stop();
         if (_match3GridHandler) _match3GridHandler.GridDestroyed -= OnGridDestroyed;
     }
 

@@ -84,7 +84,26 @@ public class Match3BottomObject : Match3Object
             SpawnDestroyParticle();
         });
 
-        _movementSequence.ChainCallback(() => { ObjectPooler.ReturnObjectToPool(gameObject); });
+        int column = _currentTile.GridPosition.x;
+        _movementSequence.ChainCallback(() =>
+        {
+            CloseCatcherIfColumnDone(column);
+            ObjectPooler.ReturnObjectToPool(gameObject);
+        });
+    }
+
+    private void CloseCatcherIfColumnDone(int column)
+    {
+        if (!_gridHandler || _gridHandler.Grid == null) return;
+
+        for (int y = 0; y < _gridHandler.Grid.Height; y++)
+        {
+            var tile = _gridHandler.GetTile(new Vector2Int(column, y));
+            if (tile && tile.CurrentMatch3Object is Match3BottomObject) return;
+        }
+
+        var catcher = _gridHandler.GetTile(new Vector2Int(column, -1));
+        if (catcher) catcher.CloseTrash();
     }
 
     private void CheckIfReachedBottom()
