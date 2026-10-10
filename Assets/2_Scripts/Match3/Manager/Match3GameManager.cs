@@ -35,12 +35,15 @@ public class Match3GameManager : MonoBehaviour
     [SerializeField] private Match3PlayHandler playHandler;
     [SerializeField] private Match3SelectionIndicator selectionIndicator;
     [SerializeField] private SOMatch3Level overrideLevel;
+    [SerializeField] private SOSurvivalMode overrideSurvival;
 
     [Header("Combo")]
     [SerializeField] private Match3ComboSettings comboSettings = new Match3ComboSettings();
 
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level currentLevel;
+    [SerializeField, ReadOnly] private SOSurvivalMode currentSurvival;
+    [SerializeField, ReadOnly] private int survivalScore;
     [SerializeField, ReadOnly] private bool levelComplete;
     [SerializeField, ReadOnly] private bool finishedObjectives;
     [SerializeField, ReadOnly] private bool populatingGrid;
@@ -50,10 +53,11 @@ public class Match3GameManager : MonoBehaviour
 
     private Match3LevelData _currentLevelData;
 
-    /// <summary>The current run of quick matches. Nothing reads it yet; the bar UI and the full-bar ability will.</summary>
+    /// <summary>The current run of quick matches, read by the combo bar, the full-bar ability and Survival scoring.</summary>
     public Match3Combo Combo => _combo ??= new Match3Combo(comboSettings);
     private Match3Combo _combo;
     public Match3LevelData CurrentLevelData => _currentLevelData;
+    public bool IsSurvival => currentSurvival;
     public Match3GridHandler GridHandler => gridHandler;
     public Match3PlayHandler PlayHandler => playHandler;
     public int MaxGuaranteedMatchAttempts => maxGuaranteedMatchAttempts;
@@ -68,6 +72,7 @@ public class Match3GameManager : MonoBehaviour
     public event Action<List<Match3Tile>> MatchesMade;
     public event Action<Match3HelperObject> HelperDestroyed;
     public event Action<List<int>, List<int>> LineBreakMade;
+    public event Action<Match3TileObjectType> BonusSpawned;
     
     
 
@@ -87,17 +92,27 @@ public class Match3GameManager : MonoBehaviour
     private void Start()
     {
         Combo.Filled += OnComboFilled;
+        Combo.StepAdded += OnComboStep;
         StartNewGame();
     }
 
     private void OnDestroy()
     {
-        if (_combo != null) _combo.Filled -= OnComboFilled;
+        if (_combo == null) return;
+
+        _combo.Filled -= OnComboFilled;
+        _combo.StepAdded -= OnComboStep;
     }
 
     private void OnComboFilled()
     {
         _currentLevelData?.OnComboFilled(comboSettings.fullBarSeconds, comboSettings.fullBarMoves);
+        if (!levelComplete) _currentLevelData?.Survival?.OnComboFilled();
+    }
+
+    private void OnComboStep(int count)
+    {
+        _currentLevelData?.Survival?.OnComboStep(count);
     }
 
     private void Update()
@@ -123,10 +138,14 @@ public class Match3GameManager : MonoBehaviour
         if (levelComplete || _currentLevelData == null) return;
 
         _currentLevelData.TimeSpent += Time.deltaTime;
+        _currentLevelData.Survival?.Tick(Time.deltaTime);
+        survivalScore = _currentLevelData.Survival?.Score ?? 0;
     }
 
     public bool HasNextLevel()
     {
+        if (IsSurvival) return false;
+
         var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
         if (levels == null || levels.Length == 0) return false;
 
@@ -157,9 +176,17 @@ public class Match3GameManager : MonoBehaviour
         
         if (!currentLevel)
         {
-            if (overrideLevel)
+            if (overrideSurvival)
+            {
+                currentSurvival = overrideSurvival;
+            }
+            else if (overrideLevel)
             {
                 currentLevel = overrideLevel;
+            }
+            else if (GameManager.Instance && GameManager.Instance.SurvivalSelected)
+            {
+                currentSurvival = GameManager.Instance.SurvivalMode;
             }
             else if (GameManager.Instance && GameManager.Instance.SelectedMatch3Level)
             {
@@ -170,6 +197,8 @@ public class Match3GameManager : MonoBehaviour
                 currentLevel = GameManager.Instance.Match3Levels[0];
             }
         }
+        
+        if (currentSurvival) currentLevel = currentSurvival.Board;
         
         if (!currentLevel)
         {
@@ -182,8 +211,8 @@ public class Match3GameManager : MonoBehaviour
         populatingGrid = false;
         Combo.Clear();
 
-        _currentLevelData = new Match3LevelData(currentLevel);
-        SaveManager.Instance?.SetLastPlayedLevel(currentLevel);
+        _currentLevelData = new Match3LevelData(currentLevel, currentSurvival);
+        if (!IsSurvival) SaveManager.Instance?.SetLastPlayedLevel(currentLevel);
         StartCoroutine(InitialLevelSetup());
         
         FirebaseManager.Instance?.LogLevelStarted(_currentLevelData);
@@ -225,13 +254,17 @@ public class Match3GameManager : MonoBehaviour
     public void NotifyMatchesWereMade(List<Match3Tile> matches)
     {
         _currentLevelData?.OnMatchesMade(matches);
+        if (!levelComplete) _currentLevelData?.Survival?.OnMatches(matches, minMatchCount, Combo.Count);
         MatchesMade?.Invoke(matches);
     }
     
     public void NotifyHelperObjectDestroyed(Match3HelperObject helper)
     {
         HelperDestroyed?.Invoke(helper);
-        if (!levelComplete) _currentLevelData?.OnHelperObjectDestroyed();
+        if (levelComplete) return;
+
+        _currentLevelData?.OnHelperObjectDestroyed();
+        _currentLevelData?.Survival?.OnPlusDestroyed(Combo.Count);
     }
     
     private void NotifyAMoveWasMade()
@@ -242,15 +275,18 @@ public class Match3GameManager : MonoBehaviour
     public void NotifyObstacleBroke(Match3ObstacleObject obstacle)
     {
         _currentLevelData?.OnObstacleBreak(obstacle);
+        if (!levelComplete) _currentLevelData?.Survival?.OnDoubleStarBroken(Combo.Count);
     }
     
     public void NotifyBottomObjectReached(Match3BottomObject bottomObject)
     {
         _currentLevelData?.OnBottomObjectReached(bottomObject);
+        if (!levelComplete) _currentLevelData?.Survival?.OnSquareStarReached(Combo.Count);
     }
     
-    public void NotifyLineBreakMade(List<int> rows, List<int> columns)
+    public void NotifyLineBreakMade(List<int> rows, List<int> columns, int piecesDestroyed)
     {
+        if (!levelComplete) _currentLevelData?.Survival?.OnLineBreakPieces(piecesDestroyed, Combo.Count);
         FirebaseManager.Instance?.LogLineBreak();
         LineBreakMade?.Invoke(rows, columns);
     }
@@ -301,7 +337,18 @@ public class Match3GameManager : MonoBehaviour
         
         yield return new WaitForSeconds(0.2f);
 
-        FirebaseManager.Instance?.LogLevelFailed(_currentLevelData);
+        var survival = _currentLevelData.Survival;
+        if (survival != null)
+        {
+            survival.PreviousBest = SaveManager.Instance ? SaveManager.Instance.SurvivalBestScore : 0;
+            survival.IsNewBest = SaveManager.Instance && SaveManager.Instance.RecordSurvivalScore(survival.Score);
+            FirebaseManager.Instance?.LogSurvivalEnded(_currentLevelData);
+        }
+        else
+        {
+            FirebaseManager.Instance?.LogLevelFailed(_currentLevelData);
+        }
+
         LevelFailed?.Invoke(_currentLevelData);
     }
     
@@ -381,7 +428,7 @@ public class Match3GameManager : MonoBehaviour
         if (!currentLevel) yield break;
         
         playHandler.CanInteract = false;
-        gridHandler.CreateGrid(currentLevel);
+        gridHandler.CreateGrid(currentLevel, IsSurvival && currentSurvival.Bonuses.squareStarChance > 0f);
         populatingGrid = true;
         
         int retryCount = 0;
@@ -415,6 +462,41 @@ public class Match3GameManager : MonoBehaviour
         }
     
         Debug.LogError($"Failed to create valid grid after {maxAttemptsToRecheckMatches} attempts");
+    }
+    
+    /// <summary>For a board refill in Survival: which new piece, if any, becomes a bonus Star instead.</summary>
+    public (Match3Tile tile, Match3TileObjectType type) PickSurvivalBonus(ICollection<Match3Tile> refillTiles)
+    {
+        var survival = _currentLevelData?.Survival;
+        if (survival == null || levelComplete) return (null, Match3TileObjectType.Matchable);
+
+        int squareStars = 0;
+        int doubleStars = 0;
+        foreach (var tile in gridHandler.Tiles.Values)
+        {
+            if (!tile || !tile.CurrentMatch3Object) continue;
+            if (tile.CurrentMatch3Object is Match3BottomObject) squareStars++;
+            else if (tile.CurrentMatch3Object is Match3ObstacleObject) doubleStars++;
+        }
+
+        return survival.PickBonus(refillTiles, gridHandler, squareStars, doubleStars);
+    }
+
+    public void SpawnSurvivalBonus(Match3Tile tile, Match3TileObjectType type)
+    {
+        if (type == Match3TileObjectType.Bottom) gridHandler.CreateBottomObject(tile);
+        else if (type == Match3TileObjectType.Obstacle) gridHandler.CreateObstacleObject(tile);
+        else return;
+
+        BonusSpawned?.Invoke(type);
+    }
+
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    private void ForceEndRun()
+    {
+        if (levelComplete || populatingGrid || !IsSurvival) return;
+
+        StartCoroutine(FailLevel());
     }
     
     [Button(ButtonPlayMode.OnlyWhenPlaying)]

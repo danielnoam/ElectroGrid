@@ -342,6 +342,8 @@ public class SettingsWindowUI : MonoBehaviour
         if (backgroundImage) backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
         if (show) _canvasGroup.alpha = 1f;
+        _canvasGroup.blocksRaycasts = show;
+        if (!show) _canvasGroup.interactable = false;
         if (!show) GameManager.Instance?.TogglePause(false, false);
 
         _toggleSequence = Sequence.Create(useUnscaledTime: true)

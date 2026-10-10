@@ -30,7 +30,7 @@ public class TopBarUI : MonoBehaviour
     private Vector2 _levelNameDefaultSize;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
-    private SOMatch3Level _currentLevel;
+    private Match3LevelData _currentLevelData;
 
     private void Awake()
     {
@@ -78,7 +78,7 @@ public class TopBarUI : MonoBehaviour
     // The language can change from the settings window mid-level
     private void RefreshLabels()
     {
-        if (_currentLevel) levelNameText.text = _currentLevel.DisplayName;
+        if (_currentLevelData != null) levelNameText.text = _currentLevelData.DisplayName;
         foreach (var pair in _currentObjectives) pair.Value.SetLabel(pair.Key.GetRequirementText());
         foreach (var pair in _currentLoseConditions) pair.Value.SetLabel(pair.Key.GetRequirementText());
     }
@@ -103,8 +103,8 @@ public class TopBarUI : MonoBehaviour
     {
         if (levelData == null) return;
 
-        _currentLevel = levelData.Level;
-        levelNameText.text = levelData.Level.DisplayName;
+        _currentLevelData = levelData;
+        levelNameText.text = levelData.DisplayName;
         SetupUIElements(levelData.CurrentObjectives, levelData.CurrentLoseConditions);
     }
 
@@ -112,7 +112,8 @@ public class TopBarUI : MonoBehaviour
     {
         if (_currentObjectives.TryGetValue(objective, out var uiElement))
         {
-            uiElement.UpdateProgress(objective.GetProgress());
+            if (objective.ShowsTotal) uiElement.UpdateProgress(objective.GetProgress());
+            else uiElement.UpdateProgress(objective.GetProgress().Item1);
         }
     }
 
@@ -158,7 +159,8 @@ public class TopBarUI : MonoBehaviour
         foreach (var objective in objectives)
         {
             var uiElement = Instantiate(match3UIElementPrefab, objectivesUIParent);
-            uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress());
+            if (objective.ShowsTotal) uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress());
+            else uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress().Item1);
             uiElement.gameObject.name = objective.GetName();
             _currentObjectives.Add(objective, uiElement);
         

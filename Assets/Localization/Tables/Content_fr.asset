@@ -74,6 +74,14 @@ MonoBehaviour:
     m_Localized: Triangle
     m_Metadata:
       m_Items: []
+  - m_Id: 1708965854437376
+    m_Localized: Survie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1708965875408896
+    m_Localized: "Marque un maximum de points avant la fin du chrono. Le Plus, une barre de combo pleine et les \xE9toiles ajoutent du temps, et ton combo multiplie chaque point."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

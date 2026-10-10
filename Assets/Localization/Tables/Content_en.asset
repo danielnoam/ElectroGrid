@@ -74,6 +74,14 @@ MonoBehaviour:
     m_Localized: Triangle
     m_Metadata:
       m_Items: []
+  - m_Id: 1708965854437376
+    m_Localized: Survival
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1708965875408896
+    m_Localized: Score as many points as you can before the clock runs out. Plus, a full combo bar and Stars add time, and your combo multiplies every point.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -35,6 +35,8 @@ public class SaveData
     public int highestLevelUnlocked;
     public List<LevelRecord> levels = new List<LevelRecord>();
     public List<string> seenTutorials = new List<string>();
+    public int survivalBestScore;
+    public int survivalRunsPlayed;
 }
 
 [DisallowMultipleComponent]
@@ -52,6 +54,7 @@ public class SaveManager : MonoBehaviour
     public SettingsData Settings => _data.settings;
     public string LastPlayedLevel => _data.lastPlayedLevel;
     public int HighestLevelUnlocked => _data.highestLevelUnlocked;
+    public int SurvivalBestScore => _data.survivalBestScore;
 
     public bool HapticsEnabled => _data.settings.hapticsEnabled;
     public bool ScreenShakeEnabled => _data.settings.screenShakeEnabled;
@@ -153,6 +156,18 @@ public class SaveManager : MonoBehaviour
         Save();
     }
 
+    /// <summary>Counts a finished Survival run and keeps its score if it is the best yet. True for a new best.</summary>
+    public bool RecordSurvivalScore(int score)
+    {
+        _data.survivalRunsPlayed++;
+
+        bool newBest = score > _data.survivalBestScore;
+        if (newBest) _data.survivalBestScore = score;
+
+        Save();
+        return newBest;
+    }
+
     public void SetLastPlayedLevel(SOMatch3Level level)
     {
         if (!level || _data.lastPlayedLevel == level.name) return;
@@ -223,6 +238,8 @@ public class SaveManager : MonoBehaviour
         _data.seenTutorials.Clear();
         _data.highestLevelUnlocked = 0;
         _data.lastPlayedLevel = null;
+        _data.survivalBestScore = 0;
+        _data.survivalRunsPlayed = 0;
 
         Save();
         SaveReset?.Invoke();

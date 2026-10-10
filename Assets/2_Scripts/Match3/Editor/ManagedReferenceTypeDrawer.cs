@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -132,6 +133,7 @@ internal abstract class ManagedReferenceTypeDrawer<TBase> : PropertyDrawer where
     {
         return TypeCache.GetTypesDerivedFrom<TBase>()
             .Where(type => !type.IsAbstract)
+            .Where(type => type.GetCustomAttribute<System.ComponentModel.BrowsableAttribute>()?.Browsable != false)
             .ToDictionary(type => GetNiceName(type.Name), type => type);
     }
 

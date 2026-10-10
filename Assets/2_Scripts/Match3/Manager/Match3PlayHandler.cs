@@ -591,6 +591,7 @@ public class Match3PlayHandler : MonoBehaviour
             List<int> brokenRows = new List<int>();
             List<int> brokenColumns = new List<int>();
             bool destroyedAObject = false;
+            int piecesDestroyed = 0;
             
             
             if (isHorizontal || isVertical)
@@ -619,6 +620,7 @@ public class Match3PlayHandler : MonoBehaviour
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
                             destroyedAObject = true;
+                            if (tile.CurrentMatch3Object is Match3MatchableObject) piecesDestroyed++;
                             tile.CurrentMatch3Object.DestroyWithAnimation();
                             tile.PunchTile(1.5f);
                             tile.SetCurrentItem(null);
@@ -647,6 +649,7 @@ public class Match3PlayHandler : MonoBehaviour
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
                             destroyedAObject = true;
+                            if (tile.CurrentMatch3Object is Match3MatchableObject) piecesDestroyed++;
                             tile.CurrentMatch3Object.DestroyWithAnimation();
                             tile.PunchTile(1.5f);
                             tile.SetCurrentItem(null);
@@ -657,7 +660,7 @@ public class Match3PlayHandler : MonoBehaviour
 
             if (destroyedAObject)
             {
-                gameManager.NotifyLineBreakMade(brokenRows, brokenColumns);
+                gameManager.NotifyLineBreakMade(brokenRows, brokenColumns, piecesDestroyed);
                 yield return new WaitForSeconds(0.3f);
             }
         }
@@ -876,6 +879,7 @@ public class Match3PlayHandler : MonoBehaviour
         {
 
             var spawnedHelperAlready = false;
+            var bonus = gameManager.PickSurvivalBonus(layout.Keys);
             
             var tilesByRow = layout
                 .GroupBy(kvp => kvp.Key.GridPosition.y)
@@ -887,7 +891,11 @@ public class Match3PlayHandler : MonoBehaviour
             {
                 foreach (var tileObjectMatch in row)
                 {
-                    if (ShouldSpawnHelperObject() && !spawnedHelperAlready)
+                    if (tileObjectMatch.Key == bonus.tile)
+                    {
+                        gameManager.SpawnSurvivalBonus(bonus.tile, bonus.type);
+                    }
+                    else if (ShouldSpawnHelperObject() && !spawnedHelperAlready)
                     {
                         gridHandler.CreateHelperObject(tileObjectMatch.Key);
                         spawnedHelperAlready = true;

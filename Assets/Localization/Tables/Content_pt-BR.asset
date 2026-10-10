@@ -74,6 +74,14 @@ MonoBehaviour:
     m_Localized: "Tri\xE2ngulo"
     m_Metadata:
       m_Items: []
+  - m_Id: 1708965854437376
+    m_Localized: "Sobreviv\xEAncia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1708965875408896
+    m_Localized: "Fa\xE7a o m\xE1ximo de pontos antes que o rel\xF3gio zere. O Plus, a barra de combo cheia e as estrelas d\xE3o mais tempo, e seu combo multiplica cada ponto."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

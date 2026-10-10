@@ -201,6 +201,31 @@ public class SaveManagerTests
     }
 
     [Test]
+    public void SurvivalScore_KeepsOnlyTheBest()
+    {
+        var manager = LoadedManager();
+
+        Assert.That(manager.RecordSurvivalScore(500), Is.True);
+        Assert.That(manager.RecordSurvivalScore(300), Is.False);
+        Assert.That(manager.RecordSurvivalScore(800), Is.True);
+
+        var reloaded = LoadedManager();
+        Assert.That(reloaded.SurvivalBestScore, Is.EqualTo(800));
+        Assert.That(reloaded.Data.survivalRunsPlayed, Is.EqualTo(3));
+    }
+
+    [Test]
+    public void ResetProgress_ClearsTheSurvivalBest()
+    {
+        var manager = LoadedManager();
+        manager.RecordSurvivalScore(500);
+
+        manager.ResetProgress();
+
+        Assert.That(LoadedManager().SurvivalBestScore, Is.Zero);
+    }
+
+    [Test]
     public void DeleteSave_RemovesTheFile()
     {
         var manager = LoadedManager();

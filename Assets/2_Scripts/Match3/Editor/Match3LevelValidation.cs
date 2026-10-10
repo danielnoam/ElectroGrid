@@ -24,22 +24,7 @@ internal static class Match3LevelValidation
         }
     }
 
-    /// <summary>
-    /// A bottom object can only score in a column whose lowest active cell is row 0. Gravity moves
-    /// objects to the lowest tile that exists, tiles only exist on active cells, and reaching the
-    /// bottom is tested as y &lt;= 0 — so on a silhouette grid a column that starts higher is a trap.
-    /// </summary>
-    public static bool IsColumnBottomEligible(Grid grid, int x)
-    {
-        if (grid == null || x < 0 || x >= grid.Width) return false;
-
-        for (int y = 0; y < grid.Height; y++)
-        {
-            if (grid.IsCellActive(x, y)) return y == 0;
-        }
-
-        return false;
-    }
+    public static bool IsColumnBottomEligible(Grid grid, int x) => Match3GridHandler.IsColumnBottomEligible(grid, x);
 
     /// <summary>Null when the list is empty. Used for the status dot next to each level in the browser.</summary>
     public static Severity? WorstSeverity(List<Issue> issues)

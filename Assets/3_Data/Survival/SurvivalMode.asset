@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e6f75d0abd0c8e4aa6d4658f47c7113, type: 3}
+  m_Name: SurvivalMode
+  m_EditorClassIdentifier: Assembly-CSharp::SOSurvivalMode
+  board: {fileID: 11400000, guid: 67db97d438c9bf54b8445f38e8fb8b4c, type: 2}
+  scoreIcon: {fileID: 0}
+  timeIcon: {fileID: 0}
+  score:
+    pointsPerPiece: 10
+    pointsPerExtraPiece: 20
+    plusBonus: 100
+    squareStarBonus: 500
+    doubleStarBonus: 300
+    comboMultiplierPerStep: 1
+    maxComboMultiplier: 10
+  time:
+    startTime: 60
+    plusTime: 5
+    fullComboTime: 5
+    squareStarTime: 3
+    doubleStarTime: 2
+    gainByMinute:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: -0.12
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 5
+        value: 0.4
+        inSlope: -0.12
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+  bonuses:
+    squareStarChance: 15
+    maxSquareStars: 2
+    squareStarMinHeight: 0.5
+    doubleStarChance: 8
+    maxDoubleStars: 2

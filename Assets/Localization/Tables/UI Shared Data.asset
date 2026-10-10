@@ -405,6 +405,51 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141696
+  - m_Id: 1712789751062528
+    m_Key: survival.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378050
+  - m_Id: 1712789793005568
+    m_Key: menu.survival
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378051
+  - m_Id: 1712789793005569
+    m_Key: survival.score
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378052
+  - m_Id: 1712789793005570
+    m_Key: survival.description
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378053
+  - m_Id: 1712789793005571
+    m_Key: survival.over.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378054
+  - m_Id: 1712789793005572
+    m_Key: survival.over.newbest
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378055
+  - m_Id: 1712789793005573
+    m_Key: survival.result.score
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378056
+  - m_Id: 1712789793005574
+    m_Key: survival.result.best
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378057
+  - m_Id: 1712789793005576
+    m_Key: survival.result.time
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378059
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
@@ -728,3 +773,39 @@ MonoBehaviour:
       type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_CommentText: Settings row label; the button next to it shows the language's own name
+    - rid: 5242841111607378050
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar title and Survival name
+    - rid: 5242841111607378051
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Main menu button that starts Survival
+    - rid: 5242841111607378052
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Top bar label next to the Survival score
+    - rid: 5242841111607378053
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Survival rule
+    - rid: 5242841111607378054
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results window title when an Survival run ends
+    - rid: 5242841111607378055
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results window title when the run beat the best score
+    - rid: 5242841111607378056
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results stat. {score} is a number
+    - rid: 5242841111607378057
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results stat, the best score so far. {best} is a number
+    - rid: 5242841111607378059
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Results stat. Keep the mm:ss format

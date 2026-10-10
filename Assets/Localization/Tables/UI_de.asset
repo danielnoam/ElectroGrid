@@ -352,6 +352,45 @@ MonoBehaviour:
     m_Localized: Sprache
     m_Metadata:
       m_Items: []
+  - m_Id: 1712789751062528
+    m_Localized: "\xDCberleben"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005568
+    m_Localized: "\xDCberleben"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005569
+    m_Localized: 'Punkte:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005570
+    m_Localized: "Hol so viele Punkte wie m\xF6glich, bevor die Zeit abl\xE4uft"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005571
+    m_Localized: Zeit abgelaufen!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005572
+    m_Localized: Neuer Rekord!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005573
+    m_Localized: 'Punkte: {score}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1712789793005574
+    m_Localized: 'Rekord: {best}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
+  - m_Id: 1712789793005576
+    m_Localized: 'Spielzeit: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141699
   references:
     version: 2
     RefIds:
@@ -381,3 +420,6 @@ MonoBehaviour:
         - id: 1437589553
         - id: 1437589557
         - id: 3823882985472
+        - id: 1712789793005573
+        - id: 1712789793005574
+        - id: 1712789793005576

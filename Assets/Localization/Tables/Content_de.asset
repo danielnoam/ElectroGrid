@@ -74,6 +74,14 @@ MonoBehaviour:
     m_Localized: Dreieck
     m_Metadata:
       m_Items: []
+  - m_Id: 1708965854437376
+    m_Localized: "\xDCberleben"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1708965875408896
+    m_Localized: "Hol so viele Punkte wie m\xF6glich, bevor die Uhr abl\xE4uft. Plus, eine volle Combo-Leiste und Sterne geben dir Zeit, und deine Combo multipliziert jeden Punkt."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

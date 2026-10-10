@@ -16,6 +16,7 @@ public abstract class Match3Objective
     public bool IsCompleted => _completed;
     
     public abstract bool AllowOnlyOneObjectiveOfThisType { get; }
+    public virtual bool ShowsTotal => true;
     public abstract void Setup();
     public abstract void OnMatchMade(List<Match3Tile> matchedTiles);
     public abstract void OnObstacleBreak(Match3ObstacleObject obstacle);

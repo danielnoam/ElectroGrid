@@ -20,6 +20,7 @@ public class MainMenuScreen : MenuScreen
     [SerializeField] private SettingsWindowUI settingsWindowUI;
     [SerializeField] private CreditsWindowUI creditsWindowUI;
     [SerializeField] private Button continueButton;
+    [SerializeField] private Button survivalButton;
 
     private void Start()
     {
@@ -62,6 +63,25 @@ public class MainMenuScreen : MenuScreen
             var vfxDuration = VFXManager.Instance ? VFXManager.Instance.PlaySequence(menuManager.EndLevelEffect) : 0.5f;
             CameraManager.Instance?.ShakeCamera(vfxDuration);
             GameManager.Instance.SelectMatch3Level(level);
+
+            HideByFade(4, () => { GameManager.Instance.Match3Scene.LoadScene(); });
+        });
+    }
+
+    private void SetupSurvivalButton()
+    {
+        if (!survivalButton) return;
+
+        bool available = GameManager.Instance && GameManager.Instance.SurvivalMode;
+        survivalButton.gameObject.SetActive(available);
+        if (!available) return;
+
+        survivalButton.onClick.RemoveAllListeners();
+        survivalButton.onClick.AddListener(() =>
+        {
+            var vfxDuration = VFXManager.Instance ? VFXManager.Instance.PlaySequence(menuManager.EndLevelEffect) : 0.5f;
+            CameraManager.Instance?.ShakeCamera(vfxDuration);
+            GameManager.Instance.SelectSurvival();
 
             HideByFade(4, () => { GameManager.Instance.Match3Scene.LoadScene(); });
         });
@@ -192,6 +212,7 @@ public class MainMenuScreen : MenuScreen
         }
 
         SetupContinueButton();
+        SetupSurvivalButton();
 
         if (infoButton)
         {

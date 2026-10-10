@@ -74,6 +74,14 @@ MonoBehaviour:
     m_Localized: "Tri\xE1ngulo"
     m_Metadata:
       m_Items: []
+  - m_Id: 1708965854437376
+    m_Localized: Supervivencia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1708965875408896
+    m_Localized: Consigue todos los puntos que puedas antes de que se acabe el reloj. El Plus, la barra de combo llena y las estrellas dan tiempo extra, y tu combo multiplica cada punto.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

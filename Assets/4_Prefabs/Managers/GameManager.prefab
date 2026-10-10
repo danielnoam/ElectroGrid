@@ -74,7 +74,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 41d47e63a62f5df4495b57256f258595, type: 2}
   - {fileID: 11400000, guid: e511aabf80dc9524cbdfef4096082732, type: 2}
   - {fileID: 11400000, guid: b326567c9cb654e4280880435d36bf1a, type: 2}
+  - {fileID: 11400000, guid: 2c1ff2df90899dd4192707387ed85eb2, type: 2}
+  survivalMode: {fileID: 11400000, guid: 2c3199903d85075479f2d045d4cde0d1, type: 2}
   selectedMatch3Level: {fileID: 0}
+  survivalSelected: 0
 --- !u!114 &8216671408826984226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -120,7 +123,8 @@ MonoBehaviour:
     - item: {fileID: 8300000, guid: f7c623d9bd239754390a45ecf483855d, type: 3}
       chance: 12
       isLocked: 0
-  isMuted: 0
+  musicVolume: 1
+  sfxVolume: 1
 --- !u!82 &4433926562512230688
 AudioSource:
   m_ObjectHideFlags: 0

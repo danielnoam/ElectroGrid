@@ -18,9 +18,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SceneField match3Scene;
     [SerializeField] private SOMatch3Level[] match3Levels = Array.Empty<SOMatch3Level>();
     [SerializeField] private SOMatch3Tutorial[] match3GeneralTutorials = Array.Empty<SOMatch3Tutorial>();
+
+    [Header("Survival")]
+    [SerializeField] private SOSurvivalMode survivalMode;
     
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level selectedMatch3Level;
+    [SerializeField, ReadOnly] private bool survivalSelected;
     
     public SceneField MainMenu => mainMenu;
     public SceneField Match3Scene => match3Scene;
@@ -28,6 +32,8 @@ public class GameManager : MonoBehaviour
     public SOMatch3Level[] Match3Levels => match3Levels;
     public SOMatch3Tutorial[] Match3GeneralTutorials => match3GeneralTutorials;
     public SOMatch3Level SelectedMatch3Level => selectedMatch3Level;
+    public SOSurvivalMode SurvivalMode => survivalMode;
+    public bool SurvivalSelected => survivalSelected && survivalMode;
 
     public event Action<bool> PauseToggled;
 
@@ -85,6 +91,13 @@ public class GameManager : MonoBehaviour
     public void SelectMatch3Level(SOMatch3Level level)
     {
         selectedMatch3Level = level;
+        survivalSelected = false;
+    }
+
+    public void SelectSurvival()
+    {
+        selectedMatch3Level = null;
+        survivalSelected = true;
     }
     
     public void TogglePause(bool pause, bool affectTimeScale = true)

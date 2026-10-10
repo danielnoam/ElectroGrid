@@ -352,6 +352,45 @@ MonoBehaviour:
     m_Localized: Idioma
     m_Metadata:
       m_Items: []
+  - m_Id: 1712789751062528
+    m_Localized: "Sobreviv\xEAncia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005568
+    m_Localized: "Sobreviv\xEAncia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005569
+    m_Localized: 'Pontos:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005570
+    m_Localized: "Fa\xE7a o m\xE1ximo de pontos antes que o tempo acabe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005571
+    m_Localized: Acabou o tempo!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005572
+    m_Localized: Novo recorde!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005573
+    m_Localized: 'Pontos: {score}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1712789793005574
+    m_Localized: 'Recorde: {best}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
+  - m_Id: 1712789793005576
+    m_Localized: 'Tempo jogado: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141698
   references:
     version: 2
     RefIds:
@@ -381,3 +420,6 @@ MonoBehaviour:
         - id: 1437589553
         - id: 1437589557
         - id: 3823882985472
+        - id: 1712789793005573
+        - id: 1712789793005574
+        - id: 1712789793005576

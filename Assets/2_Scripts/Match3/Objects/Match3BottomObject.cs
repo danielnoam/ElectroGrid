@@ -95,6 +95,7 @@ public class Match3BottomObject : Match3Object
     private void CloseCatcherIfColumnDone(int column)
     {
         if (!_gridHandler || _gridHandler.Grid == null) return;
+        if (_gameManager && _gameManager.IsSurvival) return;
 
         for (int y = 0; y < _gridHandler.Grid.Height; y++)
         {

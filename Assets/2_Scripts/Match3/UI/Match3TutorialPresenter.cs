@@ -36,6 +36,7 @@ public class Match3TutorialPresenter : MonoBehaviour
 
         _gameManager.LevelStarted += OnLevelStarted;
         _gameManager.LineBreakMade += OnLineBreakMade;
+        _gameManager.BonusSpawned += OnBonusSpawned;
 
         if (_gameManager.GridHandler) _gameManager.GridHandler.HelperSpawned += OnHelperSpawned;
     }
@@ -46,6 +47,7 @@ public class Match3TutorialPresenter : MonoBehaviour
 
         _gameManager.LevelStarted -= OnLevelStarted;
         _gameManager.LineBreakMade -= OnLineBreakMade;
+        _gameManager.BonusSpawned -= OnBonusSpawned;
 
         if (_gameManager.GridHandler) _gameManager.GridHandler.HelperSpawned -= OnHelperSpawned;
     }
@@ -69,6 +71,7 @@ public class Match3TutorialPresenter : MonoBehaviour
         _showing = null;
 
         Enqueue(Match3TutorialTrigger.AnyLevelStart);
+        if (levelData is { IsSurvival: true }) Enqueue(Match3TutorialTrigger.SurvivalStart);
 
         if (levelData?.Level == null) return;
 
@@ -81,6 +84,12 @@ public class Match3TutorialPresenter : MonoBehaviour
         {
             Enqueue(Match3TutorialTrigger.LevelHasBottomObjects);
         }
+    }
+
+    private void OnBonusSpawned(Match3TileObjectType type)
+    {
+        if (type == Match3TileObjectType.Obstacle) Enqueue(Match3TutorialTrigger.LevelHasObstacles);
+        else if (type == Match3TileObjectType.Bottom) Enqueue(Match3TutorialTrigger.LevelHasBottomObjects);
     }
 
     private void OnHelperSpawned(Match3HelperObject helper)

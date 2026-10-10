@@ -352,6 +352,45 @@ MonoBehaviour:
     m_Localized: Language
     m_Metadata:
       m_Items: []
+  - m_Id: 1712789751062528
+    m_Localized: Survival
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005568
+    m_Localized: Survival
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005569
+    m_Localized: 'Score:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005570
+    m_Localized: Score as much as you can before time runs out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005571
+    m_Localized: Time's Up!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005572
+    m_Localized: New Best Score!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005573
+    m_Localized: 'Score: {score}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1712789793005574
+    m_Localized: 'Best: {best}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 1712789793005576
+    m_Localized: 'Time Played: {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
   references:
     version: 2
     RefIds:
@@ -381,3 +420,6 @@ MonoBehaviour:
         - id: 1437589553
         - id: 1437589557
         - id: 3823882985472
+        - id: 1712789793005573
+        - id: 1712789793005574
+        - id: 1712789793005576

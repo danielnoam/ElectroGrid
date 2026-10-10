@@ -25,9 +25,9 @@ Crashlytics and the first tests are in (see DONE.md). What is left:
 
 ## 2. Features, in build order
 
-The UI rework comes first because the combo bar and Endless both add HUD
-elements. Endless depends on the combo bar (its time ability) and on score,
-and the level select rework is where the Endless entry goes.
+The UI rework comes first because the combo bar and Survival both add HUD
+elements. Survival depends on the combo bar (its time ability) and on score,
+and the level select rework is where the Survival entry would go (it is on the main menu for now).
 
 - [ ] **In-game UI rework.** Quit and restart are icons now (see DONE.md). Next,
       look at other match-3 games for ideas. Worth studying: how Royal Match,
@@ -35,7 +35,7 @@ and the level select rework is where the Endless entry goes.
       at the top, what they push into a pause menu instead of keeping on screen,
       and how they confirm a restart (a restart tapped by accident costs the
       whole level, so it needs a confirm or should live in the pause menu). Do
-      this before the combo bar and Endless, since both add HUD elements and
+      this before the combo bar and Survival, since both add HUD elements and
       the layout should be planned once.
 
 - [ ] **Combo bar.** `HandleMatchesAndRepopulate` already loops cascades but
@@ -43,7 +43,7 @@ and the level select rework is where the Endless entry goes.
       a game that is otherwise very loud. The idea: every match fills a combo bar
       on the right side of the screen. The combo resets if the next match doesn't
       come in time, and the window gets shorter as the combo grows. A full bar
-      triggers an ability (in Endless: extra time). The feel pass comes along
+      triggers an ability (in Survival: extra time). The feel pass comes along
       with it: pitch rising per step, a counter, shake getting stronger.
       **Groundwork is in:** `Match3Combo` (plain C#, 9 EditMode tests) is owned
       by `Match3GameManager` as `Combo`. A swap that matches is a step (count +1,
@@ -61,42 +61,34 @@ and the level select rework is where the Endless entry goes.
       harder; a full bar plays PlusDestroy, shakes, and adds 5s to a time limit
       or 2 moves to a move limit (`Match3LevelData.OnComboFilled`). All of it
       is tunable in the inspector. Still to do: real sounds for the step and
-      the full bar, a playtest of the numbers, and the Endless version of the
-      ability (time without the allowedTime cap).
+      the full bar, and a playtest of the numbers. In Survival a full bar adds
+      uncapped time (`SurvivalMode`).
 
 - [ ] **Level selection rework.** Not specified yet. Write down what's wrong
       with the current one before starting: is it the look, the number of
       levels per screen, not seeing best stats, or
-      no place for an Endless entry? With 12 levels a map or scrolling path is
+      no place for a Survival entry? With 12 levels a map or scrolling path is
       probably more than needed. A tidy grid with stars/best stats plus an
-      Endless button may be enough.
+      Survival button may be enough (Survival is on the main menu for now).
 
-- [ ] **Endless mode.** Score as high as you can while a timer counts down.
-      Matches score points, Plus destroys and a full combo bar add time. Square
-      Stars and Double Stars spawn at random as bonuses. What already exists and
-      what doesn't:
-      - **Time exists.** `TimeLimit` counts down, and `OnHelperObjectDestroyed`
-        already adds 5s per Plus destroyed. But `AddTime` caps at `allowedTime`,
-        which Endless can't use: gaining time would do nothing at the start.
-        Endless needs its own lose condition (or a flag) without the cap.
-      - **Score does not exist.** There is no score anywhere in the code. It
-        needs a scoring rule (per piece, match size bonus, cascade/combo
-        multiplier, bonus for Stars), a HUD readout, and a best score in
-        `SaveData` (bump `version`).
-      - **Structure.** Endless isn't really a level with objectives, it's a
-        level with none that never ends by winning. The least invasive route is
-        probably an `SOMatch3Level` with an Endless flag or an `EndlessObjective`
-        that never completes, so `Match3GameManager`, the board and the tutorials
-        are reused instead of forking them.
-      - **Random Stars.** Square Stars only score when they reach row 0, so
-        spawn them in columns where that's possible (same rule the validator
-        uses). Cap how many can be on the board at once, or they fill the board.
-      - **Tuning is the real work.** Starting time, time per Plus, how much
-        spawns. Expect several playtest passes. Log final score and duration to
-        analytics so there's real data to tune with.
-      - **Unlock.** Decide whether it's available from the start or after level
-        N. After the tutorial levels is the usual answer, since Endless assumes
-        the player already knows Plus and Stars.
+- [ ] **Survival mode.** First version is in: a separate Survival button on the
+      main menu, unlocked from the start. One run is a 60s clock on a fixed
+      board (`Assets/3_Data/Survival/Survival_Board`, Grid_FullSquare). Every
+      number lives on `Assets/3_Data/Survival/SurvivalMode`: swap the board
+      there, and tune score, time gains and Star spawns. Score is 10 per piece
+      (matches and line breaks), +20 per piece beyond 3 in one match, 100 per
+      Plus, 500 per Square Star, 300 per Double Star, and all of it is
+      multiplied by the combo count (capped at x10). Time comes from a Plus
+      (+5s), a full combo bar (+5s), Square Stars (+3s) and Double Stars (+2s),
+      uncapped, and every gain shrinks with minutes played (curve, 1 at the
+      start to 0.4 at 5 minutes). Square and Double Stars spawn at random on
+      refills, max 2 each. Best score and runs played are saved; `survival_end`
+      goes to Firebase with score and duration. Code: `Match3SurvivalRun`
+      (scoring, clock, spawns, 11 EditMode tests), `SurvivalScoreObjective` and
+      `SurvivalTimeLimit` (the top bar shows them like any objective).
+      Still to do: playtest the numbers (watch `survival_end` once it ships),
+      decide whether to show the best score on the menu, and a Steam
+      leaderboard later (section 3).
 
 ### Content, not engineering
 
@@ -111,7 +103,7 @@ and the level select rework is where the Endless entry goes.
 
 The releases repo comes first so every installed copy keeps updating before
 anything else changes. The Steam build turns the updater off, and the
-leaderboard needs Endless.
+leaderboard needs Survival.
 
 - [ ] **Separate public repo for releases, so this repo can go private.**
       Makes sense, but the order matters or every installed copy stops updating:
@@ -172,10 +164,10 @@ leaderboard needs Endless.
         it changes nothing about the $100 and it affects whether trading cards
         or DLC ever make sense.
 
-- [ ] **Steam leaderboard for Endless.** Depends on Endless (score must exist)
+- [ ] **Steam leaderboard for Survival.** Depends on Survival (score must exist)
       and on the Steam integration above. `FindOrCreateLeaderboard` + upload
       the score with `KeepBest`, show top 10 and the player's own rank next to
-      them on the Endless results screen. Things to know:
+      them on the Survival results screen. Things to know:
       - **Android players are left out.** Steam leaderboards only work in the
         Steam build. If mobile players should compete too, that's Google Play
         Games or a backend (Firebase is already there), and then the two sources
@@ -187,7 +179,7 @@ leaderboard needs Endless.
         upload the run duration as extra detail so outliers can be spotted.
       - **Scoring changes invalidate the board.** Once there's a leaderboard,
         rebalancing the score resets fairness. Use a new board name per scoring
-        version (`endless_v1`).
+        version (`survival_v1`).
 
 ---
 

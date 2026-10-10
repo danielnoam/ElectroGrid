@@ -85,6 +85,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841005928218861
+  - m_Id: 1708965854437376
+    m_Key: tutorial.survival.title
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378048
+  - m_Id: 1708965875408896
+    m_Key: tutorial.survival.text
+    m_Metadata:
+      m_Items:
+      - rid: 5242841111607378049
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
@@ -152,3 +162,11 @@ MonoBehaviour:
       type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_CommentText: Piece shape name, used inside objectives like "Collect 10 Circle Pieces"
+    - rid: 5242841111607378048
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Title of the card that introduces Survival
+    - rid: 5242841111607378049
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Card that introduces Survival

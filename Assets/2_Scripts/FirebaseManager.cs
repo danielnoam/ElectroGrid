@@ -219,6 +219,25 @@ public class FirebaseManager : MonoBehaviour
         return Mathf.RoundToInt(total / levelData.CurrentObjectives.Count * 100f);
     }
 
+    public void LogSurvivalEnded(Match3LevelData levelData)
+    {
+        if (!firebaseInitialized || levelData?.Survival == null) return;
+
+        var survival = levelData.Survival;
+        FirebaseAnalytics.LogEvent(
+            "survival_end",
+            new Parameter[] {
+                new(FirebaseAnalytics.ParameterLevelName, levelData.Level.LevelName),
+                new(FirebaseAnalytics.ParameterScore, survival.Score),
+                new("new_best", survival.IsNewBest ? 1 : 0),
+                new("best_combo", survival.BestCombo),
+                new("matches_made", levelData.PiecesCleared),
+                new("moves_made", levelData.MovesMade),
+                new("time_spent_seconds", (int)levelData.TimeSpent)
+            }
+        );
+    }
+
     public void LogLineBreak()
     {
         FirebaseAnalytics.LogEvent("Line_Break");

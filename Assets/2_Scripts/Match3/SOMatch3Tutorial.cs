@@ -7,7 +7,8 @@ public enum Match3TutorialTrigger
     LevelHasObstacles,
     LevelHasBottomObjects,
     HelperSpawned,
-    LineBreakMade
+    LineBreakMade,
+    SurvivalStart
 }
 
 [CreateAssetMenu(fileName = "New Match3 Tutorial", menuName = "Scriptable Objects/Match3 Tutorial")]

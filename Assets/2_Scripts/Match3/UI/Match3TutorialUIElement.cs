@@ -10,9 +10,10 @@ public class Match3TutorialUIElement : MonoBehaviour
     
     public void Setup(Sprite sprite, string title, string description)
     {
-        if (image && sprite)
+        if (image)
         {
-            image.sprite = sprite;
+            image.gameObject.SetActive(sprite);
+            if (sprite) image.sprite = sprite;
         }
 
         if (titleText)

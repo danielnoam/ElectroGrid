@@ -6,6 +6,7 @@ public class Match3LevelData
     public readonly SOMatch3Level Level;
     public readonly List<Match3Objective> CurrentObjectives = new List<Match3Objective>();
     public readonly List<Match3LoseCondition> CurrentLoseConditions = new List<Match3LoseCondition>();
+    public readonly Match3SurvivalRun Survival;
 
     public float TimeSpent;
     public int MovesMade;
@@ -13,7 +14,7 @@ public class Match3LevelData
     public int ObstaclesBroken;
     public int BottomObjectsReached;
     
-    public Match3LevelData(SOMatch3Level level)
+    public Match3LevelData(SOMatch3Level level, SOSurvivalMode survival = null)
     {
         Level = level;
         TimeSpent = 0;
@@ -24,6 +25,14 @@ public class Match3LevelData
         
         CurrentObjectives.Clear();
         CurrentLoseConditions.Clear();
+
+        if (survival)
+        {
+            Survival = new Match3SurvivalRun(survival);
+            CurrentObjectives.Add(Survival.ScoreDisplay);
+            CurrentLoseConditions.Add(Survival.Timer);
+            return;
+        }
         
         foreach (var objective in Level.Objectives)
         {
@@ -45,6 +54,10 @@ public class Match3LevelData
     }
     
     
+    public bool IsSurvival => Survival != null;
+
+    public string DisplayName => IsSurvival ? L10n.Get("survival.title") : Level.DisplayName;
+
     public void OnMoveMade()
     {
         MovesMade++;

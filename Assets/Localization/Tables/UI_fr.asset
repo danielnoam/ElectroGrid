@@ -352,6 +352,45 @@ MonoBehaviour:
     m_Localized: Langue
     m_Metadata:
       m_Items: []
+  - m_Id: 1712789751062528
+    m_Localized: Survie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005568
+    m_Localized: Survie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005569
+    m_Localized: 'Score :'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005570
+    m_Localized: Marque un maximum de points avant la fin du temps
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005571
+    m_Localized: "Temps \xE9coul\xE9 !"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005572
+    m_Localized: Nouveau record !
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1712789793005573
+    m_Localized: 'Score : {score}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141700
+  - m_Id: 1712789793005574
+    m_Localized: 'Record : {best}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141700
+  - m_Id: 1712789793005576
+    m_Localized: 'Temps de jeu : {minutes:00}:{seconds:00}'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141700
   references:
     version: 2
     RefIds:
@@ -381,3 +420,6 @@ MonoBehaviour:
         - id: 1437589553
         - id: 1437589557
         - id: 3823882985472
+        - id: 1712789793005573
+        - id: 1712789793005574
+        - id: 1712789793005576

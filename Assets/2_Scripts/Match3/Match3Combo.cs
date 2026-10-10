@@ -23,7 +23,7 @@ public class Match3ComboSettings
 }
 
 /// <summary>
-/// Counts a run of matches made in quick succession and fills a bar from it. Plain C#, so normal levels and Endless
+/// Counts a run of matches made in quick succession and fills a bar from it. Plain C#, so normal levels and Survival
 /// share it and it can be tested without a scene.
 /// </summary>
 /// <remarks>

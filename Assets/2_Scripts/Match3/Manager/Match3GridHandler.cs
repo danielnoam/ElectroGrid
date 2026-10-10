@@ -27,7 +27,8 @@ public class Match3GridHandler : MonoBehaviour
     public event Action<Grid> GridCreated;
     public event Action<Match3HelperObject> HelperSpawned;
     
-    public void CreateGrid(SOMatch3Level level)
+    /// <param name="catchersInEveryColumn">Puts a catch box under every column a Square Star can reach the bottom of, for boards where Stars appear later.</param>
+    public void CreateGrid(SOMatch3Level level, bool catchersInEveryColumn = false)
     {
         if (!level || !match3TilePrefab) return;
         
@@ -68,6 +69,13 @@ public class Match3GridHandler : MonoBehaviour
                     CreateBottomObject(tile);
                     rowsWithBottomObjects.Add(x);
                 }
+            }
+        }
+        if (catchersInEveryColumn)
+        {
+            for (int x = 0; x < Grid.Width; x++)
+            {
+                if (IsColumnBottomEligible(Grid, x)) rowsWithBottomObjects.Add(x);
             }
         }
         rowsWithBottomObjects = rowsWithBottomObjects.Distinct().ToList();
@@ -158,6 +166,28 @@ public class Match3GridHandler : MonoBehaviour
         HelperSpawned?.Invoke(helperOb);
 
         return helperOb;
+    }
+
+    /// <summary>
+    /// A bottom object can only score in a column whose lowest active cell is row 0. Gravity moves
+    /// objects to the lowest tile that exists, tiles only exist on active cells, and reaching the
+    /// bottom is tested as y &lt;= 0, so on a silhouette grid a column that starts higher is a trap.
+    /// </summary>
+    public static bool IsColumnBottomEligible(Grid grid, int x)
+    {
+        if (grid == null || x < 0 || x >= grid.Width) return false;
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            if (grid.IsCellActive(x, y)) return y == 0;
+        }
+
+        return false;
+    }
+
+    public bool HasCatcher(int column)
+    {
+        return _tiles.ContainsKey(new Vector2Int(column, -1));
     }
 
     public Match3Tile GetTile(Vector2Int position)

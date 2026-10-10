@@ -112,12 +112,48 @@ public class LevelCompleteWindowUI : MonoBehaviour
     private void ShowLevelFailed(Match3LevelData levelData)
     {
         if (levelData == null) return;
+
+        if (levelData.IsSurvival)
+        {
+            ShowSurvivalResults(levelData);
+            return;
+        }
         
         AudioLibrary.Play(levelCompleteFailSfx);
         
         UpdateLevelButton(false);
         UpdateLevelCompleteStats(levelData);
         levelCompleteTitle.text = L10n.Get("levelcomplete.lost.title", ("level", levelData.Level.DisplayName));
+    }
+
+    private void ShowSurvivalResults(Match3LevelData levelData)
+    {
+        var survival = levelData.Survival;
+        AudioLibrary.Play(survival.IsNewBest ? levelCompleteWinSfx : levelCompleteFailSfx);
+
+        UpdateLevelButton(false);
+        levelCompleteTitle.text = L10n.Get(survival.IsNewBest ? "survival.over.newbest" : "survival.over.title");
+
+        if (!levelCompleteStatsParent) return;
+
+        foreach (Transform child in levelCompleteStatsParent)
+        {
+            Destroy(child.gameObject);
+        }
+
+        int best = Mathf.Max(survival.Score, survival.PreviousBest);
+        int seconds = Mathf.FloorToInt(levelData.TimeSpent);
+
+        AddStat("Score", L10n.Get("survival.result.score", ("score", survival.Score)));
+        AddStat("Best", L10n.Get("survival.result.best", ("best", best)));
+        AddStat("Time", L10n.Get("survival.result.time", ("minutes", seconds / 60), ("seconds", seconds % 60)));
+    }
+
+    private void AddStat(string statName, string text)
+    {
+        var element = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
+        element.Setup(null, text);
+        element.gameObject.name = statName;
     }
 
     private void Toggle(bool show)
