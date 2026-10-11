@@ -30,6 +30,11 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private Color litWireColor = new Color(0.85f, 0.3f, 1f, 1f);
     [SerializeField] private Color darkWireColor = new Color(1f, 1f, 1f, 0.12f);
     [SerializeField] private ScrollRect levelsScroll;
+    [Tooltip("Space kept between the bottom of the level list and the top of the Back button")]
+    [SerializeField] private float listBottomMargin = 40f;
+
+    private float _cellSize;
+    private float _cellGap;
     
     [Header("References")]
     [SerializeField] private Transform buttonsHolder;
@@ -198,10 +203,10 @@ public class LevelSelectionScreen : MenuScreen
         int column = index % circuitColumns;
         if (row % 2 == 1) column = circuitColumns - 1 - column;
 
-        float gridWidth = circuitColumns * circuitCellSize + (circuitColumns - 1) * circuitGap;
+        float gridWidth = circuitColumns * _cellSize + (circuitColumns - 1) * _cellGap;
         float left = (width - gridWidth) * 0.5f;
-        float x = left + column * (circuitCellSize + circuitGap) + circuitCellSize * 0.5f;
-        float y = -(circuitPadding + row * (circuitCellSize + circuitGap) + circuitCellSize * 0.5f);
+        float x = left + column * (_cellSize + _cellGap) + _cellSize * 0.5f;
+        float y = -(circuitPadding + row * (_cellSize + _cellGap) + _cellSize * 0.5f);
         return new Vector2(x, y);
     }
 
@@ -215,12 +220,23 @@ public class LevelSelectionScreen : MenuScreen
         foreach (var group in holder.GetComponents<LayoutGroup>()) group.enabled = false;
         foreach (var fitter in holder.GetComponents<ContentSizeFitter>()) fitter.enabled = false;
 
-        float width = holder.rect.width;
-        int rows = Mathf.CeilToInt(nodes.Count / (float)circuitColumns);
+        FitListAboveBackButton();
+
         holder.anchorMin = new Vector2(0f, 1f);
         holder.anchorMax = new Vector2(1f, 1f);
         holder.pivot = new Vector2(0.5f, 1f);
-        holder.sizeDelta = new Vector2(holder.sizeDelta.x, circuitPadding * 2 + rows * circuitCellSize + Mathf.Max(0, rows - 1) * circuitGap);
+        holder.anchoredPosition = Vector2.zero;
+        holder.sizeDelta = new Vector2(0f, holder.sizeDelta.y);
+        Canvas.ForceUpdateCanvases();
+
+        float width = holder.rect.width;
+        float gapRatio = circuitCellSize > 0f ? circuitGap / circuitCellSize : 0.4f;
+        float fitCell = (width - circuitPadding * 2f) / (circuitColumns + (circuitColumns - 1) * gapRatio);
+        _cellSize = Mathf.Min(circuitCellSize, fitCell);
+        _cellGap = _cellSize * gapRatio;
+
+        int rows = Mathf.CeilToInt(nodes.Count / (float)circuitColumns);
+        holder.sizeDelta = new Vector2(0f, circuitPadding * 2 + rows * _cellSize + Mathf.Max(0, rows - 1) * _cellGap);
 
         var wires = new GameObject("Wires", typeof(RectTransform));
         var wiresRect = (RectTransform)wires.transform;
@@ -237,7 +253,7 @@ public class LevelSelectionScreen : MenuScreen
             var rect = nodes[i].rect;
             rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
             rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(circuitCellSize, circuitCellSize);
+            rect.sizeDelta = new Vector2(_cellSize, _cellSize);
             rect.anchoredPosition = CircuitPosition(i, width);
 
             if (i == 0) continue;
@@ -263,10 +279,45 @@ public class LevelSelectionScreen : MenuScreen
             Canvas.ForceUpdateCanvases();
             float viewport = levelsScroll.viewport ? levelsScroll.viewport.rect.height : ((RectTransform)levelsScroll.transform).rect.height;
             float contentHeight = holder.sizeDelta.y;
+            bool fits = contentHeight <= viewport;
+            levelsScroll.vertical = !fits;
+            if (fits)
+            {
+                levelsScroll.StopMovement();
+                holder.anchoredPosition = new Vector2(0f, -(viewport - contentHeight) * 0.5f);
+                return;
+            }
+
             float target = -CircuitPosition(nextIndex, width).y - viewport * 0.5f;
             float scrollable = Mathf.Max(0f, contentHeight - viewport);
             levelsScroll.verticalNormalizedPosition = scrollable > 0f ? 1f - Mathf.Clamp01(target / scrollable) : 1f;
         }
+    }
+
+    /// <summary>Stretches the level list down to just above the Back button, whatever the screen's aspect ratio.</summary>
+    private void FitListAboveBackButton()
+    {
+        if (!levelsScroll || !backButton) return;
+
+        Canvas.ForceUpdateCanvases();
+        var window = (RectTransform)levelsScroll.transform;
+        var back = (RectTransform)backButton.transform;
+        var windowCorners = new Vector3[4];
+        var backCorners = new Vector3[4];
+        window.GetWorldCorners(windowCorners);
+        back.GetWorldCorners(backCorners);
+
+        float scale = window.lossyScale.y;
+        if (scale <= 0f) return;
+
+        float top = windowCorners[1].y;
+        float bottom = backCorners[1].y + listBottomMargin * scale;
+        float newHeight = (top - bottom) / scale;
+        if (newHeight < 200f) return;
+
+        float oldHeight = window.rect.height;
+        window.sizeDelta = new Vector2(window.sizeDelta.x, window.sizeDelta.y + (newHeight - oldHeight));
+        window.anchoredPosition += new Vector2(0f, (oldHeight - newHeight) * (1f - window.pivot.y));
     }
 
     private void DecorateLevelButton(Button levelButton, TextMeshProUGUI buttonText, SOMatch3Level level, bool unlocked, bool isNext)
