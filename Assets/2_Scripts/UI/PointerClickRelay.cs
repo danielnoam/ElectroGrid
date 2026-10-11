@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>Raises <see cref="Clicked"/> when this graphic is tapped, for closing a window by tapping its backdrop.</summary>
 public class PointerClickRelay : MonoBehaviour, IPointerClickHandler
@@ -25,6 +26,24 @@ public class PointerClickRelay : MonoBehaviour, IPointerClickHandler
                 return false;
         }
 
+        return true;
+    }
+
+    /// <summary>
+    /// Clicks a button as if the player tapped it, so its sound, haptics and press animation play along with its
+    /// action. False when the button can't be pressed, so the caller can fall back to the action alone.
+    /// </summary>
+    public static bool Press(Button button, PointerEventData eventData)
+    {
+        if (!button || !button.isActiveAndEnabled || !button.IsInteractable()) return false;
+
+        var press = new PointerEventData(EventSystem.current)
+        {
+            button = PointerEventData.InputButton.Left,
+            position = eventData != null ? eventData.position : Vector2.zero,
+            pointerPress = button.gameObject
+        };
+        ExecuteEvents.Execute(button.gameObject, press, ExecuteEvents.pointerClickHandler);
         return true;
     }
 

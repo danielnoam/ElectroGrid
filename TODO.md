@@ -61,15 +61,16 @@ and the level select rework is where the Survival entry would go (it is on the m
       harder; a full bar plays PlusDestroy, shakes, and adds 5s to a time limit
       or 2 moves to a move limit (`Match3LevelData.OnComboFilled`). All of it
       is tunable in the inspector. Still to do: real sounds for the step and
-      the full bar, and a playtest of the numbers. In Survival a full bar adds
+      the full bar (numbers playtested 2026-10-11). In Survival a full bar adds
       uncapped time (`SurvivalMode`).
 
-- [ ] **Level selection rework.** Not specified yet. Write down what's wrong
-      with the current one before starting: is it the look, the number of
-      levels per screen, not seeing best stats, or
-      no place for a Survival entry? With 12 levels a map or scrolling path is
-      probably more than needed. A tidy grid with stars/best stats plus an
-      Survival button may be enough (Survival is on the main menu for now).
+- [ ] **Level selection rework.** Done from the UI research (UI_RESEARCH.md):
+      locked levels show a padlock, the next level glows and is preselected.
+      Stars were tried and dropped (Daniel: they add nothing here). The main
+      menu now has Continue as the big button naming its level, Level Select
+      and Survival (with its best) under it, and Quit as a power-icon button at the
+      bottom left. Still to do: the in-game HUD (Daniel didn't like the
+      mockup; waiting on what to change).
 
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
       main menu, unlocked from the start. It opens its own screen, laid out like level
@@ -89,7 +90,7 @@ and the level select rework is where the Survival entry would go (it is on the m
       goes to Firebase with score and duration. Code: `Match3SurvivalRun`
       (scoring, clock, spawns, 11 EditMode tests), `SurvivalScoreObjective` and
       `SurvivalTimeLimit` (the top bar shows them like any objective).
-      Still to do: playtest the numbers (watch `survival_end` once it ships),
+      Numbers playtested 2026-10-11. Still to do:
       decide whether to show the best score on the menu, and a Steam
       leaderboard later (section 3).
 

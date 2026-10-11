@@ -16,6 +16,20 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private Color activeCellColor = new Color(0.3f, 0.7f, 0.3f);
     [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
     [SerializeField] private string lockedLevelLabel = "?";
+
+    [Header("Level Buttons")]
+    [SerializeField] private Sprite lockSprite;
+    [SerializeField] private Color nextLevelGlowColor = new Color(1f, 0.7f, 0.1f, 1f);
+
+    [Header("Circuit Layout")]
+    [SerializeField, Min(1)] private int circuitColumns = 4;
+    [SerializeField] private float circuitCellSize = 150f;
+    [SerializeField] private float circuitGap = 60f;
+    [SerializeField] private float circuitPadding = 40f;
+    [SerializeField] private float wireThickness = 10f;
+    [SerializeField] private Color litWireColor = new Color(0.85f, 0.3f, 1f, 1f);
+    [SerializeField] private Color darkWireColor = new Color(1f, 1f, 1f, 0.12f);
+    [SerializeField] private ScrollRect levelsScroll;
     
     [Header("References")]
     [SerializeField] private Transform buttonsHolder;
@@ -29,6 +43,7 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private Button backButton;
 
     private SOMatch3Level _selectedLevel;
+    private Tween _nextLevelPulse;
 
     private void Start()
     {
@@ -37,21 +52,51 @@ public class LevelSelectionScreen : MenuScreen
 
         GameManager.Instance?.SelectMatch3Level(null);
         CreateLevelButtons();
+        _selectedLevel = NextLevel();
         UpdateLevelInfo();
         SetupButtons();
     }
 
+    public override void Show(bool animated = true, Action onComplete = null)
+    {
+        if (!_selectedLevel) _selectedLevel = NextLevel();
+        UpdateLevelInfo();
+        base.Show(animated, onComplete);
+    }
+
+    /// <summary>The first unlocked level not yet completed, or the last unlocked one when everything is done.</summary>
+    private SOMatch3Level NextLevel()
+    {
+        var levels = GameManager.Instance ? GameManager.Instance.Match3Levels : null;
+        if (levels == null) return null;
+
+        SOMatch3Level lastUnlocked = null;
+        for (int i = 0; i < levels.Length; i++)
+        {
+            var level = levels[i];
+            if (!level) continue;
+            if (SaveManager.Instance && !SaveManager.Instance.IsLevelUnlocked(i)) break;
+
+            lastUnlocked = level;
+            var record = SaveManager.Instance ? SaveManager.Instance.GetRecord(level) : null;
+            if (record is not { completed: true }) return level;
+        }
+
+        return lastUnlocked;
+    }
+
     private void OnDestroy()
     {
+        _nextLevelPulse.Stop();
         if (SaveManager.Instance) SaveManager.Instance.SaveReset -= OnSaveReset;
         L10n.LanguageChanged -= UpdateLevelInfo;
     }
 
     private void OnSaveReset()
     {
-        _selectedLevel = null;
         GameManager.Instance?.SelectMatch3Level(null);
         CreateLevelButtons();
+        _selectedLevel = NextLevel();
         UpdateLevelInfo();
     }
 
@@ -115,6 +160,11 @@ public class LevelSelectionScreen : MenuScreen
             Destroy(child.gameObject);
         }
 
+        _nextLevelPulse.Stop();
+        var nextLevel = NextLevel();
+        var nodes = new System.Collections.Generic.List<(RectTransform rect, bool unlocked)>();
+        int nextIndex = 0;
+
         for (int i = 0; i < levels.Length; i++)
         {
             SOMatch3Level level = levels[i];
@@ -131,9 +181,131 @@ public class LevelSelectionScreen : MenuScreen
             }
 
             levelButton.interactable = unlocked;
+            nodes.Add(((RectTransform)levelButton.transform, unlocked));
+            if (level == nextLevel) nextIndex = nodes.Count - 1;
+            DecorateLevelButton(levelButton, buttonText, level, unlocked, level == nextLevel);
             if (!unlocked) continue;
 
             levelButton.onClick.AddListener(() => OnLevelButtonClicked(level));
+        }
+
+        LayoutCircuit(nodes, nextIndex);
+    }
+
+    private Vector2 CircuitPosition(int index, float width)
+    {
+        int row = index / circuitColumns;
+        int column = index % circuitColumns;
+        if (row % 2 == 1) column = circuitColumns - 1 - column;
+
+        float gridWidth = circuitColumns * circuitCellSize + (circuitColumns - 1) * circuitGap;
+        float left = (width - gridWidth) * 0.5f;
+        float x = left + column * (circuitCellSize + circuitGap) + circuitCellSize * 0.5f;
+        float y = -(circuitPadding + row * (circuitCellSize + circuitGap) + circuitCellSize * 0.5f);
+        return new Vector2(x, y);
+    }
+
+    /// <summary>
+    /// Lays the level buttons out as a circuit: a snake through rows of <see cref="circuitColumns"/>, wired together.
+    /// Wires up to the next level are lit. Adding levels just adds rows, the scroll view takes care of the rest.
+    /// </summary>
+    private void LayoutCircuit(System.Collections.Generic.List<(RectTransform rect, bool unlocked)> nodes, int nextIndex)
+    {
+        var holder = (RectTransform)buttonsHolder;
+        foreach (var group in holder.GetComponents<LayoutGroup>()) group.enabled = false;
+        foreach (var fitter in holder.GetComponents<ContentSizeFitter>()) fitter.enabled = false;
+
+        float width = holder.rect.width;
+        int rows = Mathf.CeilToInt(nodes.Count / (float)circuitColumns);
+        holder.anchorMin = new Vector2(0f, 1f);
+        holder.anchorMax = new Vector2(1f, 1f);
+        holder.pivot = new Vector2(0.5f, 1f);
+        holder.sizeDelta = new Vector2(holder.sizeDelta.x, circuitPadding * 2 + rows * circuitCellSize + Mathf.Max(0, rows - 1) * circuitGap);
+
+        var wires = new GameObject("Wires", typeof(RectTransform));
+        var wiresRect = (RectTransform)wires.transform;
+        wiresRect.SetParent(holder, false);
+        wiresRect.SetAsFirstSibling();
+        wiresRect.anchorMin = new Vector2(0f, 1f);
+        wiresRect.anchorMax = new Vector2(0f, 1f);
+        wiresRect.pivot = new Vector2(0f, 1f);
+        wiresRect.anchoredPosition = Vector2.zero;
+        wiresRect.sizeDelta = Vector2.zero;
+
+        for (int i = 0; i < nodes.Count; i++)
+        {
+            var rect = nodes[i].rect;
+            rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(circuitCellSize, circuitCellSize);
+            rect.anchoredPosition = CircuitPosition(i, width);
+
+            if (i == 0) continue;
+
+            var from = CircuitPosition(i - 1, width);
+            var to = rect.anchoredPosition;
+            var wire = new GameObject($"Wire {i}", typeof(RectTransform), typeof(Image));
+            var wireRect = (RectTransform)wire.transform;
+            wireRect.SetParent(wiresRect, false);
+            wireRect.anchorMin = wireRect.anchorMax = new Vector2(0f, 1f);
+            wireRect.pivot = new Vector2(0.5f, 0.5f);
+            wireRect.anchoredPosition = (from + to) * 0.5f;
+            bool horizontal = Mathf.Approximately(from.y, to.y);
+            float length = horizontal ? Mathf.Abs(to.x - from.x) : Mathf.Abs(to.y - from.y);
+            wireRect.sizeDelta = horizontal ? new Vector2(length, wireThickness) : new Vector2(wireThickness, length);
+            var wireImage = wire.GetComponent<Image>();
+            wireImage.raycastTarget = false;
+            wireImage.color = nodes[i].unlocked ? litWireColor : darkWireColor;
+        }
+
+        if (levelsScroll && rows > 0)
+        {
+            Canvas.ForceUpdateCanvases();
+            float viewport = levelsScroll.viewport ? levelsScroll.viewport.rect.height : ((RectTransform)levelsScroll.transform).rect.height;
+            float contentHeight = holder.sizeDelta.y;
+            float target = -CircuitPosition(nextIndex, width).y - viewport * 0.5f;
+            float scrollable = Mathf.Max(0f, contentHeight - viewport);
+            levelsScroll.verticalNormalizedPosition = scrollable > 0f ? 1f - Mathf.Clamp01(target / scrollable) : 1f;
+        }
+    }
+
+    private void DecorateLevelButton(Button levelButton, TextMeshProUGUI buttonText, SOMatch3Level level, bool unlocked, bool isNext)
+    {
+        if (!unlocked)
+        {
+            if (!lockSprite) return;
+
+            if (buttonText) buttonText.text = string.Empty;
+            var lockIcon = new GameObject("Lock", typeof(RectTransform), typeof(Image));
+            lockIcon.transform.SetParent(levelButton.transform, false);
+            ((RectTransform)lockIcon.transform).sizeDelta = new Vector2(72f, 72f);
+            var lockImage = lockIcon.GetComponent<Image>();
+            lockImage.sprite = lockSprite;
+            lockImage.preserveAspect = true;
+            lockImage.raycastTarget = false;
+            lockImage.color = new Color(1f, 1f, 1f, 0.35f);
+            return;
+        }
+
+        if (isNext)
+        {
+            var buttonImage = levelButton.GetComponent<Image>();
+            var glow = new GameObject("NextGlow", typeof(RectTransform), typeof(Image));
+            glow.transform.SetParent(levelButton.transform, false);
+            glow.transform.SetAsFirstSibling();
+            var glowRect = (RectTransform)glow.transform;
+            glowRect.anchorMin = Vector2.zero;
+            glowRect.anchorMax = Vector2.one;
+            glowRect.offsetMin = Vector2.zero;
+            glowRect.offsetMax = Vector2.zero;
+            var glowImage = glow.GetComponent<Image>();
+            glowImage.sprite = buttonImage ? buttonImage.sprite : null;
+            glowImage.type = buttonImage ? buttonImage.type : Image.Type.Simple;
+            glowImage.raycastTarget = false;
+            var glowColor = nextLevelGlowColor;
+            glowColor.a = 0.15f;
+            glowImage.color = glowColor;
+            _nextLevelPulse = Tween.Alpha(glowImage, 0.5f, 0.8f, Ease.InOutSine, cycles: -1, cycleMode: CycleMode.Yoyo);
         }
     }
 

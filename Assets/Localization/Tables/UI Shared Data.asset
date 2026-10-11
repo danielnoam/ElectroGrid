@@ -465,6 +465,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841113807290491
+  - m_Id: 2148975749619712
+    m_Key: menu.survival.best
+    m_Metadata:
+      m_Items:
+      - rid: 5242841140639301738
+  - m_Id: 2153976626667520
+    m_Key: survival.bestscore
+    m_Metadata:
+      m_Items:
+      - rid: 5242841140639301739
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
@@ -836,3 +846,11 @@ MonoBehaviour:
       type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_CommentText: Survival screen. {runs} is the number of runs finished
+    - rid: 5242841140639301738
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Small second line on the main menu's Survival button. {best} is the best score
+    - rid: 5242841140639301739
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Label above the big best score on the Survival screen

@@ -302,7 +302,8 @@ public class SettingsWindowUI : MonoBehaviour
     private void OnBackgroundClicked(PointerEventData eventData)
     {
         var title = titleText ? titleText.rectTransform : null;
-        if (PointerClickRelay.IsOutside(eventData, windowRectTransform, title, _backButtonRectTransform)) Close();
+        if (!PointerClickRelay.IsOutside(eventData, windowRectTransform, title, _backButtonRectTransform)) return;
+        if (!PointerClickRelay.Press(backButton, eventData)) Close();
     }
 
     private void Close()

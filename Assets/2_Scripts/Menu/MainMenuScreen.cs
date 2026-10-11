@@ -27,7 +27,12 @@ public class MainMenuScreen : MenuScreen
         // Subscribed before the first lookup: that lookup can finish Localization's startup, which applies the
         // saved language right then, and the button must hear about it
         L10n.LanguageChanged += SetupContinueButton;
-        if (SaveManager.Instance) SaveManager.Instance.SaveReset += SetupContinueButton;
+        L10n.LanguageChanged += UpdateSurvivalLabel;
+        if (SaveManager.Instance)
+        {
+            SaveManager.Instance.SaveReset += SetupContinueButton;
+            SaveManager.Instance.SaveReset += UpdateSurvivalLabel;
+        }
 
         SetupButtons();
         informationWindowUI?.Initialize();
@@ -37,8 +42,13 @@ public class MainMenuScreen : MenuScreen
 
     private void OnDestroy()
     {
-        if (SaveManager.Instance) SaveManager.Instance.SaveReset -= SetupContinueButton;
+        if (SaveManager.Instance)
+        {
+            SaveManager.Instance.SaveReset -= SetupContinueButton;
+            SaveManager.Instance.SaveReset -= UpdateSurvivalLabel;
+        }
         L10n.LanguageChanged -= SetupContinueButton;
+        L10n.LanguageChanged -= UpdateSurvivalLabel;
     }
 
     private void SetupContinueButton()
@@ -54,7 +64,7 @@ public class MainMenuScreen : MenuScreen
         if (!level) return;
 
         var label = continueButton.GetComponentInChildren<TMP_Text>(true);
-        if (label) label.text = L10n.Get(isNewGame ? "menu.newgame" : "menu.continue");
+        if (label) label.text = $"{L10n.Get(isNewGame ? "menu.newgame" : "menu.continue")}\n<size=55%>{level.DisplayName}</size>";
 
         continueButton.onClick.RemoveAllListeners();
         continueButton.onClick.AddListener(() =>
@@ -82,6 +92,21 @@ public class MainMenuScreen : MenuScreen
             CameraManager.Instance?.ShakeCamera(0.5f);
             menuManager?.ShowSurvival();
         });
+
+        UpdateSurvivalLabel();
+    }
+
+    private void UpdateSurvivalLabel()
+    {
+        if (!survivalButton) return;
+
+        var label = survivalButton.GetComponentInChildren<TMP_Text>(true);
+        if (!label) return;
+
+        int best = SaveManager.Instance ? SaveManager.Instance.SurvivalBestScore : 0;
+        label.text = best > 0
+            ? $"{L10n.Get("menu.survival")}\n<size=55%>{L10n.Get("menu.survival.best", ("best", best.ToString("N0")))}</size>"
+            : L10n.Get("menu.survival");
     }
 
     private SOMatch3Level ResolveLastPlayedLevel()

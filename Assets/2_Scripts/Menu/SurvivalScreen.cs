@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using DNExtensions.Systems.VFXManager;
 using PrimeTween;
 using TMPro;
@@ -15,6 +14,7 @@ public class SurvivalScreen : MenuScreen
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private TextMeshProUGUI bestScoreText;
     [SerializeField] private TextMeshProUGUI infoText;
+    [SerializeField] private TextMeshProUGUI runsPlayedText;
     [SerializeField] private Button playButton;
     [SerializeField] private Button backButton;
     [SerializeField] private RectTransform runsParent;
@@ -22,6 +22,13 @@ public class SurvivalScreen : MenuScreen
     [SerializeField] private TextMeshProUGUI emptyText;
     [Tooltip("Its text is shown as the rules on this screen")]
     [SerializeField] private SOMatch3Tutorial rulesCard;
+
+    [Header("High Score Table")]
+    [SerializeField] private Color firstPlaceColor = new Color(1f, 0.75f, 0.2f, 1f);
+    [SerializeField] private Color runColor = Color.white;
+    [SerializeField] private Color emptySlotColor = new Color(1f, 1f, 1f, 0.3f);
+
+    private const int MinimumSlots = 10;
 
     private readonly List<SurvivalRunRowUI> _rows = new List<SurvivalRunRowUI>();
 
@@ -101,46 +108,47 @@ public class SurvivalScreen : MenuScreen
         var save = SaveManager.Instance;
         var runs = save ? save.SurvivalRuns : null;
         int count = runs?.Count ?? 0;
+        var locale = LocalizationSettings.SelectedLocale;
+        var culture = locale ? locale.Identifier.CultureInfo : null;
 
         if (playButton) playButton.interactable = GameManager.Instance && GameManager.Instance.SurvivalMode;
-
-        if (bestScoreText) bestScoreText.text = L10n.Get("survival.result.best", ("best", save ? save.SurvivalBestScore : 0));
-
-        if (infoText)
-        {
-            var info = new StringBuilder();
-            if (rulesCard)
-            {
-                info.AppendLine(rulesCard.TutorialText);
-                info.AppendLine();
-            }
-            info.Append(L10n.Get("survival.runsplayed", ("runs", save ? save.Data.survivalRunsPlayed : 0)));
-            infoText.text = info.ToString();
-        }
+        if (bestScoreText) bestScoreText.text = (save ? save.SurvivalBestScore : 0).ToString("N0", culture ?? System.Globalization.CultureInfo.CurrentCulture);
+        if (runsPlayedText) runsPlayedText.text = L10n.Get("survival.runsplayed", ("runs", save ? save.Data.survivalRunsPlayed : 0));
+        if (infoText && rulesCard) infoText.text = rulesCard.TutorialText;
 
         if (!runsParent || !rowTemplate) return;
 
-        while (_rows.Count < count)
+        int slots = Mathf.Max(MinimumSlots, count);
+        while (_rows.Count < slots)
         {
             var row = Instantiate(rowTemplate, runsParent);
             row.name = $"Run {_rows.Count + 1}";
+            row.gameObject.SetActive(true);
             _rows.Add(row);
         }
 
-        var locale = LocalizationSettings.SelectedLocale;
-        var culture = locale ? locale.Identifier.CultureInfo : null;
+        int latest = -1;
+        for (int i = 0; i < count; i++)
+        {
+            if (latest < 0 || runs[i].playedAtUtcTicks > runs[latest].playedAtUtcTicks) latest = i;
+        }
+
         for (int i = 0; i < _rows.Count; i++)
         {
-            bool used = i < count;
-            _rows[i].gameObject.SetActive(used);
-            if (used) _rows[i].Set(i + 1, runs[i], culture);
+            _rows[i].gameObject.SetActive(i < slots);
+            if (i < count) _rows[i].Set(i + 1, runs[i], culture, i == 0 ? firstPlaceColor : runColor, i == latest && JustPlayed(runs[i]));
+            else _rows[i].SetEmpty(i + 1, culture, emptySlotColor);
         }
 
         if (emptyText)
         {
             emptyText.text = L10n.Get("survival.noruns");
             emptyText.gameObject.SetActive(count == 0);
-            emptyText.transform.SetAsLastSibling();
         }
+    }
+
+    private static bool JustPlayed(SurvivalRunRecord run)
+    {
+        return (System.DateTime.UtcNow - new System.DateTime(run.playedAtUtcTicks, System.DateTimeKind.Utc)).TotalMinutes < 2;
     }
 }

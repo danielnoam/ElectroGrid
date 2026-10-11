@@ -404,6 +404,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841005928218761
+  - m_Id: 2148975749619712
+    m_Localized: Best {best}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
+  - m_Id: 2153976626667520
+    m_Localized: BEST SCORE
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:
@@ -437,3 +446,4 @@ MonoBehaviour:
         - id: 1712789793005574
         - id: 1712789793005576
         - id: 1735779603701760
+        - id: 2148975749619712

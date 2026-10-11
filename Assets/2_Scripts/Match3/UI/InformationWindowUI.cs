@@ -100,7 +100,8 @@ public class InformationWindowUI : MonoBehaviour
 
     private void OnBackgroundClicked(PointerEventData eventData)
     {
-        if (PointerClickRelay.IsOutside(eventData, windowRectTransform, titleText.rectTransform, _backButtonRectTransform)) Close();
+        if (!PointerClickRelay.IsOutside(eventData, windowRectTransform, titleText.rectTransform, _backButtonRectTransform)) return;
+        if (!PointerClickRelay.Press(backButton, eventData)) Close();
     }
 
     private void Close()

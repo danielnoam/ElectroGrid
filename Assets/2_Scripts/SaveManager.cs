@@ -59,7 +59,7 @@ public class SaveManager : MonoBehaviour
 
     private const int CurrentVersion = 1;
     private const string FileName = "save.json";
-    public const int MaxSurvivalRuns = 10;
+    public const int MaxSurvivalRuns = 25;
 
     private SaveData _data = new SaveData();
 

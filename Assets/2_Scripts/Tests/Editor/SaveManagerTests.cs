@@ -228,17 +228,18 @@ public class SaveManagerTests
     }
 
     [Test]
-    public void SurvivalRuns_KeepTheTopTenHighestFirst()
+    public void SurvivalRuns_KeepTheBestHighestFirst()
     {
         var manager = LoadedManager();
-        for (int i = 1; i <= 12; i++) manager.RecordSurvivalRun(i * 100, i, i);
+        int total = SaveManager.MaxSurvivalRuns + 2;
+        for (int i = 1; i <= total; i++) manager.RecordSurvivalRun(i * 100, i, i);
         manager.RecordSurvivalRun(0, 5f, 0);
 
         var runs = LoadedManager().SurvivalRuns;
         Assert.That(runs.Count, Is.EqualTo(SaveManager.MaxSurvivalRuns));
-        Assert.That(runs[0].score, Is.EqualTo(1200));
+        Assert.That(runs[0].score, Is.EqualTo(total * 100));
         Assert.That(runs[runs.Count - 1].score, Is.EqualTo(300));
-        Assert.That(runs[0].bestCombo, Is.EqualTo(12));
+        Assert.That(runs[0].bestCombo, Is.EqualTo(total));
     }
 
     [Test]
