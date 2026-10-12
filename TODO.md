@@ -29,15 +29,6 @@ The UI rework comes first because the combo bar and Survival both add HUD
 elements. Survival depends on the combo bar (its time ability) and on score,
 and the level select rework is where the Survival entry would go (it is on the main menu for now).
 
-- [ ] **In-game UI rework.** Quit and restart are icons now (see DONE.md). Next,
-      look at other match-3 games for ideas. Worth studying: how Royal Match,
-      Candy Crush and Two Dots keep the goal and moves/time readable at a glance
-      at the top, what they push into a pause menu instead of keeping on screen,
-      and how they confirm a restart (a restart tapped by accident costs the
-      whole level, so it needs a confirm or should live in the pause menu). Do
-      this before the combo bar and Survival, since both add HUD elements and
-      the layout should be planned once.
-
 - [ ] **Combo bar.** `HandleMatchesAndRepopulate` already loops cascades but
       nothing counts them, so a four-chain feels identical to a single match in
       a game that is otherwise very loud. The idea: every match fills a combo bar
@@ -63,14 +54,6 @@ and the level select rework is where the Survival entry would go (it is on the m
       is tunable in the inspector. Still to do: real sounds for the step and
       the full bar (numbers playtested 2026-10-11). In Survival a full bar adds
       uncapped time (`SurvivalMode`).
-
-- [ ] **Level selection rework.** Done from the UI research (UI_RESEARCH.md):
-      locked levels show a padlock, the next level glows and is preselected.
-      Stars were tried and dropped (Daniel: they add nothing here). The main
-      menu now has Continue as the big button naming its level, Level Select
-      and Survival (with its best) under it, and Quit as a power-icon button at the
-      bottom left. Still to do: the in-game HUD (Daniel didn't like the
-      mockup; waiting on what to change).
 
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
       main menu, unlocked from the start. It opens its own screen, laid out like level

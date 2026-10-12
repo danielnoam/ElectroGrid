@@ -232,6 +232,7 @@ internal static class ElectroGridBuild
         PlayerSettings.Android.bundleVersionCode = AndroidVersionCode(Version);
 
         var previousProfile = BuildProfile.GetActiveBuildProfile();
+        string previousProfilePath = previousProfile ? AssetDatabase.GetAssetPath(previousProfile) : null;
         var previousTarget = EditorUserBuildSettings.activeBuildTarget;
 
         // Whichever platform is already active goes first, which saves one asset reimport
@@ -240,6 +241,7 @@ internal static class ElectroGridBuild
             .OrderBy(target => ToBuildTarget(target.kind) == previousTarget ? 0 : 1)
             .ToList();
 
+        var profilePaths = targets.ToDictionary(target => target, target => AssetDatabase.GetAssetPath(target.profile));
         var artifacts = new List<string>();
 
         try
@@ -249,7 +251,7 @@ internal static class ElectroGridBuild
                 var target = targets[i];
                 EditorUtility.DisplayProgressBar("ElectroGrid Build", $"Building {target.kind} ({i + 1}/{targets.Count})", (float)i / targets.Count);
 
-                var step = BuildOne(config, target, result.OutputFolder);
+                var step = BuildOne(config, target, profilePaths[target], result.OutputFolder);
                 result.Steps.Add(step);
                 if (step.Succeeded && !string.IsNullOrEmpty(step.ArtifactPath)) artifacts.Add(step.ArtifactPath);
             }
@@ -257,7 +259,7 @@ internal static class ElectroGridBuild
         finally
         {
             EditorUtility.ClearProgressBar();
-            RestorePlatform(previousProfile, previousTarget);
+            RestorePlatform(previousProfilePath, previousTarget);
         }
 
         bool allBuilt = result.Steps.Count > 0 && result.Steps.All(step => step.Succeeded);
@@ -281,7 +283,7 @@ internal static class ElectroGridBuild
         return kind == SOBuildConfig.TargetKind.AndroidApk ? BuildTarget.Android : BuildTarget.StandaloneWindows64;
     }
 
-    private static StepResult BuildOne(SOBuildConfig config, SOBuildConfig.Target target, string outputFolder)
+    private static StepResult BuildOne(SOBuildConfig config, SOBuildConfig.Target target, string profilePath, string outputFolder)
     {
         var step = new StepResult { Name = $"Build {target.kind}{(target.developmentBuild ? " (development)" : "")}" };
         var timer = Stopwatch.StartNew();
@@ -318,12 +320,20 @@ internal static class ElectroGridBuild
             // Addressables build their content before the player and refuse unless the editor could build this target
             // itself. That check reads the active profile and the old selected platform group, which a profile switch
             // leaves behind (on Android it reports Windows as needing IL2CPP), so both are set first
-            if (BuildProfile.GetActiveBuildProfile() != target.profile) BuildProfile.SetActiveBuildProfile(target.profile);
+            var profile = AssetDatabase.LoadAssetAtPath<BuildProfile>(profilePath);
+            if (!profile)
+            {
+                step.Succeeded = false;
+                step.Message = $"Build profile not found at {profilePath}.";
+                return step;
+            }
+
+            if (BuildProfile.GetActiveBuildProfile() != profile) BuildProfile.SetActiveBuildProfile(profile);
             EditorUserBuildSettings.selectedBuildTargetGroup = BuildPipeline.GetBuildTargetGroup(ToBuildTarget(target.kind));
 
             var options = new BuildPlayerWithProfileOptions
             {
-                buildProfile = target.profile,
+                buildProfile = profile,
                 locationPathName = playerPath,
                 options = target.developmentBuild ? BuildOptions.Development : BuildOptions.None
             };
@@ -434,8 +444,9 @@ internal static class ElectroGridBuild
         }
     }
 
-    private static void RestorePlatform(BuildProfile previousProfile, BuildTarget previousTarget)
+    private static void RestorePlatform(string previousProfilePath, BuildTarget previousTarget)
     {
+        var previousProfile = string.IsNullOrEmpty(previousProfilePath) ? null : AssetDatabase.LoadAssetAtPath<BuildProfile>(previousProfilePath);
         if (previousProfile)
         {
             if (BuildProfile.GetActiveBuildProfile() != previousProfile) BuildProfile.SetActiveBuildProfile(previousProfile);

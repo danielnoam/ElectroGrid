@@ -788,3 +788,24 @@ of as a new blob per edit.
         select, the level top and bottom bars and the tutorial cards in both
         languages, and English again afterwards. The results window was not
         captured.
+
+## UI rework and build tool (1.4.1 to 1.4.6)
+
+- [x] **Level selection rework.** Locked levels show a padlock, the next level
+      glows and is preselected, the list scrolls so levels can keep being added,
+      and Back sits at the bottom right. Stars were tried and dropped. The main
+      menu has Continue naming its level, Level Select and Survival under it,
+      and Quit as a power icon at the bottom left.
+- [x] **In-game UI rework (layout A).** The icon row is at the top with the
+      level name between the buttons. Under it, one compact row: goals on the
+      left, moves or time as one big number on the right (score in Survival).
+      The goals panel is a child of the icon row, so it slides in with it, and
+      still grows open on its own. The combo bar runs full width under it. No
+      pause button: home, restart, info and settings are always visible.
+- [x] **Window buttons.** The buttons under Settings, Info, Credits and the
+      update window live inside the window and fade with its title
+      (`WindowButtons`). Tapping the dark area acts like Back.
+- [x] **Build tool builds every platform in one run.** After the first build
+      the BuildProfile reference was destroyed, so the second platform failed
+      with "Build profile is invalid". `ElectroGridBuild` now keeps each
+      profile's asset path and reloads it before switching to it.

@@ -24,6 +24,7 @@ public class InformationWindowUI : MonoBehaviour
     [SerializeField] private Match3TutorialUIElement tutorialElementPrefab;
 
     private CanvasGroup _canvasGroup;
+    private CanvasGroup _buttonsGroup;
     private RectTransform _backButtonRectTransform;
     private Vector2 _defaultSize;
     private Vector2 _openSize;
@@ -39,6 +40,7 @@ public class InformationWindowUI : MonoBehaviour
         _canvasGroup = GetComponent<CanvasGroup>();
         _backButtonRectTransform = backButton.GetComponent<RectTransform>();
         _backButtonLabel = backButton.GetComponentInChildren<TMP_Text>(true);
+        _buttonsGroup = WindowButtons.FadeGroup(backButton);
         _defaultSize = windowRectTransform.sizeDelta;
         _openSize = _defaultSize;
         windowRectTransform.sizeDelta = new Vector2(_defaultSize.x, 0);
@@ -176,6 +178,7 @@ public class InformationWindowUI : MonoBehaviour
 
         windowRectTransform.sizeDelta = startSize;
         titleText.alpha = titleStartAlpha;
+        if (_buttonsGroup) _buttonsGroup.alpha = titleStartAlpha;
         backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
         if (show) _canvasGroup.alpha = 1f;
@@ -187,6 +190,7 @@ public class InformationWindowUI : MonoBehaviour
         _toggleSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(windowRectTransform, endSize, informationWindowTweenSettings))
             .Group(Tween.Alpha(titleText, titleEndAlpha, informationWindowTweenSettings.duration * 0.8f))
+            .Group(Tween.Alpha(_buttonsGroup, titleEndAlpha, informationWindowTweenSettings.duration * 0.8f))
             .Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, informationWindowTweenSettings.duration * 0.8f))
             .Group(Tween.GlobalTimeScale(endTimeScale, informationWindowTweenSettings))
             .ChainCallback(() =>

@@ -21,6 +21,7 @@ public class CreditsWindowUI : MonoBehaviour
     [SerializeField] private Image backgroundImage;
 
     private CanvasGroup _canvasGroup;
+    private CanvasGroup _buttonsGroup;
     private RectTransform _backButtonRectTransform;
     private Vector2 _defaultSize;
     private Sequence _toggleSequence;
@@ -30,6 +31,7 @@ public class CreditsWindowUI : MonoBehaviour
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
+        _buttonsGroup = WindowButtons.FadeGroup(backButton);
 
         if (backButton)
         {
@@ -112,6 +114,7 @@ public class CreditsWindowUI : MonoBehaviour
 
         windowRectTransform.sizeDelta = startSize;
         if (titleText) titleText.alpha = titleStartAlpha;
+        if (_buttonsGroup) _buttonsGroup.alpha = titleStartAlpha;
         if (backgroundImage) backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
         if (show) _canvasGroup.alpha = 1f;
@@ -122,6 +125,7 @@ public class CreditsWindowUI : MonoBehaviour
             .Group(Tween.UISizeDelta(windowRectTransform, endSize, windowTweenSettings));
 
         if (titleText) _toggleSequence.Group(Tween.Alpha(titleText, titleEndAlpha, windowTweenSettings.duration * 0.8f));
+        if (_buttonsGroup) _toggleSequence.Group(Tween.Alpha(_buttonsGroup, titleEndAlpha, windowTweenSettings.duration * 0.8f));
         if (backgroundImage) _toggleSequence.Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, windowTweenSettings.duration * 0.8f));
 
         _toggleSequence.ChainCallback(() =>

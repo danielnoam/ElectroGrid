@@ -31,6 +31,7 @@ public class UpdateWindowUI : MonoBehaviour
     [SerializeField] private Image backgroundImage;
 
     private CanvasGroup _canvasGroup;
+    private CanvasGroup _buttonsGroup;
     private Vector2 _defaultSize;
     private Sequence _toggleSequence;
     private float _backgroundStartAlpha;
@@ -41,6 +42,7 @@ public class UpdateWindowUI : MonoBehaviour
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
+        _buttonsGroup = WindowButtons.FadeGroup(laterButton);
 
         if (windowRectTransform)
         {
@@ -224,6 +226,7 @@ public class UpdateWindowUI : MonoBehaviour
 
         windowRectTransform.sizeDelta = startSize;
         if (titleText) titleText.alpha = titleStartAlpha;
+        if (_buttonsGroup) _buttonsGroup.alpha = titleStartAlpha;
         if (backgroundImage) backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
         if (show) _canvasGroup.alpha = 1f;
@@ -236,6 +239,7 @@ public class UpdateWindowUI : MonoBehaviour
             .Group(Tween.GlobalTimeScale(endTimeScale, windowTweenSettings));
 
         if (titleText) _toggleSequence.Group(Tween.Alpha(titleText, titleEndAlpha, windowTweenSettings.duration * 0.8f));
+        if (_buttonsGroup) _toggleSequence.Group(Tween.Alpha(_buttonsGroup, titleEndAlpha, windowTweenSettings.duration * 0.8f));
         if (backgroundImage) _toggleSequence.Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, windowTweenSettings.duration * 0.8f));
 
         _toggleSequence.ChainCallback(() =>
