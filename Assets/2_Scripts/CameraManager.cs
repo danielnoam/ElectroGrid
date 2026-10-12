@@ -11,6 +11,8 @@ public class CameraManager : MonoBehaviour
     
     [Header("Match3")]
     [SerializeField] private float gridPadding = 0.5f; 
+    [Tooltip("Moves the board down the screen, as a fraction of the orthographic size, to centre it in the room the HUD leaves")]
+    [SerializeField, Range(-0.5f, 0.5f)] private float boardDownShift = 0.1f;
 
     [Header("Tilt")]
     [Tooltip("Largest camera offset, as a fraction of the orthographic size, so it scales with the board")]
@@ -30,6 +32,7 @@ public class CameraManager : MonoBehaviour
     [SerializeField, ReadOnly] private Vector2Int gridSize = new Vector2Int(10,10);
     private Match3GameManager _match3GameManager;
     private Vector3 _basePosition;
+    private Vector3 _boardOffset;
     private Quaternion _baseRotation;
     private Vector3 _shakePosition;
     private float _shakeRoll;
@@ -129,6 +132,8 @@ public class CameraManager : MonoBehaviour
             float targetHeight =  gridSize.x / screenAspect;
             cam.orthographicSize = (targetHeight / 2f) + gridPadding;
         }
+
+        _boardOffset = Vector3.up * (cam.orthographicSize * boardDownShift);
     }
     
     /// <summary>
@@ -165,7 +170,7 @@ public class CameraManager : MonoBehaviour
 
         UpdateTilt();
 
-        cam.transform.localPosition = _basePosition + TiltOffset + _shakePosition;
+        cam.transform.localPosition = _basePosition + _boardOffset + TiltOffset + _shakePosition;
         cam.transform.localRotation = _baseRotation * Quaternion.Euler(0f, 0f, _shakeRoll);
     }
 

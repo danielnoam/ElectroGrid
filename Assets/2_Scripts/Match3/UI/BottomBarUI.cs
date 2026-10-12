@@ -8,6 +8,8 @@ public class BottomBarUI : MonoBehaviour
 {
     [Header("Settings")]
     [SerializeField] private TweenSettings bottomBarTweenSettings;
+    [Tooltip("The screen edge the bar sits on and slides in from")]
+    [SerializeField] private SafeAreaMargin.Edge edge = SafeAreaMargin.Edge.Bottom;
     
     [Header("References")]
     [SerializeField] private Button quitButton;
@@ -28,8 +30,8 @@ public class BottomBarUI : MonoBehaviour
     private void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
-        _bottomBarDefaultYPosition = _rectTransform.anchoredPosition.y;
-        _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, -_rectTransform.sizeDelta.y);
+        _bottomBarDefaultYPosition = Mathf.Abs(_rectTransform.anchoredPosition.y);
+        _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, HiddenY);
     }
 
     public void Initialize(Match3GameManager match3Manager)
@@ -148,6 +150,8 @@ public class BottomBarUI : MonoBehaviour
         }
     }
 
+    private float HiddenY => edge == SafeAreaMargin.Edge.Top ? _rectTransform.sizeDelta.y : -_rectTransform.sizeDelta.y;
+
     public void Toggle(bool show)
     {
         if (!_rectTransform) return;
@@ -155,9 +159,10 @@ public class BottomBarUI : MonoBehaviour
         _bottomBarSequence.Stop();
         
         // Resolved on every toggle, the safe area can change between levels (rotation, simulator)
-        float shownYPosition = SafeAreaMargin.ResolveDistance(_rectTransform, SafeAreaMargin.Edge.Bottom, _bottomBarDefaultYPosition);
-        var startYPosition = show ? -_rectTransform.sizeDelta.y : shownYPosition;
-        var endYPosition = show ? shownYPosition : -_rectTransform.sizeDelta.y;
+        float distance = SafeAreaMargin.ResolveDistance(_rectTransform, edge, _bottomBarDefaultYPosition);
+        float shownYPosition = edge == SafeAreaMargin.Edge.Top ? -distance : distance;
+        var startYPosition = show ? HiddenY : shownYPosition;
+        var endYPosition = show ? shownYPosition : HiddenY;
         
         _rectTransform.anchoredPosition = new Vector2(_rectTransform.anchoredPosition.x, startYPosition);
         

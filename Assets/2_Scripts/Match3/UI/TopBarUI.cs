@@ -39,7 +39,7 @@ public class TopBarUI : MonoBehaviour
         
         _levelNameDefaultPositionY = levelName.anchoredPosition.y;
         _levelNameDefaultSize = levelName.sizeDelta;
-        levelName.sizeDelta = Vector2.zero;
+        levelName.sizeDelta = new Vector2(_levelNameDefaultSize.x, 0f);
         levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, 0f);
     }
 
@@ -131,13 +131,13 @@ public class TopBarUI : MonoBehaviour
         
         _topBarSequence.Stop();
         
-        var barSizeMultiplier = objectivesUIParent.gameObject.activeSelf && loseConditionsUIParent.gameObject.activeSelf ? 1f : 0.6f;
-        var barStartSize = show ? new Vector2(_topBarDefaultSize.x, 0f) : _topBarDefaultSize * barSizeMultiplier;
-        var barEndSize = show ? _topBarDefaultSize * barSizeMultiplier : new Vector2(_topBarDefaultSize.x, 0f);
+        var barStartSize = show ? new Vector2(_topBarDefaultSize.x, 0f) : _topBarDefaultSize;
+        var barEndSize = show ? _topBarDefaultSize : new Vector2(_topBarDefaultSize.x, 0f);
         var nameStartPosition = show ? 0f : _levelNameDefaultPositionY;
         var nameEndPosition = show ? _levelNameDefaultPositionY : 0f;
-        var nameStartSize = show ? Vector2.zero : _levelNameDefaultSize;
-        var nameEndSize = show ? _levelNameDefaultSize : Vector2.zero;
+        var collapsedName = new Vector2(_levelNameDefaultSize.x, 0f);
+        var nameStartSize = show ? collapsedName : _levelNameDefaultSize;
+        var nameEndSize = show ? _levelNameDefaultSize : collapsedName;
 
         topBar.sizeDelta = barStartSize;
         levelName.sizeDelta = nameStartSize;
@@ -162,6 +162,8 @@ public class TopBarUI : MonoBehaviour
             if (objective.ShowsTotal) uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress());
             else uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress().Item1);
             uiElement.gameObject.name = objective.GetName();
+            if (objective.ShowsTotal) uiElement.UseCompactRow();
+            else uiElement.UseStackedLayout();
             _currentObjectives.Add(objective, uiElement);
         
             Action progressCallback = () => UpdateObjectiveUIProgress(objective);
@@ -179,6 +181,7 @@ public class TopBarUI : MonoBehaviour
             var uiElement = Instantiate(match3UIElementPrefab, loseConditionsUIParent);
             uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetRequirementText(), loseCondition.GetProgress().Item1);
             uiElement.gameObject.name = loseCondition.GetName();
+            uiElement.UseStackedLayout();
             _currentLoseConditions.Add(loseCondition, uiElement);
         
             Action progressCallback = () => UpdateLoseConditionUIProgress(loseCondition);

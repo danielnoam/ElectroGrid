@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
   gridPadding: 2
+  boardDownShift: 0.1
   tiltMaxOffset: 0.01
   tiltForFullOffset: 0.25
   tiltSmoothing: 6
