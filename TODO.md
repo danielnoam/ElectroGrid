@@ -77,9 +77,21 @@ and the level select rework is where the Survival entry would go (it is on the m
       decide whether to show the best score on the menu, and a Steam
       leaderboard later (section 3).
 
+- [ ] **In-game level editor, with Steam Workshop later.** Let players build
+      levels inside the game: pick or paint a grid shape, place Double Stars
+      and Square Stars, choose objectives and limits, then play-test and save.
+      The editor-only tools already do most of this (`Match3LevelEditorWindow`,
+      `Match3LevelValidation`), so the work is a runtime UI for it and a level
+      format that isn't a ScriptableObject (JSON with the grid cells, tile
+      objects, objectives and limits). Run the same validation rules as
+      LEVELS.md before a level can be saved or shared. Workshop comes after
+      the Steam build: upload and subscribe through Steamworks UGC, load
+      subscribed levels from their install folders, and keep player levels
+      out of the main level list and progress.
+
 ### Content, not engineering
 
-- **Twelve levels is roughly 25 minutes of play.** The level painter and 16 grid
+- **Fifteen levels is roughly 30 minutes of play.** The level painter and 16 grid
   shapes are already there, several shapes unused by any level. Note also that
   `GetSpecificItemMatches` now works (an ordering bug meant it could never score)
   and no level uses it yet.

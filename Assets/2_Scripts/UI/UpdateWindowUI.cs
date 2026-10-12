@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public class UpdateWindowUI : MonoBehaviour
 {
     private const int MaxNotesLength = 700;
+    private const string HeaderColor = "#FF0861";
+    private static readonly System.Text.RegularExpressions.Regex HeaderPattern = new System.Text.RegularExpressions.Regex(@"^\*\*(.+?)\*\*\s*$", System.Text.RegularExpressions.RegexOptions.Multiline);
 
     [Header("Settings")]
     [SerializeField] private TweenSettings windowTweenSettings;
@@ -18,6 +20,7 @@ public class UpdateWindowUI : MonoBehaviour
 
     [Header("Content")]
     [SerializeField] private TextMeshProUGUI bodyText;
+    [SerializeField] private TextMeshProUGUI notesText;
     [SerializeField] private Slider progressSlider;
     [SerializeField] private TextMeshProUGUI statusText;
 
@@ -118,7 +121,14 @@ public class UpdateWindowUI : MonoBehaviour
         bool canInstall = GameUpdater.CanInstallOnThisPlatform && updater.PlatformAsset != null;
 
         if (titleText) titleText.text = L10n.Get("update.title");
-        if (bodyText) bodyText.text = $"{L10n.Get("update.body", ("latest", version), ("current", Application.version))}\n\n{Notes(updater.LatestRelease?.body)}";
+        string intro = L10n.Get("update.body", ("latest", version), ("current", Application.version));
+        string notes = Notes(updater.LatestRelease?.body);
+        if (notesText)
+        {
+            if (bodyText) bodyText.text = intro;
+            notesText.text = notes;
+        }
+        else if (bodyText) bodyText.text = $"{intro}\n\n{notes}";
 
         bool downloading = updater.CurrentState == GameUpdater.State.Downloading;
         if (progressSlider)
@@ -200,8 +210,9 @@ public class UpdateWindowUI : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(body)) return string.Empty;
 
-        body = body.Trim();
-        return body.Length <= MaxNotesLength ? body : body.Substring(0, MaxNotesLength).TrimEnd() + "\n...";
+        body = body.Trim().Replace("\r\n", "\n");
+        body = body.Length <= MaxNotesLength ? body : body.Substring(0, MaxNotesLength).TrimEnd() + "\n...";
+        return HeaderPattern.Replace(body, $"<color={HeaderColor}>$1</color>");
     }
 
     private static string FormatSize(long bytes)

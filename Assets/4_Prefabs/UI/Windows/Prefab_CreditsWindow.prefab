@@ -67,7 +67,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'HOT RELOAD
 
-    <size=80%><alpha=#CC>The Naugthy Cult'
+    <size=80%><color=#FF0861>The Naugthy Cult'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -143,7 +143,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'HOT RELOAD
 
-    <size=80%><alpha=#CC>The Naugthy Cult'
+    <size=80%><color=#FF0861>The Naugthy Cult'
   fixTags: 1
   forceFix: 0
 --- !u!1 &833308103505149950
@@ -211,7 +211,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Synthwave Music - Volume\_I\n<size=80%><alpha=#CC>AD Sounds"
+  m_text: "Synthwave Music - Volume\_I\n<size=80%><color=#FF0861>AD Sounds"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -285,7 +285,7 @@ MonoBehaviour:
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
   preserveNumbers: 1
   farsi: 0
-  originalText: "Synthwave Music - Volume\_I\n<size=80%><alpha=#CC>AD Sounds"
+  originalText: "Synthwave Music - Volume\_I\n<size=80%><color=#FF0861>AD Sounds"
   fixTags: 1
   forceFix: 0
 --- !u!1 &1900611241808178058
@@ -631,7 +631,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Force Field - Sci-Fi Collection
 
-    <size=80%><alpha=#CC>Alpine Audio'
+    <size=80%><color=#FF0861>Alpine Audio'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -707,7 +707,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'Force Field - Sci-Fi Collection
 
-    <size=80%><alpha=#CC>Alpine Audio'
+    <size=80%><color=#FF0861>Alpine Audio'
   fixTags: 1
   forceFix: 0
 --- !u!1 &2351561892919714879
@@ -900,7 +900,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Action Arcade Music Pack: Neon Pulse
 
-    <size=80%><alpha=#CC>Soma Animus'
+    <size=80%><color=#FF0861>Soma Animus'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -976,7 +976,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'Action Arcade Music Pack: Neon Pulse
 
-    <size=80%><alpha=#CC>Soma Animus'
+    <size=80%><color=#FF0861>Soma Animus'
   fixTags: 1
   forceFix: 0
 --- !u!1 &4990427866534023182
@@ -1046,7 +1046,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Violet Themed UI
 
-    <size=80%><alpha=#CC>Gieniel Villacote'
+    <size=80%><color=#FF0861>Gieniel Villacote'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -1122,7 +1122,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'Violet Themed UI
 
-    <size=80%><alpha=#CC>Gieniel Villacote'
+    <size=80%><color=#FF0861>Gieniel Villacote'
   fixTags: 1
   forceFix: 0
 --- !u!1 &5099633016906212297
@@ -1347,7 +1347,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Prime Tween
 
-    <size=80%><alpha=#CC>Kyrylo Kuzyk'
+    <size=80%><color=#FF0861>Kyrylo Kuzyk'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -1423,7 +1423,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'Prime Tween
 
-    <size=80%><alpha=#CC>Kyrylo Kuzyk'
+    <size=80%><color=#FF0861>Kyrylo Kuzyk'
   fixTags: 1
   forceFix: 0
 --- !u!1 &5895226987269812642
@@ -1493,7 +1493,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Free UI Soundpack
 
-    <size=80%><alpha=#CC>Cyrex'
+    <size=80%><color=#FF0861>Cyrex'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -1569,7 +1569,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'Free UI Soundpack
 
-    <size=80%><alpha=#CC>Cyrex'
+    <size=80%><color=#FF0861>Cyrex'
   fixTags: 1
   forceFix: 0
 --- !u!1 &6782174865182663286
@@ -1907,7 +1907,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'SCI-FI User Interface SFX
 
-    <size=80%><alpha=#CC>Sound Works 12'
+    <size=80%><color=#FF0861>Sound Works 12'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -1983,7 +1983,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'SCI-FI User Interface SFX
 
-    <size=80%><alpha=#CC>Sound Works 12'
+    <size=80%><color=#FF0861>Sound Works 12'
   fixTags: 1
   forceFix: 0
 --- !u!1 &7979123607417564303
@@ -2259,7 +2259,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Free 8 Synthwave Tracks
 
-    <size=80%><alpha=#CC>Alpine Audio'
+    <size=80%><color=#FF0861>Alpine Audio'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
   m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
@@ -2335,7 +2335,7 @@ MonoBehaviour:
   farsi: 0
   originalText: 'Free 8 Synthwave Tracks
 
-    <size=80%><alpha=#CC>Alpine Audio'
+    <size=80%><color=#FF0861>Alpine Audio'
   fixTags: 1
   forceFix: 0
 --- !u!1001 &6469135852302630271

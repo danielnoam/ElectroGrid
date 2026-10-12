@@ -821,3 +821,14 @@ of as a new blob per edit.
       ints for the grid's aspect, so any board taller than wide came out as 0
       and the camera fitted the height, cutting off the sides. Bolt (9x10)
       was the first such board.
+
+## Polish (1.4.8)
+
+- [x] **Back centred** at the bottom of level select and Survival, like the
+      windows.
+- [x] **The Settings pink-red (#FF0861) in more places.** Author names in
+      Credits and the section headers in the update window's release notes
+      (`**Header**` lines become coloured).
+- [x] **Release notes in their own label.** The notes are English, and sharing
+      a label with the Hebrew or Arabic intro made RTLTextMeshPro reverse the
+      wrapped English lines. `UpdateWindowUI.notesText` holds them now.
