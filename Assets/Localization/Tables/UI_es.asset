@@ -413,6 +413,23 @@ MonoBehaviour:
     m_Localized: "MEJOR PUNTUACI\xD3N"
     m_Metadata:
       m_Items: []
+  - m_Id: 2432872211275776
+    m_Localized: Buscando...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2432872249024512
+    m_Localized: Actualizado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2432872249024513
+    m_Localized: '{latest} disponible'
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141697
+  - m_Id: 2432872249024514
+    m_Localized: No se pudo comprobar
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:
@@ -447,3 +464,4 @@ MonoBehaviour:
         - id: 1712789793005576
         - id: 1735779603701760
         - id: 2148975749619712
+        - id: 2432872249024513

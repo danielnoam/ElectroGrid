@@ -44,10 +44,10 @@ public class SettingsWindowUI : MonoBehaviour
     private RectTransform _backButtonRectTransform;
     private Vector2 _defaultSize;
     private Sequence _toggleSequence;
-    private float _backButtonDefaultYPosition;
     private float _backgroundStartAlpha;
     private bool _applyingValues;
     private Action _onClosed;
+    private Coroutine _versionRestore;
     private float _resetConfirmExpiry;
 
     private void Awake()
@@ -57,8 +57,6 @@ public class SettingsWindowUI : MonoBehaviour
         if (backButton)
         {
             _backButtonRectTransform = backButton.GetComponent<RectTransform>();
-            _backButtonDefaultYPosition = _backButtonRectTransform.anchoredPosition.y;
-            _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, -windowRectTransform.sizeDelta.y);
         }
 
         if (windowRectTransform)
@@ -70,6 +68,14 @@ public class SettingsWindowUI : MonoBehaviour
         if (titleText) titleText.alpha = 0f;
         if (versionText) versionText.text = $"v{Application.version}";
         AlignVersion();
+
+        if (versionText)
+        {
+            versionText.raycastTarget = true;
+            var versionRelay = PointerClickRelay.On(versionText);
+            versionRelay.Clicked -= OnVersionClicked;
+            versionRelay.Clicked += OnVersionClicked;
+        }
 
         if (backgroundImage)
         {
@@ -97,6 +103,52 @@ public class SettingsWindowUI : MonoBehaviour
     private void OnDestroy()
     {
         L10n.LanguageChanged -= OnLanguageChanged;
+        if (GameUpdater.Instance) GameUpdater.Instance.StateChanged -= OnUpdaterStateChanged;
+    }
+
+    private void OnVersionClicked(UnityEngine.EventSystems.PointerEventData eventData)
+    {
+        var updater = GameUpdater.Instance;
+        if (!updater || !updater.CheckAgain()) return;
+
+        CameraManager.Instance?.ShakeCamera(0.1f);
+        updater.StateChanged -= OnUpdaterStateChanged;
+        updater.StateChanged += OnUpdaterStateChanged;
+        OnUpdaterStateChanged();
+    }
+
+    private System.Collections.IEnumerator RestoreVersionText()
+    {
+        yield return new WaitForSecondsRealtime(3f);
+        if (versionText) versionText.text = $"v{Application.version}";
+        _versionRestore = null;
+    }
+
+    private void OnUpdaterStateChanged()
+    {
+        var updater = GameUpdater.Instance;
+        if (!updater || !versionText) return;
+
+        string status = updater.CurrentState switch
+        {
+            GameUpdater.State.Checking => L10n.Get("settings.version.checking"),
+            GameUpdater.State.UpToDate => L10n.Get("settings.version.uptodate"),
+            GameUpdater.State.UpdateAvailable => L10n.Get("settings.version.available", ("latest", updater.LatestVersion)),
+            _ => L10n.Get("settings.version.failed")
+        };
+        versionText.text = status;
+        if (_versionRestore != null) StopCoroutine(_versionRestore);
+        _versionRestore = null;
+
+        if (updater.CurrentState == GameUpdater.State.Checking) return;
+
+        updater.StateChanged -= OnUpdaterStateChanged;
+        _versionRestore = StartCoroutine(RestoreVersionText());
+        if (updater.CurrentState == GameUpdater.State.UpdateAvailable)
+        {
+            var offer = FindAnyObjectByType<UpdateWindowUI>(FindObjectsInactive.Include);
+            if (offer) offer.OfferAgain();
+        }
     }
 
     private void OnLanguageChanged()
@@ -329,8 +381,6 @@ public class SettingsWindowUI : MonoBehaviour
 
         var startSize = show ? new Vector2(windowRectTransform.sizeDelta.x, 0f) : _defaultSize;
         var endSize = show ? _defaultSize : new Vector2(windowRectTransform.sizeDelta.x, 0f);
-        var startYPosition = show ? -_defaultSize.y : _backButtonDefaultYPosition;
-        var endYPosition = show ? _backButtonDefaultYPosition : -_defaultSize.y;
         var titleStartAlpha = show ? 0f : 1f;
         var titleEndAlpha = show ? 1f : 0f;
         var backgroundStartAlpha = show ? 0f : _backgroundStartAlpha;
@@ -338,7 +388,6 @@ public class SettingsWindowUI : MonoBehaviour
         var endTimeScale = show ? 0f : 1f;
 
         windowRectTransform.sizeDelta = startSize;
-        if (_backButtonRectTransform) _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, startYPosition);
         if (titleText) titleText.alpha = titleStartAlpha;
         if (backgroundImage) backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
@@ -353,7 +402,6 @@ public class SettingsWindowUI : MonoBehaviour
 
         if (titleText) _toggleSequence.Group(Tween.Alpha(titleText, titleEndAlpha, windowTweenSettings.duration * 0.8f));
         if (backgroundImage) _toggleSequence.Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, windowTweenSettings.duration * 0.8f));
-        if (_backButtonRectTransform) _toggleSequence.Group(Tween.UIAnchoredPositionY(_backButtonRectTransform, endYPosition, windowTweenSettings));
 
         _toggleSequence.ChainCallback(() =>
         {

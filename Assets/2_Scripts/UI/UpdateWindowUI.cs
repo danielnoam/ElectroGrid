@@ -33,7 +33,6 @@ public class UpdateWindowUI : MonoBehaviour
     private CanvasGroup _canvasGroup;
     private Vector2 _defaultSize;
     private Sequence _toggleSequence;
-    private float _buttonsDefaultYPosition;
     private float _backgroundStartAlpha;
     private bool _isOpen;
     private bool _offered;
@@ -42,12 +41,6 @@ public class UpdateWindowUI : MonoBehaviour
     private void Awake()
     {
         _canvasGroup = GetComponent<CanvasGroup>();
-
-        if (buttonsRectTransform && windowRectTransform)
-        {
-            _buttonsDefaultYPosition = buttonsRectTransform.anchoredPosition.y;
-            buttonsRectTransform.anchoredPosition = new Vector2(buttonsRectTransform.anchoredPosition.x, -windowRectTransform.sizeDelta.y);
-        }
 
         if (windowRectTransform)
         {
@@ -105,6 +98,13 @@ public class UpdateWindowUI : MonoBehaviour
         _offered = true;
         Refresh();
         Toggle(true);
+    }
+
+    /// <summary>Lets the window offer the update again this launch, for a check the player asked for.</summary>
+    public void OfferAgain()
+    {
+        _offered = false;
+        _offerTime = Time.unscaledTime;
     }
 
     private void Refresh()
@@ -216,8 +216,6 @@ public class UpdateWindowUI : MonoBehaviour
 
         var startSize = show ? new Vector2(windowRectTransform.sizeDelta.x, 0f) : _defaultSize;
         var endSize = show ? _defaultSize : new Vector2(windowRectTransform.sizeDelta.x, 0f);
-        var startYPosition = show ? -_defaultSize.y : _buttonsDefaultYPosition;
-        var endYPosition = show ? _buttonsDefaultYPosition : -_defaultSize.y;
         var titleStartAlpha = show ? 0f : 1f;
         var titleEndAlpha = show ? 1f : 0f;
         var backgroundStartAlpha = show ? 0f : _backgroundStartAlpha;
@@ -225,7 +223,6 @@ public class UpdateWindowUI : MonoBehaviour
         var endTimeScale = show ? 0f : 1f;
 
         windowRectTransform.sizeDelta = startSize;
-        if (buttonsRectTransform) buttonsRectTransform.anchoredPosition = new Vector2(buttonsRectTransform.anchoredPosition.x, startYPosition);
         if (titleText) titleText.alpha = titleStartAlpha;
         if (backgroundImage) backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
@@ -240,7 +237,6 @@ public class UpdateWindowUI : MonoBehaviour
 
         if (titleText) _toggleSequence.Group(Tween.Alpha(titleText, titleEndAlpha, windowTweenSettings.duration * 0.8f));
         if (backgroundImage) _toggleSequence.Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, windowTweenSettings.duration * 0.8f));
-        if (buttonsRectTransform) _toggleSequence.Group(Tween.UIAnchoredPositionY(buttonsRectTransform, endYPosition, windowTweenSettings));
 
         _toggleSequence.ChainCallback(() =>
         {

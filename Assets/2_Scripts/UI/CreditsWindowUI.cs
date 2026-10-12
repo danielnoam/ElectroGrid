@@ -24,7 +24,6 @@ public class CreditsWindowUI : MonoBehaviour
     private RectTransform _backButtonRectTransform;
     private Vector2 _defaultSize;
     private Sequence _toggleSequence;
-    private float _backButtonDefaultYPosition;
     private float _backgroundStartAlpha;
     private Action _onClosed;
 
@@ -35,8 +34,6 @@ public class CreditsWindowUI : MonoBehaviour
         if (backButton)
         {
             _backButtonRectTransform = backButton.GetComponent<RectTransform>();
-            _backButtonDefaultYPosition = _backButtonRectTransform.anchoredPosition.y;
-            _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, -windowRectTransform.sizeDelta.y);
         }
 
         if (windowRectTransform)
@@ -108,15 +105,12 @@ public class CreditsWindowUI : MonoBehaviour
 
         var startSize = show ? new Vector2(windowRectTransform.sizeDelta.x, 0f) : _defaultSize;
         var endSize = show ? _defaultSize : new Vector2(windowRectTransform.sizeDelta.x, 0f);
-        var startYPosition = show ? -_defaultSize.y : _backButtonDefaultYPosition;
-        var endYPosition = show ? _backButtonDefaultYPosition : -_defaultSize.y;
         var titleStartAlpha = show ? 0f : 1f;
         var titleEndAlpha = show ? 1f : 0f;
         var backgroundStartAlpha = show ? 0f : _backgroundStartAlpha;
         var backgroundEndAlpha = show ? _backgroundStartAlpha : 0f;
 
         windowRectTransform.sizeDelta = startSize;
-        if (_backButtonRectTransform) _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, startYPosition);
         if (titleText) titleText.alpha = titleStartAlpha;
         if (backgroundImage) backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
@@ -129,7 +123,6 @@ public class CreditsWindowUI : MonoBehaviour
 
         if (titleText) _toggleSequence.Group(Tween.Alpha(titleText, titleEndAlpha, windowTweenSettings.duration * 0.8f));
         if (backgroundImage) _toggleSequence.Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, windowTweenSettings.duration * 0.8f));
-        if (_backButtonRectTransform) _toggleSequence.Group(Tween.UIAnchoredPositionY(_backButtonRectTransform, endYPosition, windowTweenSettings));
 
         _toggleSequence.ChainCallback(() =>
         {

@@ -26,8 +26,6 @@ public class TopBarUI : MonoBehaviour
     private readonly Dictionary<Match3LoseCondition, Action> _loseConditionMetCallbacks = new Dictionary<Match3LoseCondition, Action>();
     
     private Match3GameManager _match3Manager;
-    private float _levelNameDefaultPositionY;
-    private Vector2 _levelNameDefaultSize;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
     private Match3LevelData _currentLevelData;
@@ -37,10 +35,6 @@ public class TopBarUI : MonoBehaviour
         _topBarDefaultSize = topBar.sizeDelta;
         topBar.sizeDelta = new Vector2(_topBarDefaultSize.x, 0f);
         
-        _levelNameDefaultPositionY = levelName.anchoredPosition.y;
-        _levelNameDefaultSize = levelName.sizeDelta;
-        levelName.sizeDelta = new Vector2(_levelNameDefaultSize.x, 0f);
-        levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, 0f);
     }
 
     public void Initialize(Match3GameManager match3Manager)
@@ -133,20 +127,11 @@ public class TopBarUI : MonoBehaviour
         
         var barStartSize = show ? new Vector2(_topBarDefaultSize.x, 0f) : _topBarDefaultSize;
         var barEndSize = show ? _topBarDefaultSize : new Vector2(_topBarDefaultSize.x, 0f);
-        var nameStartPosition = show ? 0f : _levelNameDefaultPositionY;
-        var nameEndPosition = show ? _levelNameDefaultPositionY : 0f;
-        var collapsedName = new Vector2(_levelNameDefaultSize.x, 0f);
-        var nameStartSize = show ? collapsedName : _levelNameDefaultSize;
-        var nameEndSize = show ? _levelNameDefaultSize : collapsedName;
 
         topBar.sizeDelta = barStartSize;
-        levelName.sizeDelta = nameStartSize;
-        levelName.anchoredPosition = new Vector2(levelName.anchoredPosition.x, nameStartPosition);
 
         _topBarSequence = Sequence.Create(useUnscaledTime: true)
-            .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings))
-            .Group(Tween.UISizeDelta(levelName, nameEndSize, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease))
-            .Group(Tween.UIAnchoredPositionY(levelName, nameEndPosition, startDelay: topbarTweenSettings.duration / 2, duration: topbarTweenSettings.duration * 0.8f, ease: topbarTweenSettings.ease));
+            .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings));
     }
 
     private void SetupUIElements(List<Match3Objective> objectives, List<Match3LoseCondition> loseConditions)

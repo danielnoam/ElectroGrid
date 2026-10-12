@@ -97,6 +97,15 @@ public class GameUpdater : MonoBehaviour
         StartCoroutine(CheckForUpdate());
     }
 
+    /// <summary>Runs the update check again on request, unless one is already running or an update is on its way in.</summary>
+    public bool CheckAgain()
+    {
+        if (CurrentState is State.Checking or State.Downloading or State.ReadyToInstall) return false;
+
+        StartCoroutine(CheckForUpdate());
+        return true;
+    }
+
     public void StartDownload()
     {
         if (CurrentState != State.UpdateAvailable && CurrentState != State.Failed) return;

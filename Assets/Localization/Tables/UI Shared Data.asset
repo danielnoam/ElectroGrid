@@ -475,6 +475,26 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841140639301739
+  - m_Id: 2432872211275776
+    m_Key: settings.version.checking
+    m_Metadata:
+      m_Items:
+      - rid: 5242841154489679986
+  - m_Id: 2432872249024512
+    m_Key: settings.version.uptodate
+    m_Metadata:
+      m_Items:
+      - rid: 5242841154489679987
+  - m_Id: 2432872249024513
+    m_Key: settings.version.available
+    m_Metadata:
+      m_Items:
+      - rid: 5242841154489679988
+  - m_Id: 2432872249024514
+    m_Key: settings.version.failed
+    m_Metadata:
+      m_Items:
+      - rid: 5242841154489679989
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
@@ -854,3 +874,19 @@ MonoBehaviour:
       type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
       data:
         m_CommentText: Label above the big best score on the Survival screen
+    - rid: 5242841154489679986
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Shown next to the version while it checks for an update
+    - rid: 5242841154489679987
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Shown next to the version when no update is out
+    - rid: 5242841154489679988
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Shown next to the version when an update is out. {latest} is a version like 1.4.5
+    - rid: 5242841154489679989
+      type: {class: Comment, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_CommentText: Shown next to the version when the update check failed, for example offline

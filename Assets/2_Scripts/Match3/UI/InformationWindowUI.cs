@@ -28,8 +28,6 @@ public class InformationWindowUI : MonoBehaviour
     private Vector2 _defaultSize;
     private Vector2 _openSize;
     private Sequence _toggleSequence;
-    private float _backButtonDefaultYPosition;
-    private float _backButtonOpenYPosition;
     private float _backgroundStartAlpha;
     private float _backgroundOpenAlpha;
     private Action _onClosed;
@@ -41,9 +39,6 @@ public class InformationWindowUI : MonoBehaviour
         _canvasGroup = GetComponent<CanvasGroup>();
         _backButtonRectTransform = backButton.GetComponent<RectTransform>();
         _backButtonLabel = backButton.GetComponentInChildren<TMP_Text>(true);
-        _backButtonDefaultYPosition = _backButtonRectTransform.anchoredPosition.y;
-        _backButtonOpenYPosition = _backButtonDefaultYPosition;
-        _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, -windowRectTransform.sizeDelta.y);
         _defaultSize = windowRectTransform.sizeDelta;
         _openSize = _defaultSize;
         windowRectTransform.sizeDelta = new Vector2(_defaultSize.x, 0);
@@ -163,7 +158,6 @@ public class InformationWindowUI : MonoBehaviour
 
         float height = contentHeight > 0f ? Mathf.Min(_defaultSize.y, contentHeight) : _defaultSize.y;
         _openSize = new Vector2(_defaultSize.x, height);
-        _backButtonOpenYPosition = _backButtonDefaultYPosition + (_defaultSize.y - height) * 0.5f;
     }
 
     public void Toggle(bool show)
@@ -174,8 +168,6 @@ public class InformationWindowUI : MonoBehaviour
 
         var startSize = show ? new Vector2(windowRectTransform.sizeDelta.x, 0f) : _openSize;
         var endSize = show ? _openSize : new Vector2(windowRectTransform.sizeDelta.x, 0f);
-        var startYPosition = show ? -_defaultSize.y : _backButtonOpenYPosition;
-        var endYPosition = show ? _backButtonOpenYPosition : -_defaultSize.y;
         var titleStartAlpha = show ? 0f : 1f;
         var backgroundStartAlpha = show ? 0f : _backgroundOpenAlpha;
         var titleEndAlpha = show ? 1f : 0f;
@@ -183,7 +175,6 @@ public class InformationWindowUI : MonoBehaviour
         var endTimeScale = show ? 0f : 1f ;
 
         windowRectTransform.sizeDelta = startSize;
-        _backButtonRectTransform.anchoredPosition = new Vector2(_backButtonRectTransform.anchoredPosition.x, startYPosition);
         titleText.alpha = titleStartAlpha;
         backgroundImage.color = new Color(backgroundImage.color.r, backgroundImage.color.g, backgroundImage.color.b, backgroundStartAlpha);
 
@@ -197,7 +188,6 @@ public class InformationWindowUI : MonoBehaviour
             .Group(Tween.UISizeDelta(windowRectTransform, endSize, informationWindowTweenSettings))
             .Group(Tween.Alpha(titleText, titleEndAlpha, informationWindowTweenSettings.duration * 0.8f))
             .Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, informationWindowTweenSettings.duration * 0.8f))
-            .Group(Tween.UIAnchoredPositionY(_backButtonRectTransform, endYPosition, informationWindowTweenSettings))
             .Group(Tween.GlobalTimeScale(endTimeScale, informationWindowTweenSettings))
             .ChainCallback(() =>
             {
