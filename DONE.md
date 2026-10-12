@@ -832,3 +832,12 @@ of as a new blob per edit.
 - [x] **Release notes in their own label.** The notes are English, and sharing
       a label with the Hebrew or Arabic intro made RTLTextMeshPro reverse the
       wrapped English lines. `UpdateWindowUI.notesText` holds them now.
+
+## Polish (1.4.9)
+
+- [x] **Purple outline on the selected level** in level select, the lit-wire
+      purple. `selectedOutlineColor` and `selectedOutlineWidth` on
+      `LevelSelectionScreen`.
+- [x] **Survival slides in from the right**, the opposite side to level select.
+- [x] **Update window text in the Credits font** (DS-DIGI), replacing the
+      Roboto from 1.4.5.

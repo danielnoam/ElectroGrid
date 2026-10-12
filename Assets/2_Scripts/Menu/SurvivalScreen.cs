@@ -61,13 +61,13 @@ public class SurvivalScreen : MenuScreen
 
     protected override Tween GetShowPositionTween()
     {
-        Vector3 startPosition = contentOriginalPosition - (Vector3.right * 1000f);
+        Vector3 startPosition = contentOriginalPosition + (Vector3.right * 1000f);
         return Tween.UIAnchoredPosition(contentContainer, startPosition, contentOriginalPosition, showTweenSettings);
     }
 
     protected override Tween GetHidePositionTween()
     {
-        Vector3 endPosition = contentOriginalPosition - (Vector3.right * 1000f);
+        Vector3 endPosition = contentOriginalPosition + (Vector3.right * 1000f);
         return Tween.UIAnchoredPosition(contentContainer, contentOriginalPosition, endPosition, hideTweenSettings);
     }
 

@@ -20,6 +20,8 @@ public class LevelSelectionScreen : MenuScreen
     [Header("Level Buttons")]
     [SerializeField] private Sprite lockSprite;
     [SerializeField] private Color nextLevelGlowColor = new Color(1f, 0.7f, 0.1f, 1f);
+    [SerializeField] private Color selectedOutlineColor = new Color(0.85f, 0.3f, 1f, 1f);
+    [SerializeField] private float selectedOutlineWidth = 10f;
 
     [Header("Circuit Layout")]
     [SerializeField, Min(1)] private int circuitColumns = 4;
@@ -49,6 +51,8 @@ public class LevelSelectionScreen : MenuScreen
 
     private SOMatch3Level _selectedLevel;
     private Tween _nextLevelPulse;
+    private readonly System.Collections.Generic.Dictionary<SOMatch3Level, Button> _levelButtons = new System.Collections.Generic.Dictionary<SOMatch3Level, Button>();
+    private Image _selectedOutline;
 
     private void Start()
     {
@@ -164,6 +168,8 @@ public class LevelSelectionScreen : MenuScreen
         {
             Destroy(child.gameObject);
         }
+        _levelButtons.Clear();
+        _selectedOutline = null;
 
         _nextLevelPulse.Stop();
         var nextLevel = NextLevel();
@@ -192,9 +198,44 @@ public class LevelSelectionScreen : MenuScreen
             if (!unlocked) continue;
 
             levelButton.onClick.AddListener(() => OnLevelButtonClicked(level));
+            _levelButtons[level] = levelButton;
         }
 
         LayoutCircuit(nodes, nextIndex);
+        UpdateSelectedOutline();
+    }
+
+    private void UpdateSelectedOutline()
+    {
+        if (!_selectedLevel || !_levelButtons.TryGetValue(_selectedLevel, out var button) || !button)
+        {
+            if (_selectedOutline) _selectedOutline.gameObject.SetActive(false);
+            return;
+        }
+
+        var buttonRect = (RectTransform)button.transform;
+        if (!_selectedOutline)
+        {
+            var outline = new GameObject("SelectedOutline", typeof(RectTransform), typeof(Image));
+            _selectedOutline = outline.GetComponent<Image>();
+            _selectedOutline.raycastTarget = false;
+        }
+
+        var buttonImage = button.GetComponent<Image>();
+        _selectedOutline.sprite = buttonImage ? buttonImage.sprite : null;
+        _selectedOutline.type = buttonImage ? buttonImage.type : Image.Type.Simple;
+        _selectedOutline.color = selectedOutlineColor;
+
+        var outlineRect = (RectTransform)_selectedOutline.transform;
+        outlineRect.SetParent(buttonRect.parent, false);
+        outlineRect.SetAsLastSibling();
+        outlineRect.SetSiblingIndex(buttonRect.GetSiblingIndex());
+        outlineRect.anchorMin = buttonRect.anchorMin;
+        outlineRect.anchorMax = buttonRect.anchorMax;
+        outlineRect.pivot = buttonRect.pivot;
+        outlineRect.anchoredPosition = buttonRect.anchoredPosition;
+        outlineRect.sizeDelta = buttonRect.sizeDelta + Vector2.one * (selectedOutlineWidth * 2f);
+        _selectedOutline.gameObject.SetActive(true);
     }
 
     private Vector2 CircuitPosition(int index, float width)
@@ -369,6 +410,7 @@ public class LevelSelectionScreen : MenuScreen
     
     private void UpdateLevelInfo()
     {
+        UpdateSelectedOutline();
         ClearGrid();
         
         if (!_selectedLevel)
