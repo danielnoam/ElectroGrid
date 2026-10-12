@@ -71,12 +71,18 @@ MonoBehaviour:
   - {fileID: 11400000, guid: cfd4aae6fe337ab479420566d2e832bd, type: 2}
   - {fileID: 11400000, guid: a245d731a70264a4e991ede0b0dca7e3, type: 2}
   - {fileID: 11400000, guid: 5f488d0a81d70cc448a1618784f15183, type: 2}
+  - {fileID: 11400000, guid: 732dbc75352c41b40ad82a4d699df80f, type: 2}
+  - {fileID: 11400000, guid: e478552ce06e6dc43b93b4337cdc926f, type: 2}
+  - {fileID: 11400000, guid: bd425bddb09e2a547830895d9936a1c8, type: 2}
+  - {fileID: 11400000, guid: 6581152a6be904c4ba7406d0c5906eb2, type: 2}
+  - {fileID: 11400000, guid: a153dfb31f6289f4bb6cde61a7c0de42, type: 2}
   match3GeneralTutorials:
   - {fileID: 11400000, guid: ad96ffe295951a04a8a8580fb044a531, type: 2}
   - {fileID: 11400000, guid: ef715159d1e16e24ba56e292a96dec42, type: 2}
   - {fileID: 11400000, guid: 41d47e63a62f5df4495b57256f258595, type: 2}
   - {fileID: 11400000, guid: e511aabf80dc9524cbdfef4096082732, type: 2}
   - {fileID: 11400000, guid: b326567c9cb654e4280880435d36bf1a, type: 2}
+  - {fileID: 11400000, guid: aa9412cca179809489c963aea7ce4c93, type: 2}
   - {fileID: 11400000, guid: 2c1ff2df90899dd4192707387ed85eb2, type: 2}
   survivalMode: {fileID: 11400000, guid: 2c3199903d85075479f2d045d4cde0d1, type: 2}
   selectedMatch3Level: {fileID: 0}

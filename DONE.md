@@ -841,3 +841,18 @@ of as a new blob per edit.
 - [x] **Survival slides in from the right**, the opposite side to level select.
 - [x] **Update window text in the Credits font** (DS-DIGI), replacing the
       Roboto from 1.4.5.
+
+## Levels 16 to 20 and Info polish (1.5.0)
+
+- [x] **Five more levels on new grids.** Diamond (moves and 50s), Arrow
+      (Square Stars down a 3-wide shaft), Donut (Double Stars round a hole),
+      Steps (Square Stars on a staircase) and Battery (a bolt of Double Stars
+      holding Square Stars in the cap). Listed in LEVELS.md. Move counts need a
+      phone playtest.
+- [x] **Combo Bar card in Information**, all 7 languages, not contextual.
+- [x] **Info highlights.** Card titles in the Settings red; numbers and other
+      cards' names in descriptions too (`Match3TutorialUIElement.Highlight`),
+      but not the card's own name.
+- [x] **Line break pulses the matched tiles too**, not only the rest of the line.
+- [x] **Main menu slides left into Survival** and back in from the left.
+- [x] **Continue starts the highest unlocked level**, not the last one played.

@@ -22,6 +22,8 @@ public class MainMenuScreen : MenuScreen
     [SerializeField] private Button continueButton;
     [SerializeField] private Button survivalButton;
 
+    private float _slideSide = 1f;
+
     private void Start()
     {
         // Subscribed before the first lookup: that lookup can finish Localization's startup, which applies the
@@ -56,9 +58,9 @@ public class MainMenuScreen : MenuScreen
         if (!continueButton) return;
 
         // A fresh save has nothing to continue, so the same button starts the first level instead
-        var level = ResolveLastPlayedLevel();
-        bool isNewGame = !level;
-        if (isNewGame) level = ResolveFirstLevel();
+        bool isNewGame = !ResolveLastPlayedLevel();
+        var level = ResolveLatestUnlockedLevel();
+        if (!level) level = ResolveFirstLevel();
 
         continueButton.gameObject.SetActive(level);
         if (!level) return;
@@ -90,6 +92,7 @@ public class MainMenuScreen : MenuScreen
         survivalButton.onClick.AddListener(() =>
         {
             CameraManager.Instance?.ShakeCamera(0.5f);
+            _slideSide = -1f;
             menuManager?.ShowSurvival();
         });
 
@@ -124,6 +127,19 @@ public class MainMenuScreen : MenuScreen
         return null;
     }
 
+    private static SOMatch3Level ResolveLatestUnlockedLevel()
+    {
+        if (!SaveManager.Instance || !GameManager.Instance) return null;
+
+        var levels = GameManager.Instance.Match3Levels;
+        for (int i = levels.Length - 1; i >= 0; i--)
+        {
+            if (levels[i] && SaveManager.Instance.IsLevelUnlocked(i)) return levels[i];
+        }
+
+        return null;
+    }
+
     private static SOMatch3Level ResolveFirstLevel()
     {
         if (!GameManager.Instance) return null;
@@ -138,13 +154,13 @@ public class MainMenuScreen : MenuScreen
 
     protected override Tween GetShowPositionTween()
     {
-        Vector3 startPosition = contentOriginalPosition - (Vector3.left * 1000f);
+        Vector3 startPosition = contentOriginalPosition + (Vector3.right * (1000f * _slideSide));
         return Tween.UIAnchoredPosition(contentContainer, startPosition, contentOriginalPosition, showTweenSettings);
     }
 
     protected override Tween GetHidePositionTween()
     {
-        Vector3 endPosition = contentOriginalPosition - (Vector3.left * 1000f);
+        Vector3 endPosition = contentOriginalPosition + (Vector3.right * (1000f * _slideSide));
         return Tween.UIAnchoredPosition(contentContainer, contentOriginalPosition, endPosition, hideTweenSettings);
     }
 
@@ -187,6 +203,7 @@ public class MainMenuScreen : MenuScreen
             match3Button.onClick.AddListener(() =>
             {
                 CameraManager.Instance?.ShakeCamera(0.5f);
+                _slideSide = 1f;
                 menuManager?.ShowMatch3LevelSelection();
             });
         }

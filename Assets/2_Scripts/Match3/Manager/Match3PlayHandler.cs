@@ -636,6 +636,7 @@ public class Match3PlayHandler : MonoBehaviour
                         if (!tile.CurrentMatch3Object)
                         {
                             tile.PulseColor(matchColor);
+                            tile.PunchTile(1.5f);
                             continue;
                         }
                         
@@ -672,6 +673,7 @@ public class Match3PlayHandler : MonoBehaviour
                         if (!tile.CurrentMatch3Object)
                         {
                             tile.PulseColor(matchColor);
+                            tile.PunchTile(1.5f);
                             continue;
                         }
                         

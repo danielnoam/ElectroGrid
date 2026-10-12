@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using PrimeTween;
 using TMPro;
 using UnityEngine;
@@ -129,6 +130,9 @@ public class InformationWindowUI : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        var allTutorials = GameManager.Instance ? GameManager.Instance.Match3GeneralTutorials : null;
+        var terms = allTutorials?.Where(tutorial => tutorial).Select(tutorial => tutorial.TutorialTitle).ToList();
+
         if (tutorials != null)
         {
             foreach (var tutorial in tutorials)
@@ -136,7 +140,7 @@ public class InformationWindowUI : MonoBehaviour
                 if (!tutorial) continue;
 
                 var tutorialElement = Instantiate(tutorialElementPrefab, tutorialElementsParent);
-                tutorialElement.Setup(tutorial.TutorialSprite, tutorial.TutorialTitle, tutorial.TutorialText);
+                tutorialElement.Setup(tutorial.TutorialSprite, tutorial.TutorialTitle, tutorial.TutorialText, terms);
             }
         }
 

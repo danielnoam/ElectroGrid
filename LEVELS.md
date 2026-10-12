@@ -130,3 +130,8 @@ every level from 6 on uses two.
 | 13 | Hourglass 9x9 | 24 pieces, 3 Square Stars | 16 moves |
 | 14 | Bolt 9x10 | 26 pieces, 8 Double Stars | 16 moves |
 | 15 | Crown 9x8 | 6 Double Stars, 3 Square Stars | 18 moves |
+| 16 | Diamond 9x9 | 30 pieces, 4 Double Stars | 15 moves, 50s |
+| 17 | Arrow 9x10 | 24 pieces, 3 Square Stars | 18 moves |
+| 18 | Donut 9x9 | 24 pieces, 8 Double Stars | 16 moves |
+| 19 | Steps 9x9 | 4 Double Stars, 3 Square Stars | 18 moves |
+| 20 | Battery 8x10 | 8 Double Stars, 2 Square Stars | 20 moves |

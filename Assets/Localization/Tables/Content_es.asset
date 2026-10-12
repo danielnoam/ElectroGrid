@@ -82,6 +82,14 @@ MonoBehaviour:
     m_Localized: Consigue todos los puntos que puedas antes de que se acabe el reloj. El Plus, la barra de combo llena y las estrellas dan tiempo extra, y tu combo multiplica cada punto.
     m_Metadata:
       m_Items: []
+  - m_Id: 2532849646297088
+    m_Localized: Barra de combo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2532849679851520
+    m_Localized: "Haz coincidencias r\xE1pidas para subir tu combo y llenar la barra de combo. Con la barra llena ganas 2 movimientos o 5 segundos m\xE1s."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

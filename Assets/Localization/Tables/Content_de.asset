@@ -82,6 +82,14 @@ MonoBehaviour:
     m_Localized: "Hol so viele Punkte wie m\xF6glich, bevor die Uhr abl\xE4uft. Plus, eine volle Combo-Leiste und Sterne geben dir Zeit, und deine Combo multipliziert jeden Punkt."
     m_Metadata:
       m_Items: []
+  - m_Id: 2532849646297088
+    m_Localized: Combo-Leiste
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2532849679851520
+    m_Localized: "Bilde schnell neue Treffer, um deine Combo zu steigern und die Combo-Leiste zu f\xFCllen. Eine volle Leiste gibt dir 2 Z\xFCge oder 5 Sekunden extra."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
