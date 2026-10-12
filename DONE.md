@@ -809,3 +809,15 @@ of as a new blob per edit.
       the BuildProfile reference was destroyed, so the second platform failed
       with "Build profile is invalid". `ElectroGridBuild` now keeps each
       profile's asset path and reloads it before switching to it.
+
+## Levels 13 to 15 (1.4.7)
+
+- [x] **Three new levels on new grids.** Hourglass (Square Stars drop through
+      a narrow waist), Bolt (Double Stars on a lightning bolt) and Crown
+      (Square Stars start on the points). How levels work and the rules for
+      new ones are in [LEVELS.md](LEVELS.md). Move counts still need a
+      playtest on a phone.
+- [x] **Camera on tall boards.** `CameraManager.FitCameraToGrid` divided two
+      ints for the grid's aspect, so any board taller than wide came out as 0
+      and the camera fitted the height, cutting off the sides. Bolt (9x10)
+      was the first such board.

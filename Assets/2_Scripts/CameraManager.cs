@@ -121,7 +121,7 @@ public class CameraManager : MonoBehaviour
         if (!cam) return;
         
         float screenAspect = (float)Screen.width / Screen.height;
-        float gridAspect = gridSize.x / gridSize.y;
+        float gridAspect = (float)gridSize.x / gridSize.y;
 
         if (screenAspect >= gridAspect)
         {
