@@ -15,7 +15,7 @@ A level is an `SOMatch3Level` asset in `Assets/3_Data/Levels`, named
   so far uses the same four shapes (triangle, pentagon, circle, hexagon) at
   25 each.
 - **Objectives**: what the player has to do to win. All of them must be done.
-- **Lose conditions**: moves, time, or both. Running out of either loses.
+- **Lose conditions**: a move limit or a time limit, not both. Running out loses.
 - **Tile objects**: which cells start with a Double Star or a Square Star
   instead of a piece. Painted in the level editor.
 
@@ -43,9 +43,15 @@ validates, and can play a level directly.
   has Square Stars.
 - **Plus** pieces spawn now and then (5% per new piece). Using one gives
   extra moves or time.
-- **Combo**: matches in quick succession fill the combo bar. A full bar adds
-  5 seconds to a time limit or 2 moves to a move limit, but never above the
-  level's starting amount.
+- **Combo**: off unless the level's **Combo Bar** box is ticked (Survival
+  always has it; no level uses it yet). Matches in quick succession build the
+  combo and fill the combo bar. A full bar adds 5 seconds to a time limit or
+  2 moves to a move limit, but never above the level's starting amount. In
+  Survival a full bar adds nothing; the combo only multiplies points.
+- **Score**: every level keeps a score, using the Level Score settings on
+  `Match3GameManager` (10 per piece, more for longer matches, bonuses for
+  Plus and Stars, multiplied by the combo when the level has one). Only the
+  Reach Score objective shows it.
 - The board is always generated with at least 3 possible moves, and it is
   reshuffled if the player runs out of moves.
 
@@ -56,6 +62,7 @@ validates, and can play a level directly.
 | Get Matches | N pieces cleared | Counts every piece, including line breaks. |
 | Destroy Obstacles | N Double Stars broken | N can't be more than the Double Stars placed. |
 | Reach Bottom | N Square Stars collected | N can't be more than the Square Stars placed. |
+| Reach Score | N points | Needs a lose condition, or any score is reached eventually. Double Stars (300) and Square Stars (500) add a lot, so count them in. First used by Level 21. |
 | Get Specific Item Matches | N of one piece | Exists in code, not used by any level yet. |
 
 Only one of each objective type per level. Two objectives fit the top bar;
@@ -97,8 +104,8 @@ every level from 6 on uses two.
   Level 8 brings Square Stars, Level 10 is the first to mix them.
 - Moves so far run between 9 and 18. Use 14 to 18 for levels with two
   objectives. Fewer cells or more stars means more moves.
-- Mix in a time limit now and then (Levels 4 and 11 use 45 seconds on top of
-  moves).
+- One limit per level: moves or time, never both. Use a time limit now and
+  then instead of moves (Levels 4 and 11 have 45 seconds, Level 16 has 50).
 - Playtest every new level on a phone before it ships. Losing on the last move
   a few times is about right; losing with half the goal left is too hard.
 
@@ -118,20 +125,25 @@ every level from 6 on uses two.
 | 1 | FullSquareSmall 6x6 | 16 pieces | none |
 | 2 | Heart 8x8 | 19 pieces | 10 moves |
 | 3 | HollowSquare 8x8 | 24 pieces | 9 moves |
-| 4 | Plus 9x9 | 29 pieces | 10 moves, 45s |
+| 4 | Plus 9x9 | 29 pieces | 45s |
 | 5 | H 8x8 | 46 pieces | 13 moves |
 | 6 | Circle 8x8 | 16 pieces, 4 Double Stars | 13 moves |
 | 7 | Smile 10x10 | 16 pieces, 14 Double Stars | 9 moves |
 | 8 | FullBlock 8x6 | 21 pieces, 2 Square Stars | 16 moves |
 | 9 | NoCornerShortSquare 9x7 | 26 pieces, 4 Square Stars | 18 moves |
 | 10 | TriangleSquashed 11x6 | 1 Square Star, 9 Double Stars | 16 moves |
-| 11 | Circle2 9x9 | 30 pieces, 9 Double Stars | 16 moves, 45s |
+| 11 | Circle2 9x9 | 30 pieces, 9 Double Stars | 45s |
 | 12 | ChestPlate 9x8 | 8 Double Stars, 1 Square Star | 14 moves |
 | 13 | Hourglass 9x9 | 24 pieces, 3 Square Stars | 16 moves |
 | 14 | Bolt 9x10 | 26 pieces, 8 Double Stars | 16 moves |
 | 15 | Crown 9x8 | 6 Double Stars, 3 Square Stars | 18 moves |
-| 16 | Diamond 9x9 | 30 pieces, 4 Double Stars | 15 moves, 50s |
+| 16 | Diamond 9x9 | 30 pieces, 4 Double Stars | 50s |
 | 17 | Arrow 9x10 | 24 pieces, 3 Square Stars | 18 moves |
 | 18 | Donut 9x9 | 24 pieces, 8 Double Stars | 16 moves |
 | 19 | Steps 9x9 | 4 Double Stars, 3 Square Stars | 18 moves |
 | 20 | Battery 8x10 | 8 Double Stars, 2 Square Stars | 20 moves |
+| 21 | Cross 9x9 | 1200 points | 60s |
+| 22 | Castle 9x9 | 7 Double Stars, 2 Square Stars | 18 moves |
+| 23 | Bowtie 11x7 | 36 pieces | 50s |
+| 24 | Ladder 9x10 | 28 pieces, 2 Square Stars | 18 moves |
+| 25 | Chip 10x10 | 4000 points, 12 Double Stars | 22 moves |

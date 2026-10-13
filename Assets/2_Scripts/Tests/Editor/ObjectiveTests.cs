@@ -356,6 +356,35 @@ public class ObjectiveTests
     }
 
     [Test]
+    public void ReachScore_CompletesAtTheRequiredScore()
+    {
+        var objective = Objective<ReachScoreObjective>(500);
+
+        objective.OnScoreChanged(300);
+        Assert.That(objective.IsCompleted, Is.False);
+        Assert.That(objective.GetProgress(), Is.EqualTo((300, 500)));
+
+        objective.OnScoreChanged(650);
+        Assert.That(objective.IsCompleted, Is.True);
+        Assert.That(objective.GetProgress(), Is.EqualTo((500, 500)));
+    }
+
+    [Test]
+    public void LevelData_AddScore_KeepsATotalAndPassesItToObjectives()
+    {
+        var score = new ReachScoreObjective();
+        TestUtils.SetField(score, "requiredAmount", 100);
+        var data = LevelData(new Match3Objective[] { score }, new Match3LoseCondition[0]);
+
+        data.AddScore(60);
+        data.AddScore(0);
+        data.AddScore(50);
+
+        Assert.That(data.Score, Is.EqualTo(110));
+        Assert.That(data.IsObjectivesComplete(), Is.True);
+    }
+
+    [Test]
     public void LevelData_BelowHalf_WhenAConditionIsLessThanHalfLeft()
     {
         var moves = new MoveLimit();

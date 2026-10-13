@@ -29,7 +29,7 @@ public class SurvivalTimeSettings
 
     [Header("Time Gains")]
     [Min(0)] public float plusTime = 5f;
-    [Min(0)] public float fullComboTime = 5f;
+    [Min(0)] public float fullComboTime = 0f;
     [Min(0)] public float squareStarTime = 3f;
     [Min(0)] public float doubleStarTime = 2f;
 

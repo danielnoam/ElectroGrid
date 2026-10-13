@@ -79,7 +79,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1708965875408896
-    m_Localized: Score as many points as you can before the clock runs out. Plus, a full combo bar and Stars add time, and your combo multiplies every point.
+    m_Localized: Score as many points as you can before the clock runs out. Plus and Stars add time, and your combo multiplies every point.
     m_Metadata:
       m_Items: []
   - m_Id: 2532849646297088
@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2532849679851520
-    m_Localized: Match again quickly to grow your combo and fill the combo bar. A full bar gives you 2 extra moves or 5 more seconds.
+    m_Localized: Match again quickly to grow your combo and fill the combo bar. Your combo multiplies every point you score.
     m_Metadata:
       m_Items: []
   references:

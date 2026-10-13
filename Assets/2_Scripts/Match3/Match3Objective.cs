@@ -25,6 +25,7 @@ public abstract class Match3Objective
     public abstract string GetDescription();
     public abstract string GetRequirementText();
     public abstract (int, int) GetProgress();
+    public virtual void OnScoreChanged(int score) { }
 
     public event Action ProgressChanged;
     public event Action Completed;
@@ -304,5 +305,69 @@ public class ReachBottomObjective : Match3Objective
     public override string GetDescription()
     {
         return L10n.Get("objective.squarestar.description", ("amount", requiredAmount));
+    }
+}
+
+[Serializable]
+public class ReachScoreObjective : Match3Objective
+{
+    [SerializeField, Min(1)] private int requiredAmount = 1000;
+    private int _score;
+
+    public int RequiredAmount => requiredAmount;
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
+
+    public override void Setup()
+    {
+        _score = 0;
+        _completed = false;
+    }
+
+    public override void OnScoreChanged(int score)
+    {
+        if (_completed) return;
+
+        _score = score;
+        if (_score >= requiredAmount)
+        {
+            _completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
+        }
+    }
+
+    public override void OnMatchMade(List<Match3Tile> matchedTiles)
+    {
+    }
+
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
+    {
+    }
+
+    public override void OnBottomObjectReached(Match3BottomObject bottomObject)
+    {
+    }
+
+    public override string GetRequirementText()
+    {
+        return L10n.Get("objective.score.requirement");
+    }
+
+    public override (int, int) GetProgress()
+    {
+        return (Mathf.Min(_score, requiredAmount), requiredAmount);
+    }
+
+    public override string GetName()
+    {
+        return "Reach Score";
+    }
+
+    public override string GetDescription()
+    {
+        return L10n.Get("objective.score.description", ("amount", requiredAmount));
     }
 }

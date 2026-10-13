@@ -113,6 +113,16 @@ internal static class Match3LevelValidation
         {
             if (condition == null) issues.Add(new Issue(Severity.Warning, "A lose condition slot is empty."));
         }
+
+        bool hasLoseCondition = level.LoseConditions.Exists(condition => condition != null);
+        if (level.LoseConditions.Exists(condition => condition is MoveLimit) && level.LoseConditions.Exists(condition => condition is TimeLimit))
+        {
+            issues.Add(new Issue(Severity.Warning, "Both a move limit and a time limit. Levels use one or the other."));
+        }
+        if (!hasLoseCondition && level.Objectives.Exists(objective => objective is ReachScoreObjective))
+        {
+            issues.Add(new Issue(Severity.Warning, "Reach Score with no lose condition. Any score is reached eventually, so the level cannot be lost."));
+        }
     }
 
     private static void ValidateMatchObjects(SOMatch3Level level, List<Issue> issues)

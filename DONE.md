@@ -856,3 +856,19 @@ of as a new blob per edit.
 - [x] **Line break pulses the matched tiles too**, not only the rest of the line.
 - [x] **Main menu slides left into Survival** and back in from the left.
 - [x] **Continue starts the highest unlocked level**, not the last one played.
+
+## Score objective, combo per level, Levels 21 to 25 (1.6.0)
+
+- [x] **Combo per level.** `SOMatch3Level.comboBar`, off everywhere; Survival
+      always has it (`Match3GameManager.ComboEnabled`).
+- [x] **Combo doesn't add time in Survival.** `fullComboTime` is 0; the
+      Survival and Combo Bar card texts say so in all 7 languages.
+- [x] **Runs played under the leaderboard** on the Survival screen.
+- [x] **Reach Score objective.** Levels keep a score with the Level Score
+      settings on `Match3GameManager`; `ReachScoreObjective` wins at N points.
+      Validator warns without a lose condition. Goal counters count up in at
+      most 0.6s now instead of 0.1s per point.
+- [x] **One limit per level.** Levels 4, 11 and 16 kept their timers and lost
+      their move limits; the validator warns about both.
+- [x] **Levels 21 to 25**: Cross (first score level), Castle, Bowtie, Ladder,
+      Chip. Score targets need a phone playtest.

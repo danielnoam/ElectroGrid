@@ -68,6 +68,19 @@ public class Match3LevelData
         }
     }
     
+    public int Score { get; private set; }
+
+    public void AddScore(int points)
+    {
+        if (points <= 0) return;
+
+        Score += points;
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnScoreChanged(Score);
+        }
+    }
+
     public void OnMatchesMade(List<Match3Tile> allMatches)
     {
         PiecesCleared += allMatches.Count;

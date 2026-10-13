@@ -79,7 +79,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1708965875408896
-    m_Localized: "Marque un maximum de points avant la fin du chrono. Le Plus, une barre de combo pleine et les \xE9toiles ajoutent du temps, et ton combo multiplie chaque point."
+    m_Localized: "Marque un maximum de points avant la fin du chrono. Le Plus et les \xE9toiles ajoutent du temps, et ton combo multiplie chaque point."
     m_Metadata:
       m_Items: []
   - m_Id: 2532849646297088
@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2532849679851520
-    m_Localized: "Encha\xEEne vite les combinaisons pour augmenter ton combo et remplir la barre de combo. Une barre pleine te donne 2 coups ou 5 secondes de plus."
+    m_Localized: "Encha\xEEne vite les combinaisons pour augmenter ton combo et remplir la barre de combo. Ton combo multiplie chaque point que tu marques."
     m_Metadata:
       m_Items: []
   references:

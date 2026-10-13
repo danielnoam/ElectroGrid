@@ -196,7 +196,7 @@ public class Match3UIElement : MonoBehaviour
         _sequence = Sequence.Create();
         _sequence.Group(Tween.Custom(_currentProgress,
             endValue: progress.Item1,
-            duration: 0.1f * changeAmount,
+            duration: Mathf.Clamp(0.1f * changeAmount, 0.1f, 0.6f),
             onValueChange: value => _currentProgress = Mathf.RoundToInt(value)));
         _sequence.Group(Tween.Scale(progressCount.transform, _startScale * 1.3f, 0.1f, Ease.InSine));
         _sequence.Chain(Tween.Scale(progressCount.transform, _startScale, 0.1f, Ease.OutSine));

@@ -26,7 +26,7 @@ MonoBehaviour:
   time:
     startTime: 45
     plusTime: 5
-    fullComboTime: 5
+    fullComboTime: 0
     squareStarTime: 3
     doubleStarTime: 2
     gainByMinute:

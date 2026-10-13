@@ -76,6 +76,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bd425bddb09e2a547830895d9936a1c8, type: 2}
   - {fileID: 11400000, guid: 6581152a6be904c4ba7406d0c5906eb2, type: 2}
   - {fileID: 11400000, guid: a153dfb31f6289f4bb6cde61a7c0de42, type: 2}
+  - {fileID: 11400000, guid: 92481a1a41b7cd941a0b0dc7077c7abf, type: 2}
+  - {fileID: 11400000, guid: e2a4364bd1bfc3541979c2b77d98f6d6, type: 2}
+  - {fileID: 11400000, guid: e95195d97feb5914d9993818e96dedcd, type: 2}
+  - {fileID: 11400000, guid: 366375d7cff2c2a4dafdf3c2d3923099, type: 2}
+  - {fileID: 11400000, guid: 7b7740c1c89ae1c4680d678b3f932be4, type: 2}
   match3GeneralTutorials:
   - {fileID: 11400000, guid: ad96ffe295951a04a8a8580fb044a531, type: 2}
   - {fileID: 11400000, guid: ef715159d1e16e24ba56e292a96dec42, type: 2}

@@ -12,6 +12,8 @@ public class SOMatch3Level : ScriptableObject
     [SerializeField] private ChanceList<SOItemData> matchObjects = new ChanceList<SOItemData>();
     [SerializeReference] private List<Match3Objective> objectives = new List<Match3Objective>();
     [SerializeReference] private List<Match3LoseCondition> loseConditions = new List<Match3LoseCondition>();
+    [Tooltip("Quick matches build a combo and fill the combo bar. Survival always has it")]
+    [SerializeField] private bool comboBar;
     
     [Header("Tile Objects")]
     [SerializeField, HideInInspector] private Match3TileObjectType[] tileObjects;
@@ -34,6 +36,7 @@ public class SOMatch3Level : ScriptableObject
     public ChanceList<SOItemData> MatchObjects => matchObjects;
     public List<Match3Objective> Objectives => objectives;
     public List<Match3LoseCondition> LoseConditions => loseConditions;
+    public bool ComboBar => comboBar;
     public Match3TileObjectType[] TileObjects => tileObjects;
     
     

@@ -40,6 +40,10 @@ public class Match3GameManager : MonoBehaviour
     [Header("Combo")]
     [SerializeField] private Match3ComboSettings comboSettings = new Match3ComboSettings();
 
+    [Header("Level Score")]
+    [Tooltip("Scoring for levels outside Survival, read by the Reach Score objective. Survival uses its own settings")]
+    [SerializeField] private Match3ScoreSettings levelScoreSettings = new Match3ScoreSettings();
+
     [Separator]
     [SerializeField, ReadOnly] private SOMatch3Level currentLevel;
     [SerializeField, ReadOnly] private SOSurvivalMode currentSurvival;
@@ -55,6 +59,7 @@ public class Match3GameManager : MonoBehaviour
 
     /// <summary>The current run of quick matches, read by the combo bar, the full-bar ability and Survival scoring.</summary>
     public Match3Combo Combo => _combo ??= new Match3Combo(comboSettings);
+    public bool ComboEnabled => IsSurvival || (currentLevel && currentLevel.ComboBar);
     private Match3Combo _combo;
     public Match3LevelData CurrentLevelData => _currentLevelData;
     public bool IsSurvival => currentSurvival;
@@ -255,6 +260,7 @@ public class Match3GameManager : MonoBehaviour
     {
         _currentLevelData?.OnMatchesMade(matches);
         if (!levelComplete) _currentLevelData?.Survival?.OnMatches(matches, minMatchCount, Combo.Count);
+        AddLevelPoints(Match3SurvivalRun.MatchPoints(levelScoreSettings, Match3SurvivalRun.MatchGroupSizes(matches), minMatchCount));
         MatchesMade?.Invoke(matches);
     }
     
@@ -265,6 +271,7 @@ public class Match3GameManager : MonoBehaviour
 
         _currentLevelData?.OnHelperObjectDestroyed();
         _currentLevelData?.Survival?.OnPlusDestroyed(Combo.Count);
+        AddLevelPoints(levelScoreSettings.plusBonus);
     }
     
     private void NotifyAMoveWasMade()
@@ -276,21 +283,32 @@ public class Match3GameManager : MonoBehaviour
     {
         _currentLevelData?.OnObstacleBreak(obstacle);
         if (!levelComplete) _currentLevelData?.Survival?.OnDoubleStarBroken(Combo.Count);
+        AddLevelPoints(levelScoreSettings.doubleStarBonus);
     }
     
     public void NotifyBottomObjectReached(Match3BottomObject bottomObject)
     {
         _currentLevelData?.OnBottomObjectReached(bottomObject);
         if (!levelComplete) _currentLevelData?.Survival?.OnSquareStarReached(Combo.Count);
+        AddLevelPoints(levelScoreSettings.squareStarBonus);
     }
     
     public void NotifyLineBreakMade(List<int> rows, List<int> columns, int piecesDestroyed)
     {
         if (!levelComplete) _currentLevelData?.Survival?.OnLineBreakPieces(piecesDestroyed, Combo.Count);
+        AddLevelPoints(piecesDestroyed * levelScoreSettings.pointsPerPiece);
         FirebaseManager.Instance?.LogLineBreak();
         LineBreakMade?.Invoke(rows, columns);
     }
     
+
+    private void AddLevelPoints(int points)
+    {
+        if (IsSurvival || levelComplete || _currentLevelData == null || points <= 0) return;
+
+        float multiplier = Match3SurvivalRun.ComboMultiplier(levelScoreSettings, ComboEnabled ? Combo.Count : 0);
+        _currentLevelData.AddScore(Mathf.RoundToInt(points * multiplier));
+    }
 
     /// <summary>
     /// Called when the player leaves a level before it ends, so abandonment shows up in the funnel.
@@ -381,7 +399,7 @@ public class Match3GameManager : MonoBehaviour
 
         // The combo countdown stops while this swap resolves, so its cascades can't run out the clock
         Combo.BeginResolve();
-        Combo.AddSwapStep();
+        if (ComboEnabled) Combo.AddSwapStep();
 
         // Must run before the matches are handled, objectives inspect the matched tiles while they still hold their objects
         NotifyMatchesWereMade(allMatches);
@@ -392,7 +410,7 @@ public class Match3GameManager : MonoBehaviour
     
         yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, false));
         
-        yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches, Combo.AddCascadeWave));
+        yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches, ComboEnabled ? (System.Action)Combo.AddCascadeWave : null));
 
         if (!levelComplete)
         {

@@ -430,6 +430,15 @@ MonoBehaviour:
     m_Localized: Couldn't check
     m_Metadata:
       m_Items: []
+  - m_Id: 2792580046643200
+    m_Localized: 'Score:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2792580076003328
+    m_Localized: Score {amount} Points
+    m_Metadata:
+      m_Items:
+      - rid: 5242841005928218761
   references:
     version: 2
     RefIds:
@@ -465,3 +474,4 @@ MonoBehaviour:
         - id: 1735779603701760
         - id: 2148975749619712
         - id: 2432872249024513
+        - id: 2792580076003328

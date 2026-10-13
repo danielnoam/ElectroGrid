@@ -495,6 +495,14 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841154489679989
+  - m_Id: 2792580046643200
+    m_Key: objective.score.requirement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2792580076003328
+    m_Key: objective.score.description
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -79,7 +79,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1708965875408896
-    m_Localized: "Fa\xE7a o m\xE1ximo de pontos antes que o rel\xF3gio zere. O Plus, a barra de combo cheia e as estrelas d\xE3o mais tempo, e seu combo multiplica cada ponto."
+    m_Localized: "Fa\xE7a o m\xE1ximo de pontos antes que o rel\xF3gio zere. O Plus e as estrelas d\xE3o mais tempo, e seu combo multiplica cada ponto."
     m_Metadata:
       m_Items: []
   - m_Id: 2532849646297088
@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2532849679851520
-    m_Localized: "Fa\xE7a combina\xE7\xF5es r\xE1pidas para aumentar seu combo e encher a barra de combo. Com a barra cheia voc\xEA ganha 2 movimentos ou 5 segundos a mais."
+    m_Localized: "Fa\xE7a combina\xE7\xF5es r\xE1pidas para aumentar seu combo e encher a barra de combo. Seu combo multiplica cada ponto que voc\xEA faz."
     m_Metadata:
       m_Items: []
   references:

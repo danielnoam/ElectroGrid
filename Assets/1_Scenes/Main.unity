@@ -6070,7 +6070,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -620}
+  m_AnchoredPosition: {x: 0, y: -520}
   m_SizeDelta: {x: 760, y: 640}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &150270768
@@ -45693,7 +45693,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -520}
+  m_AnchoredPosition: {x: 0, y: -1190}
   m_SizeDelta: {x: -120, y: 60}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &1587510870
@@ -55278,6 +55278,8 @@ MonoBehaviour:
   lockedLevelLabel: '?'
   lockSprite: {fileID: 21300000, guid: 16e7d64d04da5d94d944fbd1fca6a97c, type: 3}
   nextLevelGlowColor: {r: 1, g: 0.7, b: 0.1, a: 1}
+  selectedOutlineColor: {r: 0.85, g: 0.3, b: 1, a: 1}
+  selectedOutlineWidth: 10
   circuitColumns: 4
   circuitCellSize: 150
   circuitGap: 60
