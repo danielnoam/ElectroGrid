@@ -872,3 +872,9 @@ of as a new blob per edit.
       their move limits; the validator warns about both.
 - [x] **Levels 21 to 25**: Cross (first score level), Castle, Bowtie, Ladder,
       Chip. Score targets need a phone playtest.
+
+## Score levels get the combo (1.6.1)
+
+- [x] **Combo bar on Reach Score levels** (21 and 25); the validator warns if a
+      score level has it off.
+- [x] **Level 21's X is bolder**: arms 5 wide, 65 cells instead of 41.

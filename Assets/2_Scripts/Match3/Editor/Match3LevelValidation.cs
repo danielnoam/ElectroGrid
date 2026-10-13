@@ -119,6 +119,11 @@ internal static class Match3LevelValidation
         {
             issues.Add(new Issue(Severity.Warning, "Both a move limit and a time limit. Levels use one or the other."));
         }
+        if (!level.ComboBar && level.Objectives.Exists(objective => objective is ReachScoreObjective))
+        {
+            issues.Add(new Issue(Severity.Warning, "Reach Score without the combo bar. Score levels use the combo to multiply points."));
+        }
+
         if (!hasLoseCondition && level.Objectives.Exists(objective => objective is ReachScoreObjective))
         {
             issues.Add(new Issue(Severity.Warning, "Reach Score with no lose condition. Any score is reached eventually, so the level cannot be lost."));

@@ -44,7 +44,7 @@ validates, and can play a level directly.
 - **Plus** pieces spawn now and then (5% per new piece). Using one gives
   extra moves or time.
 - **Combo**: off unless the level's **Combo Bar** box is ticked (Survival
-  always has it; no level uses it yet). Matches in quick succession build the
+  always has it, and every Reach Score level should too). Matches in quick succession build the
   combo and fill the combo bar. A full bar adds 5 seconds to a time limit or
   2 moves to a move limit, but never above the level's starting amount. In
   Survival a full bar adds nothing; the combo only multiplies points.
@@ -62,7 +62,7 @@ validates, and can play a level directly.
 | Get Matches | N pieces cleared | Counts every piece, including line breaks. |
 | Destroy Obstacles | N Double Stars broken | N can't be more than the Double Stars placed. |
 | Reach Bottom | N Square Stars collected | N can't be more than the Square Stars placed. |
-| Reach Score | N points | Needs a lose condition, or any score is reached eventually. Double Stars (300) and Square Stars (500) add a lot, so count them in. First used by Level 21. |
+| Reach Score | N points | Needs a lose condition and the Combo Bar box ticked (the validator warns about both). Double Stars (300) and Square Stars (500) add a lot, so count them in. First used by Level 21. |
 | Get Specific Item Matches | N of one piece | Exists in code, not used by any level yet. |
 
 Only one of each objective type per level. Two objectives fit the top bar;
