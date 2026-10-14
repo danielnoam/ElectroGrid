@@ -101,6 +101,10 @@ and the level select rework is where the Survival entry would go (it is on the m
       in. Still to do: sounds for a glitch clearing, a virus spreading and a fuse
       blowing, and nicer Info card icons (the glitch, fuse and conveyor ones are
       still drawn in code).
+      **New glitch break effect:** clearing a glitch reuses a cyan copy of the
+      Double Star break particle (`Prefab_ParticleGlitch`). Give it its own
+      effect that reads as digital static breaking apart (scanline slices,
+      pixel shards, a short flicker of the overlay before it goes).
 
 - [ ] **Better touch feel when dragging pieces.** A piece sometimes drops by
       accident mid-drag. Cause found: `Match3PlayHandler.OnSwipe` releases
