@@ -16,11 +16,6 @@ Crashlytics and the first tests are in (see DONE.md). What is left:
       too) is the pick, deferred for now. Do it before Steam, where PC is the
       only platform. Limit it to Windows so phones don't report twice.
 
-- [ ] **No PlayMode tests.** The EditMode tests cover the logic. Still untested:
-      the coroutine flow in `Match3GameManager`, meaning a swap, the cascade
-      loop and the reshuffle running end to end. That needs a PlayMode test that
-      loads the Match3 scene.
-
 ---
 
 ## 2. Features, in build order
