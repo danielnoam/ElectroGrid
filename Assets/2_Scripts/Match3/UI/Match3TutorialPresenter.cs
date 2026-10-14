@@ -84,12 +84,19 @@ public class Match3TutorialPresenter : MonoBehaviour
         {
             Enqueue(Match3TutorialTrigger.LevelHasBottomObjects);
         }
+
+        if (levelData.Level.CountGlitches() > 0) Enqueue(Match3TutorialTrigger.LevelHasGlitches);
+        if (levelData.Level.CountObjectsOfType(Match3TileObjectType.Virus) > 0) Enqueue(Match3TutorialTrigger.LevelHasViruses);
+        if (levelData.Level.CountObjectsOfType(Match3TileObjectType.Fuse) > 0) Enqueue(Match3TutorialTrigger.LevelHasFuses);
+        if (levelData.Level.ConveyorRows is { Count: > 0 }) Enqueue(Match3TutorialTrigger.LevelHasConveyors);
     }
 
     private void OnBonusSpawned(Match3TileObjectType type)
     {
         if (type == Match3TileObjectType.Obstacle) Enqueue(Match3TutorialTrigger.LevelHasObstacles);
         else if (type == Match3TileObjectType.Bottom) Enqueue(Match3TutorialTrigger.LevelHasBottomObjects);
+        else if (type == Match3TileObjectType.Virus) Enqueue(Match3TutorialTrigger.LevelHasViruses);
+        else if (type == Match3TileObjectType.Fuse) Enqueue(Match3TutorialTrigger.LevelHasFuses);
     }
 
     private void OnHelperSpawned(Match3HelperObject helper)

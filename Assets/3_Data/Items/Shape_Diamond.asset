@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8746a70e6d2e4c5db1df0f1bae221269, type: 3}
+  m_Name: Shape_Diamond
+  m_EditorClassIdentifier: Assembly-CSharp::SOItemData
+  label: Diamond
+  displayName:
+    m_TableReference:
+      m_TableCollectionName: GUID:3e9d6025d4245e94282bbdd919393591
+    m_TableEntryReference:
+      m_KeyId: 3274541252993024
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  color: {r: 0.24, g: 0.85, b: 1, a: 1}
+  sprite: {fileID: 21300000, guid: 12d1cd01138d827580687338f6cb741f, type: 3}
+  emissionMask: {fileID: 2800000, guid: b85928b685315ebc61e4667c8ca3c812, type: 3}
+  references:
+    version: 2
+    RefIds: []

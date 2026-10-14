@@ -17,6 +17,7 @@ public abstract class Match3Objective
     
     public abstract bool AllowOnlyOneObjectiveOfThisType { get; }
     public virtual bool ShowsTotal => true;
+    public virtual bool StackedDisplay => !ShowsTotal;
     public abstract void Setup();
     public abstract void OnMatchMade(List<Match3Tile> matchedTiles);
     public abstract void OnObstacleBreak(Match3ObstacleObject obstacle);
@@ -26,6 +27,9 @@ public abstract class Match3Objective
     public abstract string GetRequirementText();
     public abstract (int, int) GetProgress();
     public virtual void OnScoreChanged(int score) { }
+    public virtual void OnGlitchCleared() { }
+    public virtual void OnVirusCountChanged(int remaining) { }
+    public virtual void OnFuseDefused() { }
 
     public event Action ProgressChanged;
     public event Action Completed;
@@ -207,7 +211,7 @@ public class DestroyObstaclesObjective : Match3Objective
 
     public override void OnObstacleBreak(Match3ObstacleObject obstacle)
     {
-        if (!obstacle || !obstacle.CurrentTile) return;
+        if (!obstacle || !obstacle.CurrentTile || obstacle is Match3VirusObject) return;
         
         _currentAmount++;
 
@@ -369,5 +373,196 @@ public class ReachScoreObjective : Match3Objective
     public override string GetDescription()
     {
         return L10n.Get("objective.score.description", ("amount", requiredAmount));
+    }
+}
+
+[Serializable]
+public class ClearGlitchesObjective : Match3Objective
+{
+    [SerializeField, Min(1)] private int requiredAmount = 5;
+    private int _currentAmount;
+
+    public int RequiredAmount => requiredAmount;
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
+
+    public override void Setup()
+    {
+        _currentAmount = 0;
+        _completed = false;
+    }
+
+    public override void OnGlitchCleared()
+    {
+        if (_completed) return;
+
+        _currentAmount++;
+        if (_currentAmount >= requiredAmount)
+        {
+            _completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
+        }
+    }
+
+    public override (int, int) GetProgress()
+    {
+        return (Mathf.Min(_currentAmount, requiredAmount), requiredAmount);
+    }
+
+    public override void OnMatchMade(List<Match3Tile> matchedTiles)
+    {
+    }
+
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
+    {
+    }
+
+    public override void OnBottomObjectReached(Match3BottomObject bottomObject)
+    {
+    }
+
+    public override string GetRequirementText()
+    {
+        return L10n.Get("objective.glitch.requirement");
+    }
+
+    public override string GetName()
+    {
+        return "Clear Glitches";
+    }
+
+    public override string GetDescription()
+    {
+        return L10n.Get("objective.glitch.description", ("amount", requiredAmount));
+    }
+}
+
+[Serializable]
+public class ClearVirusesObjective : Match3Objective
+{
+    private int _remaining;
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
+    public override bool ShowsTotal => false;
+    public override bool StackedDisplay => false;
+
+    public override void Setup()
+    {
+        _remaining = 0;
+        _completed = false;
+    }
+
+    public override void OnVirusCountChanged(int remaining)
+    {
+        if (_completed) return;
+
+        _remaining = remaining;
+        if (_remaining <= 0)
+        {
+            _completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
+        }
+    }
+
+    public override (int, int) GetProgress()
+    {
+        return (_remaining, _remaining);
+    }
+
+    public override void OnMatchMade(List<Match3Tile> matchedTiles)
+    {
+    }
+
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
+    {
+    }
+
+    public override void OnBottomObjectReached(Match3BottomObject bottomObject)
+    {
+    }
+
+    public override string GetRequirementText()
+    {
+        return L10n.Get("objective.virus.requirement");
+    }
+
+    public override string GetName()
+    {
+        return "Clear Viruses";
+    }
+
+    public override string GetDescription()
+    {
+        return L10n.Get("objective.virus.description");
+    }
+}
+
+[Serializable]
+public class DefuseObjective : Match3Objective
+{
+    [SerializeField, Min(1)] private int requiredAmount = 5;
+    private int _currentAmount;
+
+    public int RequiredAmount => requiredAmount;
+    public override bool AllowOnlyOneObjectiveOfThisType => true;
+
+    public override void Setup()
+    {
+        _currentAmount = 0;
+        _completed = false;
+    }
+
+    public override void OnFuseDefused()
+    {
+        if (_completed) return;
+
+        _currentAmount++;
+        if (_currentAmount >= requiredAmount)
+        {
+            _completed = true;
+            InvokeComplete();
+        }
+        else
+        {
+            InvokeProgressChanged();
+        }
+    }
+
+    public override (int, int) GetProgress()
+    {
+        return (Mathf.Min(_currentAmount, requiredAmount), requiredAmount);
+    }
+
+    public override void OnMatchMade(List<Match3Tile> matchedTiles)
+    {
+    }
+
+    public override void OnObstacleBreak(Match3ObstacleObject obstacle)
+    {
+    }
+
+    public override void OnBottomObjectReached(Match3BottomObject bottomObject)
+    {
+    }
+
+    public override string GetRequirementText()
+    {
+        return L10n.Get("objective.fuse.requirement");
+    }
+
+    public override string GetName()
+    {
+        return "Defuse Fuses";
+    }
+
+    public override string GetDescription()
+    {
+        return L10n.Get("objective.fuse.description", ("amount", requiredAmount));
     }
 }

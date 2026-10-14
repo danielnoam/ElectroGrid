@@ -37,6 +37,8 @@ internal class Match3LevelEditorWindow : EditorWindow
     private GUIStyle _selectedRowStyle;
 
     private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
+    private bool _paintGlitch;
+    private bool _glitchPaintValue;
     private bool _isDragging;
 
     private bool _shapeFoldout;
@@ -445,6 +447,9 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUILayout.PropertyField(_serializedLevel.FindProperty("matchObjects"));
         EditorGUILayout.PropertyField(_serializedLevel.FindProperty("objectives"));
         EditorGUILayout.PropertyField(_serializedLevel.FindProperty("loseConditions"));
+        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("comboBar"));
+        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("fuseMoves"));
+        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("conveyorRows"));
 
         EditorGUILayout.Space(10);
         EditorGUILayout.LabelField("Level Grid", EditorStyles.boldLabel);
@@ -472,9 +477,9 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField(_selectedLevel.name, EditorStyles.boldLabel);
 
-        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying))
         {
-            if (GUILayout.Button("Play This Level", GUILayout.Width(120f)))
+            if (GUILayout.Button(EditorApplication.isPlaying ? "Restart In This Level" : "Play This Level", GUILayout.Width(150f)))
             {
                 var levelToPlay = _selectedLevel;
                 Defer(() => Match3LevelPlayer.Play(levelToPlay));
@@ -517,46 +522,83 @@ internal class Match3LevelEditorWindow : EditorWindow
             _serializedLevel.ApplyModifiedProperties();
         }
 
+        var glitchTilesProp = _serializedLevel.FindProperty("glitchTiles");
+        if (glitchTilesProp.arraySize != requiredSize)
+        {
+            glitchTilesProp.arraySize = requiredSize;
+            _serializedLevel.ApplyModifiedProperties();
+        }
+
         EditorGUILayout.LabelField(Match3LevelGridGUI.BuildCountsLabel(_selectedLevel), Match3LevelGridGUI.RichLabel);
         EditorGUILayout.Space(5);
 
         Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, CellSize);
 
-        HandlePainting(gridRect, grid, tileObjectsProp);
-        Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, CellSize, true);
+        HandlePainting(gridRect, grid, tileObjectsProp, glitchTilesProp);
+        Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, CellSize, true, glitchTilesProp, _selectedLevel);
 
         if (gridRect.Contains(Event.current.mousePosition)) Repaint();
 
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginHorizontal();
-        DrawPaintModeButton("Obstacles", Match3TileObjectType.Obstacle);
-        DrawPaintModeButton("Bottom", Match3TileObjectType.Bottom);
+        var previousIconSize = EditorGUIUtility.GetIconSize();
+        EditorGUIUtility.SetIconSize(new Vector2(18f, 18f));
+        DrawPaintModeButton(Match3TileObjectType.Obstacle);
+        DrawPaintModeButton(Match3TileObjectType.Bottom);
+        DrawPaintModeButton(Match3TileObjectType.Virus);
+        DrawPaintModeButton(Match3TileObjectType.Fuse);
+        DrawGlitchModeButton();
+        EditorGUIUtility.SetIconSize(previousIconSize);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space(5);
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Clear All")) ResetCells(tileObjectsProp, grid, (_, _, _) => true);
-        if (GUILayout.Button("Clear Obstacles")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Obstacle);
-        if (GUILayout.Button("Clear Bottom")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Bottom);
+        if (GUILayout.Button("Clear Double Stars")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Obstacle);
+        if (GUILayout.Button("Clear Square Stars")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Bottom);
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Clear Viruses")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Virus);
+        if (GUILayout.Button("Clear Fuses")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Fuse);
+        if (GUILayout.Button("Clear Glitches"))
+        {
+            for (int i = 0; i < glitchTilesProp.arraySize; i++) glitchTilesProp.GetArrayElementAtIndex(i).boolValue = false;
+            glitchTilesProp.serializedObject.ApplyModifiedProperties();
+            GUI.changed = true;
+        }
         EditorGUILayout.EndHorizontal();
     }
 
-    private void DrawPaintModeButton(string label, Match3TileObjectType mode)
+    private void DrawPaintModeButton(Match3TileObjectType mode)
     {
         Color previousBackground = GUI.backgroundColor;
-        GUI.backgroundColor = _currentPaintMode == mode ? Color.yellow : Color.white;
+        GUI.backgroundColor = !_paintGlitch && _currentPaintMode == mode ? Color.yellow : Color.white;
 
-        if (GUILayout.Button(label, GUILayout.Height(30)))
+        var content = new GUIContent(" " + Match3LevelGridGUI.NameFor(mode), Match3LevelGridGUI.IconFor(mode), $"Paint {Match3LevelGridGUI.NameFor(mode)}s. Click a painted cell again to clear it.");
+        if (GUILayout.Button(content, GUILayout.Height(30)))
         {
-            _currentPaintMode = _currentPaintMode == mode ? Match3TileObjectType.Matchable : mode;
+            _currentPaintMode = !_paintGlitch && _currentPaintMode == mode ? Match3TileObjectType.Matchable : mode;
+            _paintGlitch = false;
         }
 
         GUI.backgroundColor = previousBackground;
     }
 
-    private void HandlePainting(Rect gridRect, Grid grid, SerializedProperty tileObjectsProp)
+    private void DrawGlitchModeButton()
+    {
+        Color previousBackground = GUI.backgroundColor;
+        GUI.backgroundColor = _paintGlitch ? Color.yellow : Color.white;
+
+        var content = new GUIContent(" Glitch", Match3LevelGridGUI.Icon("Glitch"), "Paint glitch tiles. They sit under whatever is on the cell.");
+        if (GUILayout.Button(content, GUILayout.Height(30))) _paintGlitch = !_paintGlitch;
+
+        GUI.backgroundColor = previousBackground;
+    }
+
+    private void HandlePainting(Rect gridRect, Grid grid, SerializedProperty tileObjectsProp, SerializedProperty glitchTilesProp)
     {
         Event e = Event.current;
 
@@ -575,6 +617,19 @@ internal class Match3LevelEditorWindow : EditorWindow
         if (index >= tileObjectsProp.arraySize) return;
 
         if (isPress) _isDragging = true;
+
+        if (_paintGlitch)
+        {
+            if (index >= glitchTilesProp.arraySize) return;
+
+            var glitch = glitchTilesProp.GetArrayElementAtIndex(index);
+            if (isPress) _glitchPaintValue = !glitch.boolValue;
+            glitch.boolValue = _glitchPaintValue;
+            glitchTilesProp.serializedObject.ApplyModifiedProperties();
+            GUI.changed = true;
+            e.Use();
+            return;
+        }
 
         var element = tileObjectsProp.GetArrayElementAtIndex(index);
         var currentType = (Match3TileObjectType)element.enumValueIndex;

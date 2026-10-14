@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using DNExtensions.Utilities;
 using UnityEngine;
 
 [Serializable]
@@ -40,15 +42,48 @@ public class SurvivalTimeSettings
 [Serializable]
 public class SurvivalBonusSettings
 {
-    [Tooltip("Chance, per board refill, that one new piece is a Square Star instead")]
+    [Tooltip("Chance, per board refill, that one new piece is a Square Star instead. Only once a Square Stars milestone is reached")]
     [Range(0f, 100f)] public float squareStarChance = 15f;
     [Min(0)] public int maxSquareStars = 2;
     [Tooltip("Square Stars only appear this high up the board or above (0 is the bottom row, 1 the top), so they have a way to fall")]
     [Range(0f, 1f)] public float squareStarMinHeight = 0.5f;
 
-    [Tooltip("Chance, per board refill, that one new piece is a Double Star instead")]
+    [Tooltip("Chance, per board refill, that one new piece is a Double Star instead. Only once a Double Stars milestone is reached")]
     [Range(0f, 100f)] public float doubleStarChance = 8f;
     [Min(0)] public int maxDoubleStars = 2;
+
+    [Header("Viruses")]
+    [Tooltip("Chance, per board refill, that one new piece is a virus instead. Only once a Viruses milestone is reached")]
+    [Range(0f, 100f)] public float virusChance = 6f;
+    [Tooltip("No new virus spawns while this many are on the board. Spreading can still go past it")]
+    [Min(0)] public int maxViruses = 2;
+
+    [Header("Fuses")]
+    [Tooltip("Chance, per board refill, that one new piece carries a fuse. Only once a Fuses milestone is reached")]
+    [Range(0f, 100f)] public float fuseChance = 4f;
+    [Min(0)] public int maxFuses = 1;
+    [Tooltip("Moves before a fuse blows and ends the run")]
+    [Min(1)] public int fuseMoves = 10;
+}
+
+public enum SurvivalUnlock
+{
+    Piece,
+    Viruses,
+    Fuses,
+    SquareStars,
+    DoubleStars
+}
+
+[Serializable]
+public class SurvivalMilestone
+{
+    [Tooltip("The run score that reaches this milestone")]
+    [Min(0)] public int score;
+    [Tooltip("What starts appearing once the run reaches the score")]
+    public SurvivalUnlock unlock;
+    [Tooltip("The piece that joins the board, as likely as one of the board pieces")]
+    [ShowIf(nameof(unlock), SurvivalUnlock.Piece)] public SOItemData piece;
 }
 
 [CreateAssetMenu(fileName = "SurvivalMode", menuName = "Scriptable Objects/Survival Mode")]
@@ -62,6 +97,8 @@ public class SOSurvivalMode : ScriptableObject
     [SerializeField] private Match3ScoreSettings score = new Match3ScoreSettings();
     [SerializeField] private SurvivalTimeSettings time = new SurvivalTimeSettings();
     [SerializeField] private SurvivalBonusSettings bonuses = new SurvivalBonusSettings();
+    [Tooltip("Scores that unlock something new during a run: a piece, viruses or fuses")]
+    [SerializeField] private List<SurvivalMilestone> milestones = new List<SurvivalMilestone>();
 
     public SOMatch3Level Board => board;
     public Sprite ScoreIcon => scoreIcon;
@@ -69,4 +106,10 @@ public class SOSurvivalMode : ScriptableObject
     public Match3ScoreSettings Score => score;
     public SurvivalTimeSettings Time => time;
     public SurvivalBonusSettings Bonuses => bonuses;
+    public IReadOnlyList<SurvivalMilestone> Milestones => milestones;
+
+    public bool HasMilestone(SurvivalUnlock unlock)
+    {
+        return milestones != null && milestones.Exists(milestone => milestone != null && milestone.unlock == unlock);
+    }
 }

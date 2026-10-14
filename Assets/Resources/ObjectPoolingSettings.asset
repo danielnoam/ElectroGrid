@@ -186,3 +186,63 @@ MonoBehaviour:
     - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
       sceneName: Match3
       scenePath: Assets/1_Scenes/Match3.unity
+  - overridePoolName:
+      isSet: 1
+      hideWhenUnchecked: 0
+      value: VirusObject
+    maxPoolSize: 100
+    prefab: {fileID: 5620589681530227648, guid: fd27c2662fb5a6345bc528251d8e7249, type: 3}
+    dontDestroyOnLoad: 0
+    usePoolHolder: 1
+    recycleActiveObjects: 0
+    preWarmPool: 1
+    preWarmPoolSize: 5
+    scenesToPreWarm:
+    - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+      sceneName: Match3
+      scenePath: Assets/1_Scenes/Match3.unity
+  - overridePoolName:
+      isSet: 1
+      hideWhenUnchecked: 0
+      value: VirusParticle
+    maxPoolSize: 100
+    prefab: {fileID: 2798804331580920947, guid: ba66f5a2a26c4f644b740a243793390d, type: 3}
+    dontDestroyOnLoad: 0
+    usePoolHolder: 1
+    recycleActiveObjects: 0
+    preWarmPool: 1
+    preWarmPoolSize: 4
+    scenesToPreWarm:
+    - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+      sceneName: Match3
+      scenePath: Assets/1_Scenes/Match3.unity
+  - overridePoolName:
+      isSet: 1
+      hideWhenUnchecked: 0
+      value: GlitchParticle
+    maxPoolSize: 100
+    prefab: {fileID: 2798804331580920947, guid: 733f49e13d7620541b5cc89910c735d2, type: 3}
+    dontDestroyOnLoad: 0
+    usePoolHolder: 1
+    recycleActiveObjects: 0
+    preWarmPool: 1
+    preWarmPoolSize: 4
+    scenesToPreWarm:
+    - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+      sceneName: Match3
+      scenePath: Assets/1_Scenes/Match3.unity
+  - overridePoolName:
+      isSet: 1
+      hideWhenUnchecked: 0
+      value: FuseBurst
+    maxPoolSize: 20
+    prefab: {fileID: 4381653546738701173, guid: e4b10a08e320c214b9fb2a96cb2629f3, type: 3}
+    dontDestroyOnLoad: 0
+    usePoolHolder: 1
+    recycleActiveObjects: 0
+    preWarmPool: 1
+    preWarmPoolSize: 2
+    scenesToPreWarm:
+    - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+      sceneName: Match3
+      scenePath: Assets/1_Scenes/Match3.unity

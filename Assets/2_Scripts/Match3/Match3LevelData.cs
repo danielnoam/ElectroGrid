@@ -81,6 +81,30 @@ public class Match3LevelData
         }
     }
 
+    public void OnGlitchCleared()
+    {
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnGlitchCleared();
+        }
+    }
+
+    public void OnVirusCountChanged(int remaining)
+    {
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnVirusCountChanged(remaining);
+        }
+    }
+
+    public void OnFuseDefused()
+    {
+        foreach (var objective in CurrentObjectives)
+        {
+            objective?.OnFuseDefused();
+        }
+    }
+
     public void OnMatchesMade(List<Match3Tile> allMatches)
     {
         PiecesCleared += allMatches.Count;

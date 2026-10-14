@@ -5,5 +5,7 @@ public enum Match3TileObjectType
 {
     Matchable,
     Obstacle,
-    Bottom
+    Bottom,
+    Virus,
+    Fuse
 }

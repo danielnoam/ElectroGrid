@@ -11,13 +11,21 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Match3GameManager match3GameManager;
     [SerializeField] private Match3MatchableObject match3MatchableObjectPrefab;
     [SerializeField] private Match3ObstacleObject match3ObstacleObjectPrefab;
+    [SerializeField] private Match3VirusObject match3VirusObjectPrefab;
     [SerializeField] private Match3BottomObject match3BottomObjectPrefab;
     [SerializeField] private Match3HelperObject match3HelperObjectPrefab;
     [SerializeField] private Match3Tile match3TilePrefab;
     [SerializeField] private SOGridShape defaultGridShape;
+
+    [Header("Conveyor")]
+    [SerializeField] private Material conveyorMaterial;
+    [SerializeField] private Sprite conveyorSprite;
+    [SerializeField, Range(0.1f, 1.2f)] private float conveyorHeight = 0.96f;
+    [SerializeField] private int conveyorSortingOffset = -1;
     
     private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
     private SOGridShape _gridShape;
+    private readonly List<GameObject> _conveyorBelts = new List<GameObject>();
     
     public IReadOnlyDictionary<Vector2Int, Match3Tile> Tiles => _tiles;
     public Grid Grid => GridShape.Grid;
@@ -59,6 +67,13 @@ public class Match3GridHandler : MonoBehaviour
 
                 var tile = CreateTile(tileWorldPosition, tileGridPosition, true);
                 _tiles.Add(tileGridPosition, tile);
+                tile.SetGlitch(level.HasGlitch(x, y));
+
+                if (level.TileHasObjectType(x, y, Match3TileObjectType.Virus))
+                {
+                    CreateVirusObject(tile);
+                    continue;
+                }
                 
                 if (level.TileHasObjectType(x, y, Match3TileObjectType.Obstacle))
                 {
@@ -86,7 +101,65 @@ public class Match3GridHandler : MonoBehaviour
             var tile = CreateTileAsTrash(tileWorldPosition, tileGridPosition);
             _tiles.Add(tileGridPosition, tile);
         }
+        CreateConveyorBelts(level);
         GridCreated?.Invoke(Grid);
+    }
+
+    private void CreateConveyorBelts(SOMatch3Level level)
+    {
+        foreach (var belt in _conveyorBelts)
+        {
+            if (belt) Destroy(belt);
+        }
+        _conveyorBelts.Clear();
+
+        if (!level || level.ConveyorRows == null || level.ConveyorRows.Count == 0) return;
+
+        var material = conveyorMaterial ? conveyorMaterial : Resources.Load<Material>("Materials/ConveyorBelt");
+        var sprite = conveyorSprite ? conveyorSprite : Resources.Load<Sprite>("Sprites/ShapeSquare");
+        if (!material || !sprite) return;
+
+        var tileRenderer = match3TilePrefab.GetComponentInChildren<SpriteRenderer>(true);
+
+        foreach (var conveyor in level.ConveyorRows)
+        {
+            if (conveyor == null || conveyor.row < 0 || conveyor.row >= Grid.Height) continue;
+
+            int minX = -1, maxX = -1;
+            for (int x = 0; x < Grid.Width; x++)
+            {
+                if (!Grid.IsCellActive(x, conveyor.row)) continue;
+                if (minX < 0) minX = x;
+                maxX = x;
+            }
+
+            if (minX < 0 || maxX == minX) continue;
+
+            var left = Grid.GetCellWorldPosition(minX, conveyor.row);
+            var right = Grid.GetCellWorldPosition(maxX, conveyor.row);
+            var beltObject = new GameObject($"Conveyor Row {conveyor.row}");
+            beltObject.transform.position = (left + right) * 0.5f;
+
+            var spriteSize = sprite.bounds.size;
+            float width = Mathf.Abs(right.x - left.x) + Grid.cellSize.x;
+            beltObject.transform.localScale = new Vector3(width / spriteSize.x, Grid.cellSize.y * conveyorHeight / spriteSize.y, 1f);
+
+            var beltRenderer = beltObject.AddComponent<SpriteRenderer>();
+            beltRenderer.sprite = sprite;
+            beltRenderer.sharedMaterial = material;
+            if (tileRenderer)
+            {
+                beltRenderer.sortingLayerID = tileRenderer.sortingLayerID;
+                beltRenderer.sortingOrder = tileRenderer.sortingOrder + conveyorSortingOffset;
+            }
+
+            var block = new MaterialPropertyBlock();
+            block.SetFloat("_Cells", maxX - minX + 1);
+            block.SetFloat("_Direction", conveyor.moveRight ? 1f : -1f);
+            beltRenderer.SetPropertyBlock(block);
+
+            _conveyorBelts.Add(beltObject);
+        }
     }
     
     private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
@@ -134,6 +207,37 @@ public class Match3GridHandler : MonoBehaviour
         obstacle.SetCurrentTile(match3Tile);
 
         return obstacle;
+    }
+
+    public Match3VirusObject CreateVirusObject(Match3Tile match3Tile)
+    {
+        if (!IsValidTile(match3Tile) || !match3VirusObjectPrefab) return null;
+
+        var virusGo = ObjectPooler.GetObjectFromPool(match3VirusObjectPrefab.gameObject, match3Tile.transform.position, Quaternion.identity);
+        var virus = virusGo.GetComponent<Match3VirusObject>();
+
+        virus.Initialize(null, this);
+        match3Tile.SetCurrentItem(virus);
+        virus.SetCurrentTile(match3Tile);
+
+        return virus;
+    }
+
+    public static int ConveyorDirection(SOMatch3Level level, int row)
+    {
+        if (!level || level.ConveyorRows == null) return 0;
+
+        foreach (var conveyor in level.ConveyorRows)
+        {
+            if (conveyor != null && conveyor.row == row) return conveyor.moveRight ? 1 : -1;
+        }
+
+        return 0;
+    }
+
+    public int CountViruses()
+    {
+        return _tiles.Values.Count(tile => tile && tile.IsActive && tile.CurrentMatch3Object is Match3VirusObject);
     }
 
     public Match3BottomObject CreateBottomObject(Match3Tile match3Tile)

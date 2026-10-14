@@ -90,6 +90,6 @@ internal class SOMatch3LevelEditor : UnityEditor.Editor
         EditorGUILayout.Space(4);
 
         Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, PreviewCellSize);
-        Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, PreviewCellSize, false);
+        Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, PreviewCellSize, false, serializedObject.FindProperty("glitchTiles"), (SOMatch3Level)target);
     }
 }

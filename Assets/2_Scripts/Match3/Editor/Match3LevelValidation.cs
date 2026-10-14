@@ -170,18 +170,6 @@ internal static class Match3LevelValidation
                     issues.Add(new Issue(Severity.Error, $"Square Star at ({x},{y}) is in a column that never reaches row 0, so it can never be collected."));
                     continue;
                 }
-
-                for (int below = y - 1; below >= 0; below--)
-                {
-                    if (!grid.IsCellActive(x, below)) continue;
-
-                    if (level.TileHasObjectType(x, below, Match3TileObjectType.Obstacle))
-                    {
-                        issues.Add(new Issue(Severity.Warning, $"Square Star at ({x},{y}) is blocked by a Double Star at ({x},{below}) until that is destroyed."));
-                    }
-
-                    break;
-                }
             }
         }
     }
@@ -190,7 +178,7 @@ internal static class Match3LevelValidation
     {
         int obstacles = level.CountObjectsOfType(Match3TileObjectType.Obstacle);
         int bottoms = level.CountObjectsOfType(Match3TileObjectType.Bottom);
-        int matchable = grid.ActiveCellCount - obstacles - bottoms;
+        int matchable = grid.ActiveCellCount - obstacles - bottoms - level.CountObjectsOfType(Match3TileObjectType.Virus);
 
         if (matchable <= 0)
         {
@@ -203,14 +191,48 @@ internal static class Match3LevelValidation
 
         GetRequiredCounts(level, out int obstaclesNeeded, out int bottomsNeeded);
 
-        if (obstaclesNeeded > obstacles)
+        int viruses = level.CountObjectsOfType(Match3TileObjectType.Virus);
+        int fuses = level.CountObjectsOfType(Match3TileObjectType.Fuse);
+        int glitches = level.CountGlitches();
+
+        foreach (var objective in level.Objectives)
         {
-            issues.Add(new Issue(Severity.Error, $"Objectives need {obstaclesNeeded} Double Stars but only {obstacles} are placed."));
+            if (objective is ClearVirusesObjective && viruses == 0)
+                issues.Add(new Issue(Severity.Error, "Clear Viruses with no viruses placed. The goal would be done before the first move."));
+            if (objective is DefuseObjective defuse && defuse.RequiredAmount != fuses)
+                issues.Add(new Issue(Severity.Error, $"Objectives need {defuse.RequiredAmount} fuses but {fuses} are placed."));
+            if (objective is ClearGlitchesObjective clear && clear.RequiredAmount != glitches)
+                issues.Add(new Issue(Severity.Error, $"Objectives need {clear.RequiredAmount} glitches but {glitches} are painted."));
         }
 
-        if (bottomsNeeded > bottoms)
+        if (fuses > 0 && !level.Objectives.Exists(objective => objective is DefuseObjective))
+            issues.Add(new Issue(Severity.Warning, "Fuses but no Defuse objective. The fuses can still blow and lose the level."));
+
+        if (level.ConveyorRows != null)
         {
-            issues.Add(new Issue(Severity.Error, $"Objectives need {bottomsNeeded} Square Stars but only {bottoms} are placed."));
+            foreach (var conveyor in level.ConveyorRows)
+            {
+                if (conveyor == null) continue;
+                if (conveyor.row < 0 || conveyor.row >= grid.Height)
+                {
+                    issues.Add(new Issue(Severity.Error, $"Conveyor row {conveyor.row} is outside the grid."));
+                    continue;
+                }
+
+                int cells = 0;
+                for (int x = 0; x < grid.Width; x++) if (grid.IsCellActive(x, conveyor.row)) cells++;
+                if (cells < 2) issues.Add(new Issue(Severity.Warning, $"Conveyor row {conveyor.row} has fewer than 2 cells, so nothing moves."));
+            }
+        }
+
+        if (obstaclesNeeded > 0 && obstaclesNeeded != obstacles)
+        {
+            issues.Add(new Issue(Severity.Error, $"Objectives need {obstaclesNeeded} Double Stars but {obstacles} are placed."));
+        }
+
+        if (bottomsNeeded > 0 && bottomsNeeded != bottoms)
+        {
+            issues.Add(new Issue(Severity.Error, $"Objectives need {bottomsNeeded} Square Stars but {bottoms} are placed."));
         }
     }
 }

@@ -103,6 +103,46 @@ MonoBehaviour:
     m_Key: tutorial.combobar.text
     m_Metadata:
       m_Items: []
+  - m_Id: 3159364713046016
+    m_Key: tutorial.glitch.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600448
+    m_Key: tutorial.glitch.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600449
+    m_Key: tutorial.virus.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600450
+    m_Key: tutorial.virus.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600451
+    m_Key: tutorial.fuse.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600452
+    m_Key: tutorial.fuse.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600453
+    m_Key: tutorial.conveyor.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600454
+    m_Key: tutorial.conveyor.text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3274541252993024
+    m_Key: item.diamond
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3277096200691712
+    m_Key: item.trapezoid
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

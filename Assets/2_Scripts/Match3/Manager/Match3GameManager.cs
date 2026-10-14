@@ -61,6 +61,8 @@ public class Match3GameManager : MonoBehaviour
     public Match3Combo Combo => _combo ??= new Match3Combo(comboSettings);
     public bool ComboEnabled => IsSurvival || (currentLevel && currentLevel.ComboBar);
     private Match3Combo _combo;
+    private bool _virusBrokenThisMove;
+    private bool _fuseBlown;
     public Match3LevelData CurrentLevelData => _currentLevelData;
     public bool IsSurvival => currentSurvival;
     public Match3GridHandler GridHandler => gridHandler;
@@ -214,6 +216,8 @@ public class Match3GameManager : MonoBehaviour
         levelComplete = false;
         finishedObjectives = false;
         populatingGrid = false;
+        _virusBrokenThisMove = false;
+        _fuseBlown = false;
         Combo.Clear();
 
         _currentLevelData = new Match3LevelData(currentLevel, currentSurvival);
@@ -240,7 +244,7 @@ public class Match3GameManager : MonoBehaviour
     {
         if (levelComplete || populatingGrid || _currentLevelData == null || finishedObjectives) return;
         
-        if (_currentLevelData.IsAnyLoseConditionMet())
+        if (_fuseBlown || _currentLevelData.IsAnyLoseConditionMet())
         {
             StartCoroutine(FailLevel());
         }
@@ -258,6 +262,7 @@ public class Match3GameManager : MonoBehaviour
     
     public void NotifyMatchesWereMade(List<Match3Tile> matches)
     {
+        foreach (var tile in matches) NotifyTileHit(tile);
         _currentLevelData?.OnMatchesMade(matches);
         if (!levelComplete) _currentLevelData?.Survival?.OnMatches(matches, minMatchCount, Combo.Count);
         AddLevelPoints(Match3SurvivalRun.MatchPoints(levelScoreSettings, Match3SurvivalRun.MatchGroupSizes(matches), minMatchCount));
@@ -282,6 +287,11 @@ public class Match3GameManager : MonoBehaviour
     public void NotifyObstacleBroke(Match3ObstacleObject obstacle)
     {
         _currentLevelData?.OnObstacleBreak(obstacle);
+        if (obstacle is Match3VirusObject)
+        {
+            _virusBrokenThisMove = true;
+            _currentLevelData?.OnVirusCountChanged(gridHandler.CountViruses());
+        }
         if (!levelComplete) _currentLevelData?.Survival?.OnDoubleStarBroken(Combo.Count);
         AddLevelPoints(levelScoreSettings.doubleStarBonus);
     }
@@ -301,6 +311,102 @@ public class Match3GameManager : MonoBehaviour
         LineBreakMade?.Invoke(rows, columns);
     }
     
+
+    /// <summary>A match or a line break landed on this cell, which clears a glitch on it.</summary>
+    public void NotifyTileHit(Match3Tile tile)
+    {
+        if (levelComplete || !tile || !tile.IsGlitched) return;
+
+        tile.SetGlitch(false);
+        tile.PunchTile(1.3f);
+        _currentLevelData?.OnGlitchCleared();
+    }
+
+    public void NotifyFuseDefused(Match3MatchableObject piece)
+    {
+        if (levelComplete) return;
+
+        _currentLevelData?.OnFuseDefused();
+    }
+
+    /// <summary>Puts fuses on the cells the level marks and reports the starting virus count, once the board is filled.</summary>
+    private void ApplyLevelSetup()
+    {
+        if (IsSurvival || !currentLevel || _currentLevelData == null) return;
+
+        var grid = gridHandler.Grid;
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                if (!currentLevel.TileHasObjectType(x, y, Match3TileObjectType.Fuse)) continue;
+
+                var tile = gridHandler.GetTile(new Vector2Int(x, y));
+                if (tile && tile.CurrentMatch3Object is Match3MatchableObject piece) piece.SetFuse(currentLevel.FuseMoves);
+            }
+        }
+
+        _currentLevelData.OnVirusCountChanged(gridHandler.CountViruses());
+    }
+
+    /// <summary>What happens on the board after each move: conveyors shift, viruses spread and fuses burn down.</summary>
+    private IEnumerator EndOfMove()
+    {
+        if (levelComplete) yield break;
+
+        if (!IsSurvival && playHandler.ShiftConveyorRows(currentLevel))
+        {
+            yield return new WaitForSeconds(0.25f);
+            yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches, ComboEnabled ? (System.Action)Combo.AddCascadeWave : null));
+        }
+
+        if (levelComplete) yield break;
+
+        if (!_virusBrokenThisMove && SpreadVirus()) yield return new WaitForSeconds(0.3f);
+
+        foreach (var tile in gridHandler.Tiles.Values)
+        {
+            if (tile && tile.IsActive && tile.CurrentMatch3Object is Match3MatchableObject { HasFuse: true } piece && piece.TickFuse())
+            {
+                _fuseBlown = true;
+                piece.BlowFuse();
+                tile.PunchTile(2f);
+                CameraManager.Instance?.ShakeCamera(1f);
+            }
+        }
+    }
+
+    /// <summary>One virus takes over a neighbouring piece. Fused pieces, Plus and Stars are safe.</summary>
+    private bool SpreadVirus()
+    {
+        var candidates = new List<Match3Tile>();
+        Vector2Int[] directions = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+        foreach (var tile in gridHandler.Tiles.Values)
+        {
+            if (!tile || !tile.IsActive || tile.CurrentMatch3Object is not Match3VirusObject) continue;
+
+            foreach (var direction in directions)
+            {
+                var neighbour = gridHandler.GetTile(tile.GridPosition + direction);
+                if (!gridHandler.IsValidTile(neighbour)) continue;
+                if (neighbour.CurrentMatch3Object is Match3MatchableObject { HasFuse: false }) candidates.Add(neighbour);
+            }
+        }
+
+        if (candidates.Count == 0) return false;
+
+        var target = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        var source = gridHandler.Tiles.Values.FirstOrDefault(tile => tile && tile.CurrentMatch3Object is Match3VirusObject && gridHandler.AreTilesNeighbours(tile, target));
+        var piece = target.CurrentMatch3Object;
+        target.SetCurrentItem(null);
+        piece.DestroyWithAnimation();
+        var virus = gridHandler.CreateVirusObject(target);
+        if (virus && source) virus.SpreadFrom(source.transform.position);
+        target.PunchTile(1.4f);
+        _currentLevelData?.OnVirusCountChanged(gridHandler.CountViruses());
+        return true;
+    }
 
     private void AddLevelPoints(int points)
     {
@@ -396,6 +502,7 @@ public class Match3GameManager : MonoBehaviour
         }
         
         NotifyAMoveWasMade();
+        _virusBrokenThisMove = false;
 
         // The combo countdown stops while this swap resolves, so its cascades can't run out the clock
         Combo.BeginResolve();
@@ -411,6 +518,8 @@ public class Match3GameManager : MonoBehaviour
         yield return StartCoroutine(playHandler.PopulateGrid(currentLevel, gridHandler.GridShape, minPossibleMatches, false));
         
         yield return StartCoroutine(playHandler.HandleMatchesAndRepopulate(currentLevel, gridHandler.GridShape, minPossibleMatches, ComboEnabled ? (System.Action)Combo.AddCascadeWave : null));
+
+        yield return StartCoroutine(EndOfMove());
 
         if (!levelComplete)
         {
@@ -446,7 +555,7 @@ public class Match3GameManager : MonoBehaviour
         if (!currentLevel) yield break;
         
         playHandler.CanInteract = false;
-        gridHandler.CreateGrid(currentLevel, IsSurvival && currentSurvival.Bonuses.squareStarChance > 0f);
+        gridHandler.CreateGrid(currentLevel, IsSurvival && currentSurvival.Bonuses.squareStarChance > 0f && currentSurvival.HasMilestone(SurvivalUnlock.SquareStars));
         populatingGrid = true;
         
         int retryCount = 0;
@@ -474,6 +583,7 @@ public class Match3GameManager : MonoBehaviour
             
             // Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
             yield return playHandler.SpawnGridLayout(gridLayout, true);
+            ApplyLevelSetup();
             gridHandler.OpenCatchers();
             playHandler.CanInteract = true;
             populatingGrid = false;
@@ -491,20 +601,31 @@ public class Match3GameManager : MonoBehaviour
 
         int squareStars = 0;
         int doubleStars = 0;
+        int viruses = 0;
+        int fuses = 0;
         foreach (var tile in gridHandler.Tiles.Values)
         {
             if (!tile || !tile.CurrentMatch3Object) continue;
             if (tile.CurrentMatch3Object is Match3BottomObject) squareStars++;
             else if (tile.CurrentMatch3Object is Match3ObstacleObject) doubleStars++;
+            else if (tile.CurrentMatch3Object is Match3VirusObject) viruses++;
+            else if (tile.CurrentMatch3Object is Match3MatchableObject { HasFuse: true }) fuses++;
         }
 
-        return survival.PickBonus(refillTiles, gridHandler, squareStars, doubleStars);
+        return survival.PickBonus(refillTiles, gridHandler, squareStars, doubleStars, viruses, fuses);
     }
 
-    public void SpawnSurvivalBonus(Match3Tile tile, Match3TileObjectType type)
+    public void SpawnSurvivalBonus(Match3Tile tile, Match3TileObjectType type, SOItemData item)
     {
         if (type == Match3TileObjectType.Bottom) gridHandler.CreateBottomObject(tile);
         else if (type == Match3TileObjectType.Obstacle) gridHandler.CreateObstacleObject(tile);
+        else if (type == Match3TileObjectType.Virus) gridHandler.CreateVirusObject(tile);
+        else if (type == Match3TileObjectType.Fuse)
+        {
+            var piece = gridHandler.CreateMatchableObject(item, tile);
+            if (!piece) return;
+            piece.SetFuse(currentSurvival.Bonuses.fuseMoves);
+        }
         else return;
 
         BonusSpawned?.Invoke(type);

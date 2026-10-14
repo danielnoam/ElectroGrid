@@ -20,6 +20,15 @@ public class Match3SurvivalRun
 
     public event Action<int> ScoreGained;
     public event Action<float> TimeGained;
+    public event Action<SurvivalMilestone> MilestoneReached;
+
+    private readonly List<SurvivalMilestone> _reachedMilestones = new List<SurvivalMilestone>();
+    private readonly List<SOItemData> _unlockedPieces = new List<SOItemData>();
+    public IReadOnlyList<SOItemData> UnlockedPieces => _unlockedPieces;
+    public bool VirusesUnlocked { get; private set; }
+    public bool FusesUnlocked { get; private set; }
+    public bool SquareStarsUnlocked { get; private set; }
+    public bool DoubleStarsUnlocked { get; private set; }
 
     private Match3ScoreSettings ScoreSettings => Mode.Score;
     private SurvivalTimeSettings TimeSettings => Mode.Time;
@@ -32,6 +41,7 @@ public class Match3SurvivalRun
         Timer = new SurvivalTimeLimit(mode.Time.startTime, mode.TimeIcon);
         ScoreDisplay.Setup();
         Timer.Setup();
+        CheckMilestones();
     }
 
     public void Tick(float deltaTime)
@@ -160,6 +170,39 @@ public class Match3SurvivalRun
         Score += gained;
         ScoreDisplay.SetScore(Score);
         ScoreGained?.Invoke(gained);
+        CheckMilestones();
+    }
+
+    private void CheckMilestones()
+    {
+        if (Mode.Milestones == null) return;
+
+        foreach (var milestone in Mode.Milestones)
+        {
+            if (milestone == null || Score < milestone.score || _reachedMilestones.Contains(milestone)) continue;
+
+            _reachedMilestones.Add(milestone);
+            switch (milestone.unlock)
+            {
+                case SurvivalUnlock.Piece:
+                    if (milestone.piece && !_unlockedPieces.Contains(milestone.piece)) _unlockedPieces.Add(milestone.piece);
+                    break;
+                case SurvivalUnlock.Viruses:
+                    VirusesUnlocked = true;
+                    break;
+                case SurvivalUnlock.Fuses:
+                    FusesUnlocked = true;
+                    break;
+                case SurvivalUnlock.SquareStars:
+                    SquareStarsUnlocked = true;
+                    break;
+                case SurvivalUnlock.DoubleStars:
+                    DoubleStarsUnlocked = true;
+                    break;
+            }
+
+            MilestoneReached?.Invoke(milestone);
+        }
     }
 
     private void AddTime(float seconds)
@@ -175,11 +218,11 @@ public class Match3SurvivalRun
     /// Which bonus, if any, should replace one piece of this refill. Square Stars need a column that reaches the bottom
     /// row and a starting cell high enough to fall from.
     /// </summary>
-    public (Match3Tile tile, Match3TileObjectType type) PickBonus(ICollection<Match3Tile> refillTiles, Match3GridHandler grid, int squareStarsOnBoard, int doubleStarsOnBoard)
+    public (Match3Tile tile, Match3TileObjectType type) PickBonus(ICollection<Match3Tile> refillTiles, Match3GridHandler grid, int squareStarsOnBoard, int doubleStarsOnBoard, int virusesOnBoard = 0, int fusesOnBoard = 0)
     {
         if (refillTiles == null || refillTiles.Count == 0 || !grid) return (null, Match3TileObjectType.Matchable);
 
-        bool trySquare = squareStarsOnBoard < BonusSettings.maxSquareStars && UnityEngine.Random.Range(0f, 100f) < BonusSettings.squareStarChance;
+        bool trySquare = SquareStarsUnlocked && squareStarsOnBoard < BonusSettings.maxSquareStars && UnityEngine.Random.Range(0f, 100f) < BonusSettings.squareStarChance;
         if (trySquare)
         {
             int minRow = Mathf.CeilToInt((grid.Grid.Height - 1) * BonusSettings.squareStarMinHeight);
@@ -192,7 +235,21 @@ public class Match3SurvivalRun
             if (candidates.Count > 0) return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Bottom);
         }
 
-        bool tryDouble = doubleStarsOnBoard < BonusSettings.maxDoubleStars && UnityEngine.Random.Range(0f, 100f) < BonusSettings.doubleStarChance;
+        bool tryFuse = FusesUnlocked && fusesOnBoard < BonusSettings.maxFuses && UnityEngine.Random.Range(0f, 100f) < BonusSettings.fuseChance;
+        if (tryFuse)
+        {
+            var candidates = new List<Match3Tile>(refillTiles);
+            return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Fuse);
+        }
+
+        bool tryVirus = VirusesUnlocked && virusesOnBoard < BonusSettings.maxViruses && UnityEngine.Random.Range(0f, 100f) < BonusSettings.virusChance;
+        if (tryVirus)
+        {
+            var candidates = new List<Match3Tile>(refillTiles);
+            return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Virus);
+        }
+
+        bool tryDouble = DoubleStarsUnlocked && doubleStarsOnBoard < BonusSettings.maxDoubleStars && UnityEngine.Random.Range(0f, 100f) < BonusSettings.doubleStarChance;
         if (tryDouble)
         {
             var candidates = new List<Match3Tile>(refillTiles);

@@ -90,6 +90,50 @@ MonoBehaviour:
     m_Localized: "Haz coincidencias r\xE1pidas para subir tu combo y llenar la barra de combo. Tu combo multiplica cada punto que consigues."
     m_Metadata:
       m_Items: []
+  - m_Id: 3159364713046016
+    m_Localized: Fallos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600448
+    m_Localized: "Las casillas con fallo parpadean. Haz una combinaci\xF3n encima de un fallo o alc\xE1nzalo con un rompel\xEDneas para limpiarlo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600449
+    m_Localized: Virus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600450
+    m_Localized: Los virus bloquean tus combinaciones como las estrellas dobles, pero en cada movimiento en que no rompes ninguno, un virus se extiende a una pieza vecina.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600451
+    m_Localized: Mechas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600452
+    m_Localized: "Una mecha baja uno en cada movimiento. Combina su pieza antes de que llegue a 0 o perder\xE1s el nivel."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600453
+    m_Localized: Cintas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600454
+    m_Localized: Las filas con flechas avanzan una casilla tras cada movimiento. Las piezas que llegan al final vuelven a entrar por el principio.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3274541252993024
+    m_Localized: Diamante
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3275166833434624
+    m_Localized: Diamante turquesa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3277096200691712
+    m_Localized: Trapecio
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

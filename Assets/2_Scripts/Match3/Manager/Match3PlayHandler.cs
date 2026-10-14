@@ -633,6 +633,7 @@ public class Match3PlayHandler : MonoBehaviour
                     {
                         var tile = gridHandler.GetTile(new Vector2Int(column, y));
                         if (!tile) continue;
+                        if (tile.IsActive) gameManager.NotifyTileHit(tile);
                         if (!tile.CurrentMatch3Object)
                         {
                             tile.PulseColor(matchColor);
@@ -670,6 +671,7 @@ public class Match3PlayHandler : MonoBehaviour
                     {
                         var tile = gridHandler.GetTile(new Vector2Int(x, row));
                         if (!tile) continue;
+                        if (tile.IsActive) gameManager.NotifyTileHit(tile);
                         if (!tile.CurrentMatch3Object)
                         {
                             tile.PulseColor(matchColor);
@@ -758,6 +760,52 @@ public class Match3PlayHandler : MonoBehaviour
         } while (objectsMoved);
     }
     
+    /// <summary>
+    /// Moves everything on each conveyor row one cell along, wrapping round the row. Double Stars, viruses and Square Stars
+    /// stay where they are and the rest of the row moves past them. True if anything moved.
+    /// </summary>
+    public bool ShiftConveyorRows(SOMatch3Level level)
+    {
+        if (!level || level.ConveyorRows == null || level.ConveyorRows.Count == 0) return false;
+
+        ReleaseObject(false);
+        bool moved = false;
+
+        foreach (var conveyor in level.ConveyorRows)
+        {
+            if (conveyor == null) continue;
+
+            var cells = new List<Match3Tile>();
+            for (int x = 0; x < gridHandler.Grid.Width; x++)
+            {
+                var tile = gridHandler.GetTile(new Vector2Int(x, conveyor.row));
+                if (!gridHandler.IsValidTile(tile)) continue;
+                if (tile.CurrentMatch3Object && (!tile.CurrentMatch3Object.IsMovable || tile.CurrentMatch3Object is Match3BottomObject)) continue;
+                cells.Add(tile);
+            }
+
+            if (cells.Count < 2) continue;
+
+            var objects = cells.Select(tile => tile.CurrentMatch3Object).ToList();
+            int step = conveyor.moveRight ? 1 : -1;
+
+            foreach (var tile in cells) tile.SetCurrentItem(null);
+
+            for (int i = 0; i < cells.Count; i++)
+            {
+                var item = objects[i];
+                if (!item) continue;
+
+                var target = cells[((i + step) % cells.Count + cells.Count) % cells.Count];
+                target.SetCurrentItem(item);
+                item.SetCurrentTile(target);
+                moved = true;
+            }
+        }
+
+        return moved;
+    }
+
     public IEnumerator ClearObjects()
     {
         var tiles = gridHandler.Tiles.Values.Where(t => t.HasObject).ToList();
@@ -775,7 +823,7 @@ public class Match3PlayHandler : MonoBehaviour
         ReleaseObject(false);
 
         var tiles = gridHandler.Tiles.Values
-            .Where(tile => tile.HasObject && tile.CurrentMatch3Object is Match3MatchableObject)
+            .Where(tile => tile.HasObject && tile.CurrentMatch3Object is Match3MatchableObject { HasFuse: false })
             .ToList();
 
         if (tiles.Count == 0) yield break;
@@ -853,7 +901,7 @@ public class Match3PlayHandler : MonoBehaviour
 
                 do
                 {
-                    selectedItem = level.MatchObjects.GetRandomItem();
+                    selectedItem = RandomItem(level);
                     attempts++;
             
                     if (attempts >= gameManager.MaxAttemptsToRecheckMatches)
@@ -925,7 +973,7 @@ public class Match3PlayHandler : MonoBehaviour
                 {
                     if (tileObjectMatch.Key == bonus.tile)
                     {
-                        gameManager.SpawnSurvivalBonus(bonus.tile, bonus.type);
+                        gameManager.SpawnSurvivalBonus(bonus.tile, bonus.type, tileObjectMatch.Value);
                     }
                     else if (ShouldSpawnHelperObject() && !spawnedHelperAlready)
                     {
@@ -989,6 +1037,20 @@ public class Match3PlayHandler : MonoBehaviour
         return pairs;
     }
 
+    private SOItemData RandomItem(SOMatch3Level level)
+    {
+        var extra = gameManager.CurrentLevelData?.Survival?.UnlockedPieces;
+        if (extra == null || extra.Count == 0) return level.MatchObjects.GetRandomItem();
+
+        int pick = Random.Range(0, level.MatchObjects.Count + extra.Count);
+        return pick < level.MatchObjects.Count ? level.MatchObjects.GetRandomItem() : extra[pick - level.MatchObjects.Count];
+    }
+
+    private int ItemCount(SOMatch3Level level)
+    {
+        return level.MatchObjects.Count + (gameManager.CurrentLevelData?.Survival?.UnlockedPieces.Count ?? 0);
+    }
+
     private SOItemData GetForcedItemForGuaranteedMatch(Vector2Int position, 
         List<(Vector2Int posA, Vector2Int posB)> guaranteedPairs, 
         Dictionary<Match3Tile, SOItemData> tilesToPopulate, 
@@ -1005,7 +1067,7 @@ public class Match3PlayHandler : MonoBehaviour
                 
                 if (gridHandler.IsValidTile(thirdTile))
                 {
-                    var itemData = level.MatchObjects.GetRandomItem();
+                    var itemData = RandomItem(level);
                     
                     if (tilesToPopulate.ContainsKey(thirdTile))
                     {
@@ -1023,8 +1085,8 @@ public class Match3PlayHandler : MonoBehaviour
                     SOItemData differentItem;
                     do
                     {
-                        differentItem = level.MatchObjects.GetRandomItem();
-                    } while (differentItem == tilesToPopulate[tileA] && level.MatchObjects.Count > 1);
+                        differentItem = RandomItem(level);
+                    } while (differentItem == tilesToPopulate[tileA] && ItemCount(level) > 1);
                     
                     return differentItem;
                 }

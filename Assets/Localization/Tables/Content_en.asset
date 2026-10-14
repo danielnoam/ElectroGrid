@@ -90,6 +90,50 @@ MonoBehaviour:
     m_Localized: Match again quickly to grow your combo and fill the combo bar. Your combo multiplies every point you score.
     m_Metadata:
       m_Items: []
+  - m_Id: 3159364713046016
+    m_Localized: Glitches
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600448
+    m_Localized: Glitched cells flicker. Make a match on top of a glitch or hit it with a line break to clear it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600449
+    m_Localized: Viruses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600450
+    m_Localized: Viruses block your matches like Double Stars, but every move you don't break one, a virus spreads to a piece next to it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600451
+    m_Localized: Fuses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600452
+    m_Localized: A fuse counts down by one every move. Match its piece before it reaches 0, or the level is lost.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600453
+    m_Localized: Conveyors
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600454
+    m_Localized: Rows with arrows move one cell along after every move. Pieces that reach the end come back in at the start.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3274541252993024
+    m_Localized: Diamond
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3275166833434624
+    m_Localized: Teal Diamond
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3277096200691712
+    m_Localized: Trapezoid
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f1b43a145a04e729c1b4bdcefcab301, type: 3}
+  m_Name: Level_46
+  m_EditorClassIdentifier: Assembly-CSharp::SOMatch3Level
+  levelName: Level 46
+  gridShape: {fileID: 11400000, guid: 249967330e7ef524992d019e2f9000b7, type: 2}
+  matchObjects:
+    internalItems:
+    - item: {fileID: 11400000, guid: 06c7eecdb5f79c542a8465be434742cc, type: 2}
+      chance: 25
+      isLocked: 0
+    - item: {fileID: 11400000, guid: 722fd8be5dc57954fa27ae90745cf7fb, type: 2}
+      chance: 25
+      isLocked: 0
+    - item: {fileID: 11400000, guid: 77f3a0176c25eb544a29ff2d11409f4d, type: 2}
+      chance: 25
+      isLocked: 0
+    - item: {fileID: 11400000, guid: 9fea70a12a1878d4d9aced044654ddc3, type: 2}
+      chance: 25
+      isLocked: 0
+  objectives:
+  - rid: 5242841204944011292
+  - rid: 5242841204944011293
+  loseConditions:
+  - rid: 5242841200272080954
+  comboBar: 0
+  fuseMoves: 8
+  conveyorRows: []
+  tileObjects: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000i
+  glitchTiles: 000100000000000100010100000000000101010100000000000101010100000000000101000000000000000000010100000000000101010100000000000101010100000000000101000100000000000100y
+  references:
+    version: 2
+    RefIds:
+    - rid: 5242841200272080954
+      type: {class: TimeLimit, ns: , asm: Assembly-CSharp}
+      data:
+        conditionSprite: {fileID: 0}
+        allowedTime: 45
+    - rid: 5242841204944011292
+      type: {class: ClearGlitchesObjective, ns: , asm: Assembly-CSharp}
+      data:
+        objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: 249967330e7ef524992d019e2f9000b7, type: 2}
+        requiredAmount: 28
+    - rid: 5242841204944011293
+      type: {class: DestroyObstaclesObjective, ns: , asm: Assembly-CSharp}
+      data:
+        objectiveSprite: {fileID: 0}
+        gridShape: {fileID: 11400000, guid: 249967330e7ef524992d019e2f9000b7, type: 2}
+        requiredAmount: 5

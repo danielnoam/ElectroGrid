@@ -13,6 +13,7 @@ internal static class Match3LevelPlayer
 {
     private const string ScenePathKey = "ElectroGrid.LevelEditor.PlayScenePath";
     private const string RestorePathKey = "ElectroGrid.LevelEditor.PlayRestorePath";
+    private const string PendingLevelKey = "ElectroGrid.LevelEditor.PendingLevel";
     private const string OverrideProperty = "overrideLevel";
 
     static Match3LevelPlayer()
@@ -20,12 +21,33 @@ internal static class Match3LevelPlayer
         EditorApplication.playModeStateChanged += OnPlayModeChanged;
     }
 
+    /// <summary>Plays the level. While the game is running it stops play mode first and starts again in this level.</summary>
     public static void Play(SOMatch3Level level)
     {
-        if (!level || EditorApplication.isPlayingOrWillChangePlaymode) return;
+        if (!level) return;
+
+        if (EditorApplication.isPlaying)
+        {
+            SessionState.SetString(PendingLevelKey, AssetDatabase.GetAssetPath(level));
+            EditorApplication.ExitPlaymode();
+            return;
+        }
+
+        if (EditorApplication.isPlayingOrWillChangePlaymode) return;
 
         // Loading a scene tears down the GUI, so never do it inside an editor window's repaint
-        EditorApplication.delayCall += () => PlayNow(level);
+        RunNextUpdate(() => PlayNow(level));
+    }
+
+    private static void RunNextUpdate(System.Action action)
+    {
+        EditorApplication.CallbackFunction callback = null;
+        callback = () =>
+        {
+            EditorApplication.update -= callback;
+            action();
+        };
+        EditorApplication.update += callback;
     }
 
     private static void PlayNow(SOMatch3Level level)
@@ -70,6 +92,16 @@ internal static class Match3LevelPlayer
     {
         if (change != PlayModeStateChange.EnteredEditMode) return;
 
+        RestoreOverride();
+
+        string pendingPath = SessionState.GetString(PendingLevelKey, string.Empty);
+        SessionState.EraseString(PendingLevelKey);
+        var pending = string.IsNullOrEmpty(pendingPath) ? null : AssetDatabase.LoadAssetAtPath<SOMatch3Level>(pendingPath);
+        if (pending) RunNextUpdate(() => PlayNow(pending));
+    }
+
+    private static void RestoreOverride()
+    {
         string scenePath = SessionState.GetString(ScenePathKey, string.Empty);
         if (string.IsNullOrEmpty(scenePath)) return;
 

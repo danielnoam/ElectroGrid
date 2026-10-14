@@ -193,6 +193,13 @@ MonoBehaviour:
   inactiveSprite: {fileID: 21300000, guid: f4579f688b18fa847b51a5cddaca9fda, type: 3}
   punchScaleAmount: 1.1
   punchDuration: 0.2
+  lineBreakPulseDuration: 0.45
+  lineBreakPulseAlpha: 0.8
+  glitchMaterial: {fileID: 2100000, guid: 8185dc25cc6e03e4e82d6a171386eb23, type: 2}
+  glitchSprite: {fileID: 21300000, guid: 7bd91b4c5e24b96468ef779d3cebca3f, type: 3}
+  glitchClearParticle: {fileID: 243077210646262330, guid: 733f49e13d7620541b5cc89910c735d2, type: 3}
+  glitchClearDuration: 0.3
+  glitchSize: 0.98
   squashScaleAmount: 0.7
   squashDuration: 0.15
   spriteRenderer: {fileID: 2548959169750997435}

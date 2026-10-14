@@ -23,6 +23,13 @@ public class Match3Tile : MonoBehaviour, IPoolable
     [SerializeField] private float lineBreakPulseDuration = 0.45f;
     [SerializeField, Range(0f, 1f)] private float lineBreakPulseAlpha = 0.8f;
     
+    [Header("Glitch")]
+    [SerializeField] private Material glitchMaterial;
+    [SerializeField] private Sprite glitchSprite;
+    [SerializeField] private PoolableParticleSystem glitchClearParticle;
+    [SerializeField, Min(0.01f)] private float glitchClearDuration = 0.3f;
+    [SerializeField, Min(0.01f)] private float glitchSize = 0.98f;
+
     [Header("Squash Settings")]
     [SerializeField] private float squashScaleAmount = 0.7f;
     [SerializeField] private float squashDuration = 0.15f;
@@ -45,12 +52,17 @@ public class Match3Tile : MonoBehaviour, IPoolable
     private Sequence _pulseSequence;
     private Tween _trashTween;
     private Sequence _colorSequence;
+    private bool _glitched;
+    private SpriteRenderer _glitchOverlay;
+    private MaterialPropertyBlock _glitchBlock;
+    private Sequence _glitchSequence;
     
     public Vector2Int GridPosition => gridPosition;
     public Match3Object CurrentMatch3Object => _currentMatch3Object;
     public bool CanSelect => isActive && _currentMatch3Object && !_isSelected && _currentMatch3Object.IsSwappable;
     public bool IsActive => isActive;
     public bool HasObject => isActive && _currentMatch3Object;
+    public bool IsGlitched => _glitched;
 
 
     private void Awake()
@@ -74,6 +86,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
         _isSelected = false;
         _isHovered = false;
         isActive = active;
+        HideGlitch();
         ToggleTrash(false);
         
         UpdateVisuals();
@@ -93,6 +106,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
         _isSelected = false;
         _isHovered = false;
         isActive = false;   
+        HideGlitch();
         ToggleTrash(true);
         
         UpdateVisuals();
@@ -167,6 +181,84 @@ public class Match3Tile : MonoBehaviour, IPoolable
         }
     }
     
+    public void SetGlitch(bool glitched)
+    {
+        bool wasGlitched = _glitched;
+        _glitched = glitched && isActive;
+
+        if (_glitched)
+        {
+            ShowGlitch();
+            return;
+        }
+
+        if (wasGlitched) ClearGlitchWithEffect();
+        else HideGlitch();
+    }
+
+    private void ShowGlitch()
+    {
+        EnsureGlitchOverlay();
+        _glitchSequence.Stop();
+        _glitchOverlay.gameObject.SetActive(true);
+        _glitchOverlay.transform.localScale = Vector3.one * glitchSize;
+        SetGlitchProperties(UnityEngine.Random.value * 100f, 1f);
+    }
+
+    private void HideGlitch()
+    {
+        _glitched = false;
+        _glitchSequence.Stop();
+        if (_glitchOverlay) _glitchOverlay.gameObject.SetActive(false);
+    }
+
+    private void ClearGlitchWithEffect()
+    {
+        if (!_glitchOverlay)
+        {
+            HideGlitch();
+            return;
+        }
+
+        if (glitchClearParticle)
+        {
+            var particleGo = ObjectPooler.GetObjectFromPool(glitchClearParticle.gameObject, transform.position, Quaternion.identity);
+            particleGo.GetComponent<PoolableParticleSystem>().Play(transform.position);
+        }
+
+        _glitchSequence.Stop();
+        _glitchSequence = Sequence.Create()
+            .Group(Tween.Scale(_glitchOverlay.transform, Vector3.one * glitchSize * 1.35f, glitchClearDuration, Ease.OutQuad))
+            .Group(Tween.Custom(1f, 0f, glitchClearDuration, value => SetGlitchProperties(null, value), Ease.InQuad))
+            .ChainCallback(() =>
+            {
+                if (_glitchOverlay) _glitchOverlay.gameObject.SetActive(false);
+            });
+    }
+
+    private void SetGlitchProperties(float? seed, float intensity)
+    {
+        _glitchBlock ??= new MaterialPropertyBlock();
+        _glitchOverlay.GetPropertyBlock(_glitchBlock);
+        if (seed.HasValue) _glitchBlock.SetFloat("_Seed", seed.Value);
+        _glitchBlock.SetFloat("_Intensity", intensity);
+        _glitchOverlay.SetPropertyBlock(_glitchBlock);
+    }
+
+    private void EnsureGlitchOverlay()
+    {
+        if (_glitchOverlay) return;
+
+        var overlay = new GameObject("Glitch");
+        overlay.transform.SetParent(transform, false);
+        overlay.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+        _glitchOverlay = overlay.AddComponent<SpriteRenderer>();
+        _glitchOverlay.sprite = glitchSprite ? glitchSprite : Resources.Load<Sprite>("Sprites/ShapeSquare");
+        _glitchOverlay.sharedMaterial = glitchMaterial ? glitchMaterial : Resources.Load<Material>("Materials/Glitch");
+        _glitchOverlay.sortingLayerID = SortingLayer.NameToID("Object");
+        _glitchOverlay.sortingOrder = 10;
+    }
+
     public void SetHovered(bool hovered)
     {
         if (!CanSelect) return;
@@ -225,6 +317,7 @@ public class Match3Tile : MonoBehaviour, IPoolable
         _pulseSequence.Stop();
         _colorSequence.Stop();
         _trashTween.Stop();
+        _glitchSequence.Stop();
         if (_match3GridHandler) _match3GridHandler.GridDestroyed -= OnGridDestroyed;
     }
 

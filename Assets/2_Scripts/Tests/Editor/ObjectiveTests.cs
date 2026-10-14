@@ -356,6 +356,47 @@ public class ObjectiveTests
     }
 
     [Test]
+    public void ClearGlitches_CompletesAfterEnoughGlitches()
+    {
+        var objective = Objective<ClearGlitchesObjective>(3);
+
+        objective.OnGlitchCleared();
+        objective.OnGlitchCleared();
+        Assert.That(objective.IsCompleted, Is.False);
+        Assert.That(objective.GetProgress(), Is.EqualTo((2, 3)));
+
+        objective.OnGlitchCleared();
+        Assert.That(objective.IsCompleted, Is.True);
+    }
+
+    [Test]
+    public void ClearViruses_CompletesOnlyWhenNoneAreLeft()
+    {
+        var objective = new ClearVirusesObjective();
+        objective.Setup();
+
+        objective.OnVirusCountChanged(3);
+        objective.OnVirusCountChanged(4);
+        Assert.That(objective.IsCompleted, Is.False);
+        Assert.That(objective.GetProgress().Item1, Is.EqualTo(4));
+
+        objective.OnVirusCountChanged(0);
+        Assert.That(objective.IsCompleted, Is.True);
+    }
+
+    [Test]
+    public void Defuse_CountsDefusedFuses()
+    {
+        var objective = Objective<DefuseObjective>(2);
+
+        objective.OnFuseDefused();
+        Assert.That(objective.IsCompleted, Is.False);
+
+        objective.OnFuseDefused();
+        Assert.That(objective.IsCompleted, Is.True);
+    }
+
+    [Test]
     public void ReachScore_CompletesAtTheRequiredScore()
     {
         var objective = Objective<ReachScoreObjective>(500);

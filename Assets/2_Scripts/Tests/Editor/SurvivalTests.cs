@@ -137,4 +137,99 @@ public class SurvivalTests
 
         Assert.AreEqual(5, _run.BestCombo);
     }
+
+    [Test]
+    public void PiecesUnlockAtTheirMilestone()
+    {
+        var piece = ScriptableObject.CreateInstance<SOItemData>();
+        try
+        {
+            _mode.Score.plusBonus = 100;
+            SetMilestones(new SurvivalMilestone { score = 200, unlock = SurvivalUnlock.Piece, piece = piece });
+            var run = new Match3SurvivalRun(_mode);
+            SurvivalMilestone reached = null;
+            run.MilestoneReached += m => reached = m;
+
+            run.OnPlusDestroyed(1);
+            Assert.AreEqual(0, run.UnlockedPieces.Count);
+
+            run.OnPlusDestroyed(1);
+            Assert.AreEqual(1, run.UnlockedPieces.Count);
+            Assert.AreSame(piece, run.UnlockedPieces[0]);
+            Assert.AreSame(piece, reached.piece);
+
+            run.OnPlusDestroyed(1);
+            Assert.AreEqual(1, run.UnlockedPieces.Count);
+        }
+        finally
+        {
+            Object.DestroyImmediate(piece);
+        }
+    }
+
+    [Test]
+    public void VirusesOnlySpawnAfterTheirMilestone()
+    {
+        using var board = new Match3TestBoard("AB", "BA");
+        _mode.Bonuses.squareStarChance = 0f;
+        _mode.Bonuses.doubleStarChance = 0f;
+        _mode.Bonuses.fuseChance = 0f;
+        _mode.Bonuses.virusChance = 100f;
+        SetMilestones(new SurvivalMilestone { score = 100, unlock = SurvivalUnlock.Viruses });
+        _run = new Match3SurvivalRun(_mode);
+        _mode.Score.plusBonus = 100;
+        var tiles = new System.Collections.Generic.List<Match3Tile>(board.GridHandler.Tiles.Values);
+
+        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+
+        _run.OnPlusDestroyed(1);
+        Assert.AreEqual(Match3TileObjectType.Virus, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0, _mode.Bonuses.maxViruses).type);
+    }
+
+    [Test]
+    public void FusesOnlySpawnAfterTheirMilestone()
+    {
+        using var board = new Match3TestBoard("AB", "BA");
+        _mode.Bonuses.squareStarChance = 0f;
+        _mode.Bonuses.doubleStarChance = 0f;
+        _mode.Bonuses.virusChance = 0f;
+        _mode.Bonuses.fuseChance = 100f;
+        SetMilestones(new SurvivalMilestone { score = 200, unlock = SurvivalUnlock.Fuses });
+        _run = new Match3SurvivalRun(_mode);
+        _mode.Score.plusBonus = 100;
+        var tiles = new System.Collections.Generic.List<Match3Tile>(board.GridHandler.Tiles.Values);
+
+        _run.OnPlusDestroyed(1);
+        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+
+        _run.OnPlusDestroyed(1);
+        Assert.AreEqual(Match3TileObjectType.Fuse, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+    }
+
+    [Test]
+    public void DoubleStarsOnlySpawnAfterTheirMilestone()
+    {
+        using var board = new Match3TestBoard("AB", "BA");
+        _mode.Bonuses.squareStarChance = 0f;
+        _mode.Bonuses.virusChance = 0f;
+        _mode.Bonuses.fuseChance = 0f;
+        _mode.Bonuses.doubleStarChance = 100f;
+        _mode.Score.plusBonus = 100;
+        var tiles = new System.Collections.Generic.List<Match3Tile>(board.GridHandler.Tiles.Values);
+
+        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+
+        SetMilestones(new SurvivalMilestone { score = 100, unlock = SurvivalUnlock.DoubleStars });
+        _run = new Match3SurvivalRun(_mode);
+        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+
+        _run.OnPlusDestroyed(1);
+        Assert.AreEqual(Match3TileObjectType.Obstacle, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
+    }
+
+    private void SetMilestones(params SurvivalMilestone[] milestones)
+    {
+        TestUtils.SetField(_mode, "milestones", new System.Collections.Generic.List<SurvivalMilestone>(milestones));
+    }
 }

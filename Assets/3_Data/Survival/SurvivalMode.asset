@@ -59,3 +59,27 @@ MonoBehaviour:
     squareStarMinHeight: 0.5
     doubleStarChance: 8
     maxDoubleStars: 2
+    virusChance: 6
+    maxViruses: 2
+    fuseChance: 4
+    maxFuses: 1
+    fuseMoves: 10
+  milestones:
+  - score: 0
+    unlock: 3
+    piece: {fileID: 0}
+  - score: 0
+    unlock: 4
+    piece: {fileID: 0}
+  - score: 25000
+    unlock: 0
+    piece: {fileID: 11400000, guid: 0b8b058a55e7abc488bcf3cb3d382948, type: 2}
+  - score: 40000
+    unlock: 1
+    piece: {fileID: 0}
+  - score: 60000
+    unlock: 0
+    piece: {fileID: 11400000, guid: 287f40165846c404a986966a6f3f211b, type: 2}
+  - score: 75000
+    unlock: 2
+    piece: {fileID: 0}

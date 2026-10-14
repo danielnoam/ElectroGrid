@@ -90,6 +90,50 @@ MonoBehaviour:
     m_Localized: "Fa\xE7a combina\xE7\xF5es r\xE1pidas para aumentar seu combo e encher a barra de combo. Seu combo multiplica cada ponto que voc\xEA faz."
     m_Metadata:
       m_Items: []
+  - m_Id: 3159364713046016
+    m_Localized: Falhas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600448
+    m_Localized: "As casas com falha piscam. Fa\xE7a uma combina\xE7\xE3o em cima de uma falha ou acerte-a com um quebra-linha para limp\xE1-la."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600449
+    m_Localized: "V\xEDrus"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600450
+    m_Localized: "Os v\xEDrus bloqueiam suas combina\xE7\xF5es como as estrelas duplas, mas a cada movimento em que voc\xEA n\xE3o quebra nenhum, um v\xEDrus se espalha para uma pe\xE7a vizinha."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600451
+    m_Localized: Pavios
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600452
+    m_Localized: "Um pavio diminui um a cada movimento. Combine a pe\xE7a dele antes que chegue a 0, ou voc\xEA perde a fase."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600453
+    m_Localized: Esteiras
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600454
+    m_Localized: "As linhas com setas andam uma casa depois de cada movimento. As pe\xE7as que chegam ao fim voltam pelo come\xE7o."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3274541252993024
+    m_Localized: Diamante
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3275166833434624
+    m_Localized: Diamante turquesa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3277096200691712
+    m_Localized: "Trap\xE9zio"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

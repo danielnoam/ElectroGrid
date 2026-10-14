@@ -73,7 +73,12 @@ and the level select rework is where the Survival entry would go (it is on the m
       goes to Firebase with score and duration. Code: `Match3SurvivalRun`
       (scoring, clock, spawns, 11 EditMode tests), `SurvivalScoreObjective` and
       `SurvivalTimeLimit` (the top bar shows them like any objective).
-      Numbers playtested 2026-10-11. Still to do:
+      Unlocks are now score **Milestones** on `SurvivalMode`: each entry is a
+      score and what it unlocks (a piece, viruses, fuses, Square Stars or Double
+      Stars). Set now: Stars at 0, Diamond 25,000, viruses 40,000, Trapezoid
+      60,000, fuses 75,000 (a blown fuse ends the run). Thresholds need a
+      playtest on the phone. Numbers playtested 2026-10-11. Still to do: a
+      pop-in when a milestone unlocks (`MilestoneReached` is already raised),
       decide whether to show the best score on the menu, and a Steam
       leaderboard later (section 3).
 
@@ -89,12 +94,28 @@ and the level select rework is where the Survival entry would go (it is on the m
       subscribed levels from their install folders, and keep player levels
       out of the main level list and progress.
 
+- [ ] **Spark and Surge power-ups.** An L or T match leaves a Spark (clears a
+      3x3 area when matched or swapped), 5 in a row leaves a Surge (swap it
+      with a piece to clear every piece of that colour). Today a match of 5
+      is just a bigger line break. Agreed with Daniel to do later; the Drone
+      (2x2) was dropped because Plus already fills the helper role.
+
+- [ ] **New-mechanic visuals, what is left.** Shaders for glitches (`Glitch.shader`),
+      fuse rings (`FuseRing.shader`) and conveyor belts (`ConveyorBelt.shader`),
+      a real virus sprite with a glow mask, spread and glitch-clear particles are
+      in. Still to do: sounds for a glitch clearing, a virus spreading and a fuse
+      blowing, and nicer Info card icons (the glitch, fuse and conveyor ones are
+      still drawn in code).
+
+- [ ] **Separate win and lose endings.** Winning and losing a level play the
+      same end-of-level animation right now. Winning should feel like a
+      celebration and losing like a power-down, so the result reads before the
+      results screen even appears.
+
 ### Content, not engineering
 
-- **Fifteen levels is roughly 30 minutes of play.** The level painter and 16 grid
-  shapes are already there, several shapes unused by any level. Note also that
-  `GetSpecificItemMatches` now works (an ordering bug meant it could never score)
-  and no level uses it yet.
+- **50 levels are in** (see LEVELS.md). `GetSpecificItemMatches` is left
+  unused on purpose: it played badly, so levels use Get Matches instead.
 
 ---
 

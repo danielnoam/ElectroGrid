@@ -147,7 +147,7 @@ public class TopBarUI : MonoBehaviour
             if (objective.ShowsTotal) uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress());
             else uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress().Item1);
             uiElement.gameObject.name = objective.GetName();
-            if (objective.ShowsTotal) uiElement.UseCompactRow();
+            if (!objective.StackedDisplay) uiElement.UseCompactRow();
             else uiElement.UseStackedLayout();
             _currentObjectives.Add(objective, uiElement);
         

@@ -8,7 +8,11 @@ public enum Match3TutorialTrigger
     LevelHasBottomObjects,
     HelperSpawned,
     LineBreakMade,
-    SurvivalStart
+    SurvivalStart,
+    LevelHasGlitches,
+    LevelHasViruses,
+    LevelHasFuses,
+    LevelHasConveyors
 }
 
 [CreateAssetMenu(fileName = "New Match3 Tutorial", menuName = "Scriptable Objects/Match3 Tutorial")]

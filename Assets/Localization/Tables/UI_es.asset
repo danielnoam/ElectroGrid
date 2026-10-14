@@ -439,6 +439,32 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141697
+  - m_Id: 3163188689362944
+    m_Localized: 'Fallos:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188735500288
+    m_Localized: Limpia {amount} fallos
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141697
+  - m_Id: 3163188735500289
+    m_Localized: 'Virus:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188735500290
+    m_Localized: Elimina todos los virus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188739694592
+    m_Localized: 'Mechas:'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188739694593
+    m_Localized: Desactiva {amount} mechas
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141697
   references:
     version: 2
     RefIds:
@@ -475,3 +501,5 @@ MonoBehaviour:
         - id: 2148975749619712
         - id: 2432872249024513
         - id: 2792580076003328
+        - id: 3163188735500288
+        - id: 3163188739694593

@@ -34,13 +34,33 @@ validates, and can play a level directly.
 - **Gravity** is straight down per column. Pieces fall through switched-off
   cells, so a column with a gap still refills (Hourglass and Hollow Square
   rely on this). New pieces fill whatever is empty after the fall.
-- **Double Stars** (obstacles) don't move, can't be swapped, and break when a
+- **Viruses, fuses and conveyors**
+
+- Give viruses room to be reached: a virus walled in by Double Stars spreads
+  with nothing you can do about it.
+- Fuse Moves should leave time to set up a match, 7 or more for a first
+  meeting. Put fuses where a match can reach them in a move or two.
+- Keep Double Stars off conveyor rows unless the point is to split the row.
+
+**Double Stars** (obstacles) don't move, can't be swapped, and break when a
   match happens next to them or a line break passes through them. One hit
   each. Pieces above a Double Star can't fall past it, so the cells under it
   only refill from new spawns.
 - **Square Stars** fall like pieces and are collected when they reach the
   bottom row of their column. The catchers under the board open when a level
   has Square Stars.
+- **Glitches** are a layer painted on cells (Glitch paint mode). A match on
+  the cell or a line break through it clears it. The cell flickers cyan until
+  then.
+- **Viruses** sit still and break like Double Stars, but after every move in
+  which no virus broke, one spreads onto a neighbouring piece. Fused pieces,
+  Plus and Stars are safe from it.
+- **Fuses** are painted on cells and land on whatever piece fills that cell.
+  The number drops by one every move; matching the piece defuses it, and
+  reaching 0 loses the level. The count is the level's Fuse Moves setting.
+- **Conveyor rows** (Conveyor Rows list, row 0 is the bottom) move every
+  piece one cell along after each move and wrap at the end. Double Stars and
+  viruses stay put and the row moves past them. Small arrows mark the row.
 - **Plus** pieces spawn now and then (5% per new piece). Using one gives
   extra moves or time.
 - **Combo**: off unless the level's **Combo Bar** box is ticked (Survival
@@ -63,7 +83,10 @@ validates, and can play a level directly.
 | Destroy Obstacles | N Double Stars broken | N can't be more than the Double Stars placed. |
 | Reach Bottom | N Square Stars collected | N can't be more than the Square Stars placed. |
 | Reach Score | N points | Needs a lose condition and the Combo Bar box ticked (the validator warns about both). Double Stars (300) and Square Stars (500) add a lot, so count them in. First used by Level 21. |
-| Get Specific Item Matches | N of one piece | Exists in code, not used by any level yet. |
+| Get Specific Item Matches | N of one piece | Not used: it plays badly, so levels use Get Matches instead. |
+| Clear Glitches | N glitches cleared | N can't be more than the glitches painted. First used by Level 18. |
+| Clear Viruses | Every virus gone | Counts down as you break them and up as they spread. Needs at least one virus. First used by Level 19. |
+| Defuse | N fuses matched | Any fuse that runs out loses the level, goal or not. First used by Level 24. |
 
 Only one of each objective type per level. Two objectives fit the top bar;
 every level from 6 on uses two.
@@ -86,8 +109,9 @@ every level from 6 on uses two.
 - Never on the bottom row: they would score the moment the level starts.
 - Only in columns whose lowest switched-on cell is on row 0, or they can
   never be collected. The validator checks both.
-- Avoid a Double Star directly below one unless the point is to break it
-  first. The validator warns about this.
+- A Double Star directly below a Square Star is allowed and worth using now
+  and then: the player has to break it before the Square Star can fall.
+  Levels 10, 12, 31, 40 and 50 do this.
 
 **Double Stars**
 
@@ -101,11 +125,12 @@ every level from 6 on uses two.
 
 - Each new level should be a little harder than the one before it, or teach
   something new. Introduce one new idea at a time: Level 6 brings Double Stars,
-  Level 8 brings Square Stars, Level 10 is the first to mix them.
+  Level 8 brings Square Stars, Level 10 is the first to mix them, then
+  glitches at 18, viruses at 19, fuses at 24 and conveyors at 26.
 - Moves so far run between 9 and 18. Use 14 to 18 for levels with two
   objectives. Fewer cells or more stars means more moves.
 - One limit per level: moves or time, never both. Use a time limit now and
-  then instead of moves (Levels 4 and 11 have 45 seconds, Level 16 has 50).
+  then instead of moves. Keep time limits at 45 seconds or less.
 - Playtest every new level on a phone before it ships. Losing on the last move
   a few times is about right; losing with half the goal left is too hard.
 
@@ -131,19 +156,44 @@ every level from 6 on uses two.
 | 7 | Smile 10x10 | 16 pieces, 14 Double Stars | 9 moves |
 | 8 | FullBlock 8x6 | 21 pieces, 2 Square Stars | 16 moves |
 | 9 | NoCornerShortSquare 9x7 | 26 pieces, 4 Square Stars | 18 moves |
-| 10 | TriangleSquashed 11x6 | 1 Square Star, 9 Double Stars | 16 moves |
+| 10 | TriangleSquashed 11x6 | 1 Square Stars, 9 Double Stars | 16 moves |
 | 11 | Circle2 9x9 | 30 pieces, 9 Double Stars | 45s |
-| 12 | ChestPlate 9x8 | 8 Double Stars, 1 Square Star | 14 moves |
+| 12 | ChestPlate 9x8 | 8 Double Stars, 1 Square Stars | 14 moves |
 | 13 | Hourglass 9x9 | 24 pieces, 3 Square Stars | 16 moves |
 | 14 | Bolt 9x10 | 26 pieces, 8 Double Stars | 16 moves |
 | 15 | Crown 9x8 | 6 Double Stars, 3 Square Stars | 18 moves |
-| 16 | Diamond 9x9 | 30 pieces, 4 Double Stars | 50s |
+| 16 | Diamond 9x9 | 27 pieces, 4 Double Stars | 45s |
 | 17 | Arrow 9x10 | 24 pieces, 3 Square Stars | 18 moves |
-| 18 | Donut 9x9 | 24 pieces, 8 Double Stars | 16 moves |
-| 19 | Steps 9x9 | 4 Double Stars, 3 Square Stars | 18 moves |
+| 18 | Donut 9x9 | 18 glitches, 8 Double Stars | 16 moves |
+| 19 | Steps 9x9 | all viruses, 3 Square Stars | 18 moves |
 | 20 | Battery 8x10 | 8 Double Stars, 2 Square Stars | 20 moves |
-| 21 | Cross 9x9 | 1200 points | 60s |
+| 21 | Cross 9x9 | 900 points | 45s |
 | 22 | Castle 9x9 | 7 Double Stars, 2 Square Stars | 18 moves |
-| 23 | Bowtie 11x7 | 36 pieces | 50s |
-| 24 | Ladder 9x10 | 28 pieces, 2 Square Stars | 18 moves |
+| 23 | Bowtie 11x7 | 32 pieces | 45s |
+| 24 | Ladder 9x10 | 28 pieces, 3 fuses (9 moves each) | 18 moves |
 | 25 | Chip 10x10 | 4000 points, 12 Double Stars | 22 moves |
+| 26 | Star 9x9 | 30 matches, conveyors on rows 6 | 18 moves |
+| 27 | V 11x7 | 30 pieces, all viruses | 18 moves |
+| 28 | House 9x9 | 18 glitches, 2 Square Stars | 18 moves |
+| 29 | Tree 9x10 | 1150 points | 45s |
+| 30 | Moon 9x9 | 3 Double Stars, 3 fuses (9 moves each) | 17 moves |
+| 31 | Eight 7x9 | 5 Double Stars (one under a Square Star), 2 Square Stars, conveyors on rows 7 and 5 | 18 moves |
+| 32 | T 9x8 | 1600 points, 2 Square Stars | 20 moves |
+| 33 | Arch 11x8 | 14 glitches | 45s |
+| 34 | Hexagon 9x9 | 30 matches, all viruses | 20 moves |
+| 35 | Shield 9x9 | 3 fuses (8 moves each), 2 Square Stars | 18 moves |
+| 36 | Dumbbell 11x6 | 23 pieces, 5 Double Stars | 45s |
+| 37 | Snake 9x10 | 1150 points | 45s |
+| 38 | Pyramid 11x6 | 2 Square Stars, 5 Double Stars, conveyors on rows 2 | 18 moves |
+| 39 | Butterfly 11x9 | 13 glitches, 19 matches | 45s |
+| 40 | Fortress 10x10 | 11 Double Stars (one under a Square Star), 2 Square Stars | 22 moves |
+| 41 | Boat 11x6 | 2000 points, 2 Square Stars | 20 moves |
+| 42 | Gem 9x9 | 23 pieces, all viruses | 45s |
+| 43 | Comb 11x8 | 30 pieces, 3 Square Stars, conveyors on rows 6 and 5 | 20 moves |
+| 44 | Frame 10x10 | 5000 points, 12 Double Stars | 22 moves |
+| 45 | Trophy 9x10 | 3 fuses (8 moves each), 25 matches | 20 moves |
+| 46 | Clover 9x9 | 28 glitches, 5 Double Stars | 45s |
+| 47 | Window 10x10 | 4000 points, 4 Double Stars, conveyors on rows 8 and 1 | 22 moves |
+| 48 | Bridge 11x8 | 2 Square Stars, all viruses | 20 moves |
+| 49 | Skull 9x10 | 4500 points, 3 fuses (8 moves each) | 24 moves |
+| 50 | Circuit 11x10 | 10 Double Stars (one under a Square Star), 3 Square Stars, conveyors on rows 7 and 5 | 26 moves |

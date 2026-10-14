@@ -90,6 +90,50 @@ MonoBehaviour:
     m_Localized: "Encha\xEEne vite les combinaisons pour augmenter ton combo et remplir la barre de combo. Ton combo multiplie chaque point que tu marques."
     m_Metadata:
       m_Items: []
+  - m_Id: 3159364713046016
+    m_Localized: Bugs
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600448
+    m_Localized: "Les cases bugu\xE9es clignotent. Fais une combinaison sur un bug ou touche-le avec un brise-ligne pour l'effacer."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600449
+    m_Localized: Virus
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600450
+    m_Localized: "Les virus bloquent tes combinaisons comme les \xE9toiles doubles, mais \xE0 chaque coup o\xF9 tu n'en d\xE9truis aucun, un virus se propage sur une pi\xE8ce voisine."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600451
+    m_Localized: "M\xE8ches"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600452
+    m_Localized: "Une m\xE8che baisse d'un \xE0 chaque coup. Combine sa pi\xE8ce avant qu'elle n'arrive \xE0 0, sinon le niveau est perdu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600453
+    m_Localized: Tapis roulants
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600454
+    m_Localized: "Les rang\xE9es fl\xE9ch\xE9es avancent d'une case apr\xE8s chaque coup. Les pi\xE8ces qui arrivent au bout reviennent par le d\xE9but."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3274541252993024
+    m_Localized: Losange
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3275166833434624
+    m_Localized: Losange turquoise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3277096200691712
+    m_Localized: "Trap\xE8ze"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

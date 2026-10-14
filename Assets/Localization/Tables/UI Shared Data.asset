@@ -503,6 +503,30 @@ MonoBehaviour:
     m_Key: objective.score.description
     m_Metadata:
       m_Items: []
+  - m_Id: 3163188689362944
+    m_Key: objective.glitch.requirement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188735500288
+    m_Key: objective.glitch.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188735500289
+    m_Key: objective.virus.requirement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188735500290
+    m_Key: objective.virus.description
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188739694592
+    m_Key: objective.fuse.requirement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3163188739694593
+    m_Key: objective.fuse.description
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

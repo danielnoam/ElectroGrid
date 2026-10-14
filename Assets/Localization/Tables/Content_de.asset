@@ -90,6 +90,50 @@ MonoBehaviour:
     m_Localized: "Bilde schnell neue Treffer, um deine Combo zu steigern und die Combo-Leiste zu f\xFCllen. Deine Combo multipliziert jeden Punkt, den du holst."
     m_Metadata:
       m_Items: []
+  - m_Id: 3159364713046016
+    m_Localized: "St\xF6rungen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600448
+    m_Localized: "Gest\xF6rte Felder flackern. Bilde eine Kombination auf einer St\xF6rung oder triff sie mit einem Linienbrecher, um sie zu entfernen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600449
+    m_Localized: Viren
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600450
+    m_Localized: "Viren blockieren deine Kombinationen wie Doppelsterne, aber in jedem Zug, in dem du keines zerst\xF6rst, breitet sich ein Virus auf ein Nachbarteil aus."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600451
+    m_Localized: "Z\xFCnder"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600452
+    m_Localized: "Ein Z\xFCnder z\xE4hlt bei jedem Zug um eins herunter. Kombiniere sein Teil, bevor er 0 erreicht, sonst ist das Level verloren."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600453
+    m_Localized: "F\xF6rderb\xE4nder"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3159364746600454
+    m_Localized: "Reihen mit Pfeilen r\xFCcken nach jedem Zug ein Feld weiter. Teile, die das Ende erreichen, kommen am Anfang wieder herein."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3274541252993024
+    m_Localized: Diamant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3275166833434624
+    m_Localized: "T\xFCrkiser Diamant"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3277096200691712
+    m_Localized: Trapez
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
