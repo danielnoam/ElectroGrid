@@ -107,6 +107,14 @@ and the level select rework is where the Survival entry would go (it is on the m
       blowing, and nicer Info card icons (the glitch, fuse and conveyor ones are
       still drawn in code).
 
+- [ ] **Better touch feel when dragging pieces.** A piece sometimes drops by
+      accident mid-drag. Cause found: `Match3PlayHandler.OnSwipe` releases
+      the held piece whenever a swipe is too diagonal (the off axis is more than
+      `SwipeDeadzone` of the main one). Fix: take the stronger axis and ignore
+      a too-diagonal swipe instead of dropping the piece, and only release when
+      the finger lifts. Also worth checking: the swipe distance threshold and
+      how it feels on small phones.
+
 - [ ] **Separate win and lose endings.** Winning and losing a level play the
       same end-of-level animation right now. Winning should feel like a
       celebration and losing like a power-down, so the result reads before the
@@ -184,6 +192,33 @@ leaderboard needs Survival.
         it changes nothing about the $100 and it affects whether trading cards
         or DLC ever make sense.
 
+- [ ] **PC and large-screen support.** The game is built for a portrait phone
+      (540x960, fixed-size window). Rework it so it plays well on a PC monitor
+      and other large screens:
+      - **Display settings** in the Settings window: windowed, fullscreen and
+        borderless; resolution (window size); v-sync; and a frame rate cap.
+        Save them with the rest of the settings and apply them on start.
+      - **Layout.** Let the window resize and keep the board and HUD scaled
+        and centred at any aspect ratio, with something filling the sides on
+        wide screens instead of black bars. Ties into the portrait-on-desktop
+        question in the Steam item below.
+      - **Input.** Make mouse play feel right (hover states, no touch-only
+        gestures) and add basic keyboard shortcuts (Esc for back or pause).
+
+- [ ] **Make the build tool generic, with itch.io and Steam uploads.** The
+      ElectroGrid build window (`Assets/2_Scripts/Build/Editor`) should work in
+      any Unity project, not just this one:
+      - **Generic.** Take out the ElectroGrid-specific names, paths and repo, so
+        it can be its own package (it could live with the DNExtensions packages)
+        and every project reads its own config.
+      - **More upload targets.** Next to GitHub releases, upload to itch.io
+        with `butler push` (one channel per platform) and to Steam with
+        SteamPipe (`steamcmd` + depot scripts), each turned on per build.
+      - **Settings tab.** Move the per-machine and rarely changed settings
+        (output and copy folders, keystore path and passwords, upload logins
+        and tokens) out of the main view into a Settings tab, so the main view
+        is just what changes per build.
+
 - [ ] **Steam leaderboard for Survival.** Depends on Survival (score must exist)
       and on the Steam integration above. `FindOrCreateLeaderboard` + upload
       the score with `KeepBest`, show top 10 and the player's own rank next to
@@ -209,6 +244,19 @@ leaderboard needs Survival.
       loading problems are fixed (see DONE.md > Music clips moved to Streaming).
       Dropping quality to 0.5-0.7 would roughly halve the build size and is
       normally transparent for game music, but A/B it by ear before changing it.
+
+- [ ] **Performance pass.** Do it together with the music quality pass:
+      - **Sprite atlases.** Only the small shape masks are in one
+        (`SmallShapes.spriteatlasv2`). Pack the piece, Star, obstacle and UI
+        sprites too so the board batches into fewer draw calls. Check first
+        that the custom-material sprites (glitch, fuse ring, conveyor) still
+        work when packed.
+      - **Shaders.** Review the glitch, fuse ring and conveyor shaders for
+        mobile cost (overdraw from the additive ones, per-pixel noise), and use
+        shared materials with property blocks everywhere.
+      - **Pooling.** Find anything still created and destroyed at runtime that
+        happens often enough to matter, and pool it. Check with the Profiler on
+        a phone, not just in the editor.
 
 ---
 
