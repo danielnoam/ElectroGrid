@@ -115,6 +115,18 @@ and the level select rework is where the Survival entry would go (it is on the m
       celebration and losing like a power-down, so the result reads before the
       results screen even appears.
 
+- [ ] **Rework the level curve.** Difficulty is all over the place across the
+      50 levels. Re-order and retune them into a steady curve: rate each level
+      (moves or time against the goal, number of mechanics, board size), then
+      sort by that. Some objectives and objects can come in earlier (for
+      example Double Stars, a simple glitch or conveyor level) and harder
+      combinations move later. Introduce one new idea at a time and give each
+      a gentle first level. Playtest on the phone, and update LEVELS.md to match.
+
+- [ ] **New game icon.** Replace the current app icon (Android adaptive icon,
+      Windows exe icon, and later the Steam and itch.io capsules) with one that
+      fits the neon ElectroGrid look and reads at small sizes.
+
 ### Content, not engineering
 
 - **50 levels are in** (see LEVELS.md). `GetSpecificItemMatches` is left
