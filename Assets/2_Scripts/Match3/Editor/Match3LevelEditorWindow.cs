@@ -39,6 +39,7 @@ internal class Match3LevelEditorWindow : EditorWindow
     private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
     private bool _paintGlitch;
     private bool _glitchPaintValue;
+    private bool _starFusePaintValue;
     private bool _isDragging;
 
     private bool _shapeFoldout;
@@ -529,12 +530,19 @@ internal class Match3LevelEditorWindow : EditorWindow
             _serializedLevel.ApplyModifiedProperties();
         }
 
+        var starFuseTilesProp = _serializedLevel.FindProperty("starFuseTiles");
+        if (starFuseTilesProp.arraySize != requiredSize)
+        {
+            starFuseTilesProp.arraySize = requiredSize;
+            _serializedLevel.ApplyModifiedProperties();
+        }
+
         EditorGUILayout.LabelField(Match3LevelGridGUI.BuildCountsLabel(_selectedLevel), Match3LevelGridGUI.RichLabel);
         EditorGUILayout.Space(5);
 
         Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, CellSize);
 
-        HandlePainting(gridRect, grid, tileObjectsProp, glitchTilesProp);
+        HandlePainting(gridRect, grid, tileObjectsProp, glitchTilesProp, starFuseTilesProp);
         Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, CellSize, true, glitchTilesProp, _selectedLevel);
 
         if (gridRect.Contains(Event.current.mousePosition)) Repaint();
@@ -556,13 +564,19 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Clear All")) ResetCells(tileObjectsProp, grid, (_, _, _) => true);
-        if (GUILayout.Button("Clear Double Stars")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Obstacle);
-        if (GUILayout.Button("Clear Square Stars")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Bottom);
+        if (GUILayout.Button("Clear Stars")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Obstacle);
+        if (GUILayout.Button("Clear Plugs")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Bottom);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Clear Viruses")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Virus);
-        if (GUILayout.Button("Clear Fuses")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Fuse);
+        if (GUILayout.Button("Clear Fuses"))
+        {
+            ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Fuse);
+            for (int i = 0; i < starFuseTilesProp.arraySize; i++) starFuseTilesProp.GetArrayElementAtIndex(i).boolValue = false;
+            starFuseTilesProp.serializedObject.ApplyModifiedProperties();
+            GUI.changed = true;
+        }
         if (GUILayout.Button("Clear Glitches"))
         {
             for (int i = 0; i < glitchTilesProp.arraySize; i++) glitchTilesProp.GetArrayElementAtIndex(i).boolValue = false;
@@ -577,7 +591,10 @@ internal class Match3LevelEditorWindow : EditorWindow
         Color previousBackground = GUI.backgroundColor;
         GUI.backgroundColor = !_paintGlitch && _currentPaintMode == mode ? Color.yellow : Color.white;
 
-        var content = new GUIContent(" " + Match3LevelGridGUI.NameFor(mode), Match3LevelGridGUI.IconFor(mode), $"Paint {Match3LevelGridGUI.NameFor(mode)}s. Click a painted cell again to clear it.");
+        string tooltip = mode == Match3TileObjectType.Fuse
+            ? "Paint fuses. On a Star or Plug the fuse goes on the Star. Click a painted cell again to clear it."
+            : $"Paint {Match3LevelGridGUI.NameFor(mode)}s. Click a painted cell again to clear it.";
+        var content = new GUIContent(" " + Match3LevelGridGUI.NameFor(mode), Match3LevelGridGUI.IconFor(mode), tooltip);
         if (GUILayout.Button(content, GUILayout.Height(30)))
         {
             _currentPaintMode = !_paintGlitch && _currentPaintMode == mode ? Match3TileObjectType.Matchable : mode;
@@ -598,7 +615,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         GUI.backgroundColor = previousBackground;
     }
 
-    private void HandlePainting(Rect gridRect, Grid grid, SerializedProperty tileObjectsProp, SerializedProperty glitchTilesProp)
+    private void HandlePainting(Rect gridRect, Grid grid, SerializedProperty tileObjectsProp, SerializedProperty glitchTilesProp, SerializedProperty starFuseTilesProp)
     {
         Event e = Event.current;
 
@@ -633,6 +650,20 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         var element = tileObjectsProp.GetArrayElementAtIndex(index);
         var currentType = (Match3TileObjectType)element.enumValueIndex;
+
+        bool onStar = currentType is Match3TileObjectType.Obstacle or Match3TileObjectType.Bottom;
+        if (_currentPaintMode == Match3TileObjectType.Fuse && onStar)
+        {
+            if (index >= starFuseTilesProp.arraySize) return;
+
+            var starFuse = starFuseTilesProp.GetArrayElementAtIndex(index);
+            if (isPress) _starFusePaintValue = !starFuse.boolValue;
+            starFuse.boolValue = _starFusePaintValue;
+            starFuseTilesProp.serializedObject.ApplyModifiedProperties();
+            GUI.changed = true;
+            e.Use();
+            return;
+        }
 
         // Painting the mode already on a cell clears it, so the same button both paints and erases
         element.enumValueIndex = (int)(currentType == _currentPaintMode ? Match3TileObjectType.Matchable : _currentPaintMode);
@@ -696,7 +727,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         }
 
         EditorGUILayout.HelpBox(
-            "Changing the shape resets tile objects that end up on inactive cells, and can strand Square Stars in columns that no longer reach row 0. Check the validation below afterwards.",
+            "Changing the shape resets tile objects that end up on inactive cells, and can strand Plugs in columns that no longer reach row 0. Check the validation below afterwards.",
             MessageType.None);
 
         EditorGUILayout.BeginHorizontal();
@@ -830,20 +861,20 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         Match3LevelValidation.GetRequiredCounts(_selectedLevel, out int obstaclesNeeded, out int bottomsNeeded);
 
-        _obstacleCount = DrawCountField("Double Stars", _obstacleCount, obstaclesNeeded);
-        _bottomCount = DrawCountField("Square Stars", _bottomCount, bottomsNeeded);
+        _obstacleCount = DrawCountField("Stars", _obstacleCount, obstaclesNeeded);
+        _bottomCount = DrawCountField("Plugs", _bottomCount, bottomsNeeded);
         _seed = DrawSeedField(_seed);
         _minObstacleSpacing = Mathf.Max(0, EditorGUILayout.IntField("Min Obstacle Spacing", _minObstacleSpacing));
-        _keepObstaclesFromUnderBottoms = EditorGUILayout.Toggle("Keep Clear Under Square Stars", _keepObstaclesFromUnderBottoms);
+        _keepObstaclesFromUnderBottoms = EditorGUILayout.Toggle("Keep Clear Under Plugs", _keepObstaclesFromUnderBottoms);
 
         EditorGUILayout.HelpBox(
-            "Square Stars are only placed in columns that reach row 0, and never on row 0 itself. Undo reverts a roll, so reroll freely.",
+            "Plugs are only placed in columns that reach row 0, and never on row 0 itself. Undo reverts a roll, so reroll freely.",
             MessageType.None);
 
         EditorGUILayout.BeginHorizontal();
         if (GUILayout.Button("Randomize All")) ApplyRandomize(grid, true, true);
-        if (GUILayout.Button("Double Stars")) ApplyRandomize(grid, true, false);
-        if (GUILayout.Button("Square Stars")) ApplyRandomize(grid, false, true);
+        if (GUILayout.Button("Stars")) ApplyRandomize(grid, true, false);
+        if (GUILayout.Button("Plugs")) ApplyRandomize(grid, false, true);
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.indentLevel--;

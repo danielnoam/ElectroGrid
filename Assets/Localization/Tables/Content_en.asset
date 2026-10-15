@@ -27,11 +27,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 837804032
-    m_Localized: Double Stars
+    m_Localized: Stars
     m_Metadata:
       m_Items: []
   - m_Id: 837804033
-    m_Localized: Double Stars block your matches. Create a match next to them or use a line break to destroy them.
+    m_Localized: 'Stars block your matches. Each one takes two hits: make matches next to it, or use a line break to destroy it at once.'
     m_Metadata:
       m_Items: []
   - m_Id: 837804034
@@ -51,11 +51,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 846192640
-    m_Localized: Square Stars
+    m_Localized: Plugs
     m_Metadata:
       m_Items: []
   - m_Id: 846192641
-    m_Localized: Square Stars fall when you create matches below them. Keep matching underneath until they reach the bottom of the grid.
+    m_Localized: Plugs fall when you create matches below them. Keep matching underneath until they plug into the bottom of the grid.
     m_Metadata:
       m_Items: []
   - m_Id: 846192642
@@ -103,7 +103,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600450
-    m_Localized: Viruses block your matches like Double Stars, but every move you don't break one, a virus spreads to a piece next to it.
+    m_Localized: Viruses block your matches like Stars, but every move you don't break one, a virus spreads to a piece next to it.
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600451

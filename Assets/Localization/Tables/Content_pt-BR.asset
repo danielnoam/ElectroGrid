@@ -27,11 +27,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 837804032
-    m_Localized: Estrelas duplas
+    m_Localized: Estrelas
     m_Metadata:
       m_Items: []
   - m_Id: 837804033
-    m_Localized: "As estrelas duplas bloqueiam suas combina\xE7\xF5es. Fa\xE7a uma combina\xE7\xE3o ao lado delas ou use um quebra-linha para destru\xED-las."
+    m_Localized: "As estrelas bloqueiam suas combina\xE7\xF5es. Cada uma precisa de dois golpes: fa\xE7a combina\xE7\xF5es ao lado dela, ou use um quebra-linha para destru\xED-la de uma vez."
     m_Metadata:
       m_Items: []
   - m_Id: 837804034
@@ -51,11 +51,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 846192640
-    m_Localized: Estrelas quadradas
+    m_Localized: Plugues
     m_Metadata:
       m_Items: []
   - m_Id: 846192641
-    m_Localized: "As estrelas quadradas caem quando voc\xEA faz combina\xE7\xF5es embaixo delas. Continue combinando por baixo at\xE9 elas chegarem ao fundo da grade."
+    m_Localized: "Os plugues caem quando voc\xEA faz combina\xE7\xF5es embaixo deles. Continue combinando por baixo at\xE9 eles se conectarem no fundo da grade."
     m_Metadata:
       m_Items: []
   - m_Id: 846192642
@@ -103,7 +103,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600450
-    m_Localized: "Os v\xEDrus bloqueiam suas combina\xE7\xF5es como as estrelas duplas, mas a cada movimento em que voc\xEA n\xE3o quebra nenhum, um v\xEDrus se espalha para uma pe\xE7a vizinha."
+    m_Localized: "Os v\xEDrus bloqueiam suas combina\xE7\xF5es como as estrelas, mas a cada movimento em que voc\xEA n\xE3o quebra nenhum, um v\xEDrus se espalha para uma pe\xE7a vizinha."
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600451

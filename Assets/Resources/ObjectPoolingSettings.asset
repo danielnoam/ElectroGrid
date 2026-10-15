@@ -246,3 +246,18 @@ MonoBehaviour:
     - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
       sceneName: Match3
       scenePath: Assets/1_Scenes/Match3.unity
+  - overridePoolName:
+      isSet: 1
+      hideWhenUnchecked: 0
+      value: StarHitParticle
+    maxPoolSize: 150
+    prefab: {fileID: 2798804331580920947, guid: 483f485a64a893741b5cc3be068ebde0, type: 3}
+    dontDestroyOnLoad: 0
+    usePoolHolder: 1
+    recycleActiveObjects: 0
+    preWarmPool: 1
+    preWarmPoolSize: 5
+    scenesToPreWarm:
+    - sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
+      sceneName: Match3
+      scenePath: Assets/1_Scenes/Match3.unity

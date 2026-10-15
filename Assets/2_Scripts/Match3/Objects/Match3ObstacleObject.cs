@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using DNExtensions.Systems.AudioLibrary;
+using DNExtensions.Systems.ObjectPooling;
 using PrimeTween;
 using UnityEngine;
 
@@ -10,6 +11,10 @@ public class Match3ObstacleObject : Match3Object
 {
     [Header("Obstacle Settings")]
     [SerializeField] private int maxHealth = 1;
+    [Tooltip("The sprite for each health left: element 0 at 1 health, element 1 at 2, and so on")]
+    [SerializeField] private Sprite[] healthSprites;
+    [Tooltip("Played when the Star takes a hit but survives, a lighter version of the break particle")]
+    [SerializeField] private PoolableParticleSystem hitParticle;
     [SerializeField] private float pulseEffectSpeed = 2f;
     [SerializeField] private float pulseEffectMinScale = 0.8f;
     [SerializeField] private float pulseEffectMaxScale = 1.2f;
@@ -18,6 +23,7 @@ public class Match3ObstacleObject : Match3Object
 
     private Match3GameManager _gameManager;
     private int _currentHealth;
+    private Sequence _hitSequence;
     private Vector3 _baseSpriteScale;
     private float _pulseTimeOffset;
     
@@ -36,7 +42,7 @@ public class Match3ObstacleObject : Match3Object
 
     private void Update()
     {
-        if (_currentTile)
+        if (_currentTile && !_hitSequence.isAlive)
         {
             float time = (Time.time + _pulseTimeOffset) * pulseEffectSpeed;
             float sinWave = Mathf.Sin(time);
@@ -56,7 +62,8 @@ public class Match3ObstacleObject : Match3Object
         base.Initialize(data, gridHandler);
         
         _currentHealth = maxHealth;
-        
+        RefreshHealthSprite();
+
         _gameManager = Match3GameManager.Instance;
         if (_gameManager)
         {
@@ -104,11 +111,33 @@ public class Match3ObstacleObject : Match3Object
         }
         else
         {
-            var damageSequence = Sequence.Create();
-            damageSequence.Group(Tween.Scale(transform, _baseScale * 1.3f, 0.1f, Ease.OutBack));
-            damageSequence.Chain(Tween.Scale(transform, _baseScale, 0.1f, Ease.OutBack));
+            _hitSequence.Stop();
+            _hitSequence = Sequence.Create();
+            var damageSequence = _hitSequence;
+            damageSequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
+            damageSequence.InsertCallback(destroyDuration * 0.5f, () =>
+            {
+                RefreshHealthSprite();
+                MobileHaptics.Vibrate(30);
+                CameraManager.Instance?.ShakeCamera(0.1f);
+                AudioLibrary.Play(destroySfx);
+                if (hitParticle)
+                {
+                    var particle = ObjectPooler.GetObjectFromPool(hitParticle.gameObject, transform.position, Quaternion.identity);
+                    particle.GetComponent<PoolableParticleSystem>().Play(transform.position);
+                }
+            });
+            damageSequence.Chain(Tween.Scale(transform, _baseScale, 0.15f, Ease.OutBack));
         }
     }
+    private void RefreshHealthSprite()
+    {
+        if (!itemRenderer || healthSprites == null || healthSprites.Length == 0) return;
+
+        var sprite = healthSprites[Mathf.Clamp(_currentHealth - 1, 0, healthSprites.Length - 1)];
+        if (sprite) itemRenderer.sprite = sprite;
+    }
+
     private void OnMatchesMade(List<Match3Tile> matches)
     {
         if (IsAdjacentToAnyMatch(matches)) TakeDamage();
@@ -116,6 +145,7 @@ public class Match3ObstacleObject : Match3Object
 
     public override void DestroyWithAnimation()
     {
+        _hitSequence.Stop();
         _currentTile?.SetCurrentItem(null);
         _gameManager?.NotifyObstacleBroke(this);
 
@@ -125,6 +155,7 @@ public class Match3ObstacleObject : Match3Object
     public override void OnPoolReturn()
     {
         base.OnPoolReturn();
+        _hitSequence.Stop();
         
         if (_gameManager) _gameManager.MatchesMade -= OnMatchesMade;
     }

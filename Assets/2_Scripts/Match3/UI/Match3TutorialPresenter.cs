@@ -87,7 +87,7 @@ public class Match3TutorialPresenter : MonoBehaviour
 
         if (levelData.Level.CountGlitches() > 0) Enqueue(Match3TutorialTrigger.LevelHasGlitches);
         if (levelData.Level.CountObjectsOfType(Match3TileObjectType.Virus) > 0) Enqueue(Match3TutorialTrigger.LevelHasViruses);
-        if (levelData.Level.CountObjectsOfType(Match3TileObjectType.Fuse) > 0) Enqueue(Match3TutorialTrigger.LevelHasFuses);
+        if (levelData.Level.CountFuses() > 0) Enqueue(Match3TutorialTrigger.LevelHasFuses);
         if (levelData.Level.ConveyorRows is { Count: > 0 }) Enqueue(Match3TutorialTrigger.LevelHasConveyors);
     }
 

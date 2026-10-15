@@ -27,11 +27,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 837804032
-    m_Localized: Estrellas dobles
+    m_Localized: Estrellas
     m_Metadata:
       m_Items: []
   - m_Id: 837804033
-    m_Localized: "Las estrellas dobles bloquean tus combinaciones. Haz una combinaci\xF3n junto a ellas o usa un rompel\xEDneas para destruirlas."
+    m_Localized: "Las estrellas bloquean tus combinaciones. Cada una necesita dos golpes: haz combinaciones a su lado, o usa un rompel\xEDneas para destruirla de una vez."
     m_Metadata:
       m_Items: []
   - m_Id: 837804034
@@ -51,11 +51,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 846192640
-    m_Localized: Estrellas cuadradas
+    m_Localized: Enchufes
     m_Metadata:
       m_Items: []
   - m_Id: 846192641
-    m_Localized: "Las estrellas cuadradas caen cuando haces combinaciones debajo de ellas. Sigue combinando por debajo hasta que lleguen al fondo de la cuadr\xEDcula."
+    m_Localized: "Los enchufes caen cuando haces combinaciones debajo de ellos. Sigue combinando por debajo hasta que se conecten en el fondo de la cuadr\xEDcula."
     m_Metadata:
       m_Items: []
   - m_Id: 846192642
@@ -103,7 +103,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600450
-    m_Localized: Los virus bloquean tus combinaciones como las estrellas dobles, pero en cada movimiento en que no rompes ninguno, un virus se extiende a una pieza vecina.
+    m_Localized: Los virus bloquean tus combinaciones como las estrellas, pero en cada movimiento en que no rompes ninguno, un virus se extiende a una pieza vecina.
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600451

@@ -27,11 +27,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 837804032
-    m_Localized: "\xC9toiles doubles"
+    m_Localized: "\xC9toiles"
     m_Metadata:
       m_Items: []
   - m_Id: 837804033
-    m_Localized: "Les \xE9toiles doubles bloquent tes combinaisons. Fais une combinaison \xE0 c\xF4t\xE9 d'elles ou utilise un brise-ligne pour les d\xE9truire."
+    m_Localized: "Les \xE9toiles bloquent tes combinaisons. Chacune demande deux coups : fais des combinaisons \xE0 c\xF4t\xE9, ou utilise un brise-ligne pour la d\xE9truire d'un coup."
     m_Metadata:
       m_Items: []
   - m_Id: 837804034
@@ -51,11 +51,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 846192640
-    m_Localized: "\xC9toiles carr\xE9es"
+    m_Localized: Prises
     m_Metadata:
       m_Items: []
   - m_Id: 846192641
-    m_Localized: "Les \xE9toiles carr\xE9es tombent quand tu fais des combinaisons en dessous. Continue \xE0 combiner en dessous jusqu'\xE0 ce qu'elles atteignent le bas de la grille."
+    m_Localized: "Les prises tombent quand tu fais des combinaisons en dessous. Continue \xE0 combiner en dessous jusqu'\xE0 ce qu'elles se branchent en bas de la grille."
     m_Metadata:
       m_Items: []
   - m_Id: 846192642
@@ -103,7 +103,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600450
-    m_Localized: "Les virus bloquent tes combinaisons comme les \xE9toiles doubles, mais \xE0 chaque coup o\xF9 tu n'en d\xE9truis aucun, un virus se propage sur une pi\xE8ce voisine."
+    m_Localized: "Les virus bloquent tes combinaisons comme les \xE9toiles, mais \xE0 chaque coup o\xF9 tu n'en d\xE9truis aucun, un virus se propage sur une pi\xE8ce voisine."
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600451

@@ -30,12 +30,12 @@ MonoBehaviour:
       m_Items:
       - rid: 5242841009418141699
   - m_Id: 1437589506
-    m_Localized: "Zerst\xF6re {amount} Doppelsterne"
+    m_Localized: "Zerst\xF6re {amount} Sterne"
     m_Metadata:
       m_Items:
       - rid: 5242841009418141699
   - m_Id: 1437589508
-    m_Localized: Bringe {amount} Quadratsterne nach unten
+    m_Localized: Bringe {amount} Stecker nach unten
     m_Metadata:
       m_Items:
       - rid: 5242841009418141699
@@ -133,11 +133,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
-    m_Localized: 'Doppelsterne:'
+    m_Localized: 'Sterne:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589507
-    m_Localized: 'Quadratstern:'
+    m_Localized: 'Stecker:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589509

@@ -7,13 +7,24 @@ using UnityEngine;
 [SelectionBase]
 public class Match3BottomObject : Match3Object
 {
-    [Header("Rotation Settings")]
-    [SerializeField] private float rotationSpeed = 1f;
-    [SerializeField] private float rotationAmount = 35f;
-    [SerializeField] private float rotationRandomOffset = 0.5f;
-    
+    private static readonly int EmissionMaskId = Shader.PropertyToID("_Emission_Mask");
+
+    [Header("Plug")]
+    [SerializeField] private Texture2D emissionMask;
+    [Tooltip("Seconds between two plug-in dips")]
+    [SerializeField, Min(0.1f)] private float bobPeriod = 1.6f;
+    [Tooltip("How far the plug dips down, in world units")]
+    [SerializeField, Min(0f)] private float bobDistance = 0.08f;
+    [Tooltip("Share of the period the dip takes, the rest of the time it rests")]
+    [SerializeField, Range(0.05f, 1f)] private float bobShare = 0.18f;
+    [SerializeField, Min(0f)] private float bobRandomOffset = 1.6f;
+    [SerializeField] private ParticleSystem pinSparks;
+    [SerializeField, Min(0)] private int sparksPerDip = 3;
+
     private Match3GameManager _gameManager;
-    private float _rotationTimeOffset;
+    private float _bobTimeOffset;
+    private Vector3 _spriteBasePosition;
+    private bool _sparkedThisDip;
     
     public override bool IsSwappable => false;
     public override bool IsMatchable => false;
@@ -21,13 +32,32 @@ public class Match3BottomObject : Match3Object
     public override bool IsAffectedBySpecialMatches => false;
     
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        if (!itemRenderer) return;
+        _spriteBasePosition = itemRenderer.transform.localPosition;
+        if (emissionMask) itemRenderer.material.SetTexture(EmissionMaskId, emissionMask);
+    }
+
     private void Update()
     {
-        if (_currentTile)
+        if (!_currentTile || _beingDestroyed || !itemRenderer) return;
+
+        float phase = Mathf.Repeat((Time.time + _bobTimeOffset) / bobPeriod, 1f);
+        float dip = phase < bobShare ? Mathf.Sin(phase / bobShare * Mathf.PI) : 0f;
+        itemRenderer.transform.localPosition = _spriteBasePosition + Vector3.down * (bobDistance * dip);
+
+        bool atBottom = phase >= bobShare * 0.5f && phase < bobShare;
+        if (atBottom && !_sparkedThisDip)
         {
-            float time = (Time.time + _rotationTimeOffset) * rotationSpeed;
-            float rotation = Mathf.Sin(time) * rotationAmount;
-            transform.localRotation = Quaternion.Euler(0f, 0f, rotation);
+            _sparkedThisDip = true;
+            if (pinSparks && sparksPerDip > 0) pinSparks.Emit(sparksPerDip);
+        }
+        else if (!atBottom)
+        {
+            _sparkedThisDip = false;
         }
     }
 
@@ -35,7 +65,9 @@ public class Match3BottomObject : Match3Object
     {
         base.Initialize(data, gridHandler);
         
-        _rotationTimeOffset = Random.Range(0f, rotationRandomOffset);
+        _bobTimeOffset = Random.Range(0f, bobRandomOffset);
+        transform.localRotation = Quaternion.identity;
+        if (itemRenderer) itemRenderer.transform.localPosition = _spriteBasePosition;
         _gameManager = Match3GameManager.Instance;
     }
 
@@ -66,6 +98,7 @@ public class Match3BottomObject : Match3Object
     
     public override void DestroyWithAnimation()
     {
+        DefuseOnDestroy();
         _beingDestroyed = true;
 
         var bellowCellPosition = _gridHandler.Grid.GetCellWorldPosition(_currentTile.GridPosition.x, -1);
@@ -87,6 +120,8 @@ public class Match3BottomObject : Match3Object
         int column = _currentTile.GridPosition.x;
         _movementSequence.ChainCallback(() =>
         {
+            var socket = _gridHandler ? _gridHandler.GetTile(new Vector2Int(column, -1)) : null;
+            if (socket) socket.PlugIn();
             CloseCatcherIfColumnDone(column);
             ObjectPooler.ReturnObjectToPool(gameObject);
         });

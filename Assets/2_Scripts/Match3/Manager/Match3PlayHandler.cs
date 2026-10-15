@@ -753,7 +753,7 @@ public class Match3PlayHandler : MonoBehaviour
     }
     
     /// <summary>
-    /// Moves everything on each conveyor row one cell along, wrapping round the row. Double Stars, viruses and Square Stars
+    /// Moves everything on each conveyor row one cell along, wrapping round the row. Stars, viruses and Plugs
     /// stay where they are and the rest of the row moves past them. True if anything moved.
     /// </summary>
     public bool ShiftConveyorRows(SOMatch3Level level)

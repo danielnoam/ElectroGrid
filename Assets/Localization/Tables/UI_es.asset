@@ -30,12 +30,12 @@ MonoBehaviour:
       m_Items:
       - rid: 5242841009418141697
   - m_Id: 1437589506
-    m_Localized: Destruye {amount} estrellas dobles
+    m_Localized: Destruye {amount} estrellas
     m_Metadata:
       m_Items:
       - rid: 5242841009418141697
   - m_Id: 1437589508
-    m_Localized: Lleva {amount} estrellas cuadradas hasta abajo
+    m_Localized: Lleva {amount} enchufes hasta abajo
     m_Metadata:
       m_Items:
       - rid: 5242841009418141697
@@ -133,11 +133,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
-    m_Localized: 'Estrellas dobles:'
+    m_Localized: 'Estrellas:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589507
-    m_Localized: 'Estrella cuadrada:'
+    m_Localized: 'Enchufe:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589509

@@ -42,13 +42,13 @@ public class SurvivalTimeSettings
 [Serializable]
 public class SurvivalBonusSettings
 {
-    [Tooltip("Chance, per board refill, that one new piece is a Square Star instead. Only once a Square Stars milestone is reached")]
+    [Tooltip("Chance, per board refill, that one new piece is a Plug instead. Only once a Plugs milestone is reached")]
     [Range(0f, 100f)] public float squareStarChance = 15f;
     [Min(0)] public int maxSquareStars = 2;
-    [Tooltip("Square Stars only appear this high up the board or above (0 is the bottom row, 1 the top), so they have a way to fall")]
+    [Tooltip("Plugs only appear this high up the board or above (0 is the bottom row, 1 the top), so they have a way to fall")]
     [Range(0f, 1f)] public float squareStarMinHeight = 0.5f;
 
-    [Tooltip("Chance, per board refill, that one new piece is a Double Star instead. Only once a Double Stars milestone is reached")]
+    [Tooltip("Chance, per board refill, that one new piece is a Star instead. Only once a Stars milestone is reached")]
     [Range(0f, 100f)] public float doubleStarChance = 8f;
     [Min(0)] public int maxDoubleStars = 2;
 

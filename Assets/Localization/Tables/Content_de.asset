@@ -27,11 +27,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 837804032
-    m_Localized: Doppelsterne
+    m_Localized: Sterne
     m_Metadata:
       m_Items: []
   - m_Id: 837804033
-    m_Localized: "Doppelsterne blockieren deine Kombinationen. Bilde daneben eine Kombination oder nutze einen Linienbrecher, um sie zu zerst\xF6ren."
+    m_Localized: "Sterne blockieren deine Kombinationen. Jeder braucht zwei Treffer: Bilde daneben Kombinationen oder nutze einen Linienbrecher, um ihn sofort zu zerst\xF6ren."
     m_Metadata:
       m_Items: []
   - m_Id: 837804034
@@ -51,11 +51,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 846192640
-    m_Localized: Quadratsterne
+    m_Localized: Stecker
     m_Metadata:
       m_Items: []
   - m_Id: 846192641
-    m_Localized: Quadratsterne fallen, wenn du unter ihnen Kombinationen bildest. Kombiniere weiter darunter, bis sie den unteren Rand des Rasters erreichen.
+    m_Localized: Stecker fallen, wenn du unter ihnen Kombinationen bildest. Kombiniere weiter darunter, bis sie unten im Raster einstecken.
     m_Metadata:
       m_Items: []
   - m_Id: 846192642
@@ -103,7 +103,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600450
-    m_Localized: "Viren blockieren deine Kombinationen wie Doppelsterne, aber in jedem Zug, in dem du keines zerst\xF6rst, breitet sich ein Virus auf ein Nachbarteil aus."
+    m_Localized: "Viren blockieren deine Kombinationen wie Sterne, aber in jedem Zug, in dem du keines zerst\xF6rst, breitet sich ein Virus auf ein Nachbarteil aus."
     m_Metadata:
       m_Items: []
   - m_Id: 3159364746600451

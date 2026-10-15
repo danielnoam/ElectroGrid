@@ -322,11 +322,45 @@ public class Match3GameManager : MonoBehaviour
         _currentLevelData?.OnGlitchCleared();
     }
 
-    public void NotifyFuseDefused(Match3MatchableObject piece)
+    public void NotifyFuseDefused(Match3Object carrier)
     {
         if (levelComplete) return;
 
         _currentLevelData?.OnFuseDefused();
+        BlastAroundFuse(carrier);
+    }
+
+    /// <summary>A defused fuse goes off: every piece in the eight cells around it is destroyed and those cells count as hit.</summary>
+    private void BlastAroundFuse(Match3Object carrier)
+    {
+        var center = carrier ? carrier.CurrentTile : null;
+        if (!center) return;
+
+        int pieces = 0;
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                if (dx == 0 && dy == 0) continue;
+
+                var tile = gridHandler.GetTile(center.GridPosition + new Vector2Int(dx, dy));
+                if (!gridHandler.IsValidTile(tile)) continue;
+
+                NotifyTileHit(tile);
+                if (tile.CurrentMatch3Object is not Match3MatchableObject piece) continue;
+
+                tile.SetCurrentItem(null);
+                tile.PunchTile(1.4f);
+                piece.DestroyWithAnimation();
+                pieces++;
+            }
+        }
+
+        if (pieces == 0) return;
+
+        CameraManager.Instance?.ShakeCamera(0.6f);
+        _currentLevelData?.Survival?.OnLineBreakPieces(pieces, Combo.Count);
+        AddLevelPoints(pieces * levelScoreSettings.pointsPerPiece);
     }
 
     /// <summary>Puts fuses on the cells the level marks and reports the starting virus count, once the board is filled.</summary>
@@ -339,10 +373,11 @@ public class Match3GameManager : MonoBehaviour
         {
             for (int x = 0; x < grid.Width; x++)
             {
-                if (!currentLevel.TileHasObjectType(x, y, Match3TileObjectType.Fuse)) continue;
-
                 var tile = gridHandler.GetTile(new Vector2Int(x, y));
-                if (tile && tile.CurrentMatch3Object is Match3MatchableObject piece) piece.SetFuse(currentLevel.FuseMoves);
+                if (!tile) continue;
+
+                if (currentLevel.TileHasObjectType(x, y, Match3TileObjectType.Fuse) && tile.CurrentMatch3Object is Match3MatchableObject piece) piece.SetFuse(currentLevel.FuseMoves);
+                else if (currentLevel.HasStarFuse(x, y) && tile.CurrentMatch3Object is Match3ObstacleObject or Match3BottomObject) tile.CurrentMatch3Object.SetFuse(currentLevel.FuseMoves);
             }
         }
 
@@ -366,7 +401,7 @@ public class Match3GameManager : MonoBehaviour
 
         foreach (var tile in gridHandler.Tiles.Values)
         {
-            if (tile && tile.IsActive && tile.CurrentMatch3Object is Match3MatchableObject { HasFuse: true } piece && piece.TickFuse())
+            if (tile && tile.IsActive && tile.CurrentMatch3Object is { HasFuse: true } piece && piece.TickFuse())
             {
                 _fuseBlown = true;
                 piece.BlowFuse();
@@ -606,10 +641,10 @@ public class Match3GameManager : MonoBehaviour
         foreach (var tile in gridHandler.Tiles.Values)
         {
             if (!tile || !tile.CurrentMatch3Object) continue;
+            if (tile.CurrentMatch3Object.HasFuse) fuses++;
             if (tile.CurrentMatch3Object is Match3BottomObject) squareStars++;
             else if (tile.CurrentMatch3Object is Match3ObstacleObject) doubleStars++;
             else if (tile.CurrentMatch3Object is Match3VirusObject) viruses++;
-            else if (tile.CurrentMatch3Object is Match3MatchableObject { HasFuse: true }) fuses++;
         }
 
         return survival.PickBonus(refillTiles, gridHandler, squareStars, doubleStars, viruses, fuses);

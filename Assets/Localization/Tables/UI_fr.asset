@@ -30,12 +30,12 @@ MonoBehaviour:
       m_Items:
       - rid: 5242841009418141700
   - m_Id: 1437589506
-    m_Localized: "D\xE9truis {amount} \xE9toiles doubles"
+    m_Localized: "D\xE9truis {amount} \xE9toiles"
     m_Metadata:
       m_Items:
       - rid: 5242841009418141700
   - m_Id: 1437589508
-    m_Localized: "Am\xE8ne {amount} \xE9toiles carr\xE9es en bas"
+    m_Localized: "Am\xE8ne {amount} prises en bas"
     m_Metadata:
       m_Items:
       - rid: 5242841009418141700
@@ -133,11 +133,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
-    m_Localized: "\xC9toiles doubles :"
+    m_Localized: "\xC9toiles :"
     m_Metadata:
       m_Items: []
   - m_Id: 1437589507
-    m_Localized: "\xC9toile carr\xE9e :"
+    m_Localized: 'Prise :'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589509

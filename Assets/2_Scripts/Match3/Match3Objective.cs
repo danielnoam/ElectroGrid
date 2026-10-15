@@ -242,7 +242,7 @@ public class DestroyObstaclesObjective : Match3Objective
     }
     public override string GetName()
     {
-        return "Destroy Double Stars";
+        return "Destroy Stars";
     }
     
     public override string GetDescription()

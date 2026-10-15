@@ -215,7 +215,7 @@ public class Match3SurvivalRun
     }
 
     /// <summary>
-    /// Which bonus, if any, should replace one piece of this refill. Square Stars need a column that reaches the bottom
+    /// Which bonus, if any, should replace one piece of this refill. Plugs need a column that reaches the bottom
     /// row and a starting cell high enough to fall from.
     /// </summary>
     public (Match3Tile tile, Match3TileObjectType type) PickBonus(ICollection<Match3Tile> refillTiles, Match3GridHandler grid, int squareStarsOnBoard, int doubleStarsOnBoard, int virusesOnBoard = 0, int fusesOnBoard = 0)

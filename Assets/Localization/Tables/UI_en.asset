@@ -38,20 +38,20 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
-    m_Localized: 'Double Stars:'
+    m_Localized: 'Stars:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589506
-    m_Localized: Destroy {amount} Double Stars
+    m_Localized: Destroy {amount} Stars
     m_Metadata:
       m_Items:
       - rid: 5242841005928218761
   - m_Id: 1437589507
-    m_Localized: 'Square Star:'
+    m_Localized: 'Plug:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589508
-    m_Localized: Get {amount} Square Stars to the Bottom
+    m_Localized: Get {amount} Plugs to the Bottom
     m_Metadata:
       m_Items:
       - rid: 5242841005928218761

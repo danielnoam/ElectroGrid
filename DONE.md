@@ -878,3 +878,52 @@ of as a new blob per edit.
 - [x] **Combo bar on Reach Score levels** (21 and 25); the validator warns if a
       score level has it off.
 - [x] **Level 21's X is bolder**: arms 5 wide, 65 cells instead of 41.
+
+## Levels 26 to 50, new mechanics, Survival milestones (1.7.0)
+
+- [x] **Levels 26 to 50**, with glitches, viruses, fuses and conveyors mixed
+      into Levels 18 to 50. Specific-shape goals were swapped for Get Matches.
+- [x] **Real visuals for the new mechanics**: glitch, fuse ring and conveyor
+      shaders, a virus sprite with a glow mask, spread and glitch-clear
+      particles, all pooled. The fuse burst outlives the piece.
+- [x] **Survival milestones** on `SurvivalMode`: a score and what it unlocks
+      (a piece, viruses, fuses, Plugs or Stars). The Diamond and the
+      Trapezoid are new pieces that only come in through milestones.
+- [x] **Timed levels are 45 seconds at most.** Validator: object counts must
+      match the goal exactly.
+
+## Drag feel and input fixes (1.7.1)
+
+- [x] **Swipes go with the stronger direction** instead of dropping the piece
+      on diagonals; a near-45° swipe waits for more movement.
+- [x] **Swipe distance is 40% of a tile on screen**, not a fixed 55 px.
+- [x] **Input bugs**: the press position is read fresh at touch-down, the
+      re-subscribe runs once per scene, gamepad and joystick bindings are out
+      of the Match3 input, and pausing releases a held piece.
+- [x] **Combo bar stays on screen** on levels that have it.
+
+## Plugs, Stars and fuse blasts (after 1.7.1)
+
+- [x] **Combo counter always shows**, x1 with no combo.
+- [x] **Info card icons redrawn** for glitch, fuse (the burning ring, not a
+      bomb) and conveyor.
+- [x] **Glitch break effect**: sideways static slivers and pixel shards
+      (`Prefab_ParticleGlitch`).
+- [x] **Fuses on Stars and Plugs.** The fuse moved from the matchable piece
+      to `Match3Object`; Stars and Plugs get it from a per-cell
+      `starFuseTiles` layer painted with the Fuse brush. Level 35 has one.
+- [x] **Fuse rings grow in** instead of popping on.
+- [x] **A defused fuse blasts** the 8 cells around it: pieces are destroyed
+      (Stars, Plugs and viruses stay), those cells count as hit for glitches,
+      and blasted pieces score like line-break pieces. Fuses chain.
+- [x] **Only pieces have colour.** Viruses and their particles are white;
+      fuses stay gold and glitches keep their cyan static.
+- [x] **Square Star is now the Plug**, named Plug in all 7 languages. It dips
+      as if plugging in with sparks from the pins, and the catchers are
+      two-part sockets: the back half draws behind the plug and the front half
+      in front, so the pins go in.
+- [x] **Double Star is now the Star, with 2 health.** It shows the double star
+      at 2 and a single star at 1 (`healthSprites`). The first hit plays the
+      break animation with a lighter particle (`Prefab_ParticleStarHit`); a
+      line break still breaks it at once. Named Star in all 7 languages.
+- [x] **Cleanup**: the `Assets/_Recovery` scene backup is gone.

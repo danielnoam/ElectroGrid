@@ -137,13 +137,23 @@ public class Match3Tile : MonoBehaviour, IPoolable
         _trashTween = Tween.ScaleY(trashSprite, _baseTrashScale.y, 0.35f, Ease.OutBack, startDelay: delay);
     }
 
-    /// <summary>Folds the catch box under the board shut, once the last Square Star for its column has dropped in.</summary>
+    /// <summary>Folds the catch box under the board shut, once the last Plug for its column has dropped in.</summary>
     public void CloseTrash()
     {
         if (!trashSprite.gameObject.activeSelf) return;
 
         _trashTween.Stop();
         _trashTween = Tween.ScaleY(trashSprite, 0f, 0.35f, Ease.InBack);
+    }
+
+    /// <summary>A Plug just landed in this socket, so it gives a short jolt.</summary>
+    public void PlugIn()
+    {
+        if (!trashSprite.gameObject.activeSelf) return;
+
+        _trashTween.Stop();
+        trashSprite.localScale = _baseTrashScale;
+        _trashTween = Tween.PunchScale(trashSprite, new Vector3(0.25f, -0.2f, 0f), 0.3f, frequency: 6);
     }
 
     public void SetCurrentItem(Match3Object match3Object)

@@ -6,8 +6,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Shows the combo next to the level title: a counter on one side, a bar that fills on the other, and a thin line under
 /// the bar that drains as the window to the next match runs out. Also plays the combo's feel: a sound that rises in
-/// pitch per step and a shake that grows with it. On levels with the combo bar it stays on screen, empty, while there is no
-/// combo; only the counter fades out.
+/// pitch per step and a shake that grows with it. On levels with the combo bar it stays on screen while there is no combo,
+/// empty and showing x1.
 /// </summary>
 public class ComboBarUI : MonoBehaviour
 {
@@ -18,8 +18,6 @@ public class ComboBarUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countText;
 
     [Header("Look")]
-    [Tooltip("The counter only appears from this step, a single match is not a combo yet")]
-    [SerializeField, Min(1)] private int showFromStep = 2;
     [SerializeField, Min(0.01f)] private float fadeSpeed = 6f;
     [SerializeField, Min(0.01f)] private float fillSpeed = 4f;
 
@@ -40,7 +38,7 @@ public class ComboBarUI : MonoBehaviour
     private void Start()
     {
         if (canvasGroup) canvasGroup.alpha = 0f;
-        if (countText) countText.alpha = 0f;
+        SetCount(0);
         if (!Match3GameManager.Instance) return;
 
         _combo = Match3GameManager.Instance.Combo;
@@ -64,11 +62,8 @@ public class ComboBarUI : MonoBehaviour
 
         // Unscaled, the bar keeps animating behind a pause window even though the combo itself is frozen
         float dt = Time.unscaledDeltaTime;
-        bool visible = _combo.Count >= showFromStep;
-
         bool comboOn = Match3GameManager.Instance && Match3GameManager.Instance.ComboEnabled;
         if (canvasGroup) canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, comboOn ? 1f : 0f, fadeSpeed * dt);
-        if (countText) countText.alpha = Mathf.MoveTowards(countText.alpha, visible ? 1f : 0f, fadeSpeed * dt);
 
         _shownFill = Mathf.MoveTowards(_shownFill, _combo.Fill, fillSpeed * dt);
         if (fillImage) fillImage.fillAmount = _shownFill;
@@ -77,7 +72,7 @@ public class ComboBarUI : MonoBehaviour
 
     private void OnStepAdded(int count)
     {
-        if (countText) countText.text = $"x{count}";
+        SetCount(count);
 
         AudioLibrary.Play(stepSfx, Mathf.Min(maxPitch, 1f + pitchPerStep * (count - 1)));
         CameraManager.Instance?.ShakeCamera(Mathf.Min(maxShake, baseShake + shakePerStep * (count - 1)));
@@ -94,5 +89,11 @@ public class ComboBarUI : MonoBehaviour
     private void OnReset(int reached)
     {
         _shownFill = 0f;
+        SetCount(0);
+    }
+
+    private void SetCount(int count)
+    {
+        if (countText) countText.text = $"x{Mathf.Max(1, count)}";
     }
 }

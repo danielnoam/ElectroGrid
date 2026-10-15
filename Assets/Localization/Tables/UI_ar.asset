@@ -30,12 +30,12 @@ MonoBehaviour:
       m_Items:
       - rid: 5242841020651274371
   - m_Id: 1437589506
-    m_Localized: "\u062F\u0645\u0651\u0631 {amount} \u0646\u062C\u0645\u0629 \u0645\u0632\u062F\u0648\u062C\u0629"
+    m_Localized: "\u062F\u0645\u0651\u0631 {amount} \u0646\u062C\u0645\u0629"
     m_Metadata:
       m_Items:
       - rid: 5242841020651274371
   - m_Id: 1437589508
-    m_Localized: "\u0623\u0648\u0635\u0644 {amount} \u0646\u062C\u0645\u0629 \u0645\u0631\u0628\u0639\u0629 \u0625\u0644\u0649 \u0627\u0644\u0623\u0633\u0641\u0644"
+    m_Localized: "\u0623\u0648\u0635\u0644 {amount} \u0642\u0627\u0628\u0633\u064B\u0627 \u0625\u0644\u0649 \u0627\u0644\u0623\u0633\u0641\u0644"
     m_Metadata:
       m_Items:
       - rid: 5242841020651274371
@@ -133,11 +133,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
-    m_Localized: "\u0627\u0644\u0646\u062C\u0648\u0645 \u0627\u0644\u0645\u0632\u062F\u0648\u062C\u0629:"
+    m_Localized: "\u0627\u0644\u0646\u062C\u0648\u0645:"
     m_Metadata:
       m_Items: []
   - m_Id: 1437589507
-    m_Localized: "\u0627\u0644\u0646\u062C\u0645\u0629 \u0627\u0644\u0645\u0631\u0628\u0639\u0629:"
+    m_Localized: "\u0627\u0644\u0642\u0627\u0628\u0633:"
     m_Metadata:
       m_Items: []
   - m_Id: 1437589509

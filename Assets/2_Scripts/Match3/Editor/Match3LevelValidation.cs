@@ -40,7 +40,7 @@ internal static class Match3LevelValidation
         return worst;
     }
 
-    /// <summary>How many Double Stars and Square Stars the level's objectives ask for in total.</summary>
+    /// <summary>How many Stars and Plugs the level's objectives ask for in total.</summary>
     public static void GetRequiredCounts(SOMatch3Level level, out int obstaclesNeeded, out int bottomsNeeded)
     {
         obstaclesNeeded = 0;
@@ -161,13 +161,13 @@ internal static class Match3LevelValidation
 
                 if (y == 0)
                 {
-                    issues.Add(new Issue(Severity.Error, $"Square Star at ({x},{y}) is on the bottom row and scores the moment the level starts."));
+                    issues.Add(new Issue(Severity.Error, $"Plug at ({x},{y}) is on the bottom row and scores the moment the level starts."));
                     continue;
                 }
 
                 if (!IsColumnBottomEligible(grid, x))
                 {
-                    issues.Add(new Issue(Severity.Error, $"Square Star at ({x},{y}) is in a column that never reaches row 0, so it can never be collected."));
+                    issues.Add(new Issue(Severity.Error, $"Plug at ({x},{y}) is in a column that never reaches row 0, so it can never be collected."));
                     continue;
                 }
             }
@@ -192,7 +192,7 @@ internal static class Match3LevelValidation
         GetRequiredCounts(level, out int obstaclesNeeded, out int bottomsNeeded);
 
         int viruses = level.CountObjectsOfType(Match3TileObjectType.Virus);
-        int fuses = level.CountObjectsOfType(Match3TileObjectType.Fuse);
+        int fuses = level.CountFuses();
         int glitches = level.CountGlitches();
 
         foreach (var objective in level.Objectives)
@@ -203,6 +203,17 @@ internal static class Match3LevelValidation
                 issues.Add(new Issue(Severity.Error, $"Objectives need {defuse.RequiredAmount} fuses but {fuses} are placed."));
             if (objective is ClearGlitchesObjective clear && clear.RequiredAmount != glitches)
                 issues.Add(new Issue(Severity.Error, $"Objectives need {clear.RequiredAmount} glitches but {glitches} are painted."));
+        }
+
+        var starFuses = level.StarFuseTiles;
+        if (starFuses != null)
+        {
+            for (int i = 0; i < starFuses.Length && i < grid.Width * grid.Height; i++)
+            {
+                int x = i % grid.Width, y = i / grid.Width;
+                if (starFuses[i] && grid.IsCellActive(x, y) && !level.HasStarFuse(x, y))
+                    issues.Add(new Issue(Severity.Warning, $"Star fuse at ({x},{y}) has no Star or Plug under it, so it does nothing."));
+            }
         }
 
         if (fuses > 0 && !level.Objectives.Exists(objective => objective is DefuseObjective))
@@ -227,12 +238,12 @@ internal static class Match3LevelValidation
 
         if (obstaclesNeeded > 0 && obstaclesNeeded != obstacles)
         {
-            issues.Add(new Issue(Severity.Error, $"Objectives need {obstaclesNeeded} Double Stars but {obstacles} are placed."));
+            issues.Add(new Issue(Severity.Error, $"Objectives need {obstaclesNeeded} Stars but {obstacles} are placed."));
         }
 
         if (bottomsNeeded > 0 && bottomsNeeded != bottoms)
         {
-            issues.Add(new Issue(Severity.Error, $"Objectives need {bottomsNeeded} Square Stars but {bottoms} are placed."));
+            issues.Add(new Issue(Severity.Error, $"Objectives need {bottomsNeeded} Plugs but {bottoms} are placed."));
         }
     }
 }

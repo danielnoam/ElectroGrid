@@ -1092,11 +1092,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TouchInputReader
   inputManager: {fileID: 1105389518}
   swipeThreshold: 55
-  swipeDeadzone: 0.3
+  swipeTileFraction: 0.4
+  diagonalTolerance: 0.85
+  maxSwipeWait: 2.5
   mousePosition: {x: 0, y: 0}
   isPressing: 0
   pressStartPosition: {x: 0, y: 0}
   swipeDirection: {x: 0, y: 0}
+  tileSwipeDistance: 0
 --- !u!1001 &604789036
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2647,7 +2650,6 @@ MonoBehaviour:
   fillImage: {fileID: 1462471397}
   timerImage: {fileID: 1656458131}
   countText: {fileID: 1632533942}
-  showFromStep: 2
   fadeSpeed: 6
   fillSpeed: 4
   stepSfx: ButtonSelect

@@ -38,7 +38,7 @@ internal static class Match3LevelGridGUI
     public static Texture2D IconFor(Match3TileObjectType type) => type switch
     {
         Match3TileObjectType.Obstacle => Icon("ShapeDoubleStar"),
-        Match3TileObjectType.Bottom => Icon("ShapeSquareStar"),
+        Match3TileObjectType.Bottom => Icon("ShapePlug"),
         Match3TileObjectType.Virus => Icon("Virus"),
         Match3TileObjectType.Fuse => Icon("Fuse"),
         _ => null
@@ -55,8 +55,8 @@ internal static class Match3LevelGridGUI
 
     public static string NameFor(Match3TileObjectType type) => type switch
     {
-        Match3TileObjectType.Obstacle => "Double Star",
-        Match3TileObjectType.Bottom => "Square Star",
+        Match3TileObjectType.Obstacle => "Star",
+        Match3TileObjectType.Bottom => "Plug",
         Match3TileObjectType.Virus => "Virus",
         Match3TileObjectType.Fuse => "Fuse",
         _ => "Piece"
@@ -128,6 +128,12 @@ internal static class Match3LevelGridGUI
                     EditorGUI.DrawRect(new Rect(cellRect.x + cellRect.width * 0.42f, cellRect.y + cellRect.height * 0.62f, cellRect.width * 0.4f, slice), GlitchColor);
                 }
 
+                if (isActive && level && level.HasStarFuse(x, y))
+                {
+                    float ring = Mathf.Max(2f, cellSize * 0.08f);
+                    DrawOutline(new Rect(cellRect.x + ring, cellRect.y + ring, cellRect.width - ring * 2f, cellRect.height - ring * 2f), FuseColor, ring);
+                }
+
                 if (drawHover && cellRect.Contains(Event.current.mousePosition))
                 {
                     EditorGUI.DrawRect(cellRect, HoverColor);
@@ -184,13 +190,13 @@ internal static class Match3LevelGridGUI
         int obstacleCount = level.CountObjectsOfType(Match3TileObjectType.Obstacle);
         int bottomObjectCount = level.CountObjectsOfType(Match3TileObjectType.Bottom);
         int virusCount = level.CountObjectsOfType(Match3TileObjectType.Virus);
-        int fuseCount = level.CountObjectsOfType(Match3TileObjectType.Fuse);
+        int fuseCount = level.CountFuses();
         int glitchCount = level.CountGlitches();
         int matchableCount = level.GridShape.Grid.ActiveCellCount - obstacleCount - bottomObjectCount - virusCount;
 
         Match3LevelValidation.GetRequiredCounts(level, out int obstacleNeeded, out int bottomObjectNeeded);
 
-        var parts = new List<string> { $"Pieces: {matchableCount}", Tally("Double Stars", obstacleCount, obstacleNeeded), Tally("Square Stars", bottomObjectCount, bottomObjectNeeded) };
+        var parts = new List<string> { $"Pieces: {matchableCount}", Tally("Stars", obstacleCount, obstacleNeeded), Tally("Plugs", bottomObjectCount, bottomObjectNeeded) };
         if (virusCount > 0) parts.Add($"Viruses: {virusCount}");
         if (fuseCount > 0) parts.Add($"Fuses: {fuseCount}");
         if (glitchCount > 0) parts.Add($"Glitches: {glitchCount}");

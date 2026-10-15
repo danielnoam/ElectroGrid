@@ -246,8 +246,8 @@ public class UpdateWindowUI : MonoBehaviour
         if (!show) GameManager.Instance?.TogglePause(false, false);
 
         _toggleSequence = Sequence.Create(useUnscaledTime: true)
-            .Group(Tween.UISizeDelta(windowRectTransform, endSize, windowTweenSettings))
-            .Group(Tween.GlobalTimeScale(endTimeScale, windowTweenSettings));
+            .Group(Tween.UISizeDelta(windowRectTransform, endSize, windowTweenSettings));
+        if (!Mathf.Approximately(Time.timeScale, endTimeScale)) _toggleSequence.Group(Tween.GlobalTimeScale(endTimeScale, windowTweenSettings));
 
         if (titleText) _toggleSequence.Group(Tween.Alpha(titleText, titleEndAlpha, windowTweenSettings.duration * 0.8f));
         if (_buttonsGroup) _toggleSequence.Group(Tween.Alpha(_buttonsGroup, titleEndAlpha, windowTweenSettings.duration * 0.8f));

@@ -35,7 +35,7 @@ public class Match3GridHandler : MonoBehaviour
     public event Action<Grid> GridCreated;
     public event Action<Match3HelperObject> HelperSpawned;
     
-    /// <param name="catchersInEveryColumn">Puts a catch box under every column a Square Star can reach the bottom of, for boards where Stars appear later.</param>
+    /// <param name="catchersInEveryColumn">Puts a catch box under every column a Plug can reach the bottom of, for boards where Stars appear later.</param>
     public void CreateGrid(SOMatch3Level level, bool catchersInEveryColumn = false)
     {
         if (!level || !match3TilePrefab) return;

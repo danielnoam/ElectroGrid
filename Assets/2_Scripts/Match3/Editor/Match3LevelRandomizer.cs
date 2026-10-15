@@ -59,7 +59,7 @@ internal static class Match3LevelRandomizer
         {
             if (!Match3LevelValidation.IsColumnBottomEligible(grid, x)) continue;
 
-            // Row 0 is excluded, a Square Star there scores the instant the level starts
+            // Row 0 is excluded, a Plug there scores the instant the level starts
             for (int y = 1; y < grid.Height; y++)
             {
                 if (!grid.IsCellActive(x, y)) continue;
@@ -69,7 +69,7 @@ internal static class Match3LevelRandomizer
             }
         }
 
-        // Weighted toward higher rows so a Square Star has some distance to fall
+        // Weighted toward higher rows so a Plug has some distance to fall
         Shuffle(candidates, random);
         candidates.Sort((a, b) =>
         {
@@ -99,7 +99,7 @@ internal static class Match3LevelRandomizer
 
         if (placed < options.BottomCount)
         {
-            Debug.LogWarning($"Only placed {placed} of {options.BottomCount} Square Stars, the grid has no more eligible cells.");
+            Debug.LogWarning($"Only placed {placed} of {options.BottomCount} Plugs, the grid has no more eligible cells.");
         }
     }
 
@@ -148,7 +148,7 @@ internal static class Match3LevelRandomizer
 
         if (placed < options.ObstacleCount)
         {
-            Debug.LogWarning($"Only placed {placed} of {options.ObstacleCount} Double Stars, the grid has no more free cells.");
+            Debug.LogWarning($"Only placed {placed} of {options.ObstacleCount} Stars, the grid has no more free cells.");
         }
     }
 

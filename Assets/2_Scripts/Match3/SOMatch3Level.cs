@@ -22,6 +22,7 @@ public class SOMatch3Level : ScriptableObject
     [Header("Tile Objects")]
     [SerializeField, HideInInspector] private Match3TileObjectType[] tileObjects;
     [SerializeField, HideInInspector] private bool[] glitchTiles;
+    [SerializeField, HideInInspector] private bool[] starFuseTiles;
 
     
     /// <summary>The authored name. Stays in English for analytics and save records, players see DisplayName.</summary>
@@ -45,6 +46,7 @@ public class SOMatch3Level : ScriptableObject
     public int FuseMoves => fuseMoves;
     public List<Match3ConveyorRow> ConveyorRows => conveyorRows;
     public bool[] GlitchTiles => glitchTiles;
+    public bool[] StarFuseTiles => starFuseTiles;
     public Match3TileObjectType[] TileObjects => tileObjects;
     
     
@@ -81,6 +83,36 @@ public class SOMatch3Level : ScriptableObject
 
         int index = y * width + x;
         return index < glitchTiles.Length && glitchTiles[index] && gridShape.Grid.IsCellActive(x, y);
+    }
+
+    /// <summary>A fuse on the Star or Plug in this cell. Only counts when the cell holds a Star.</summary>
+    public bool HasStarFuse(int x, int y)
+    {
+        if (!gridShape || gridShape.Grid == null || starFuseTiles == null) return false;
+
+        int width = gridShape.Grid.Width;
+        if (x < 0 || x >= width || y < 0 || y >= gridShape.Grid.Height) return false;
+
+        int index = y * width + x;
+        if (index >= starFuseTiles.Length || !starFuseTiles[index] || !gridShape.Grid.IsCellActive(x, y)) return false;
+        return TileHasObjectType(x, y, Match3TileObjectType.Obstacle) || TileHasObjectType(x, y, Match3TileObjectType.Bottom);
+    }
+
+    /// <summary>Every fuse the level starts with: on pieces and on Stars.</summary>
+    public int CountFuses()
+    {
+        int count = CountObjectsOfType(Match3TileObjectType.Fuse);
+        if (!gridShape || gridShape.Grid == null) return count;
+
+        for (int y = 0; y < gridShape.Grid.Height; y++)
+        {
+            for (int x = 0; x < gridShape.Grid.Width; x++)
+            {
+                if (HasStarFuse(x, y)) count++;
+            }
+        }
+
+        return count;
     }
 
     public int CountGlitches()

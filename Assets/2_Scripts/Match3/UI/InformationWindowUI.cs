@@ -195,9 +195,9 @@ public class InformationWindowUI : MonoBehaviour
             .Group(Tween.UISizeDelta(windowRectTransform, endSize, informationWindowTweenSettings))
             .Group(Tween.Alpha(titleText, titleEndAlpha, informationWindowTweenSettings.duration * 0.8f))
             .Group(Tween.Alpha(_buttonsGroup, titleEndAlpha, informationWindowTweenSettings.duration * 0.8f))
-            .Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, informationWindowTweenSettings.duration * 0.8f))
-            .Group(Tween.GlobalTimeScale(endTimeScale, informationWindowTweenSettings))
-            .ChainCallback(() =>
+            .Group(Tween.Alpha(backgroundImage, backgroundEndAlpha, informationWindowTweenSettings.duration * 0.8f));
+        if (!Mathf.Approximately(Time.timeScale, endTimeScale)) _toggleSequence.Group(Tween.GlobalTimeScale(endTimeScale, informationWindowTweenSettings));
+        _toggleSequence.ChainCallback(() =>
             {
                 if (show) GameManager.Instance.TogglePause(true, false);
                 if (!show) _canvasGroup.alpha = 0f;

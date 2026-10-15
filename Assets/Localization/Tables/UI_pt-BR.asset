@@ -30,12 +30,12 @@ MonoBehaviour:
       m_Items:
       - rid: 5242841009418141698
   - m_Id: 1437589506
-    m_Localized: Destrua {amount} estrelas duplas
+    m_Localized: Destrua {amount} estrelas
     m_Metadata:
       m_Items:
       - rid: 5242841009418141698
   - m_Id: 1437589508
-    m_Localized: "Leve {amount} estrelas quadradas at\xE9 o fundo"
+    m_Localized: "Leve {amount} plugues at\xE9 o fundo"
     m_Metadata:
       m_Items:
       - rid: 5242841009418141698
@@ -133,11 +133,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
-    m_Localized: 'Estrelas duplas:'
+    m_Localized: 'Estrelas:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589507
-    m_Localized: 'Estrela quadrada:'
+    m_Localized: 'Plugue:'
     m_Metadata:
       m_Items: []
   - m_Id: 1437589509

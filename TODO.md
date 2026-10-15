@@ -14,14 +14,6 @@ the mechanics stop changing (retuning 50 levels twice is the waste to avoid).
 Decide whether Spark and Surge are in for launch before the level curve
 rework, since they change how every level plays.
 
-- [ ] **Better touch feel when dragging pieces.** A piece sometimes drops by
-      accident mid-drag. Cause found: `Match3PlayHandler.OnSwipe` releases
-      the held piece whenever a swipe is too diagonal (the off axis is more than
-      `SwipeDeadzone` of the main one). Fix: take the stronger axis and ignore
-      a too-diagonal swipe instead of dropping the piece, and only release when
-      the finger lifts. Also worth checking: the swipe distance threshold and
-      how it feels on small phones.
-
 - [ ] **Combo bar.** `HandleMatchesAndRepopulate` already loops cascades but
       nothing counts them, so a four-chain feels identical to a single match in
       a game that is otherwise very loud. The idea: every match fills a combo bar
@@ -57,12 +49,7 @@ rework, since they change how every level plays.
       fuse rings (`FuseRing.shader`) and conveyor belts (`ConveyorBelt.shader`),
       a real virus sprite with a glow mask, spread and glitch-clear particles are
       in. Still to do: sounds for a glitch clearing, a virus spreading and a fuse
-      blowing, and nicer Info card icons (the glitch, fuse and conveyor ones are
-      still drawn in code).
-      **New glitch break effect:** clearing a glitch reuses a cyan copy of the
-      Double Star break particle (`Prefab_ParticleGlitch`). Give it its own
-      effect that reads as digital static breaking apart (scanline slices,
-      pixel shards, a short flicker of the overlay before it goes).
+      blowing.
 
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
       main menu, unlocked from the start. It opens its own screen, laid out like level
@@ -73,17 +60,17 @@ rework, since they change how every level plays.
       number lives on `Assets/3_Data/Survival/SurvivalMode`: swap the board
       there, and tune score, time gains and Star spawns. Score is 10 per piece
       (matches and line breaks), +20 per piece beyond 3 in one match, 100 per
-      Plus, 500 per Square Star, 300 per Double Star, and all of it is
+      Plus, 500 per Plug, 300 per Star, and all of it is
       multiplied by the combo count (capped at x10). Time comes from a Plus
-      (+5s), a full combo bar (+5s), Square Stars (+3s) and Double Stars (+2s),
+      (+5s), a full combo bar (+5s), Plugs (+3s) and Stars (+2s),
       uncapped, and every gain shrinks with minutes played (curve, 1 at the
-      start to 0.4 at 5 minutes). Square and Double Stars spawn at random on
+      start to 0.4 at 5 minutes). Square and Stars spawn at random on
       refills, max 2 each. Best score and runs played are saved; `survival_end`
       goes to Firebase with score and duration. Code: `Match3SurvivalRun`
       (scoring, clock, spawns, 11 EditMode tests), `SurvivalScoreObjective` and
       `SurvivalTimeLimit` (the top bar shows them like any objective).
       Unlocks are now score **Milestones** on `SurvivalMode`: each entry is a
-      score and what it unlocks (a piece, viruses, fuses, Square Stars or Double
+      score and what it unlocks (a piece, viruses, fuses, Plugs or Double
       Stars). Set now: Stars at 0, Diamond 25,000, viruses 40,000, Trapezoid
       60,000, fuses 75,000 (a blown fuse ends the run). Thresholds need a
       playtest on the phone. Numbers playtested 2026-10-11. Still to do: a
@@ -96,16 +83,6 @@ rework, since they change how every level plays.
       with a piece to clear every piece of that colour). Today a match of 5
       is just a bigger line break. Agreed with Daniel to do later; the Drone
       (2x2) was dropped because Plus already fills the helper role.
-
-- [ ] **Fuses on Double Stars and Square Stars.** Let a fuse sit on a Double
-      Star (defused when the Double Star is destroyed) or a Square Star
-      (defused when it reaches the bottom and drops off). If the fuse runs out
-      first, the level is lost, same as a fuse on a normal piece. Today the
-      fuse lives only on `Match3MatchableObject`, and a level cell holds one
-      `Match3TileObjectType`, so a cell can't be both a Star and a Fuse. The
-      fuse needs to move to a shared base (or its own per-cell layer like
-      `glitchTiles`), with the level editor, validation, the Defuse objective
-      and Survival spawns updated to match.
 
 - [ ] **50 more levels (51 to 100).** Build them before the rework, with the
       same rules as LEVELS.md, so the rework has 100 levels to order. Use the
@@ -121,7 +98,7 @@ rework, since they change how every level plays.
       1. **Before it:** 3 to 4 levels with only known obstacles and different
          objectives, so the player is comfortable.
       2. **Introduce:** 1 or 2 easy levels with just the new obstacle (for
-         example only Double Stars), with its tutorial card.
+         example only Stars), with its tutorial card.
       3. **Reinforce:** 2 or 3 levels mixing it with the objectives the player
          knows.
       4. **Combine:** then mix it with earlier obstacles, and repeat the cycle
@@ -341,8 +318,8 @@ what makes it worth building.
         version (`survival_v1`).
 
 - [ ] **In-game level editor, with Steam Workshop later.** Let players build
-      levels inside the game: pick or paint a grid shape, place Double Stars
-      and Square Stars, choose objectives and limits, then play-test and save.
+      levels inside the game: pick or paint a grid shape, place Stars
+      and Plugs, choose objectives and limits, then play-test and save.
       The editor-only tools already do most of this (`Match3LevelEditorWindow`,
       `Match3LevelValidation`), so the work is a runtime UI for it and a level
       format that isn't a ScriptableObject (JSON with the grid cells, tile
