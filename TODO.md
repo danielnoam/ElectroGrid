@@ -1,28 +1,26 @@
 # ElectroGrid — outstanding work
 
-Open work, in the order to do it. Finished items are in [DONE.md](DONE.md).
+Open work, in the order to do it: finish the game, polish and compliance,
+performance, the Android release, then Windows and Steam last. Finished items
+are in [DONE.md](DONE.md).
 Last full check against the code: 2026-09-29.
 
 ---
 
-## 1. Before a wider release
+## 1. Finish the game
 
-Crashlytics and the first tests are in (see DONE.md). What is left:
+Feel fixes first, then the last gameplay additions, then the level curve once
+the mechanics stop changing (retuning 50 levels twice is the waste to avoid).
+Decide whether Spark and Surge are in for launch before the level curve
+rework, since they change how every level plays.
 
-- [ ] **Windows builds still report no crashes to a dashboard.** Crashlytics for
-      Unity only reports from Android and iOS. Exceptions now go to `crash.log`
-      next to the save (see DONE.md), but that only helps when a player sends
-      it in. Sentry's Unity SDK (free tier, catches native crashes on desktop
-      too) is the pick, deferred for now. Do it before Steam, where PC is the
-      only platform. Limit it to Windows so phones don't report twice.
-
----
-
-## 2. Features, in build order
-
-The UI rework comes first because the combo bar and Survival both add HUD
-elements. Survival depends on the combo bar (its time ability) and on score,
-and the level select rework is where the Survival entry would go (it is on the main menu for now).
+- [ ] **Better touch feel when dragging pieces.** A piece sometimes drops by
+      accident mid-drag. Cause found: `Match3PlayHandler.OnSwipe` releases
+      the held piece whenever a swipe is too diagonal (the off axis is more than
+      `SwipeDeadzone` of the main one). Fix: take the stronger axis and ignore
+      a too-diagonal swipe instead of dropping the piece, and only release when
+      the finger lifts. Also worth checking: the swipe distance threshold and
+      how it feels on small phones.
 
 - [ ] **Combo bar.** `HandleMatchesAndRepopulate` already loops cascades but
       nothing counts them, so a four-chain feels identical to a single match in
@@ -53,6 +51,22 @@ and the level select rework is where the Survival entry would go (it is on the m
       when there is no combo running. It should stay on screen (empty) so the
       HUD does not jump in and out.
 
+- [ ] **Separate win and lose endings.** Winning and losing a level play the
+      same end-of-level animation right now. Winning should feel like a
+      celebration and losing like a power-down, so the result reads before the
+      results screen even appears.
+
+- [ ] **New-mechanic visuals, what is left.** Shaders for glitches (`Glitch.shader`),
+      fuse rings (`FuseRing.shader`) and conveyor belts (`ConveyorBelt.shader`),
+      a real virus sprite with a glow mask, spread and glitch-clear particles are
+      in. Still to do: sounds for a glitch clearing, a virus spreading and a fuse
+      blowing, and nicer Info card icons (the glitch, fuse and conveyor ones are
+      still drawn in code).
+      **New glitch break effect:** clearing a glitch reuses a cyan copy of the
+      Double Star break particle (`Prefab_ParticleGlitch`). Give it its own
+      effect that reads as digital static breaking apart (scanline slices,
+      pixel shards, a short flicker of the overlay before it goes).
+
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
       main menu, unlocked from the start. It opens its own screen, laid out like level
       select: rules, best score and Play on top, your 10 best runs (score,
@@ -78,49 +92,13 @@ and the level select rework is where the Survival entry would go (it is on the m
       playtest on the phone. Numbers playtested 2026-10-11. Still to do: a
       pop-in when a milestone unlocks (`MilestoneReached` is already raised),
       decide whether to show the best score on the menu, and a Steam
-      leaderboard later (section 3).
-
-- [ ] **In-game level editor, with Steam Workshop later.** Let players build
-      levels inside the game: pick or paint a grid shape, place Double Stars
-      and Square Stars, choose objectives and limits, then play-test and save.
-      The editor-only tools already do most of this (`Match3LevelEditorWindow`,
-      `Match3LevelValidation`), so the work is a runtime UI for it and a level
-      format that isn't a ScriptableObject (JSON with the grid cells, tile
-      objects, objectives and limits). Run the same validation rules as
-      LEVELS.md before a level can be saved or shared. Workshop comes after
-      the Steam build: upload and subscribe through Steamworks UGC, load
-      subscribed levels from their install folders, and keep player levels
-      out of the main level list and progress.
+      leaderboard later (section 5).
 
 - [ ] **Spark and Surge power-ups.** An L or T match leaves a Spark (clears a
       3x3 area when matched or swapped), 5 in a row leaves a Surge (swap it
       with a piece to clear every piece of that colour). Today a match of 5
       is just a bigger line break. Agreed with Daniel to do later; the Drone
       (2x2) was dropped because Plus already fills the helper role.
-
-- [ ] **New-mechanic visuals, what is left.** Shaders for glitches (`Glitch.shader`),
-      fuse rings (`FuseRing.shader`) and conveyor belts (`ConveyorBelt.shader`),
-      a real virus sprite with a glow mask, spread and glitch-clear particles are
-      in. Still to do: sounds for a glitch clearing, a virus spreading and a fuse
-      blowing, and nicer Info card icons (the glitch, fuse and conveyor ones are
-      still drawn in code).
-      **New glitch break effect:** clearing a glitch reuses a cyan copy of the
-      Double Star break particle (`Prefab_ParticleGlitch`). Give it its own
-      effect that reads as digital static breaking apart (scanline slices,
-      pixel shards, a short flicker of the overlay before it goes).
-
-- [ ] **Better touch feel when dragging pieces.** A piece sometimes drops by
-      accident mid-drag. Cause found: `Match3PlayHandler.OnSwipe` releases
-      the held piece whenever a swipe is too diagonal (the off axis is more than
-      `SwipeDeadzone` of the main one). Fix: take the stronger axis and ignore
-      a too-diagonal swipe instead of dropping the piece, and only release when
-      the finger lifts. Also worth checking: the swipe distance threshold and
-      how it feels on small phones.
-
-- [ ] **Separate win and lose endings.** Winning and losing a level play the
-      same end-of-level animation right now. Winning should feel like a
-      celebration and losing like a power-down, so the result reads before the
-      results screen even appears.
 
 - [ ] **Rework the level curve.** Difficulty is all over the place across the
       50 levels. Re-order and retune them into a steady curve: rate each level
@@ -130,10 +108,6 @@ and the level select rework is where the Survival entry would go (it is on the m
       combinations move later. Introduce one new idea at a time and give each
       a gentle first level. Playtest on the phone, and update LEVELS.md to match.
 
-- [ ] **New game icon.** Replace the current app icon (Android adaptive icon,
-      Windows exe icon, and later the Steam and itch.io capsules) with one that
-      fits the neon ElectroGrid look and reads at small sizes.
-
 ### Content, not engineering
 
 - **50 levels are in** (see LEVELS.md). `GetSpecificItemMatches` is left
@@ -141,11 +115,61 @@ and the level select rework is where the Survival entry would go (it is on the m
 
 ---
 
-## 3. Distribution
+## 2. Polish and compliance
+
+Everything a store page and a paying audience can hold against the game.
+
+- [ ] **New game icon.** Replace the current app icon (Android adaptive icon,
+      Windows exe icon, and later the Steam and itch.io capsules) with one that
+      fits the neon ElectroGrid look and reads at small sizes.
+
+- [ ] **License check for everything shipped.** Go through every asset,
+      plugin, package, font, sound, music track and shader the build uses and
+      confirm its license allows a commercial release (selling, or a free game
+      with store distribution) and what attribution it requires. Keep a list
+      (name, source, license, link) in the repo, and remove or replace
+      anything that is unclear.
+
+- [ ] **Credits complete.** Every entry from the license check that asks for
+      attribution is in the Credits screen, plus Unity and Firebase notices
+      where their terms ask for them.
+
+- [ ] **Localization pass.** Check every word and sentence in every language:
+      menus, objectives, Info cards, tutorials, Survival rules, settings, the
+      results screens and the update prompt. Look for wrong or literal
+      translations, text that overflows or is cut off, and RTL layout in Hebrew
+      and Arabic. As part of it, look at how other games handle credits: whether
+      they translate the headings (usually yes) and keep names and license
+      notices in their original form (usually yes), and do the same.
+
+---
+
+## 3. Performance pass
+
+- [ ] **Music Vorbis quality is still 100%.** Needs listening, so later. The
+      loading problems are fixed (see DONE.md > Music clips moved to Streaming).
+      Dropping quality to 0.5-0.7 would roughly halve the build size and is
+      normally transparent for game music, but A/B it by ear before changing it.
+
+- [ ] **Performance pass.** Do it together with the music quality pass:
+      - **Sprite atlases.** Only the small shape masks are in one
+        (`SmallShapes.spriteatlasv2`). Pack the piece, Star, obstacle and UI
+        sprites too so the board batches into fewer draw calls. Check first
+        that the custom-material sprites (glitch, fuse ring, conveyor) still
+        work when packed.
+      - **Shaders.** Review the glitch, fuse ring and conveyor shaders for
+        mobile cost (overdraw from the additive ones, per-pixel noise), and use
+        shared materials with property blocks everywhere.
+      - **Pooling.** Find anything still created and destroyed at runtime that
+        happens often enough to matter, and pool it. Check with the Profiler on
+        a phone, not just in the editor.
+
+---
+
+## 4. Android release
 
 The releases repo comes first so every installed copy keeps updating before
-anything else changes. The Steam build turns the updater off, and the
-leaderboard needs Survival.
+anything else changes.
 
 - [ ] **Separate public repo for releases, so this repo can go private.**
       Makes sense, but the order matters or every installed copy stops updating:
@@ -169,6 +193,50 @@ leaderboard needs Survival.
          permanent for those installs.
       Also check: the README links and anything else that points players at
       this repo's releases page (the updater's Open Page fallback).
+
+- [ ] **Google Play release checklist.** Research and check before the first
+      Play upload; confirm each rule against the current Play Console docs:
+      - **Developer account.** One-time fee and identity verification. New
+        personal accounts have had to run a closed test with a minimum number
+        of testers for 14 days before production access; check the current
+        numbers.
+      - **Build.** AAB, not APK, signed with Play App Signing (back up the
+        upload keystore). Target API level at the current Play minimum,
+        64-bit (ARM64) only, and 16 KB memory page support for native
+        libraries (Unity and Firebase versions must support it). Bump the
+        version code every upload. Upload IL2CPP symbols so Crashlytics and
+        Play vitals show readable stacks.
+      - **Turn off the GitHub updater in Play builds.** Play policy forbids
+        apps updating themselves outside Play. Same scripting define idea as
+        the Steam build.
+      - **Policy forms.** Data safety form (Firebase Analytics and Crashlytics
+        collect data), a privacy policy URL, the content rating questionnaire,
+        target audience (stay out of the Families program unless aimed at
+        children) and the "contains ads" answer. Check whether EU players need
+        a consent prompt for Analytics.
+      - **Store listing.** 512x512 icon, 1024x500 feature graphic, phone
+        screenshots, short and full description, localized for every language
+        the game has.
+      - **Device testing.** A low-end phone, a tall phone and a tablet; notches
+        and safe areas; the system back button and back gesture (back or pause,
+        never a silent quit); pausing and resuming mid-level (calls,
+        notifications, app switching) keeps the save and audio right; first
+        launch with no network.
+
+---
+
+## 5. Windows and Steam release
+
+Last. The Steam build turns the updater off, and the leaderboard needs
+Survival. The in-game level editor sits here too: it is big, and Workshop is
+what makes it worth building.
+
+- [ ] **Windows builds still report no crashes to a dashboard.** Crashlytics for
+      Unity only reports from Android and iOS. Exceptions now go to `crash.log`
+      next to the save (see DONE.md), but that only helps when a player sends
+      it in. Sentry's Unity SDK (free tier, catches native crashes on desktop
+      too) is the pick, deferred for now. Do it before Steam, where PC is the
+      only platform. Limit it to Windows so phones don't report twice.
 
 - [ ] **Free-to-play Steam release — what it takes.** Research, not started.
       Known requirements and the costs people tend to miss:
@@ -250,27 +318,17 @@ leaderboard needs Survival.
         rebalancing the score resets fairness. Use a new board name per scoring
         version (`survival_v1`).
 
----
-
-## 4. Later
-
-- [ ] **Music Vorbis quality is still 100%.** Needs listening, so later. The
-      loading problems are fixed (see DONE.md > Music clips moved to Streaming).
-      Dropping quality to 0.5-0.7 would roughly halve the build size and is
-      normally transparent for game music, but A/B it by ear before changing it.
-
-- [ ] **Performance pass.** Do it together with the music quality pass:
-      - **Sprite atlases.** Only the small shape masks are in one
-        (`SmallShapes.spriteatlasv2`). Pack the piece, Star, obstacle and UI
-        sprites too so the board batches into fewer draw calls. Check first
-        that the custom-material sprites (glitch, fuse ring, conveyor) still
-        work when packed.
-      - **Shaders.** Review the glitch, fuse ring and conveyor shaders for
-        mobile cost (overdraw from the additive ones, per-pixel noise), and use
-        shared materials with property blocks everywhere.
-      - **Pooling.** Find anything still created and destroyed at runtime that
-        happens often enough to matter, and pool it. Check with the Profiler on
-        a phone, not just in the editor.
+- [ ] **In-game level editor, with Steam Workshop later.** Let players build
+      levels inside the game: pick or paint a grid shape, place Double Stars
+      and Square Stars, choose objectives and limits, then play-test and save.
+      The editor-only tools already do most of this (`Match3LevelEditorWindow`,
+      `Match3LevelValidation`), so the work is a runtime UI for it and a level
+      format that isn't a ScriptableObject (JSON with the grid cells, tile
+      objects, objectives and limits). Run the same validation rules as
+      LEVELS.md before a level can be saved or shared. Workshop comes after
+      the Steam build: upload and subscribe through Steamworks UGC, load
+      subscribed levels from their install folders, and keep player levels
+      out of the main level list and progress.
 
 ---
 
