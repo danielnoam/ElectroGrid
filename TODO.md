@@ -49,6 +49,9 @@ and the level select rework is where the Survival entry would go (it is on the m
       is tunable in the inspector. Still to do: real sounds for the step and
       the full bar (numbers playtested 2026-10-11). In Survival a full bar adds
       uncapped time (`SurvivalMode`).
+      **Keep the bar visible with no combo:** right now the combo bar fades out
+      when there is no combo running. It should stay on screen (empty) so the
+      HUD does not jump in and out.
 
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
       main menu, unlocked from the start. It opens its own screen, laid out like level
