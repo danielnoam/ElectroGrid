@@ -102,6 +102,7 @@ public class Match3PlayHandler : MonoBehaviour
     private void OnPauseToggled(bool paused)
     {
         isPaused = paused;
+        if (paused && heldMatch3Object) ReleaseObject(false);
     }
 
 
@@ -111,29 +112,9 @@ public class Match3PlayHandler : MonoBehaviour
     {
         if (!canInteract || !heldMatch3Object || isPaused) return;
 
-        Vector2Int gridDirection;
-
-        float absX = Mathf.Abs(direction.x);
-        float absY = Mathf.Abs(direction.y);
-
-        if (absX > absY)
-        {
-            if (absY > absX * _inputReader.SwipeDeadzone)
-            {
-                ReleaseObject(true);
-                return;
-            }
-            gridDirection = direction.x > 0 ? Vector2Int.right : Vector2Int.left;
-        }
-        else
-        {
-            if (absX > absY * _inputReader.SwipeDeadzone)
-            {
-                ReleaseObject(true);
-                return;
-            }
-            gridDirection = direction.y > 0 ? Vector2Int.up : Vector2Int.down;
-        }
+        Vector2Int gridDirection = Mathf.Abs(direction.x) >= Mathf.Abs(direction.y)
+            ? (direction.x > 0 ? Vector2Int.right : Vector2Int.left)
+            : (direction.y > 0 ? Vector2Int.up : Vector2Int.down);
 
         var newTilePos = selectedMatch3Tile.GridPosition + gridDirection;
         var newTile = gridHandler.GetTile(newTilePos);
@@ -174,6 +155,17 @@ public class Match3PlayHandler : MonoBehaviour
         }
         
         selectionIndicator?.EnableIndicator(selectedMatch3Tile);
+        if (_inputReader) _inputReader.SetTileScreenSize(TileScreenSize(selectedMatch3Tile.GridPosition));
+    }
+
+    private float TileScreenSize(Vector2Int cell)
+    {
+        if (!_camera) return 0f;
+
+        var grid = gridHandler.Grid;
+        Vector3 a = _camera.WorldToScreenPoint(grid.GetCellWorldPosition(cell.x, cell.y));
+        Vector3 b = _camera.WorldToScreenPoint(grid.GetCellWorldPosition(cell.x + 1, cell.y));
+        return Vector2.Distance(a, b);
     }
     
     private void ReleaseObject(bool animateReturn)
