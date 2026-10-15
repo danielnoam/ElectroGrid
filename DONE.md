@@ -955,3 +955,16 @@ of as a new blob per edit.
 - [x] **Menu buttons** no longer slide in greyed out.
 - [x] **Combo bar** folds away with the top bar when a window opens or the
       level ends.
+
+## Survival Plugs and placed pieces (after 1.9.0)
+
+- [x] **Survival sockets** open only under a column that has a Plug, and fold
+      shut once it drops in.
+- [x] **Plugs no longer come back small.** A Plug that fell while it was still
+      growing in had its grow tween cut off; the grow now runs on its own.
+- [x] **No stacked Plugs in Survival.** A new Plug never spawns in a column
+      that already has one.
+- [x] **Placed pieces in the level editor.** The Piece brush paints a chosen
+      piece that always starts on that cell and spawns in like any other. The
+      validator flags three placed pieces in a line, since the board can't
+      start with a match.

@@ -23,6 +23,7 @@ public class Match3BottomObject : Match3Object
 
     private Match3GameManager _gameManager;
     private float _bobTimeOffset;
+    private Tween _spawnTween;
     private Vector3 _spriteBasePosition;
     private bool _sparkedThisDip;
     
@@ -85,8 +86,8 @@ public class Match3BottomObject : Match3Object
         {
             transform.localPosition = endPosition;
             transform.localScale = Vector3.zero;
-            _movementSequence.Group(Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f));
-            _movementSequence.ChainCallback(() => { AudioLibrary.Play(spawnSfx); });
+            _spawnTween.Stop();
+            _spawnTween = Tween.Scale(transform, _baseScale, 0.5f, Ease.OutBack, startDelay: 0.5f).OnComplete(this, plug => AudioLibrary.Play(plug.spawnSfx));
         }
         else
         {
@@ -105,6 +106,7 @@ public class Match3BottomObject : Match3Object
         var endPosition = new Vector3(bellowCellPosition.x, bellowCellPosition.y, transform.localPosition.z);
         AudioLibrary.Play(destroySfx);
         
+        _spawnTween.Stop();
         _movementSequence.Stop();
         _movementSequence = Sequence.Create();
         var duration = swapDuration * 3f;
@@ -127,10 +129,21 @@ public class Match3BottomObject : Match3Object
         });
     }
 
+    public override void OnPoolReturn()
+    {
+        _spawnTween.Stop();
+        base.OnPoolReturn();
+    }
+
+    protected override void OnGridDestroyed()
+    {
+        _spawnTween.Stop();
+        base.OnGridDestroyed();
+    }
+
     private void CloseCatcherIfColumnDone(int column)
     {
         if (!_gridHandler || _gridHandler.Grid == null) return;
-        if (_gameManager && _gameManager.IsSurvival) return;
 
         for (int y = 0; y < _gridHandler.Grid.Height; y++)
         {

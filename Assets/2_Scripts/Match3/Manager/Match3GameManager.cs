@@ -626,7 +626,7 @@ public class Match3GameManager : MonoBehaviour
         {
             retryCount++;
         
-            var gridLayout = playHandler.GenerateGridLayout(currentLevel, gridHandler.GridShape, minPossibleMatches);
+            var gridLayout = playHandler.GenerateGridLayout(currentLevel, gridHandler.GridShape, minPossibleMatches, true);
             
             if (gridLayout == null || gridLayout.Count == 0)
             {
@@ -646,7 +646,8 @@ public class Match3GameManager : MonoBehaviour
             // Debug.Log($"Grid validated successfully with {validationResult.possibleMatches} possible matches");
             yield return playHandler.SpawnGridLayout(gridLayout, true);
             ApplyLevelSetup();
-            gridHandler.OpenCatchers();
+            if (IsSurvival) OpenCatchersUnderPlugs();
+            else gridHandler.OpenCatchers();
             playHandler.CanInteract = true;
             populatingGrid = false;
             yield break;
@@ -655,6 +656,14 @@ public class Match3GameManager : MonoBehaviour
         Debug.LogError($"Failed to create valid grid after {maxAttemptsToRecheckMatches} attempts");
     }
     
+    private void OpenCatchersUnderPlugs()
+    {
+        for (int x = 0; x < gridHandler.Grid.Width; x++)
+        {
+            if (gridHandler.HasPlugInColumn(x)) gridHandler.OpenCatcher(x);
+        }
+    }
+
     /// <summary>For a board refill in Survival: which new piece, if any, becomes a bonus Star instead.</summary>
     public (Match3Tile tile, Match3TileObjectType type) PickSurvivalBonus(ICollection<Match3Tile> refillTiles)
     {
@@ -679,7 +688,11 @@ public class Match3GameManager : MonoBehaviour
 
     public void SpawnSurvivalBonus(Match3Tile tile, Match3TileObjectType type, SOItemData item)
     {
-        if (type == Match3TileObjectType.Bottom) gridHandler.CreateBottomObject(tile);
+        if (type == Match3TileObjectType.Bottom)
+        {
+            gridHandler.CreateBottomObject(tile);
+            gridHandler.OpenCatcher(tile.GridPosition.x);
+        }
         else if (type == Match3TileObjectType.Obstacle) gridHandler.CreateObstacleObject(tile);
         else if (type == Match3TileObjectType.Virus) gridHandler.CreateVirusObject(tile);
         else if (type == Match3TileObjectType.Fuse)

@@ -117,6 +117,11 @@ internal static class Match3LevelGridGUI
 
                     if (tileObjectType == Match3TileObjectType.Surge && level) DrawSurgeTarget(cellRect, level, x, y);
                 }
+                else if (level && level.PlacedPiece(x, y) is { } placed && placed.Sprite)
+                {
+                    var pieceRect = new Rect(cellRect.x + cellRect.width * 0.2f, cellRect.y + cellRect.height * 0.2f, cellRect.width * 0.6f, cellRect.height * 0.6f);
+                    GUI.DrawTexture(pieceRect, AssetPreview.GetAssetPreview(placed.Sprite) ?? placed.Sprite.texture, ScaleMode.ScaleToFit, true, 0f, placed.Color, 0f, 0f);
+                }
                 else
                 {
                     float dot = cellRect.width * 0.18f;

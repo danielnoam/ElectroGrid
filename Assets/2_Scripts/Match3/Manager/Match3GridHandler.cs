@@ -324,6 +324,23 @@ public class Match3GridHandler : MonoBehaviour
         }
     }
 
+    public void OpenCatcher(int column)
+    {
+        var catcher = GetTile(new Vector2Int(column, -1));
+        if (catcher) catcher.OpenTrash();
+    }
+
+    public bool HasPlugInColumn(int column)
+    {
+        for (int y = 0; y < Grid.Height; y++)
+        {
+            var tile = GetTile(new Vector2Int(column, y));
+            if (tile && tile.CurrentMatch3Object is Match3BottomObject) return true;
+        }
+
+        return false;
+    }
+
     public bool HasCatcher(int column)
     {
         return _tiles.ContainsKey(new Vector2Int(column, -1));

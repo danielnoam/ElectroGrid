@@ -942,7 +942,7 @@ public class Match3PlayHandler : MonoBehaviour
     
     #region Population
 
-    public Dictionary<Match3Tile, SOItemData> GenerateGridLayout(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches)
+    public Dictionary<Match3Tile, SOItemData> GenerateGridLayout(SOMatch3Level level, SOGridShape gridShape, int minPossibleMatches, bool usePlacedPieces = false)
     {
         if (!level)
         {
@@ -978,10 +978,21 @@ public class Match3PlayHandler : MonoBehaviour
             return tilesToPopulate;
         }
         
+        if (usePlacedPieces)
+        {
+            foreach (var tile in tilesToPopulate.Keys.ToList())
+            {
+                var placed = level.PlacedPiece(tile.GridPosition.x, tile.GridPosition.y);
+                if (placed) tilesToPopulate[tile] = placed;
+            }
+        }
+
         List<(Vector2Int posA, Vector2Int posB)> guaranteedMatchPairs = CreateGuaranteedMatchPositions(minPossibleMatches);
         
         foreach (var tileItemPair in tilesToPopulate.ToList())
         {
+            if (tilesToPopulate[tileItemPair.Key]) continue;
+
             SOItemData forcedItem = GetForcedItemForGuaranteedMatch(
                 tileItemPair.Key.GridPosition, guaranteedMatchPairs, tilesToPopulate, level);
             

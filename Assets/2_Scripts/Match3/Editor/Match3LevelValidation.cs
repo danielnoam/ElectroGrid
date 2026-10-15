@@ -79,8 +79,29 @@ internal static class Match3LevelValidation
         ValidateMatchObjects(level, issues);
         ValidateTilePlacement(level, grid, issues);
         ValidateCounts(level, grid, issues);
+        ValidatePlacedPieces(level, grid, issues);
 
         return issues;
+    }
+
+    private static void ValidatePlacedPieces(SOMatch3Level level, Grid grid, List<Issue> issues)
+    {
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                var piece = level.PlacedPiece(x, y);
+                if (!piece) continue;
+
+                bool row = x + 2 < grid.Width && level.PlacedPiece(x + 1, y) == piece && level.PlacedPiece(x + 2, y) == piece;
+                bool column = y + 2 < grid.Height && level.PlacedPiece(x, y + 1) == piece && level.PlacedPiece(x, y + 2) == piece;
+                if (row || column)
+                {
+                    issues.Add(new Issue(Severity.Error, $"Three placed {piece.Label} pieces in a line at ({x}, {y}) match at once. The board can't start with a match."));
+                    return;
+                }
+            }
+        }
     }
 
     private static void ValidateObjectives(SOMatch3Level level, List<Issue> issues)

@@ -229,7 +229,7 @@ public class Match3SurvivalRun
             var candidates = new List<Match3Tile>();
             foreach (var tile in refillTiles)
             {
-                if (tile.GridPosition.y >= minRow && tile.GridPosition.y > 0 && grid.HasCatcher(tile.GridPosition.x)) candidates.Add(tile);
+                if (tile.GridPosition.y >= minRow && tile.GridPosition.y > 0 && grid.HasCatcher(tile.GridPosition.x) && !grid.HasPlugInColumn(tile.GridPosition.x)) candidates.Add(tile);
             }
 
             if (candidates.Count > 0) return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Bottom);

@@ -38,6 +38,9 @@ internal class Match3LevelEditorWindow : EditorWindow
 
     private Match3TileObjectType _currentPaintMode = Match3TileObjectType.Obstacle;
     private bool _paintGlitch;
+    private bool _paintPiece;
+    private int _piecePaint;
+    private int _piecePaintValue;
     private bool _glitchPaintValue;
     private bool _starFusePaintValue;
     private string _pendingClear;
@@ -539,6 +542,13 @@ internal class Match3LevelEditorWindow : EditorWindow
             _serializedLevel.ApplyModifiedProperties();
         }
 
+        var placedPiecesProp = _serializedLevel.FindProperty("placedPieces");
+        if (placedPiecesProp.arraySize != requiredSize)
+        {
+            placedPiecesProp.arraySize = requiredSize;
+            _serializedLevel.ApplyModifiedProperties();
+        }
+
         var surgeTargetsProp = _serializedLevel.FindProperty("surgeTargets");
         if (surgeTargetsProp.arraySize != requiredSize)
         {
@@ -553,7 +563,8 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, CellSize);
 
-        if (_currentPaintMode == Match3TileObjectType.Surge && !_paintGlitch) DrawSurgeTargetPicker();
+        if (_currentPaintMode == Match3TileObjectType.Surge && !LayerMode) DrawSurgeTargetPicker();
+        if (_paintPiece) DrawPiecePicker();
         HandlePainting(gridRect, grid, tileObjectsProp, glitchTilesProp, starFuseTilesProp);
         Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, CellSize, true, glitchTilesProp, _selectedLevel);
 
@@ -567,6 +578,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         DrawPaintModeButton(Match3TileObjectType.Obstacle);
         DrawPaintModeButton(Match3TileObjectType.Bottom);
         DrawGlitchModeButton();
+        DrawPieceModeButton();
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.BeginHorizontal();
         DrawPaintModeButton(Match3TileObjectType.Virus);
@@ -595,6 +607,13 @@ internal class Match3LevelEditorWindow : EditorWindow
         {
             for (int i = 0; i < starFuseTilesProp.arraySize; i++) starFuseTilesProp.GetArrayElementAtIndex(i).boolValue = false;
             starFuseTilesProp.serializedObject.ApplyModifiedProperties();
+        }
+
+        if (all || clear == "Piece")
+        {
+            var pieces = tileObjectsProp.serializedObject.FindProperty("placedPieces");
+            for (int i = 0; i < pieces.arraySize; i++) pieces.GetArrayElementAtIndex(i).intValue = 0;
+            pieces.serializedObject.ApplyModifiedProperties();
         }
 
         if (all || clear == "Glitch")
@@ -633,7 +652,7 @@ internal class Match3LevelEditorWindow : EditorWindow
     private void DrawPaintModeButton(Match3TileObjectType mode)
     {
         Color previousBackground = GUI.backgroundColor;
-        GUI.backgroundColor = !_paintGlitch && _currentPaintMode == mode ? Color.yellow : Color.white;
+        GUI.backgroundColor = !LayerMode && _currentPaintMode == mode ? Color.yellow : Color.white;
 
         string tooltip = mode == Match3TileObjectType.Fuse
             ? "Paint fuses. On a Star or Plug the fuse goes on the Star. Click a painted cell again to clear it."
@@ -644,8 +663,9 @@ internal class Match3LevelEditorWindow : EditorWindow
         ShowClearMenu(rect, mode.ToString(), plural);
         if (GUI.Button(rect, content))
         {
-            _currentPaintMode = !_paintGlitch && _currentPaintMode == mode ? Match3TileObjectType.Matchable : mode;
+            _currentPaintMode = !LayerMode && _currentPaintMode == mode ? Match3TileObjectType.Matchable : mode;
             _paintGlitch = false;
+            _paintPiece = false;
         }
 
         GUI.backgroundColor = previousBackground;
@@ -659,9 +679,45 @@ internal class Match3LevelEditorWindow : EditorWindow
         var content = new GUIContent(" Glitch", Match3LevelGridGUI.Icon("Glitch"), "Paint glitch tiles. They sit under whatever is on the cell. Right-click to clear.");
         var rect = GUILayoutUtility.GetRect(content, GUI.skin.button, GUILayout.Height(30));
         ShowClearMenu(rect, "Glitch", "Glitches");
-        if (GUI.Button(rect, content)) _paintGlitch = !_paintGlitch;
+        if (GUI.Button(rect, content))
+        {
+            _paintGlitch = !_paintGlitch;
+            _paintPiece = false;
+        }
 
         GUI.backgroundColor = previousBackground;
+    }
+
+    private bool LayerMode => _paintGlitch || _paintPiece;
+
+    private void DrawPieceModeButton()
+    {
+        Color previousBackground = GUI.backgroundColor;
+        GUI.backgroundColor = _paintPiece ? Color.yellow : Color.white;
+
+        var items = _selectedLevel ? _selectedLevel.MatchObjects : null;
+        var item = items != null && _piecePaint < items.Count ? items[_piecePaint] : null;
+        var icon = item && item.Sprite ? item.Sprite.texture : null;
+        var content = new GUIContent(" Piece", icon, "Paint a specific piece that always starts on the cell. It spawns in like any other piece. Click it again to clear it. Right-click to clear.");
+        var rect = GUILayoutUtility.GetRect(content, GUI.skin.button, GUILayout.Height(30));
+        ShowClearMenu(rect, "Piece", "Placed Pieces");
+        if (GUI.Button(rect, content))
+        {
+            _paintPiece = !_paintPiece;
+            _paintGlitch = false;
+        }
+
+        GUI.backgroundColor = previousBackground;
+    }
+
+    private void DrawPiecePicker()
+    {
+        var items = _selectedLevel.MatchObjects;
+        if (items == null || items.Count == 0) return;
+
+        var names = new string[items.Count];
+        for (int i = 0; i < items.Count; i++) names[i] = items[i] ? items[i].Label : "(empty)";
+        _piecePaint = EditorGUILayout.Popup("Piece", Mathf.Clamp(_piecePaint, 0, names.Length - 1), names);
     }
 
     private void HandlePainting(Rect gridRect, Grid grid, SerializedProperty tileObjectsProp, SerializedProperty glitchTilesProp, SerializedProperty starFuseTilesProp)
@@ -692,6 +748,20 @@ internal class Match3LevelEditorWindow : EditorWindow
             if (isPress) _glitchPaintValue = !glitch.boolValue;
             glitch.boolValue = _glitchPaintValue;
             glitchTilesProp.serializedObject.ApplyModifiedProperties();
+            GUI.changed = true;
+            e.Use();
+            return;
+        }
+
+        if (_paintPiece)
+        {
+            var pieces = tileObjectsProp.serializedObject.FindProperty("placedPieces");
+            if (index >= pieces.arraySize) return;
+
+            var piece = pieces.GetArrayElementAtIndex(index);
+            if (isPress) _piecePaintValue = piece.intValue == _piecePaint + 1 ? 0 : _piecePaint + 1;
+            piece.intValue = _piecePaintValue;
+            pieces.serializedObject.ApplyModifiedProperties();
             GUI.changed = true;
             e.Use();
             return;

@@ -24,6 +24,7 @@ public class SOMatch3Level : ScriptableObject
     [SerializeField, HideInInspector] private bool[] glitchTiles;
     [SerializeField, HideInInspector] private bool[] starFuseTiles;
     [SerializeField, HideInInspector] private int[] surgeTargets;
+    [SerializeField, HideInInspector] private int[] placedPieces;
 
 
     /// <summary>The authored name. Stays in English for analytics and save records, players see DisplayName.</summary>
@@ -49,6 +50,7 @@ public class SOMatch3Level : ScriptableObject
     public bool[] GlitchTiles => glitchTiles;
     public bool[] StarFuseTiles => starFuseTiles;
     public int[] SurgeTargets => surgeTargets;
+    public int[] PlacedPieces => placedPieces;
     public Match3TileObjectType[] TileObjects => tileObjects;
 
 
@@ -98,6 +100,18 @@ public class SOMatch3Level : ScriptableObject
         int index = y * width + x;
         if (index >= starFuseTiles.Length || !starFuseTiles[index] || !gridShape.Grid.IsCellActive(x, y)) return false;
         return TileHasObjectType(x, y, Match3TileObjectType.Obstacle) || TileHasObjectType(x, y, Match3TileObjectType.Bottom);
+    }
+
+    /// <summary>The piece painted on this cell to always start there, or null. Stored as match object index + 1, so 0 is none.</summary>
+    public SOItemData PlacedPiece(int x, int y)
+    {
+        if (matchObjects == null || placedPieces == null || !gridShape || gridShape.Grid == null) return null;
+
+        int index = y * gridShape.Grid.Width + x;
+        if (index < 0 || index >= placedPieces.Length) return null;
+
+        int item = placedPieces[index] - 1;
+        return item >= 0 && item < matchObjects.Count ? matchObjects[item] : null;
     }
 
     /// <summary>The piece a Surge placed in this cell holds: an index into the match objects, or random when unset.</summary>
