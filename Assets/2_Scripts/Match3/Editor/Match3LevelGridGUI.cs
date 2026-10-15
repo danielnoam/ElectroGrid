@@ -41,6 +41,7 @@ internal static class Match3LevelGridGUI
         Match3TileObjectType.Bottom => Icon("ShapePlug"),
         Match3TileObjectType.Virus => Icon("Virus"),
         Match3TileObjectType.Fuse => Icon("Fuse"),
+        Match3TileObjectType.Surge => Icon("ShapeSurge"),
         _ => null
     };
 
@@ -59,6 +60,7 @@ internal static class Match3LevelGridGUI
         Match3TileObjectType.Bottom => "Plug",
         Match3TileObjectType.Virus => "Virus",
         Match3TileObjectType.Fuse => "Fuse",
+        Match3TileObjectType.Surge => "Surge",
         _ => "Piece"
     };
     private static readonly Color GridLineColor = new Color(0.1f, 0.1f, 0.1f);
@@ -112,6 +114,8 @@ internal static class Match3LevelGridGUI
                 {
                     var iconRect = new Rect(cellRect.x + cellRect.width * 0.12f, cellRect.y + cellRect.height * 0.12f, cellRect.width * 0.76f, cellRect.height * 0.76f);
                     GUI.DrawTexture(iconRect, icon, ScaleMode.ScaleToFit, true, 0f, ColorFor(tileObjectType), 0f, 0f);
+
+                    if (tileObjectType == Match3TileObjectType.Surge && level) DrawSurgeTarget(cellRect, level, x, y);
                 }
                 else
                 {
@@ -183,6 +187,25 @@ internal static class Match3LevelGridGUI
     }
 
     /// <summary>Counts of each tile type against what the level's objectives actually require.</summary>
+    private static void DrawSurgeTarget(Rect cellRect, SOMatch3Level level, int x, int y)
+    {
+        var targets = level.SurgeTargets;
+        int index = y * level.GridShape.Grid.Width + x;
+        int target = targets != null && index < targets.Length ? targets[index] : -1;
+        var item = target >= 0 && target < level.MatchObjects.Count ? level.MatchObjects[target] : null;
+
+        var coreRect = new Rect(cellRect.x + cellRect.width * 0.33f, cellRect.y + cellRect.height * 0.33f, cellRect.width * 0.34f, cellRect.height * 0.34f);
+        if (item && item.Sprite)
+        {
+            GUI.DrawTexture(coreRect, AssetPreview.GetAssetPreview(item.Sprite) ?? item.Sprite.texture, ScaleMode.ScaleToFit, true, 0f, item.Color, 0f, 0f);
+            return;
+        }
+
+        var style = new GUIStyle(EditorStyles.boldLabel) { alignment = TextAnchor.MiddleCenter, fontSize = Mathf.RoundToInt(cellRect.height * 0.3f) };
+        style.normal.textColor = Color.white;
+        GUI.Label(coreRect, "?", style);
+    }
+
     public static string BuildCountsLabel(SOMatch3Level level)
     {
         if (!level || !level.GridShape || level.GridShape.Grid == null) return string.Empty;
@@ -191,6 +214,7 @@ internal static class Match3LevelGridGUI
         int bottomObjectCount = level.CountObjectsOfType(Match3TileObjectType.Bottom);
         int virusCount = level.CountObjectsOfType(Match3TileObjectType.Virus);
         int fuseCount = level.CountFuses();
+        int surgeCount = level.CountObjectsOfType(Match3TileObjectType.Surge);
         int glitchCount = level.CountGlitches();
         int matchableCount = level.GridShape.Grid.ActiveCellCount - obstacleCount - bottomObjectCount - virusCount;
 
@@ -199,6 +223,7 @@ internal static class Match3LevelGridGUI
         var parts = new List<string> { $"Pieces: {matchableCount}", Tally("Stars", obstacleCount, obstacleNeeded), Tally("Plugs", bottomObjectCount, bottomObjectNeeded) };
         if (virusCount > 0) parts.Add($"Viruses: {virusCount}");
         if (fuseCount > 0) parts.Add($"Fuses: {fuseCount}");
+        if (surgeCount > 0) parts.Add($"Surges: {surgeCount}");
         if (glitchCount > 0) parts.Add($"Glitches: {glitchCount}");
         return string.Join(" | ", parts);
     }

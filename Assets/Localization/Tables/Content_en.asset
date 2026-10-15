@@ -134,6 +134,14 @@ MonoBehaviour:
     m_Localized: Trapezoid
     m_Metadata:
       m_Items: []
+  - m_Id: 3659092647206912
+    m_Localized: Surges
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3659092676567040
+    m_Localized: Match 5 in a row to make a Surge. Swap it with any neighbour to zap every piece of the kind it holds.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

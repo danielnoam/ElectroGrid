@@ -12,7 +12,8 @@ public enum Match3TutorialTrigger
     LevelHasGlitches,
     LevelHasViruses,
     LevelHasFuses,
-    LevelHasConveyors
+    LevelHasConveyors,
+    LevelHasSurges
 }
 
 [CreateAssetMenu(fileName = "New Match3 Tutorial", menuName = "Scriptable Objects/Match3 Tutorial")]

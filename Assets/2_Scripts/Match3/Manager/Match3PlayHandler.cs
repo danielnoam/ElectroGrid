@@ -16,6 +16,11 @@ public class Match3PlayHandler : MonoBehaviour
     [SerializeField, Min(0)] private float objectSwapDuration = 0.3f;
     [Tooltip("Delay between popping matched objects")]
     [SerializeField, Min(0)] private float delayBetweenMatchPops = 0.05f;
+    [Tooltip("A straight match this long leaves a Surge instead of a line break")]
+    [SerializeField, Min(4)] private int surgeMatchLength = 5;
+    [SerializeField, Min(0)] private float delayBetweenSurgeZaps = 0.04f;
+
+    private readonly List<Match3Tile> _queuedSurges = new();
     [Tooltip("Delay between moving objects downwards")]
     [SerializeField, Min(0)] private float delayBetweenObjectMovement = 0.15f;
     
@@ -557,11 +562,27 @@ public class Match3PlayHandler : MonoBehaviour
 
     public IEnumerator HandleMatches(List<Match3Tile> tilesWithMatches)
     {
+        yield return HandleMatchedTiles(tilesWithMatches);
+        yield return RunQueuedSurges();
+    }
+
+    private IEnumerator HandleMatchedTiles(List<Match3Tile> tilesWithMatches)
+    {
         var matchColors = new Dictionary<Match3Tile, Color>();
+        var matchItems = new Dictionary<Match3Tile, SOItemData>();
         foreach (var tile in tilesWithMatches)
         {
-            if (tile && tile.CurrentMatch3Object is Match3MatchableObject matched) matchColors[tile] = matched.Color;
+            if (tile && tile.CurrentMatch3Object is Match3MatchableObject matched)
+            {
+                matchColors[tile] = matched.Color;
+                matchItems[tile] = matched.ItemData;
+            }
         }
+
+        var surgeLine = tilesWithMatches.GroupBy(tile => tile.GridPosition.x).Where(group => group.Count() >= surgeMatchLength)
+            .Concat(tilesWithMatches.GroupBy(tile => tile.GridPosition.y).Where(group => group.Count() >= surgeMatchLength))
+            .Select(group => group.OrderBy(tile => tile.GridPosition.x + tile.GridPosition.y).ToList())
+            .FirstOrDefault();
 
         Color LineColor(IEnumerable<Match3Tile> line)
         {
@@ -580,6 +601,20 @@ public class Match3PlayHandler : MonoBehaviour
                 matchable.MatchFound();
                 yield return new WaitForSeconds(delayBetweenMatchPops);
             }
+        }
+
+        if (surgeLine != null)
+        {
+            var surgeTile = surgeLine[surgeLine.Count / 2];
+            if (matchItems.TryGetValue(surgeTile, out var surgeItem) && !surgeTile.CurrentMatch3Object)
+            {
+                gridHandler.CreateSurgeObject(surgeItem, surgeTile);
+                gameManager.NotifySurgeCreated();
+                surgeTile.PulseColor(matchColors.TryGetValue(surgeTile, out var surgeColor) ? surgeColor : Color.white);
+                CameraManager.Instance?.ShakeCamera(1.5f, 0.4f);
+                yield return new WaitForSeconds(0.2f);
+            }
+            yield break;
         }
 
         // Check if the match amount is more than the minimum amount for a match
@@ -633,6 +668,12 @@ public class Match3PlayHandler : MonoBehaviour
                             continue;
                         }
                         
+                        if (tile.CurrentMatch3Object is Match3SurgeObject)
+                        {
+                            QueueSurge(tile);
+                            continue;
+                        }
+
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
                             destroyedAObject = true;
@@ -671,6 +712,12 @@ public class Match3PlayHandler : MonoBehaviour
                             continue;
                         }
                         
+                        if (tile.CurrentMatch3Object is Match3SurgeObject)
+                        {
+                            QueueSurge(tile);
+                            continue;
+                        }
+
                         if (tile.CurrentMatch3Object.IsAffectedBySpecialMatches)
                         {
                             destroyedAObject = true;
@@ -692,6 +739,62 @@ public class Match3PlayHandler : MonoBehaviour
         }
     }
 
+
+    public List<Match3Tile> SurgeTargets(Match3SurgeObject surge)
+    {
+        return gridHandler.Tiles.Values
+            .Where(tile => tile && tile.IsActive && surge && surge.Target != null && tile.CurrentMatch3Object is Match3MatchableObject piece && piece.ItemData == surge.Target)
+            .ToList();
+    }
+
+    public void QueueSurge(Match3Tile tile)
+    {
+        if (tile && tile.CurrentMatch3Object is Match3SurgeObject && !_queuedSurges.Contains(tile)) _queuedSurges.Add(tile);
+    }
+
+    /// <summary>Sets off the Surges hit by line breaks, fuse blasts or a Surge of the same piece, one after another.</summary>
+    public IEnumerator RunQueuedSurges()
+    {
+        while (_queuedSurges.Count > 0)
+        {
+            var tile = _queuedSurges[0];
+            _queuedSurges.RemoveAt(0);
+            if (!tile || tile.CurrentMatch3Object is not Match3SurgeObject surge) continue;
+
+            var targets = SurgeTargets(surge);
+            if (targets.Count > 0) gameManager.NotifyMatchesWereMade(targets);
+            yield return ActivateSurge(tile, targets);
+        }
+    }
+
+    /// <summary>A swapped Surge goes off: every piece of the kind it holds is zapped, nearest first.</summary>
+    public IEnumerator ActivateSurge(Match3Tile surgeTile, List<Match3Tile> targets)
+    {
+        if (!surgeTile || surgeTile.CurrentMatch3Object is not Match3SurgeObject surge) yield break;
+
+        var color = surge.Target ? surge.Target.Color : Color.white;
+        surgeTile.SetCurrentItem(null);
+
+        foreach (var other in gridHandler.Tiles.Values)
+        {
+            if (other && other.CurrentMatch3Object is Match3SurgeObject twin && twin.Target == surge.Target) QueueSurge(other);
+        }
+        surgeTile.PunchTile(1.8f);
+        surgeTile.PulseColor(color);
+        surge.DestroyWithAnimation();
+        CameraManager.Instance?.ShakeCamera(2.5f, 0.6f);
+
+        foreach (var tile in targets.OrderBy(tile => (tile.GridPosition - surgeTile.GridPosition).sqrMagnitude))
+        {
+            if (!tile || tile.CurrentMatch3Object is not Match3MatchableObject piece) continue;
+
+            tile.PulseColor(color);
+            piece.MatchFound();
+            if (delayBetweenSurgeZaps > 0f) yield return new WaitForSeconds(delayBetweenSurgeZaps);
+        }
+
+        yield return new WaitForSeconds(0.2f);
+    }
 
     public IEnumerator MoveObjectsDown(SOGridShape gridShape)
     {

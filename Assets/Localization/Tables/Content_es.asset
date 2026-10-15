@@ -134,6 +134,14 @@ MonoBehaviour:
     m_Localized: Trapecio
     m_Metadata:
       m_Items: []
+  - m_Id: 3659092647206912
+    m_Localized: Descargas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3659092676567040
+    m_Localized: "Combina 5 en l\xEDnea para crear una Descarga. Interc\xE1mbiala con cualquier vecina para eliminar todas las piezas del tipo que lleva dentro."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -11,12 +11,13 @@ A level is an `SOMatch3Level` asset in `Assets/3_Data/Levels`, named
 - **Grid shape**: an `SOGridShape` in `Assets/2_Scripts/Grid`, named
   `Grid_<Shape>` (Grid_Heart, Grid_Bolt). It sets the width, height and which
   cells are on. One shape can be used by more than one level.
-- **Match objects**: the pieces that can spawn, with a chance each. Every level
-  so far uses the same four shapes (triangle, pentagon, circle, hexagon) at
-  25 each.
+- **Match objects**: the pieces that can spawn, with a chance each. Levels 1
+  to 50 use the same four shapes (triangle, pentagon, circle, hexagon) at 25
+  each. From 51 some levels add the Diamond, the Trapezoid or both, split
+  evenly. Every extra kind makes matches rarer, so give those levels more moves.
 - **Objectives**: what the player has to do to win. All of them must be done.
 - **Lose conditions**: a move limit or a time limit, not both. Running out loses.
-- **Tile objects**: which cells start with a Star or a Plug
+- **Tile objects**: which cells start with a Star, a Plug, a virus or a Surge
   instead of a piece. Painted in the level editor.
 
 A level is only in the game if it is in the `match3Levels` list on the
@@ -63,6 +64,11 @@ validates, and can play a level directly.
 - **Conveyor rows** (Conveyor Rows list, row 0 is the bottom) move every
   piece one cell along after each move and wrap at the end. Stars and
   viruses stay put and the row moves past them. Small arrows mark the row.
+- **Surges** come from a straight match of 5 or more, or can be placed in the
+  level editor (each one holds a chosen piece, or a random one). Swapping a
+  Surge with any neighbour zaps every piece of the kind it holds. A line break
+  or fuse blast that hits a Surge sets it off too, and so does another Surge
+  holding the same piece.
 - **Plus** pieces spawn now and then (5% per new piece). Using one gives
   extra moves or time.
 - **Combo**: off unless the level's **Combo Bar** box is ticked (Survival
@@ -129,7 +135,7 @@ every level from 6 on uses two.
   something new. Introduce one new idea at a time: Level 6 brings Stars,
   Level 8 brings Plugs, Level 10 is the first to mix them, then
   glitches at 18, viruses at 19, fuses at 24 and conveyors at 26.
-- Moves so far run between 9 and 18. Use 14 to 18 for levels with two
+- Moves so far run between 9 and 28. Use 14 to 18 for levels with two
   objectives. Fewer cells or more stars means more moves.
 - One limit per level: moves or time, never both. Use a time limit now and
   then instead of moves. Keep time limits at 45 seconds or less.
@@ -199,3 +205,53 @@ every level from 6 on uses two.
 | 48 | Bridge 11x8 | 2 Plugs, all viruses | 20 moves |
 | 49 | Skull 9x10 | 4500 points, 3 fuses (8 moves each) | 24 moves |
 | 50 | Circuit 11x10 | 10 Stars (one under a Plug), 3 Plugs, conveyors on rows 7 and 5 | 26 moves |
+| 51 | Square7 7x7 | 22 pieces | 12 moves |
+| 52 | Tall 6x9 | 24 pieces, + Diamond | 15 moves |
+| 53 | Wide 9x6 | 26 pieces, + Diamond | 40s |
+| 54 | Ring 9x9 | 22 pieces, 4 Stars, + Diamond | 17 moves |
+| 55 | Pill 9x7 | 28 pieces, + Trapezoid | 16 moves |
+| 56 | Envelope 9x8 | 11 glitches, 24 pieces | 16 moves |
+| 57 | Cup 9x9 | 36 pieces, 2 Surges | 14 moves |
+| 58 | Rocket 7x10 | 2 Plugs, 22 pieces, + Diamond | 18 moves |
+| 59 | Petri 9x9 | all viruses, 26 pieces | 18 moves |
+| 60 | Gate 10x10 | 4 Stars, 2 Plugs, 2 Surges, + Trapezoid | 24 moves |
+| 61 | Lens 8x8 | 32 pieces | 40s |
+| 62 | Belt 10x7 | 30 pieces, 4 Stars, conveyors on rows 3, + Diamond | 18 moves |
+| 63 | Dynamite 9x9 | 3 fuses (9 moves each), 26 pieces | 18 moves |
+| 64 | Bars 11x8 | 1400 points | 45s |
+| 65 | Garden 9x9 | 18 glitches, 2 Plugs | 20 moves |
+| 66 | Lab 9x8 | all viruses, 28 pieces, 1 Surge, + Diamond | 18 moves |
+| 67 | Field 10x10 | 30 pieces, + Diamond, Trapezoid | 20 moves |
+| 68 | Checker 9x9 | 8 Stars, 22 pieces, + Trapezoid | 45s |
+| 69 | Mill 9x9 | 2 Plugs, 30 pieces, conveyors on rows 4 and 2 | 18 moves |
+| 70 | Reactor 11x10 | 3 fuses (9 moves each), 4 Stars, 2 Surges, + Diamond | 24 moves |
+| 71 | Square8 8x8 | 38 pieces | 45s |
+| 72 | Hook 9x8 | 4 Stars, 2 Plugs | 20 moves |
+| 73 | Lattice 9x9 | 16 glitches | 45s |
+| 74 | Fireworks 9x9 | 2200 points, 4 Surges | 18 moves |
+| 75 | Cannon 10x8 | 2 fuses (9 moves each), 2 Plugs, + Diamond | 20 moves |
+| 76 | Outbreak 10x9 | all viruses, 24 pieces | 45s |
+| 77 | Highway 11x7 | 36 pieces, conveyors on rows 1 and 3 and 5, + Trapezoid | 18 moves |
+| 78 | Anchor 10x10 | 4 Stars, 26 pieces | 20 moves |
+| 79 | Prism 9x9 | 18 glitches, 24 pieces, 1 Surge, + Diamond | 18 moves |
+| 80 | Mainframe 11x10 | all viruses, 2 Plugs, conveyors on rows 4 | 26 moves |
+| 81 | Square9 9x9 | 40 pieces | 45s |
+| 82 | Clock 9x9 | 4 fuses (10 moves each), 24 pieces | 18 moves |
+| 83 | Zigzag 10x8 | 1300 points | 45s |
+| 84 | Temple 9x9 | 6 Stars, 28 pieces, 1 Surge, + Trapezoid | 20 moves |
+| 85 | Elevator 7x10 | 3 Plugs, 30 pieces, + Diamond | 22 moves |
+| 86 | Infection 9x9 | 16 glitches, all viruses | 22 moves |
+| 87 | Assembly 10x8 | 3 fuses (9 moves each), 28 pieces, conveyors on rows 4 and 2 | 20 moves |
+| 88 | Arena 10x9 | 28 pieces, 4 Stars, + Diamond, Trapezoid | 24 moves |
+| 89 | Volcano 11x9 | 2 Plugs, 30 pieces, 2 Surges, + Trapezoid | 20 moves |
+| 90 | Core 11x10 | 16 glitches, 3 fuses (10 moves each), + Diamond | 26 moves |
+| 91 | Slab 7x8 | 30 pieces | 14 moves |
+| 92 | Twins 10x7 | all viruses, 26 pieces, + Diamond | 20 moves |
+| 93 | Vault 10x10 | 4500 points, 12 Stars | 24 moves |
+| 94 | Staircase 9x9 | 8 glitches, 26 pieces, + Trapezoid | 45s |
+| 95 | Power 9x10 | 3000 points, 5 Surges, + Diamond | 18 moves |
+| 96 | Depot 11x8 | 2 Plugs, 4 Stars, conveyors on rows 4 and 2 | 22 moves |
+| 97 | Quarantine 9x9 | all viruses, 4 fuses (10 moves each) | 22 moves |
+| 98 | Spectrum 11x8 | 2000 points, + Trapezoid | 45s |
+| 99 | Labyrinth 11x10 | 24 glitches, 6 Stars, 2 Surges, + Diamond | 26 moves |
+| 100 | Finale 11x10 | 3 Plugs, 3 fuses (10 moves each), 1 Surge, + Trapezoid | 28 moves |

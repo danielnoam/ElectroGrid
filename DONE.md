@@ -937,3 +937,21 @@ of as a new blob per edit.
       with moves, time and goals) and can copy the report.
 - [x] **Firebase Crashlytics metas re-saved** in the current PluginImporter
       format, which silences the version 1 warnings.
+
+## Surge and Levels 51 to 100 (after 1.8.0)
+
+- [x] **Surge**: a straight match of 5 or more leaves a Surge holding that
+      piece. Swapping it with any neighbour zaps every piece of that kind. Line
+      breaks, fuse blasts and Surges holding the same piece set it off too.
+      Its frame takes the piece's colour and the piece inside shakes. It can be
+      placed in the level editor with a chosen or random piece, and has its own
+      info card in all 7 languages.
+- [x] **Levels 51 to 100**, with 50 new grid shapes, including plain squares
+      and rectangles for the start of the curve rework. They use the Diamond
+      and Trapezoid, placed Surges, and every mechanic. All pass the validator.
+- [x] **Level editor**: the brushes sit in two rows. Right-click a brush to
+      clear all of that kind, and one Clear All button clears everything.
+- [x] **Level title** no longer wraps onto two lines at Level 100.
+- [x] **Menu buttons** no longer slide in greyed out.
+- [x] **Combo bar** folds away with the top bar when a window opens or the
+      level ends.

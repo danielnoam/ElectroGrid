@@ -347,6 +347,12 @@ public class Match3GameManager : MonoBehaviour
                 if (!gridHandler.IsValidTile(tile)) continue;
 
                 NotifyTileHit(tile);
+                if (tile.CurrentMatch3Object is Match3SurgeObject)
+                {
+                    playHandler.QueueSurge(tile);
+                    continue;
+                }
+
                 if (tile.CurrentMatch3Object is not Match3MatchableObject piece) continue;
 
                 tile.SetCurrentItem(null);
@@ -523,30 +529,51 @@ public class Match3GameManager : MonoBehaviour
         selectionIndicator.ResetHoveredTile();
     
         yield return StartCoroutine(playHandler.SwapObjects(posA, posB));
-    
-        var matchesWithTileA = playHandler.FindMatchesWithTile(gridHandler.GetTile(posA), gridHandler.GridShape);
-        var matchesWithTileB = playHandler.FindMatchesWithTile(gridHandler.GetTile(posB), gridHandler.GridShape);
-        var allMatches = matchesWithTileA.Concat(matchesWithTileB).Distinct().ToList();
-    
-        if (allMatches.Count == 0)
+
+        var tileA = gridHandler.GetTile(posA);
+        var tileB = gridHandler.GetTile(posB);
+        var surgeTile = tileA && tileA.CurrentMatch3Object is Match3SurgeObject ? tileA : tileB && tileB.CurrentMatch3Object is Match3SurgeObject ? tileB : null;
+
+        if (surgeTile)
         {
-            yield return StartCoroutine(playHandler.SwapObjects(posB, posA));
-            playHandler.CanInteract = true;
-            populatingGrid = false;
-            yield break;
+            var surge = (Match3SurgeObject)surgeTile.CurrentMatch3Object;
+            var targets = playHandler.SurgeTargets(surge);
+
+            NotifyAMoveWasMade();
+            _virusBrokenThisMove = false;
+            Combo.BeginResolve();
+            if (ComboEnabled) Combo.AddSwapStep();
+            if (targets.Count > 0) NotifyMatchesWereMade(targets);
+
+            yield return StartCoroutine(playHandler.ActivateSurge(surgeTile, targets));
+            yield return StartCoroutine(playHandler.RunQueuedSurges());
         }
-        
-        NotifyAMoveWasMade();
-        _virusBrokenThisMove = false;
+        else
+        {
+            var matchesWithTileA = playHandler.FindMatchesWithTile(tileA, gridHandler.GridShape);
+            var matchesWithTileB = playHandler.FindMatchesWithTile(tileB, gridHandler.GridShape);
+            var allMatches = matchesWithTileA.Concat(matchesWithTileB).Distinct().ToList();
 
-        // The combo countdown stops while this swap resolves, so its cascades can't run out the clock
-        Combo.BeginResolve();
-        if (ComboEnabled) Combo.AddSwapStep();
+            if (allMatches.Count == 0)
+            {
+                yield return StartCoroutine(playHandler.SwapObjects(posB, posA));
+                playHandler.CanInteract = true;
+                populatingGrid = false;
+                yield break;
+            }
 
-        // Must run before the matches are handled, objectives inspect the matched tiles while they still hold their objects
-        NotifyMatchesWereMade(allMatches);
+            NotifyAMoveWasMade();
+            _virusBrokenThisMove = false;
 
-        yield return StartCoroutine(playHandler.HandleMatches(allMatches));
+            // The combo countdown stops while this swap resolves, so its cascades can't run out the clock
+            Combo.BeginResolve();
+            if (ComboEnabled) Combo.AddSwapStep();
+
+            // Must run before the matches are handled, objectives inspect the matched tiles while they still hold their objects
+            NotifyMatchesWereMade(allMatches);
+
+            yield return StartCoroutine(playHandler.HandleMatches(allMatches));
+        }
     
         yield return StartCoroutine(playHandler.MoveObjectsDown(gridHandler.GridShape));
     
@@ -664,6 +691,11 @@ public class Match3GameManager : MonoBehaviour
         else return;
 
         BonusSpawned?.Invoke(type);
+    }
+
+    public void NotifySurgeCreated()
+    {
+        BonusSpawned?.Invoke(Match3TileObjectType.Surge);
     }
 
     [Button(ButtonPlayMode.OnlyWhenPlaying)]

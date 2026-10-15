@@ -89,6 +89,7 @@ public class Match3TutorialPresenter : MonoBehaviour
         if (levelData.Level.CountObjectsOfType(Match3TileObjectType.Virus) > 0) Enqueue(Match3TutorialTrigger.LevelHasViruses);
         if (levelData.Level.CountFuses() > 0) Enqueue(Match3TutorialTrigger.LevelHasFuses);
         if (levelData.Level.ConveyorRows is { Count: > 0 }) Enqueue(Match3TutorialTrigger.LevelHasConveyors);
+        if (levelData.Level.CountObjectsOfType(Match3TileObjectType.Surge) > 0) Enqueue(Match3TutorialTrigger.LevelHasSurges);
     }
 
     private void OnBonusSpawned(Match3TileObjectType type)
@@ -97,6 +98,7 @@ public class Match3TutorialPresenter : MonoBehaviour
         else if (type == Match3TileObjectType.Bottom) Enqueue(Match3TutorialTrigger.LevelHasBottomObjects);
         else if (type == Match3TileObjectType.Virus) Enqueue(Match3TutorialTrigger.LevelHasViruses);
         else if (type == Match3TileObjectType.Fuse) Enqueue(Match3TutorialTrigger.LevelHasFuses);
+        else if (type == Match3TileObjectType.Surge) Enqueue(Match3TutorialTrigger.LevelHasSurges);
     }
 
     private void OnHelperSpawned(Match3HelperObject helper)

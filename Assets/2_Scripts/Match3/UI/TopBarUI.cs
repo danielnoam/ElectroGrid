@@ -28,6 +28,7 @@ public class TopBarUI : MonoBehaviour
     private Match3GameManager _match3Manager;
     private Vector2 _topBarDefaultSize;
     private Sequence _topBarSequence;
+    private ComboBarUI _comboBar;
     private Match3LevelData _currentLevelData;
 
     private void Awake()
@@ -132,6 +133,9 @@ public class TopBarUI : MonoBehaviour
 
         _topBarSequence = Sequence.Create(useUnscaledTime: true)
             .Group(Tween.UISizeDelta(topBar, barEndSize, topbarTweenSettings));
+
+        if (!_comboBar) _comboBar = FindAnyObjectByType<ComboBarUI>(FindObjectsInactive.Include);
+        if (_comboBar) _comboBar.Toggle(show, topbarTweenSettings);
     }
 
     private void SetupUIElements(List<Match3Objective> objectives, List<Match3LoseCondition> loseConditions)

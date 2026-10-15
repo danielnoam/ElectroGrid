@@ -12,6 +12,7 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Match3MatchableObject match3MatchableObjectPrefab;
     [SerializeField] private Match3ObstacleObject match3ObstacleObjectPrefab;
     [SerializeField] private Match3VirusObject match3VirusObjectPrefab;
+    [SerializeField] private Match3SurgeObject match3SurgeObjectPrefab;
     [SerializeField] private Match3BottomObject match3BottomObjectPrefab;
     [SerializeField] private Match3HelperObject match3HelperObjectPrefab;
     [SerializeField] private Match3Tile match3TilePrefab;
@@ -22,24 +23,24 @@ public class Match3GridHandler : MonoBehaviour
     [SerializeField] private Sprite conveyorSprite;
     [SerializeField, Range(0.1f, 1.2f)] private float conveyorHeight = 0.96f;
     [SerializeField] private int conveyorSortingOffset = -1;
-    
+
     private readonly Dictionary<Vector2Int, Match3Tile> _tiles = new Dictionary<Vector2Int, Match3Tile>();
     private SOGridShape _gridShape;
     private readonly List<GameObject> _conveyorBelts = new List<GameObject>();
-    
+
     public IReadOnlyDictionary<Vector2Int, Match3Tile> Tiles => _tiles;
     public Grid Grid => GridShape.Grid;
     public SOGridShape GridShape => _gridShape ? _gridShape : defaultGridShape;
-    
+
     public event Action GridDestroyed;
     public event Action<Grid> GridCreated;
     public event Action<Match3HelperObject> HelperSpawned;
-    
+
     /// <param name="catchersInEveryColumn">Puts a catch box under every column a Plug can reach the bottom of, for boards where Stars appear later.</param>
     public void CreateGrid(SOMatch3Level level, bool catchersInEveryColumn = false)
     {
         if (!level || !match3TilePrefab) return;
-        
+
         _gridShape = level.GridShape;
 
         // Reset tiles
@@ -62,7 +63,7 @@ public class Match3GridHandler : MonoBehaviour
                 Vector2Int tileGridPosition = new Vector2Int(x, y);
                 Vector3 tileWorldPosition = Grid.GetCellWorldPosition(x, y);
                 bool tileState = Grid.IsCellActive(x, y);
-                
+
                 if (!tileState) continue;
 
                 var tile = CreateTile(tileWorldPosition, tileGridPosition, true);
@@ -74,7 +75,13 @@ public class Match3GridHandler : MonoBehaviour
                     CreateVirusObject(tile);
                     continue;
                 }
-                
+
+                if (level.TileHasObjectType(x, y, Match3TileObjectType.Surge))
+                {
+                    CreateSurgeObject(level.SurgeTarget(x, y), tile);
+                    continue;
+                }
+
                 if (level.TileHasObjectType(x, y, Match3TileObjectType.Obstacle))
                 {
                     CreateObstacleObject(tile);
@@ -161,33 +168,33 @@ public class Match3GridHandler : MonoBehaviour
             _conveyorBelts.Add(beltObject);
         }
     }
-    
+
     private Match3Tile CreateTile(Vector3 position, Vector2Int gridPos, bool isActive)
     {
         var tileGo = ObjectPooler.GetObjectFromPool(match3TilePrefab.gameObject, position, Quaternion.identity);
         var tile = tileGo.GetComponent<Match3Tile>();
         tile.Initialize(match3GameManager, gridPos, isActive);
-        
+
         return tile;
     }
-    
+
     private Match3Tile CreateTileAsTrash(Vector3 position, Vector2Int gridPos)
     {
         var tileGo = ObjectPooler.GetObjectFromPool(match3TilePrefab.gameObject, position, Quaternion.identity);
         var tile = tileGo.GetComponent<Match3Tile>();
         tile.InitializeAsTrash(match3GameManager, gridPos);
-        
+
         return tile;
     }
-    
+
     public Match3MatchableObject CreateMatchableObject(SOItemData itemData, Match3Tile match3Tile)
     {
         if (!IsValidTile(match3Tile)) return null;
-        
+
         var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
         var itemGo = ObjectPooler.GetObjectFromPool(match3MatchableObjectPrefab.gameObject, spawnPosition, Quaternion.identity);
         var item = itemGo.GetComponent<Match3MatchableObject>();
-        
+
         item.Initialize(itemData, this);
         match3Tile.SetCurrentItem(item);
         item.SetCurrentTile(match3Tile);
@@ -198,10 +205,10 @@ public class Match3GridHandler : MonoBehaviour
     public Match3ObstacleObject CreateObstacleObject(Match3Tile match3Tile)
     {
         if (!IsValidTile(match3Tile)) return null;
-        
+
         var obstacleGo = ObjectPooler.GetObjectFromPool(match3ObstacleObjectPrefab.gameObject, match3Tile.transform.position, Quaternion.identity);
         var obstacle = obstacleGo.GetComponent<Match3ObstacleObject>();
-        
+
         obstacle.Initialize(null, this);
         match3Tile.SetCurrentItem(obstacle);
         obstacle.SetCurrentTile(match3Tile);
@@ -221,6 +228,21 @@ public class Match3GridHandler : MonoBehaviour
         virus.SetCurrentTile(match3Tile);
 
         return virus;
+    }
+
+    public Match3SurgeObject CreateSurgeObject(SOItemData target, Match3Tile match3Tile)
+    {
+        if (!match3SurgeObjectPrefab) match3SurgeObjectPrefab = Resources.Load<Match3SurgeObject>("Prefabs/Prefab_ObjectSurge");
+        if (!IsValidTile(match3Tile) || !match3SurgeObjectPrefab) return null;
+
+        var surgeGo = ObjectPooler.GetObjectFromPool(match3SurgeObjectPrefab.gameObject, match3Tile.transform.position, Quaternion.identity);
+        var surge = surgeGo.GetComponent<Match3SurgeObject>();
+
+        surge.Initialize(target, this);
+        match3Tile.SetCurrentItem(surge);
+        surge.SetCurrentTile(match3Tile);
+
+        return surge;
     }
 
     public static int ConveyorDirection(SOMatch3Level level, int row)
@@ -243,26 +265,26 @@ public class Match3GridHandler : MonoBehaviour
     public Match3BottomObject CreateBottomObject(Match3Tile match3Tile)
     {
         if (!IsValidTile(match3Tile)) return null;
-        
+
         var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
         var bottomObjGo = ObjectPooler.GetObjectFromPool(match3BottomObjectPrefab.gameObject, spawnPosition, Quaternion.identity);
         var bottomObj = bottomObjGo.GetComponent<Match3BottomObject>();
-        
+
         bottomObj.Initialize(null, this);
         match3Tile.SetCurrentItem(bottomObj);
         bottomObj.SetCurrentTile(match3Tile);
 
         return bottomObj;
     }
-    
+
     public Match3HelperObject CreateHelperObject(Match3Tile match3Tile)
     {
         if (!IsValidTile(match3Tile)) return null;
-        
+
         var spawnPosition = Grid.GetCellWorldPosition(match3Tile.GridPosition.x, Grid.Height);
         var helperObjGo = ObjectPooler.GetObjectFromPool(match3HelperObjectPrefab.gameObject, spawnPosition, Quaternion.identity);
         var helperOb = helperObjGo.GetComponent<Match3HelperObject>();
-        
+
         helperOb.Initialize(null, this);
         match3Tile.SetCurrentItem(helperOb);
         helperOb.SetCurrentTile(match3Tile);
@@ -317,7 +339,7 @@ public class Match3GridHandler : MonoBehaviour
     {
         return match3Tile && match3Tile.IsActive;
     }
-    
+
     public bool CanSelectTile(Match3Tile match3Tile)
     {
         return IsValidTile(match3Tile) && match3Tile.CurrentMatch3Object && match3Tile.CurrentMatch3Object.IsSwappable;
@@ -328,7 +350,7 @@ public class Match3GridHandler : MonoBehaviour
         var validTiles = _tiles.Values.Where(IsValidTile).ToList();
         return validTiles.Count > 0 ? validTiles[Random.Range(0, validTiles.Count)] : null;
     }
-    
+
     public bool AreTilesNeighbours(Match3Tile tile1, Match3Tile tile2)
     {
         return Grid.AreCellsNeighbors(tile1.GridPosition, tile2.GridPosition);
@@ -338,7 +360,7 @@ public class Match3GridHandler : MonoBehaviour
     {
         return _tiles.Values.Count(tile => tile.IsActive);
     }
-    
+
     private void OnDrawGizmos()
     {
         Grid?.DrawGrid();

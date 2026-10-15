@@ -134,6 +134,14 @@ MonoBehaviour:
     m_Localized: "Trap\xE8ze"
     m_Metadata:
       m_Items: []
+  - m_Id: 3659092647206912
+    m_Localized: Surtensions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3659092676567040
+    m_Localized: "Aligne 5 pi\xE8ces pour cr\xE9er une Surtension. \xC9change-la avec une voisine pour d\xE9truire toutes les pi\xE8ces du type qu'elle contient."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

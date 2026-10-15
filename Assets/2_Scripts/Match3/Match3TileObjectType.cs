@@ -7,5 +7,6 @@ public enum Match3TileObjectType
     Obstacle,
     Bottom,
     Virus,
-    Fuse
+    Fuse,
+    Surge
 }

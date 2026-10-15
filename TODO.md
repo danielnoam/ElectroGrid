@@ -10,9 +10,9 @@ Last full check against the code: 2026-09-29.
 ## 1. Finish the game
 
 Feel fixes first, then the last gameplay additions, then the level curve once
-the mechanics stop changing (retuning 50 levels twice is the waste to avoid).
-Decide whether Spark and Surge are in for launch before the level curve
-rework, since they change how every level plays.
+the mechanics stop changing (retuning 100 levels twice is the waste to avoid).
+Surge is in. Decide whether Spark is in for launch before the level curve
+rework, since it changes how every level plays.
 
 - [ ] **Combo bar.** `HandleMatchesAndRepopulate` already loops cascades but
       nothing counts them, so a four-chain feels identical to a single match in
@@ -78,16 +78,15 @@ rework, since they change how every level plays.
       and a Steam leaderboard later (section 5). The best score already shows
       on the main menu Survival button.
 
-- [ ] **Spark and Surge power-ups.** An L or T match leaves a Spark (clears a
-      3x3 area when matched or swapped), 5 in a row leaves a Surge (swap it
-      with a piece to clear every piece of that colour). Today a match of 5
-      is just a bigger line break. Agreed with Daniel to do later; the Drone
+- [ ] **Spark power-up.** An L or T match leaves a Spark that clears a 3x3
+      area when matched or swapped. Surge is done (see DONE.md); the Drone
       (2x2) was dropped because Plus already fills the helper role.
 
-- [ ] **50 more levels (51 to 100).** Build them before the rework, with the
-      same rules as LEVELS.md, so the rework has 100 levels to order. Use the
-      new pieces (Diamond, Trapezoid) and every mechanic, and add new grid
-      shapes, including simpler ones the rework can move to the start.
+- [ ] **Surge, what is left.** A lightning arc from the Surge to each piece it
+      zaps, a glow on its core, its own sounds (made, zapping, chain), and a
+      combo when two Surges are swapped with each other (today only one goes
+      off unless they hold the same piece). Add a tutorial level for it in the curve
+      rework.
 
 - [ ] **Rework the level curve, after the 100 levels.** Difficulty is all
       over the place. Re-order and retune all 100 into a steady ramp: rate
@@ -109,7 +108,7 @@ rework, since they change how every level plays.
 
 ### Content, not engineering
 
-- **50 levels are in** (see LEVELS.md). `GetSpecificItemMatches` is left
+- **100 levels are in** (see LEVELS.md). `GetSpecificItemMatches` is left
   unused on purpose: it played badly, so levels use Get Matches instead.
 
 ---

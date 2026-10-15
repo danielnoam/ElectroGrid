@@ -134,6 +134,14 @@ MonoBehaviour:
     m_Localized: "Trap\xE9zio"
     m_Metadata:
       m_Items: []
+  - m_Id: 3659092647206912
+    m_Localized: Descargas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3659092676567040
+    m_Localized: "Combine 5 em linha para criar uma Descarga. Troque-a com qualquer vizinha para eliminar todas as pe\xE7as do tipo que ela guarda."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

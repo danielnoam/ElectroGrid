@@ -18,13 +18,14 @@ public class SOMatch3Level : ScriptableObject
     [SerializeField, Min(1)] private int fuseMoves = 8;
     [Tooltip("Rows that shift one cell along after every move. Row 0 is the bottom row")]
     [SerializeField] private List<Match3ConveyorRow> conveyorRows = new List<Match3ConveyorRow>();
-    
+
     [Header("Tile Objects")]
     [SerializeField, HideInInspector] private Match3TileObjectType[] tileObjects;
     [SerializeField, HideInInspector] private bool[] glitchTiles;
     [SerializeField, HideInInspector] private bool[] starFuseTiles;
+    [SerializeField, HideInInspector] private int[] surgeTargets;
 
-    
+
     /// <summary>The authored name. Stays in English for analytics and save records, players see DisplayName.</summary>
     public string LevelName => levelName;
 
@@ -47,33 +48,34 @@ public class SOMatch3Level : ScriptableObject
     public List<Match3ConveyorRow> ConveyorRows => conveyorRows;
     public bool[] GlitchTiles => glitchTiles;
     public bool[] StarFuseTiles => starFuseTiles;
+    public int[] SurgeTargets => surgeTargets;
     public Match3TileObjectType[] TileObjects => tileObjects;
-    
-    
+
+
     private void OnValidate()
     {
         if (objectives == null) return;
-    
+
         foreach (var objective in objectives)
         {
             objective?.SetGridShape(gridShape);
         }
     }
-    
+
     public bool TileHasObjectType(int x, int y, Match3TileObjectType objectType)
     {
         if (!gridShape || gridShape.Grid == null) return false;
-        
+
         int width = gridShape.Grid.Width;
         int height = gridShape.Grid.Height;
-        
+
         if (x < 0 || x >= width || y < 0 || y >= height) return false;
         if (tileObjects == null || tileObjects.Length != width * height) return false;
-        
+
         int index = y * width + x;
         return tileObjects[index] == objectType;
     }
-    
+
     public bool HasGlitch(int x, int y)
     {
         if (!gridShape || gridShape.Grid == null || glitchTiles == null) return false;
@@ -96,6 +98,23 @@ public class SOMatch3Level : ScriptableObject
         int index = y * width + x;
         if (index >= starFuseTiles.Length || !starFuseTiles[index] || !gridShape.Grid.IsCellActive(x, y)) return false;
         return TileHasObjectType(x, y, Match3TileObjectType.Obstacle) || TileHasObjectType(x, y, Match3TileObjectType.Bottom);
+    }
+
+    /// <summary>The piece a Surge placed in this cell holds: an index into the match objects, or random when unset.</summary>
+    public SOItemData SurgeTarget(int x, int y)
+    {
+        if (matchObjects == null || matchObjects.Count == 0) return null;
+        if (gridShape && gridShape.Grid != null && surgeTargets != null)
+        {
+            int index = y * gridShape.Grid.Width + x;
+            if (index >= 0 && index < surgeTargets.Length)
+            {
+                int target = surgeTargets[index];
+                if (target >= 0 && target < matchObjects.Count && matchObjects[target]) return matchObjects[target];
+            }
+        }
+
+        return matchObjects.GetRandomItem();
     }
 
     /// <summary>Every fuse the level starts with: on pieces and on Stars.</summary>
@@ -134,7 +153,7 @@ public class SOMatch3Level : ScriptableObject
     public int CountObjectsOfType(Match3TileObjectType objectType)
     {
         if (tileObjects == null) return 0;
-        
+
         int count = 0;
         foreach (var tileObj in tileObjects)
         {

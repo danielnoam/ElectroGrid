@@ -134,6 +134,14 @@ MonoBehaviour:
     m_Localized: Trapez
     m_Metadata:
       m_Items: []
+  - m_Id: 3659092647206912
+    m_Localized: "Stromst\xF6\xDFe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 3659092676567040
+    m_Localized: "Kombiniere 5 in einer Reihe f\xFCr einen Stromsto\xDF. Tausche ihn mit einem Nachbarn, um jedes Teil der Art in seinem Inneren zu zerst\xF6ren."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

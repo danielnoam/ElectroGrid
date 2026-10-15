@@ -40,6 +40,8 @@ internal class Match3LevelEditorWindow : EditorWindow
     private bool _paintGlitch;
     private bool _glitchPaintValue;
     private bool _starFusePaintValue;
+    private string _pendingClear;
+    private int _surgeTargetPaint = -1;
     private bool _isDragging;
 
     private bool _shapeFoldout;
@@ -537,11 +539,21 @@ internal class Match3LevelEditorWindow : EditorWindow
             _serializedLevel.ApplyModifiedProperties();
         }
 
+        var surgeTargetsProp = _serializedLevel.FindProperty("surgeTargets");
+        if (surgeTargetsProp.arraySize != requiredSize)
+        {
+            int oldSize = surgeTargetsProp.arraySize;
+            surgeTargetsProp.arraySize = requiredSize;
+            for (int i = oldSize; i < requiredSize; i++) surgeTargetsProp.GetArrayElementAtIndex(i).intValue = -1;
+            _serializedLevel.ApplyModifiedProperties();
+        }
+
         EditorGUILayout.LabelField(Match3LevelGridGUI.BuildCountsLabel(_selectedLevel), Match3LevelGridGUI.RichLabel);
         EditorGUILayout.Space(5);
 
         Rect gridRect = Match3LevelGridGUI.GetCenteredGridRect(grid, CellSize);
 
+        if (_currentPaintMode == Match3TileObjectType.Surge && !_paintGlitch) DrawSurgeTargetPicker();
         HandlePainting(gridRect, grid, tileObjectsProp, glitchTilesProp, starFuseTilesProp);
         Match3LevelGridGUI.DrawCells(gridRect, grid, tileObjectsProp, CellSize, true, glitchTilesProp, _selectedLevel);
 
@@ -554,36 +566,68 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUIUtility.SetIconSize(new Vector2(18f, 18f));
         DrawPaintModeButton(Match3TileObjectType.Obstacle);
         DrawPaintModeButton(Match3TileObjectType.Bottom);
+        DrawGlitchModeButton();
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.BeginHorizontal();
         DrawPaintModeButton(Match3TileObjectType.Virus);
         DrawPaintModeButton(Match3TileObjectType.Fuse);
-        DrawGlitchModeButton();
+        DrawPaintModeButton(Match3TileObjectType.Surge);
         EditorGUIUtility.SetIconSize(previousIconSize);
         EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space(5);
+        if (GUILayout.Button("Clear All")) _pendingClear = "All";
 
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Clear All")) ResetCells(tileObjectsProp, grid, (_, _, _) => true);
-        if (GUILayout.Button("Clear Stars")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Obstacle);
-        if (GUILayout.Button("Clear Plugs")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Bottom);
-        EditorGUILayout.EndHorizontal();
+        ApplyPendingClear(grid, tileObjectsProp, glitchTilesProp, starFuseTilesProp);
+    }
 
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button("Clear Viruses")) ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Virus);
-        if (GUILayout.Button("Clear Fuses"))
+    private void ApplyPendingClear(Grid grid, SerializedProperty tileObjectsProp, SerializedProperty glitchTilesProp, SerializedProperty starFuseTilesProp)
+    {
+        if (_pendingClear == null) return;
+        string clear = _pendingClear;
+        _pendingClear = null;
+
+        bool all = clear == "All";
+        if (all) ResetCells(tileObjectsProp, grid, (_, _, _) => true);
+        else if (Enum.TryParse(clear, out Match3TileObjectType type)) ResetCells(tileObjectsProp, grid, (x, y, cellType) => grid.IsCellActive(x, y) && cellType == type);
+
+        if (all || clear == nameof(Match3TileObjectType.Fuse))
         {
-            ResetCells(tileObjectsProp, grid, (x, y, type) => grid.IsCellActive(x, y) && type == Match3TileObjectType.Fuse);
             for (int i = 0; i < starFuseTilesProp.arraySize; i++) starFuseTilesProp.GetArrayElementAtIndex(i).boolValue = false;
             starFuseTilesProp.serializedObject.ApplyModifiedProperties();
-            GUI.changed = true;
         }
-        if (GUILayout.Button("Clear Glitches"))
+
+        if (all || clear == "Glitch")
         {
             for (int i = 0; i < glitchTilesProp.arraySize; i++) glitchTilesProp.GetArrayElementAtIndex(i).boolValue = false;
             glitchTilesProp.serializedObject.ApplyModifiedProperties();
-            GUI.changed = true;
         }
-        EditorGUILayout.EndHorizontal();
+
+        GUI.changed = true;
+    }
+
+    private void ShowClearMenu(Rect buttonRect, string clear, string label)
+    {
+        var e = Event.current;
+        bool rightClick = e.type == EventType.MouseDown && e.button == 1;
+        if (!rightClick || !buttonRect.Contains(e.mousePosition)) return;
+
+        var menu = new GenericMenu();
+        menu.AddItem(new GUIContent($"Clear All {label}"), false, () => { _pendingClear = clear; Repaint(); });
+        menu.ShowAsContext();
+        e.Use();
+    }
+
+    private void DrawSurgeTargetPicker()
+    {
+        var items = _selectedLevel.MatchObjects;
+        var names = new string[items.Count + 1];
+        names[0] = "Random piece";
+        for (int i = 0; i < items.Count; i++) names[i + 1] = items[i] ? items[i].Label : "(empty)";
+
+        int selected = Mathf.Clamp(_surgeTargetPaint + 1, 0, names.Length - 1);
+        selected = EditorGUILayout.Popup("Surge holds", selected, names);
+        _surgeTargetPaint = selected - 1;
     }
 
     private void DrawPaintModeButton(Match3TileObjectType mode)
@@ -594,8 +638,11 @@ internal class Match3LevelEditorWindow : EditorWindow
         string tooltip = mode == Match3TileObjectType.Fuse
             ? "Paint fuses. On a Star or Plug the fuse goes on the Star. Click a painted cell again to clear it."
             : $"Paint {Match3LevelGridGUI.NameFor(mode)}s. Click a painted cell again to clear it.";
-        var content = new GUIContent(" " + Match3LevelGridGUI.NameFor(mode), Match3LevelGridGUI.IconFor(mode), tooltip);
-        if (GUILayout.Button(content, GUILayout.Height(30)))
+        var content = new GUIContent(" " + Match3LevelGridGUI.NameFor(mode), Match3LevelGridGUI.IconFor(mode), tooltip + " Right-click to clear.");
+        var rect = GUILayoutUtility.GetRect(content, GUI.skin.button, GUILayout.Height(30));
+        string plural = Match3LevelGridGUI.NameFor(mode).EndsWith("s") ? Match3LevelGridGUI.NameFor(mode) + "es" : Match3LevelGridGUI.NameFor(mode) + "s";
+        ShowClearMenu(rect, mode.ToString(), plural);
+        if (GUI.Button(rect, content))
         {
             _currentPaintMode = !_paintGlitch && _currentPaintMode == mode ? Match3TileObjectType.Matchable : mode;
             _paintGlitch = false;
@@ -609,8 +656,10 @@ internal class Match3LevelEditorWindow : EditorWindow
         Color previousBackground = GUI.backgroundColor;
         GUI.backgroundColor = _paintGlitch ? Color.yellow : Color.white;
 
-        var content = new GUIContent(" Glitch", Match3LevelGridGUI.Icon("Glitch"), "Paint glitch tiles. They sit under whatever is on the cell.");
-        if (GUILayout.Button(content, GUILayout.Height(30))) _paintGlitch = !_paintGlitch;
+        var content = new GUIContent(" Glitch", Match3LevelGridGUI.Icon("Glitch"), "Paint glitch tiles. They sit under whatever is on the cell. Right-click to clear.");
+        var rect = GUILayoutUtility.GetRect(content, GUI.skin.button, GUILayout.Height(30));
+        ShowClearMenu(rect, "Glitch", "Glitches");
+        if (GUI.Button(rect, content)) _paintGlitch = !_paintGlitch;
 
         GUI.backgroundColor = previousBackground;
     }
@@ -650,6 +699,12 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         var element = tileObjectsProp.GetArrayElementAtIndex(index);
         var currentType = (Match3TileObjectType)element.enumValueIndex;
+
+        if (_currentPaintMode == Match3TileObjectType.Surge)
+        {
+            var surgeTargets = tileObjectsProp.serializedObject.FindProperty("surgeTargets");
+            if (index < surgeTargets.arraySize) surgeTargets.GetArrayElementAtIndex(index).intValue = _surgeTargetPaint;
+        }
 
         bool onStar = currentType is Match3TileObjectType.Obstacle or Match3TileObjectType.Bottom;
         if (_currentPaintMode == Match3TileObjectType.Fuse && onStar)

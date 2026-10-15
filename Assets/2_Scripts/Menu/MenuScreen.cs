@@ -35,9 +35,14 @@ public abstract class MenuScreen : MonoBehaviour
         }
 
         animationSequence.Stop();
-        
-        if (canvasGroup) canvasGroup.alpha = 0f;
-        
+
+        if (canvasGroup)
+        {
+            canvasGroup.alpha = 0f;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = false;
+        }
+
         animationSequence = Sequence.Create()
             .Group(Tween.Alpha(canvasGroup, 1f, showTweenSettings))
             .Group(GetShowPositionTween())

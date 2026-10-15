@@ -1,4 +1,5 @@
 using DNExtensions.Systems.AudioLibrary;
+using PrimeTween;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,6 +17,8 @@ public class ComboBarUI : MonoBehaviour
     [SerializeField] private Image fillImage;
     [SerializeField] private Image timerImage;
     [SerializeField] private TextMeshProUGUI countText;
+    [Tooltip("What folds shut and open with the top bar, the whole bar when left empty")]
+    [SerializeField] private RectTransform foldRoot;
 
     [Header("Look")]
     [SerializeField, Min(0.01f)] private float fadeSpeed = 6f;
@@ -34,14 +37,23 @@ public class ComboBarUI : MonoBehaviour
 
     private Match3Combo _combo;
     private float _shownFill;
+    private Match3GameManager _manager;
+    private Vector3 _foldScale = Vector3.one;
+    private Tween _foldTween;
+
+    private void Awake()
+    {
+        _foldScale = FoldRoot.localScale;
+    }
 
     private void Start()
     {
         if (canvasGroup) canvasGroup.alpha = 0f;
         SetCount(0);
-        if (!Match3GameManager.Instance) return;
+        _manager = Match3GameManager.Instance;
+        if (!_manager) return;
 
-        _combo = Match3GameManager.Instance.Combo;
+        _combo = _manager.Combo;
         _combo.StepAdded += OnStepAdded;
         _combo.Filled += OnFilled;
         _combo.Reset += OnReset;
@@ -49,6 +61,8 @@ public class ComboBarUI : MonoBehaviour
 
     private void OnDestroy()
     {
+        _foldTween.Stop();
+
         if (_combo == null) return;
 
         _combo.StepAdded -= OnStepAdded;
@@ -62,12 +76,25 @@ public class ComboBarUI : MonoBehaviour
 
         // Unscaled, the bar keeps animating behind a pause window even though the combo itself is frozen
         float dt = Time.unscaledDeltaTime;
-        bool comboOn = Match3GameManager.Instance && Match3GameManager.Instance.ComboEnabled;
+        bool comboOn = _manager && _manager.ComboEnabled;
         if (canvasGroup) canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, comboOn ? 1f : 0f, fadeSpeed * dt);
 
         _shownFill = Mathf.MoveTowards(_shownFill, _combo.Fill, fillSpeed * dt);
         if (fillImage) fillImage.fillAmount = _shownFill;
         if (timerImage) timerImage.fillAmount = _combo.Window > 0f ? Mathf.Clamp01(_combo.TimeLeft / _combo.Window) : 0f;
+    }
+
+    private RectTransform FoldRoot => foldRoot ? foldRoot : (RectTransform)transform;
+
+    /// <summary>Folds the bar shut or open along with the top bar's panel.</summary>
+    public void Toggle(bool show, TweenSettings settings)
+    {
+        var rootTransform = FoldRoot;
+        _foldTween.Stop();
+
+        var closed = new Vector3(_foldScale.x, 0f, _foldScale.z);
+        rootTransform.localScale = show ? closed : rootTransform.localScale;
+        _foldTween = Tween.Scale(rootTransform, show ? _foldScale : closed, settings);
     }
 
     private void OnStepAdded(int count)

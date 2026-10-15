@@ -178,7 +178,7 @@ internal static class Match3LevelValidation
     {
         int obstacles = level.CountObjectsOfType(Match3TileObjectType.Obstacle);
         int bottoms = level.CountObjectsOfType(Match3TileObjectType.Bottom);
-        int matchable = grid.ActiveCellCount - obstacles - bottoms - level.CountObjectsOfType(Match3TileObjectType.Virus);
+        int matchable = grid.ActiveCellCount - obstacles - bottoms - level.CountObjectsOfType(Match3TileObjectType.Virus) - level.CountObjectsOfType(Match3TileObjectType.Surge);
 
         if (matchable <= 0)
         {
