@@ -100,6 +100,16 @@ rework, since they change how every level plays.
       is just a bigger line break. Agreed with Daniel to do later; the Drone
       (2x2) was dropped because Plus already fills the helper role.
 
+- [ ] **Fuses on Double Stars and Square Stars.** Let a fuse sit on a Double
+      Star (defused when the Double Star is destroyed) or a Square Star
+      (defused when it reaches the bottom and drops off). If the fuse runs out
+      first, the level is lost, same as a fuse on a normal piece. Today the
+      fuse lives only on `Match3MatchableObject`, and a level cell holds one
+      `Match3TileObjectType`, so a cell can't be both a Star and a Fuse. The
+      fuse needs to move to a shared base (or its own per-cell layer like
+      `glitchTiles`), with the level editor, validation, the Defuse objective
+      and Survival spawns updated to match.
+
 - [ ] **Rework the level curve.** Difficulty is all over the place across the
       50 levels. Re-order and retune them into a steady curve: rate each level
       (moves or time against the goal, number of mechanics, board size), then
