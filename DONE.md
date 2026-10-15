@@ -927,3 +927,13 @@ of as a new blob per edit.
       break animation with a lighter particle (`Prefab_ParticleStarHit`); a
       line break still breaks it at once. Named Star in all 7 languages.
 - [x] **Cleanup**: the `Assets/_Recovery` scene backup is gone.
+
+## Match3 Bot (after 1.8.0)
+
+- [x] **ElectroGrid > Match3 Bot**, an editor window that plays the game in play
+      mode: random valid swaps on the current level, a level range or
+      Survival, closing tutorial cards, waiting for each move to settle and for
+      the result screen. It logs one line per level (won, lost, stuck or error,
+      with moves, time and goals) and can copy the report.
+- [x] **Firebase Crashlytics metas re-saved** in the current PluginImporter
+      format, which silences the version 1 warnings.
