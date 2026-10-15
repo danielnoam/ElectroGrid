@@ -78,6 +78,18 @@ rework, since it changes how every level plays.
       and a Steam leaderboard later (section 5). The best score already shows
       on the main menu Survival button.
 
+- [ ] **Survival Plug fixes.**
+      - The sockets under the board should only show once Plugs are in play
+        (after their milestone), not from the start of the run.
+      - Plugs sometimes come back small. Probably the pool not resetting their
+        scale when they are reused.
+      - Plugs can spawn on top of each other. A Plug should never spawn on a
+        cell where another Plug is.
+
+- [ ] **Placed pieces in the level editor.** Paint specific pieces (triangle,
+      circle and so on) on cells so a level always starts the same way. They
+      should spawn in like any other piece, so the player can't tell.
+
 - [ ] **Spark power-up.** An L or T match leaves a Spark that clears a 3x3
       area when matched or swapped. Surge is done (see DONE.md); the Drone
       (2x2) was dropped because Plus already fills the helper role.
