@@ -88,8 +88,8 @@ rework, since they change how every level plays.
       60,000, fuses 75,000 (a blown fuse ends the run). Thresholds need a
       playtest on the phone. Numbers playtested 2026-10-11. Still to do: a
       pop-in when a milestone unlocks (`MilestoneReached` is already raised),
-      decide whether to show the best score on the menu, and a Steam
-      leaderboard later (section 5).
+      and a Steam leaderboard later (section 5). The best score already shows
+      on the main menu Survival button.
 
 - [ ] **Spark and Surge power-ups.** An L or T match leaves a Spark (clears a
       3x3 area when matched or swapped), 5 in a row leaves a Surge (swap it
