@@ -107,13 +107,28 @@ rework, since they change how every level plays.
       `glitchTiles`), with the level editor, validation, the Defuse objective
       and Survival spawns updated to match.
 
-- [ ] **Rework the level curve.** Difficulty is all over the place across the
-      50 levels. Re-order and retune them into a steady curve: rate each level
-      (moves or time against the goal, number of mechanics, board size), then
-      sort by that. Some objectives and objects can come in earlier (for
-      example Double Stars, a simple glitch or conveyor level) and harder
-      combinations move later. Introduce one new idea at a time and give each
-      a gentle first level. Playtest on the phone, and update LEVELS.md to match.
+- [ ] **50 more levels (51 to 100).** Build them before the rework, with the
+      same rules as LEVELS.md, so the rework has 100 levels to order. Use the
+      new pieces (Diamond, Trapezoid) and every mechanic, and add new grid
+      shapes, including simpler ones the rework can move to the start.
+
+- [ ] **Rework the level curve, after the 100 levels.** Difficulty is all
+      over the place. Re-order and retune all 100 into a steady ramp: rate
+      each level (limit against goal, mechanics in play, board size and shape),
+      then sort by that. Simpler grid shapes go at the start.
+      **How a new obstacle comes in** (the pattern most match-3 games use:
+      introduce, isolate, reinforce, combine):
+      1. **Before it:** 3 to 4 levels with only known obstacles and different
+         objectives, so the player is comfortable.
+      2. **Introduce:** 1 or 2 easy levels with just the new obstacle (for
+         example only Double Stars), with its tutorial card.
+      3. **Reinforce:** 2 or 3 levels mixing it with the objectives the player
+         knows.
+      4. **Combine:** then mix it with earlier obstacles, and repeat the cycle
+         for the next one. That is a new obstacle about every 8 to 10 levels.
+      Keep a saw-tooth inside the ramp: an easier breather level after a hard
+      one, and a harder "boss" level at the end of each cycle. Playtest on the
+      phone and update LEVELS.md to match.
 
 ### Content, not engineering
 
