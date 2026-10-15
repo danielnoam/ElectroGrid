@@ -47,9 +47,6 @@ rework, since they change how every level plays.
       is tunable in the inspector. Still to do: real sounds for the step and
       the full bar (numbers playtested 2026-10-11). In Survival a full bar adds
       uncapped time (`SurvivalMode`).
-      **Keep the bar visible with no combo:** right now the combo bar fades out
-      when there is no combo running. It should stay on screen (empty) so the
-      HUD does not jump in and out.
 
 - [ ] **Separate win and lose endings.** Winning and losing a level play the
       same end-of-level animation right now. Winning should feel like a

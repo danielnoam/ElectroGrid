@@ -6,7 +6,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Shows the combo next to the level title: a counter on one side, a bar that fills on the other, and a thin line under
 /// the bar that drains as the window to the next match runs out. Also plays the combo's feel: a sound that rises in
-/// pitch per step and a shake that grows with it. Hidden while there is no combo.
+/// pitch per step and a shake that grows with it. On levels with the combo bar it stays on screen, empty, while there is no
+/// combo; only the counter fades out.
 /// </summary>
 public class ComboBarUI : MonoBehaviour
 {
@@ -39,6 +40,7 @@ public class ComboBarUI : MonoBehaviour
     private void Start()
     {
         if (canvasGroup) canvasGroup.alpha = 0f;
+        if (countText) countText.alpha = 0f;
         if (!Match3GameManager.Instance) return;
 
         _combo = Match3GameManager.Instance.Combo;
@@ -64,7 +66,9 @@ public class ComboBarUI : MonoBehaviour
         float dt = Time.unscaledDeltaTime;
         bool visible = _combo.Count >= showFromStep;
 
-        if (canvasGroup) canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, visible ? 1f : 0f, fadeSpeed * dt);
+        bool comboOn = Match3GameManager.Instance && Match3GameManager.Instance.ComboEnabled;
+        if (canvasGroup) canvasGroup.alpha = Mathf.MoveTowards(canvasGroup.alpha, comboOn ? 1f : 0f, fadeSpeed * dt);
+        if (countText) countText.alpha = Mathf.MoveTowards(countText.alpha, visible ? 1f : 0f, fadeSpeed * dt);
 
         _shownFill = Mathf.MoveTowards(_shownFill, _combo.Fill, fillSpeed * dt);
         if (fillImage) fillImage.fillAmount = _shownFill;
