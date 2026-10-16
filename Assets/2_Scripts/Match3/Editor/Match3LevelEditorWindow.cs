@@ -30,6 +30,8 @@ internal class Match3LevelEditorWindow : EditorWindow
 
     private Vector2 _sidebarScroll;
     private Vector2 _editorScroll;
+    private SOSurvivalMode _survival;
+    private SerializedObject _serializedSurvival;
     private ReorderableList _orderList;
     private readonly List<SOMatch3Level> _unlisted = new List<SOMatch3Level>();
     private bool _unlistedFoldout = true;
@@ -46,6 +48,8 @@ internal class Match3LevelEditorWindow : EditorWindow
     private string _pendingClear;
     private int _surgeTargetPaint = -1;
     private bool _isDragging;
+    private bool _erasing;
+    private bool _paintObjectOn;
 
     private bool _shapeFoldout;
     private int _shapeWidth = 8;
@@ -142,6 +146,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         EditorGUILayout.BeginVertical(GUILayout.Width(SidebarWidth), GUILayout.ExpandHeight(true));
 
         DrawSidebarToolbar();
+        DrawSurvivalRow();
 
         _sidebarScroll = EditorGUILayout.BeginScrollView(_sidebarScroll);
 
@@ -161,6 +166,56 @@ internal class Match3LevelEditorWindow : EditorWindow
         DrawFolderField();
 
         EditorGUILayout.EndVertical();
+    }
+
+    private void DrawSurvivalRow()
+    {
+        var mode = Match3LevelRegistry.Prefab ? Match3LevelRegistry.Prefab.SurvivalMode : null;
+        if (!mode) return;
+
+        var style = _survival ? _selectedRowStyle : _rowStyle;
+        if (GUILayout.Button("  \u221E  Survival", style)) Defer(() => SelectSurvival(mode));
+        var rect = GUILayoutUtility.GetLastRect();
+        EditorGUI.DrawRect(new Rect(rect.x, rect.yMax + 1f, rect.width, 1f), new Color(1f, 1f, 1f, 0.12f));
+        EditorGUILayout.Space(3);
+    }
+
+    private void SelectSurvival(SOSurvivalMode mode)
+    {
+        SelectLevel(mode.Board);
+        _survival = mode;
+        _serializedSurvival = new SerializedObject(mode);
+    }
+
+    private void DrawSurvivalSettings()
+    {
+        _serializedSurvival.Update();
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField($"Survival ({_survival.name})", EditorStyles.boldLabel);
+        using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode && !EditorApplication.isPlaying))
+        {
+            if (GUILayout.Button(EditorApplication.isPlaying ? "Restart Survival" : "Play Survival", GUILayout.Width(150f)))
+            {
+                var modeToPlay = _survival;
+                Defer(() => Match3LevelPlayer.PlaySurvival(modeToPlay));
+            }
+        }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.Space(4);
+        EditorGUILayout.PropertyField(_serializedSurvival.FindProperty("board"));
+        EditorGUILayout.PropertyField(_serializedSurvival.FindProperty("score"), true);
+        EditorGUILayout.PropertyField(_serializedSurvival.FindProperty("time"), true);
+        EditorGUILayout.PropertyField(_serializedSurvival.FindProperty("obstacles"), true);
+        EditorGUILayout.PropertyField(_serializedSurvival.FindProperty("milestones"), true);
+
+        if (_serializedSurvival.ApplyModifiedProperties() && _survival.Board != _selectedLevel) SelectSurvival(_survival);
+
+        EditorGUILayout.Space(10);
+        EditorGUILayout.LabelField($"Board ({(_selectedLevel ? _selectedLevel.name : "none")})", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("The board's grid, pieces and placed Stars are used. Its objectives and limits are ignored in Survival.", MessageType.None);
+        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("matchObjects"));
     }
 
     private void DrawSidebarToolbar()
@@ -446,16 +501,23 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         _editorScroll = EditorGUILayout.BeginScrollView(_editorScroll);
 
-        DrawLevelHeader();
+        if (_survival)
+        {
+            DrawSurvivalSettings();
+        }
+        else
+        {
+            DrawLevelHeader();
 
-        EditorGUILayout.Space(4);
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("levelName"));
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("matchObjects"));
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("objectives"));
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("loseConditions"));
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("comboBar"));
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("fuseMoves"));
-        EditorGUILayout.PropertyField(_serializedLevel.FindProperty("conveyorRows"));
+            EditorGUILayout.Space(4);
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("levelName"));
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("matchObjects"));
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("objectives"));
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("loseConditions"));
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("conveyorRows"));
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("comboBar"));
+            EditorGUILayout.PropertyField(_serializedLevel.FindProperty("fuseMoves"));
+        }
 
         EditorGUILayout.Space(10);
         EditorGUILayout.LabelField("Level Grid", EditorStyles.boldLabel);
@@ -469,7 +531,7 @@ internal class Match3LevelEditorWindow : EditorWindow
         DrawTileObjectPainter(shape, grid);
         DrawShapeRandomizer(shape);
         DrawTileObjectRandomizer(grid);
-        DrawValidation();
+        if (!_survival) DrawValidation();
 
         EditorGUILayout.EndScrollView();
 
@@ -738,14 +800,18 @@ internal class Match3LevelEditorWindow : EditorWindow
         if (!Match3LevelGridGUI.TryGetCellIndex(gridRect, grid, e.mousePosition, CellSize, out int index)) return;
         if (index >= tileObjectsProp.arraySize) return;
 
-        if (isPress) _isDragging = true;
+        if (isPress)
+        {
+            _isDragging = true;
+            _erasing = e.button == 1;
+        }
 
         if (_paintGlitch)
         {
             if (index >= glitchTilesProp.arraySize) return;
 
             var glitch = glitchTilesProp.GetArrayElementAtIndex(index);
-            if (isPress) _glitchPaintValue = !glitch.boolValue;
+            if (isPress) _glitchPaintValue = !_erasing && !glitch.boolValue;
             glitch.boolValue = _glitchPaintValue;
             glitchTilesProp.serializedObject.ApplyModifiedProperties();
             GUI.changed = true;
@@ -759,7 +825,7 @@ internal class Match3LevelEditorWindow : EditorWindow
             if (index >= pieces.arraySize) return;
 
             var piece = pieces.GetArrayElementAtIndex(index);
-            if (isPress) _piecePaintValue = piece.intValue == _piecePaint + 1 ? 0 : _piecePaint + 1;
+            if (isPress) _piecePaintValue = _erasing || piece.intValue == _piecePaint + 1 ? 0 : _piecePaint + 1;
             piece.intValue = _piecePaintValue;
             pieces.serializedObject.ApplyModifiedProperties();
             GUI.changed = true;
@@ -769,6 +835,16 @@ internal class Match3LevelEditorWindow : EditorWindow
 
         var element = tileObjectsProp.GetArrayElementAtIndex(index);
         var currentType = (Match3TileObjectType)element.enumValueIndex;
+
+        if (_erasing)
+        {
+            element.enumValueIndex = (int)Match3TileObjectType.Matchable;
+            if (index < starFuseTilesProp.arraySize) starFuseTilesProp.GetArrayElementAtIndex(index).boolValue = false;
+            tileObjectsProp.serializedObject.ApplyModifiedProperties();
+            GUI.changed = true;
+            e.Use();
+            return;
+        }
 
         if (_currentPaintMode == Match3TileObjectType.Surge)
         {
@@ -790,8 +866,9 @@ internal class Match3LevelEditorWindow : EditorWindow
             return;
         }
 
-        // Painting the mode already on a cell clears it, so the same button both paints and erases
-        element.enumValueIndex = (int)(currentType == _currentPaintMode ? Match3TileObjectType.Matchable : _currentPaintMode);
+        // Clicking a cell that already has the brush clears it; a drag keeps doing whatever the click did
+        if (isPress) _paintObjectOn = currentType != _currentPaintMode;
+        element.enumValueIndex = (int)(_paintObjectOn ? _currentPaintMode : currentType == _currentPaintMode ? Match3TileObjectType.Matchable : currentType);
 
         tileObjectsProp.serializedObject.ApplyModifiedProperties();
         GUI.changed = true;
@@ -1145,6 +1222,8 @@ internal class Match3LevelEditorWindow : EditorWindow
 
     private void SelectLevel(SOMatch3Level level)
     {
+        _survival = null;
+        _serializedSurvival = null;
         _selectedLevel = level;
         _serializedLevel = level ? new SerializedObject(level) : null;
         _isDragging = false;

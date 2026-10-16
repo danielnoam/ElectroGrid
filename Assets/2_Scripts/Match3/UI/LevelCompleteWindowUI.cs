@@ -152,7 +152,7 @@ public class LevelCompleteWindowUI : MonoBehaviour
     private void AddStat(string statName, string text)
     {
         var element = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        element.Setup(null, text);
+        element.Setup(text);
         element.gameObject.name = statName;
     }
 
@@ -191,11 +191,11 @@ public class LevelCompleteWindowUI : MonoBehaviour
         }
 
         var piecesClearedElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        piecesClearedElement.Setup(null, L10n.Get("levelcomplete.pieces", ("pieces", levelData.PiecesCleared)));
+        piecesClearedElement.Setup(L10n.Get("levelcomplete.pieces", ("pieces", levelData.PiecesCleared)));
         piecesClearedElement.gameObject.name = "PiecesCleared";
         
         var movesMadeElement = Instantiate(match3UIElementPrefab, levelCompleteStatsParent);
-        movesMadeElement.Setup(null, L10n.Get("levelcomplete.moves", ("moves", levelData.MovesMade)));
+        movesMadeElement.Setup(L10n.Get("levelcomplete.moves", ("moves", levelData.MovesMade)));
         movesMadeElement.gameObject.name = "MovesMade";
     }
 

@@ -292,15 +292,15 @@ public class Match3GameManager : MonoBehaviour
             _virusBrokenThisMove = true;
             _currentLevelData?.OnVirusCountChanged(gridHandler.CountViruses());
         }
-        if (!levelComplete) _currentLevelData?.Survival?.OnDoubleStarBroken(Combo.Count);
-        AddLevelPoints(levelScoreSettings.doubleStarBonus);
+        if (!levelComplete) _currentLevelData?.Survival?.OnStarBroken(Combo.Count);
+        AddLevelPoints(levelScoreSettings.starBonus);
     }
     
     public void NotifyBottomObjectReached(Match3BottomObject bottomObject)
     {
         _currentLevelData?.OnBottomObjectReached(bottomObject);
-        if (!levelComplete) _currentLevelData?.Survival?.OnSquareStarReached(Combo.Count);
-        AddLevelPoints(levelScoreSettings.squareStarBonus);
+        if (!levelComplete) _currentLevelData?.Survival?.OnPlugReached(Combo.Count);
+        AddLevelPoints(levelScoreSettings.plugBonus);
     }
     
     public void NotifyLineBreakMade(List<int> rows, List<int> columns, int piecesDestroyed)
@@ -475,7 +475,7 @@ public class Match3GameManager : MonoBehaviour
         
         yield return new WaitForSeconds(0.1f);
         
-        yield return StartCoroutine(playHandler.ClearObjects());
+        yield return StartCoroutine(playHandler.SweepClearObjects());
         
         yield return new WaitForSeconds(0.2f);
         
@@ -498,7 +498,7 @@ public class Match3GameManager : MonoBehaviour
         
         yield return new WaitForSeconds(0.1f);
         
-        yield return StartCoroutine(playHandler.ClearObjects());
+        yield return StartCoroutine(playHandler.GreyOutObjects());
         
         yield return new WaitForSeconds(0.2f);
 
@@ -617,7 +617,7 @@ public class Match3GameManager : MonoBehaviour
         if (!currentLevel) yield break;
         
         playHandler.CanInteract = false;
-        gridHandler.CreateGrid(currentLevel, IsSurvival && currentSurvival.Bonuses.squareStarChance > 0f && currentSurvival.HasMilestone(SurvivalUnlock.SquareStars));
+        gridHandler.CreateGrid(currentLevel, IsSurvival && currentSurvival.Obstacles.plugChance > 0f && currentSurvival.HasMilestone(SurvivalUnlock.Plugs));
         populatingGrid = true;
         
         int retryCount = 0;
@@ -670,20 +670,20 @@ public class Match3GameManager : MonoBehaviour
         var survival = _currentLevelData?.Survival;
         if (survival == null || levelComplete) return (null, Match3TileObjectType.Matchable);
 
-        int squareStars = 0;
-        int doubleStars = 0;
+        int plugs = 0;
+        int stars = 0;
         int viruses = 0;
         int fuses = 0;
         foreach (var tile in gridHandler.Tiles.Values)
         {
             if (!tile || !tile.CurrentMatch3Object) continue;
             if (tile.CurrentMatch3Object.HasFuse) fuses++;
-            if (tile.CurrentMatch3Object is Match3BottomObject) squareStars++;
-            else if (tile.CurrentMatch3Object is Match3ObstacleObject) doubleStars++;
+            if (tile.CurrentMatch3Object is Match3BottomObject) plugs++;
+            else if (tile.CurrentMatch3Object is Match3ObstacleObject) stars++;
             else if (tile.CurrentMatch3Object is Match3VirusObject) viruses++;
         }
 
-        return survival.PickBonus(refillTiles, gridHandler, squareStars, doubleStars, viruses, fuses);
+        return survival.PickBonus(refillTiles, gridHandler, plugs, stars, viruses, fuses);
     }
 
     public void SpawnSurvivalBonus(Match3Tile tile, Match3TileObjectType type, SOItemData item)
@@ -699,7 +699,7 @@ public class Match3GameManager : MonoBehaviour
         {
             var piece = gridHandler.CreateMatchableObject(item, tile);
             if (!piece) return;
-            piece.SetFuse(currentSurvival.Bonuses.fuseMoves);
+            piece.SetFuse(currentSurvival.Obstacles.fuseMoves);
         }
         else return;
 
@@ -720,10 +720,20 @@ public class Match3GameManager : MonoBehaviour
     }
     
     [Button(ButtonPlayMode.OnlyWhenPlaying)]
-    private void ForceCompleteLevel()
+    public void ForceCompleteLevel()
     {
         if (levelComplete || populatingGrid) return;
         
         StartCoroutine(CompleteLevel());
     }
+
+    [Button(ButtonPlayMode.OnlyWhenPlaying)]
+    public void ForceFailLevel()
+    {
+        if (levelComplete || populatingGrid) return;
+
+        StartCoroutine(FailLevel());
+    }
+
+    public bool CanForceEnd => !levelComplete && !populatingGrid;
 }

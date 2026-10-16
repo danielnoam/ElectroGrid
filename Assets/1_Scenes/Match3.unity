@@ -819,7 +819,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 52.15
+  m_fontSize: 47.25
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -951,8 +951,8 @@ MonoBehaviour:
     pointsPerPiece: 10
     pointsPerExtraPiece: 20
     plusBonus: 100
-    squareStarBonus: 500
-    doubleStarBonus: 300
+    plugBonus: 500
+    starBonus: 300
     comboMultiplierPerStep: 1
     maxComboMultiplier: 10
   currentLevel: {fileID: 0}
@@ -1023,6 +1023,11 @@ MonoBehaviour:
   delayBetweenMatchPops: 0.05
   surgeMatchLength: 5
   delayBetweenSurgeZaps: 0.04
+  sweepColor: {r: 0.3, g: 0.95, b: 1, a: 1}
+  greyOutSpread: 1
+  greyOutDuration: 0.3
+  greyOutBrightness: 0.55
+  greyOutSfx: PowerDown
   delayBetweenObjectMovement: 0.15
   gameManager: {fileID: 586155249}
   gridHandler: {fileID: 586155251}

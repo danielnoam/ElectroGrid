@@ -24,6 +24,8 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
     protected Match3Tile _currentTile;
     protected SOItemData _itemData;
     protected Sequence _movementSequence;
+    private readonly List<(SpriteRenderer renderer, Color color)> _greyedRenderers = new();
+    private Tween _greyScaleTween;
     protected Match3GridHandler _gridHandler;
     protected bool _beingDestroyed;
 
@@ -257,8 +259,41 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
     {
     }
 
+    /// <summary>Fades every sprite on the object to its grey value, for the lose ending. Undone when the object goes back to the pool.</summary>
+    public void GreyOut(float delay, float duration, float brightness)
+    {
+        foreach (var spriteRenderer in GetComponentsInChildren<SpriteRenderer>())
+        {
+            var color = spriteRenderer.color;
+            _greyedRenderers.Add((spriteRenderer, color));
+            float grey = (color.r * 0.299f + color.g * 0.587f + color.b * 0.114f) * brightness;
+            var sequence = Sequence.Create();
+            if (delay > 0f) sequence.ChainDelay(delay);
+            sequence.Chain(Tween.Color(spriteRenderer, color * 1.6f, 0.05f))
+                .Chain(Tween.Alpha(spriteRenderer, color.a * 0.2f, 0.04f))
+                .Chain(Tween.Color(spriteRenderer, new Color(grey, grey, grey, color.a), duration, Ease.OutQuad));
+        }
+
+        _greyScaleTween = Tween.Scale(transform, transform.localScale * 0.82f, duration + 0.09f, Ease.OutBack, startDelay: delay + 0.05f);
+    }
+
+    private void RestoreGreyedRenderers()
+    {
+        foreach (var (spriteRenderer, color) in _greyedRenderers)
+        {
+            if (!spriteRenderer) continue;
+
+            Tween.StopAll(spriteRenderer);
+            spriteRenderer.color = color;
+        }
+
+        _greyedRenderers.Clear();
+        _greyScaleTween.Stop();
+    }
+
     public virtual void OnPoolReturn()
     {
+        RestoreGreyedRenderers();
         ClearFuse();
         if (_gridHandler) _gridHandler.GridDestroyed -= OnGridDestroyed;
     }

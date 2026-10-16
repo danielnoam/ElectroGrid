@@ -6,12 +6,10 @@ using UnityEngine;
 [Serializable]
 public abstract class Match3Objective
 {
-    [SerializeField] protected Sprite objectiveSprite;
     [SerializeField, HideInInspector] protected SOGridShape gridShape;
     
     protected bool _completed;
     
-    public Sprite ObjectiveSprite => objectiveSprite;
     public SOGridShape GridShape => gridShape;
     public bool IsCompleted => _completed;
     

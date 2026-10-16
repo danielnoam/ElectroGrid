@@ -414,6 +414,44 @@ public class Match3BotWindow : EditorWindow
         return $"{report.level}: {result}{note}, {report.moves} moves, {report.seconds:0}s, {report.goals}";
     }
 
+    /// <summary>Starts a bot run from code. Mode is current, range or survival; play mode must already be running.</summary>
+    public static string StartRun(string mode, int from, int to, float speed)
+    {
+        if (!EditorApplication.isPlaying) return "Enter play mode first.";
+
+        var window = GetWindow<Match3BotWindow>("Match3 Bot");
+        window._mode = (mode ?? "").ToLowerInvariant() switch
+        {
+            "current" => BotMode.CurrentLevel,
+            "survival" => BotMode.Survival,
+            _ => BotMode.LevelRange
+        };
+        window._fromLevel = Mathf.Max(1, from);
+        window._toLevel = Mathf.Max(window._fromLevel, to);
+        window._speed = Mathf.Max(0.1f, speed);
+        window._reports.Clear();
+        window.StartBot();
+        return $"Bot running: {window._mode}, levels {window._fromLevel} to {window._toLevel}, speed {window._speed}x.";
+    }
+
+    public static string StopRun()
+    {
+        if (!HasOpenInstances<Match3BotWindow>()) return "The bot is not open.";
+
+        GetWindow<Match3BotWindow>().StopBot();
+        return "Bot stopped.";
+    }
+
+    public static string Report()
+    {
+        if (!HasOpenInstances<Match3BotWindow>()) return "The bot is not open.";
+
+        var window = GetWindow<Match3BotWindow>();
+        string state = window._running ? $"running, {window.StatusLine()}" : "idle";
+        string report = window.ReportText();
+        return $"Bot {state}.\n{(string.IsNullOrEmpty(report) ? "No levels finished yet." : report)}";
+    }
+
     private string ReportText()
     {
         var builder = new StringBuilder();

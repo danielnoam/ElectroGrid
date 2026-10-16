@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using DNExtensions.Systems.AudioLibrary;
 using DNExtensions.Utilities;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,6 +20,13 @@ public class Match3PlayHandler : MonoBehaviour
     [Tooltip("A straight match this long leaves a Surge instead of a line break")]
     [SerializeField, Min(4)] private int surgeMatchLength = 5;
     [SerializeField, Min(0)] private float delayBetweenSurgeZaps = 0.04f;
+
+    [Header("Level End")]
+    [SerializeField] private Color sweepColor = new Color(0.3f, 0.95f, 1f, 1f);
+    [SerializeField, Min(0)] private float greyOutSpread = 0.45f;
+    [SerializeField, Min(0.01f)] private float greyOutDuration = 0.3f;
+    [SerializeField, Range(0f, 1f)] private float greyOutBrightness = 0.55f;
+    [SerializeField, AudioLibraryID] private string greyOutSfx = "PowerDown";
 
     private readonly List<Match3Tile> _queuedSurges = new();
     [Tooltip("Delay between moving objects downwards")]
@@ -664,7 +672,7 @@ public class Match3PlayHandler : MonoBehaviour
                         if (!tile.CurrentMatch3Object)
                         {
                             tile.PulseColor(matchColor);
-                            tile.PunchTile(1.5f);
+                            tile.PunchTileTo(1.5f);
                             continue;
                         }
                         
@@ -680,7 +688,7 @@ public class Match3PlayHandler : MonoBehaviour
                             if (tile.CurrentMatch3Object is Match3MatchableObject) piecesDestroyed++;
                             tile.PulseColor(matchColor);
                             tile.CurrentMatch3Object.DestroyWithAnimation();
-                            tile.PunchTile(1.5f);
+                            tile.PunchTileTo(1.5f);
                             tile.SetCurrentItem(null);
                         } 
                     }
@@ -708,7 +716,7 @@ public class Match3PlayHandler : MonoBehaviour
                         if (!tile.CurrentMatch3Object)
                         {
                             tile.PulseColor(matchColor);
-                            tile.PunchTile(1.5f);
+                            tile.PunchTileTo(1.5f);
                             continue;
                         }
                         
@@ -724,7 +732,7 @@ public class Match3PlayHandler : MonoBehaviour
                             if (tile.CurrentMatch3Object is Match3MatchableObject) piecesDestroyed++;
                             tile.PulseColor(matchColor);
                             tile.CurrentMatch3Object.DestroyWithAnimation();
-                            tile.PunchTile(1.5f);
+                            tile.PunchTileTo(1.5f);
                             tile.SetCurrentItem(null);
                         } 
                     }
@@ -911,6 +919,56 @@ public class Match3PlayHandler : MonoBehaviour
             tileObjectMatch.CurrentMatch3Object.DestroyWithAnimation();
             yield return new WaitForSeconds(populationDuration / tiles.Count);
         }
+    }
+
+    /// <summary>The win ending: objects pop one by one, each tile flashing the sweep colour as its object goes.</summary>
+    public IEnumerator SweepClearObjects()
+    {
+        var tiles = gridHandler.Tiles.Values.Where(t => t.HasObject).ToList();
+
+        foreach (var tile in tiles)
+        {
+            CameraManager.Instance?.ShakeCamera(1, 0.25f);
+            tile.PulseColor(sweepColor);
+            tile.CurrentMatch3Object.DestroyWithAnimation();
+            yield return new WaitForSeconds(populationDuration / tiles.Count);
+        }
+    }
+
+    /// <summary>The lose ending: every object on the board fades to grey, one after another in a random order.</summary>
+    public IEnumerator GreyOutObjects()
+    {
+        var objects = gridHandler.Tiles.Values.Where(t => t && t.HasObject).Select(t => t.CurrentMatch3Object).OrderBy(_ => Random.value).ToList();
+        CameraManager.Instance?.ShakeCamera(0.6f, 0.2f);
+        foreach (var tile in gridHandler.Tiles.Values)
+        {
+            if (tile && tile.GridPosition.y >= 0) tile.PowerDown(Random.value * greyOutSpread, greyOutDuration, greyOutBrightness);
+        }
+
+        float elapsed = 0f;
+        float lastSound = float.MinValue;
+        int next = 0;
+        while (next < objects.Count)
+        {
+            while (next < objects.Count && greyOutSpread * next / objects.Count <= elapsed)
+            {
+                var target = objects[next];
+                float progress = next / (float)Mathf.Max(1, objects.Count - 1);
+                next++;
+                if (!target) continue;
+
+                target.GreyOut(0f, greyOutDuration, greyOutBrightness);
+                if (elapsed - lastSound < 0.035f) continue;
+
+                AudioLibrary.Play(greyOutSfx, Mathf.Lerp(1f, 0.6f, progress));
+                lastSound = elapsed;
+            }
+
+            yield return null;
+            elapsed += Time.deltaTime;
+        }
+
+        yield return new WaitForSeconds(greyOutDuration);
     }
 
     public IEnumerator ClearMatchableObjects()

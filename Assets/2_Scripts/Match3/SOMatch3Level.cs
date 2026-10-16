@@ -12,12 +12,12 @@ public class SOMatch3Level : ScriptableObject
     [SerializeField] private ChanceList<SOItemData> matchObjects = new ChanceList<SOItemData>();
     [SerializeReference] private List<Match3Objective> objectives = new List<Match3Objective>();
     [SerializeReference] private List<Match3LoseCondition> loseConditions = new List<Match3LoseCondition>();
+    [Tooltip("Rows that shift one cell along after every move. Row 0 is the bottom row")]
+    [SerializeField] private List<Match3ConveyorRow> conveyorRows = new List<Match3ConveyorRow>();
     [Tooltip("Quick matches build a combo and fill the combo bar. Survival always has it")]
     [SerializeField] private bool comboBar;
     [Tooltip("Moves a fuse lasts before it blows and the level is lost")]
     [SerializeField, Min(1)] private int fuseMoves = 8;
-    [Tooltip("Rows that shift one cell along after every move. Row 0 is the bottom row")]
-    [SerializeField] private List<Match3ConveyorRow> conveyorRows = new List<Match3ConveyorRow>();
 
     [Header("Tile Objects")]
     [SerializeField, HideInInspector] private Match3TileObjectType[] tileObjects;

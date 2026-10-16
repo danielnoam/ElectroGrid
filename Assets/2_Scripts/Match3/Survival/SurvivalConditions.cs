@@ -15,11 +15,6 @@ public class SurvivalScoreObjective : Match3Objective
     {
     }
 
-    public SurvivalScoreObjective(Sprite sprite)
-    {
-        objectiveSprite = sprite;
-    }
-
     public void SetScore(int score)
     {
         _score = score;
@@ -77,10 +72,9 @@ public class SurvivalTimeLimit : Match3LoseCondition
     {
     }
 
-    public SurvivalTimeLimit(float startTime, Sprite sprite)
+    public SurvivalTimeLimit(float startTime)
     {
         _startTime = startTime;
-        conditionSprite = sprite;
     }
 
     public void AddTime(float amount)

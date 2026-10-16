@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Enters play mode straight into one level. Match3GameManager reads overrideLevel in Start, so the
+/// Enters play mode straight into one level or Survival. Match3GameManager reads overrideLevel and overrideSurvival in Start, so the
 /// value is written into the open scene before play mode begins and put back when it ends — the
 /// scene is saved with its original value, so the file on disk is unchanged either way.
 /// </summary>
@@ -14,7 +14,9 @@ internal static class Match3LevelPlayer
     private const string ScenePathKey = "ElectroGrid.LevelEditor.PlayScenePath";
     private const string RestorePathKey = "ElectroGrid.LevelEditor.PlayRestorePath";
     private const string PendingLevelKey = "ElectroGrid.LevelEditor.PendingLevel";
-    private const string OverrideProperty = "overrideLevel";
+    private const string PropertyKey = "ElectroGrid.LevelEditor.PlayProperty";
+    private const string LevelProperty = "overrideLevel";
+    private const string SurvivalProperty = "overrideSurvival";
 
     static Match3LevelPlayer()
     {
@@ -22,7 +24,12 @@ internal static class Match3LevelPlayer
     }
 
     /// <summary>Plays the level. While the game is running it stops play mode first and starts again in this level.</summary>
-    public static void Play(SOMatch3Level level)
+    public static void Play(SOMatch3Level level) => PlayTarget(level);
+
+    /// <summary>Plays a Survival run on this mode, the same way as a level.</summary>
+    public static void PlaySurvival(SOSurvivalMode mode) => PlayTarget(mode);
+
+    private static void PlayTarget(Object level)
     {
         if (!level) return;
 
@@ -50,7 +57,7 @@ internal static class Match3LevelPlayer
         EditorApplication.update += callback;
     }
 
-    private static void PlayNow(SOMatch3Level level)
+    private static void PlayNow(Object level)
     {
         if (!level || EditorApplication.isPlayingOrWillChangePlaymode) return;
 
@@ -75,12 +82,14 @@ internal static class Match3LevelPlayer
         }
 
         var serialized = new SerializedObject(gameManager);
-        var overrideProp = serialized.FindProperty(OverrideProperty);
+        string property = level is SOSurvivalMode ? SurvivalProperty : LevelProperty;
+        var overrideProp = serialized.FindProperty(property);
 
         // Remember what was there, so playing a level is never a way to quietly change the scene
         var previous = overrideProp.objectReferenceValue;
         SessionState.SetString(RestorePathKey, previous ? AssetDatabase.GetAssetPath(previous) : string.Empty);
         SessionState.SetString(ScenePathKey, scenePath);
+        SessionState.SetString(PropertyKey, property);
 
         overrideProp.objectReferenceValue = level;
         serialized.ApplyModifiedPropertiesWithoutUndo();
@@ -96,7 +105,7 @@ internal static class Match3LevelPlayer
 
         string pendingPath = SessionState.GetString(PendingLevelKey, string.Empty);
         SessionState.EraseString(PendingLevelKey);
-        var pending = string.IsNullOrEmpty(pendingPath) ? null : AssetDatabase.LoadAssetAtPath<SOMatch3Level>(pendingPath);
+        var pending = string.IsNullOrEmpty(pendingPath) ? null : AssetDatabase.LoadAssetAtPath<Object>(pendingPath);
         if (pending) RunNextUpdate(() => PlayNow(pending));
     }
 
@@ -106,7 +115,9 @@ internal static class Match3LevelPlayer
         if (string.IsNullOrEmpty(scenePath)) return;
 
         string restorePath = SessionState.GetString(RestorePathKey, string.Empty);
+        string property = SessionState.GetString(PropertyKey, LevelProperty);
         SessionState.EraseString(ScenePathKey);
+        SessionState.EraseString(PropertyKey);
         SessionState.EraseString(RestorePathKey);
 
         Scene scene = SceneManager.GetActiveScene();
@@ -116,9 +127,9 @@ internal static class Match3LevelPlayer
         if (!gameManager) return;
 
         var serialized = new SerializedObject(gameManager);
-        serialized.FindProperty(OverrideProperty).objectReferenceValue = string.IsNullOrEmpty(restorePath)
+        serialized.FindProperty(property).objectReferenceValue = string.IsNullOrEmpty(restorePath)
             ? null
-            : AssetDatabase.LoadAssetAtPath<SOMatch3Level>(restorePath);
+            : AssetDatabase.LoadAssetAtPath<Object>(restorePath);
 
         serialized.ApplyModifiedPropertiesWithoutUndo();
 

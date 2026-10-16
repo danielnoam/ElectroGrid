@@ -4,10 +4,7 @@ using UnityEngine;
 [Serializable]
 public abstract class Match3LoseCondition
 {
-    [SerializeField] protected Sprite conditionSprite;
-    
     protected bool _conditionMet;
-    public Sprite ConditionSprite => conditionSprite;
     public bool IsConditionMet => _conditionMet;
 
     public abstract void Setup();

@@ -968,3 +968,32 @@ of as a new blob per edit.
       piece that always starts on that cell and spawns in like any other. The
       validator flags three placed pieces in a line, since the board can't
       start with a match.
+
+## Win and lose endings (after 1.9.1)
+
+- [x] **Win**: the pieces still pop one by one as before, and each tile
+      flashes cyan as its piece goes (`Match3PlayHandler.SweepClearObjects`).
+- [x] **Lose**: every piece fades to grey one by one in a random order, then
+      the screen closes as before (`GreyOutObjects`, `Match3Object.GreyOut`).
+      Colours come back when the object returns to the pool. Colour, width,
+      spread, duration and brightness are in the Level End section of
+      `Match3PlayHandler`.
+
+## Agent commands and the debug window (after 1.9.1)
+
+- [x] **Agent commands** (`ElectroGridAgentCommands`): every editor tool can be
+      driven from the command line with `unity command eg_<name>`, listed by
+      `unity list`. Play, load a level or Survival, win, lose, swap, bot move,
+      spawn objects, add moves, time or Survival score, print the board, switch
+      language, screenshot, read errors, list and validate levels, run the bot,
+      and start or check a build. New tools get commands too.
+- [x] **Match3 Debug window** (ElectroGrid > Match3 Debug) has the same actions as
+      buttons, all running through `Match3DebugActions`.
+- [x] **Cleanup**: objectives, lose conditions, the top bar elements and Survival
+      no longer carry icon sprites (never used). Survival settings say Plug and
+      Star, and spawning, caps and time gains sit under an Obstacles section per
+      obstacle.
+- [x] **Survival in the level editor**: a Survival row at the top of the level
+      list opens every Survival setting (score, time, obstacles, milestones) with
+      Play Survival, and the board below it is painted like any level. Agent
+      commands eg_survival_settings and eg_survival_set read and change them.

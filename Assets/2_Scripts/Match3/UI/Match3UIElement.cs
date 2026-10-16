@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class Match3UIElement : MonoBehaviour
 {
 
-    [SerializeField] private Image image;
     [SerializeField] private TextMeshProUGUI progressText;
     [SerializeField] private TextMeshProUGUI progressCount;
     [SerializeField] private TextMeshProUGUI amountCount;
@@ -110,20 +109,8 @@ public class Match3UIElement : MonoBehaviour
         if (progressText) progressText.text = text;
     }
 
-    public void Setup(Sprite sprite, string text)
+    public void Setup(string text)
     {
-        if (image)
-        {
-            if (!sprite)
-            {
-                image.gameObject.SetActive(false);
-            }
-            else
-            {
-                image.sprite = sprite;
-            }
-        }
-        
         progressCount.gameObject.SetActive(false);
         amountCount.gameObject.SetActive(false);
         
@@ -134,19 +121,8 @@ public class Match3UIElement : MonoBehaviour
         }
     }
     
-    public void Setup(Sprite sprite, string text, int progress)
+    public void Setup(string text, int progress)
     {
-        if (image)
-        {
-            if (!sprite)
-            {
-                image.gameObject.SetActive(false);
-            }
-            else
-            {
-                image.sprite = sprite;
-            }
-        }
         amountCount.gameObject.SetActive(false);
 
         _currentProgress = progress;
@@ -157,20 +133,8 @@ public class Match3UIElement : MonoBehaviour
         }
     }
 
-    public void Setup(Sprite sprite, string text, (int, int) progress)
+    public void Setup(string text, (int, int) progress)
     {
-        if (image)
-        {
-            if (!sprite)
-            {
-                image.gameObject.SetActive(false);
-            }
-            else
-            {
-                image.sprite = sprite;
-            }
-        }
-
         _currentProgress = progress.Item1;
         _totalAmount = progress.Item2;
         
@@ -190,6 +154,7 @@ public class Match3UIElement : MonoBehaviour
         if (_sequence.isAlive)
         {
             _sequence.Stop();
+            progressCount.transform.localScale = _startScale;
         }
         var changeAmount = progress.Item1 - _currentProgress;
         
@@ -209,6 +174,7 @@ public class Match3UIElement : MonoBehaviour
         if (_sequence.isAlive)
         {
             _sequence.Stop();
+            progressCount.transform.localScale = _startScale;
         }
         
         _sequence = Sequence.Create();

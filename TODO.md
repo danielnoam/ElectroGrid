@@ -40,16 +40,11 @@ rework, since it changes how every level plays.
       the full bar (numbers playtested 2026-10-11). In Survival a full bar adds
       uncapped time (`SurvivalMode`).
 
-- [ ] **Separate win and lose endings.** Winning and losing a level play the
-      same end-of-level animation right now. Winning should feel like a
-      celebration and losing like a power-down, so the result reads before the
-      results screen even appears.
-
 - [ ] **New-mechanic visuals, what is left.** Shaders for glitches (`Glitch.shader`),
       fuse rings (`FuseRing.shader`) and conveyor belts (`ConveyorBelt.shader`),
       a real virus sprite with a glow mask, spread and glitch-clear particles are
       in. Still to do: sounds for a glitch clearing, a virus spreading and a fuse
-      blowing.
+      blowing, and for the win sweep and the lose grey-out.
 
 - [ ] **Survival mode.** First version is in: a separate Survival button on the
       main menu, unlocked from the start. It opens its own screen, laid out like level

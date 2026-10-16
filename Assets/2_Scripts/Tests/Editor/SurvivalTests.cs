@@ -59,9 +59,9 @@ public class SurvivalTests
     [Test]
     public void BonusesAreMultipliedByTheCombo()
     {
-        _mode.Score.squareStarBonus = 500;
+        _mode.Score.plugBonus = 500;
 
-        _run.OnSquareStarReached(3);
+        _run.OnPlugReached(3);
 
         Assert.AreEqual(1500, _run.Score);
     }
@@ -171,10 +171,10 @@ public class SurvivalTests
     public void VirusesOnlySpawnAfterTheirMilestone()
     {
         using var board = new Match3TestBoard("AB", "BA");
-        _mode.Bonuses.squareStarChance = 0f;
-        _mode.Bonuses.doubleStarChance = 0f;
-        _mode.Bonuses.fuseChance = 0f;
-        _mode.Bonuses.virusChance = 100f;
+        _mode.Obstacles.plugChance = 0f;
+        _mode.Obstacles.starChance = 0f;
+        _mode.Obstacles.fuseChance = 0f;
+        _mode.Obstacles.virusChance = 100f;
         SetMilestones(new SurvivalMilestone { score = 100, unlock = SurvivalUnlock.Viruses });
         _run = new Match3SurvivalRun(_mode);
         _mode.Score.plusBonus = 100;
@@ -184,17 +184,17 @@ public class SurvivalTests
 
         _run.OnPlusDestroyed(1);
         Assert.AreEqual(Match3TileObjectType.Virus, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
-        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0, _mode.Bonuses.maxViruses).type);
+        Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0, _mode.Obstacles.maxViruses).type);
     }
 
     [Test]
     public void FusesOnlySpawnAfterTheirMilestone()
     {
         using var board = new Match3TestBoard("AB", "BA");
-        _mode.Bonuses.squareStarChance = 0f;
-        _mode.Bonuses.doubleStarChance = 0f;
-        _mode.Bonuses.virusChance = 0f;
-        _mode.Bonuses.fuseChance = 100f;
+        _mode.Obstacles.plugChance = 0f;
+        _mode.Obstacles.starChance = 0f;
+        _mode.Obstacles.virusChance = 0f;
+        _mode.Obstacles.fuseChance = 100f;
         SetMilestones(new SurvivalMilestone { score = 200, unlock = SurvivalUnlock.Fuses });
         _run = new Match3SurvivalRun(_mode);
         _mode.Score.plusBonus = 100;
@@ -208,19 +208,19 @@ public class SurvivalTests
     }
 
     [Test]
-    public void DoubleStarsOnlySpawnAfterTheirMilestone()
+    public void StarsOnlySpawnAfterTheirMilestone()
     {
         using var board = new Match3TestBoard("AB", "BA");
-        _mode.Bonuses.squareStarChance = 0f;
-        _mode.Bonuses.virusChance = 0f;
-        _mode.Bonuses.fuseChance = 0f;
-        _mode.Bonuses.doubleStarChance = 100f;
+        _mode.Obstacles.plugChance = 0f;
+        _mode.Obstacles.virusChance = 0f;
+        _mode.Obstacles.fuseChance = 0f;
+        _mode.Obstacles.starChance = 100f;
         _mode.Score.plusBonus = 100;
         var tiles = new System.Collections.Generic.List<Match3Tile>(board.GridHandler.Tiles.Values);
 
         Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
 
-        SetMilestones(new SurvivalMilestone { score = 100, unlock = SurvivalUnlock.DoubleStars });
+        SetMilestones(new SurvivalMilestone { score = 100, unlock = SurvivalUnlock.Stars });
         _run = new Match3SurvivalRun(_mode);
         Assert.AreEqual(Match3TileObjectType.Matchable, _run.PickBonus(tiles, board.GridHandler, 0, 0).type);
 

@@ -27,18 +27,18 @@ public class Match3SurvivalRun
     public IReadOnlyList<SOItemData> UnlockedPieces => _unlockedPieces;
     public bool VirusesUnlocked { get; private set; }
     public bool FusesUnlocked { get; private set; }
-    public bool SquareStarsUnlocked { get; private set; }
-    public bool DoubleStarsUnlocked { get; private set; }
+    public bool PlugsUnlocked { get; private set; }
+    public bool StarsUnlocked { get; private set; }
 
     private Match3ScoreSettings ScoreSettings => Mode.Score;
     private SurvivalTimeSettings TimeSettings => Mode.Time;
-    private SurvivalBonusSettings BonusSettings => Mode.Bonuses;
+    private SurvivalObstacleSettings ObstacleSettings => Mode.Obstacles;
 
     public Match3SurvivalRun(SOSurvivalMode mode)
     {
         Mode = mode;
-        ScoreDisplay = new SurvivalScoreObjective(mode.ScoreIcon);
-        Timer = new SurvivalTimeLimit(mode.Time.startTime, mode.TimeIcon);
+        ScoreDisplay = new SurvivalScoreObjective();
+        Timer = new SurvivalTimeLimit(mode.Time.startTime);
         ScoreDisplay.Setup();
         Timer.Setup();
         CheckMilestones();
@@ -132,16 +132,16 @@ public class Match3SurvivalRun
         AddTime(TimeSettings.plusTime);
     }
 
-    public void OnSquareStarReached(int comboCount)
+    public void OnPlugReached(int comboCount)
     {
-        AddPoints(ScoreSettings.squareStarBonus, comboCount);
-        AddTime(TimeSettings.squareStarTime);
+        AddPoints(ScoreSettings.plugBonus, comboCount);
+        AddTime(ObstacleSettings.plugTime);
     }
 
-    public void OnDoubleStarBroken(int comboCount)
+    public void OnStarBroken(int comboCount)
     {
-        AddPoints(ScoreSettings.doubleStarBonus, comboCount);
-        AddTime(TimeSettings.doubleStarTime);
+        AddPoints(ScoreSettings.starBonus, comboCount);
+        AddTime(ObstacleSettings.starTime);
     }
 
     public void OnComboFilled()
@@ -173,6 +173,15 @@ public class Match3SurvivalRun
         CheckMilestones();
     }
 
+    /// <summary>Debug only: adds points straight to the score, which also checks the milestones.</summary>
+    public void DebugAddScore(int points)
+    {
+        Score += points;
+        ScoreDisplay.SetScore(Score);
+        ScoreGained?.Invoke(points);
+        CheckMilestones();
+    }
+
     private void CheckMilestones()
     {
         if (Mode.Milestones == null) return;
@@ -193,11 +202,11 @@ public class Match3SurvivalRun
                 case SurvivalUnlock.Fuses:
                     FusesUnlocked = true;
                     break;
-                case SurvivalUnlock.SquareStars:
-                    SquareStarsUnlocked = true;
+                case SurvivalUnlock.Plugs:
+                    PlugsUnlocked = true;
                     break;
-                case SurvivalUnlock.DoubleStars:
-                    DoubleStarsUnlocked = true;
+                case SurvivalUnlock.Stars:
+                    StarsUnlocked = true;
                     break;
             }
 
@@ -218,14 +227,14 @@ public class Match3SurvivalRun
     /// Which bonus, if any, should replace one piece of this refill. Plugs need a column that reaches the bottom
     /// row and a starting cell high enough to fall from.
     /// </summary>
-    public (Match3Tile tile, Match3TileObjectType type) PickBonus(ICollection<Match3Tile> refillTiles, Match3GridHandler grid, int squareStarsOnBoard, int doubleStarsOnBoard, int virusesOnBoard = 0, int fusesOnBoard = 0)
+    public (Match3Tile tile, Match3TileObjectType type) PickBonus(ICollection<Match3Tile> refillTiles, Match3GridHandler grid, int plugsOnBoard, int starsOnBoard, int virusesOnBoard = 0, int fusesOnBoard = 0)
     {
         if (refillTiles == null || refillTiles.Count == 0 || !grid) return (null, Match3TileObjectType.Matchable);
 
-        bool trySquare = SquareStarsUnlocked && squareStarsOnBoard < BonusSettings.maxSquareStars && UnityEngine.Random.Range(0f, 100f) < BonusSettings.squareStarChance;
-        if (trySquare)
+        bool tryPlug = PlugsUnlocked && plugsOnBoard < ObstacleSettings.maxPlugs && UnityEngine.Random.Range(0f, 100f) < ObstacleSettings.plugChance;
+        if (tryPlug)
         {
-            int minRow = Mathf.CeilToInt((grid.Grid.Height - 1) * BonusSettings.squareStarMinHeight);
+            int minRow = Mathf.CeilToInt((grid.Grid.Height - 1) * ObstacleSettings.plugMinHeight);
             var candidates = new List<Match3Tile>();
             foreach (var tile in refillTiles)
             {
@@ -235,21 +244,21 @@ public class Match3SurvivalRun
             if (candidates.Count > 0) return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Bottom);
         }
 
-        bool tryFuse = FusesUnlocked && fusesOnBoard < BonusSettings.maxFuses && UnityEngine.Random.Range(0f, 100f) < BonusSettings.fuseChance;
+        bool tryFuse = FusesUnlocked && fusesOnBoard < ObstacleSettings.maxFuses && UnityEngine.Random.Range(0f, 100f) < ObstacleSettings.fuseChance;
         if (tryFuse)
         {
             var candidates = new List<Match3Tile>(refillTiles);
             return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Fuse);
         }
 
-        bool tryVirus = VirusesUnlocked && virusesOnBoard < BonusSettings.maxViruses && UnityEngine.Random.Range(0f, 100f) < BonusSettings.virusChance;
+        bool tryVirus = VirusesUnlocked && virusesOnBoard < ObstacleSettings.maxViruses && UnityEngine.Random.Range(0f, 100f) < ObstacleSettings.virusChance;
         if (tryVirus)
         {
             var candidates = new List<Match3Tile>(refillTiles);
             return (candidates[UnityEngine.Random.Range(0, candidates.Count)], Match3TileObjectType.Virus);
         }
 
-        bool tryDouble = DoubleStarsUnlocked && doubleStarsOnBoard < BonusSettings.maxDoubleStars && UnityEngine.Random.Range(0f, 100f) < BonusSettings.doubleStarChance;
+        bool tryDouble = StarsUnlocked && starsOnBoard < ObstacleSettings.maxStars && UnityEngine.Random.Range(0f, 100f) < ObstacleSettings.starChance;
         if (tryDouble)
         {
             var candidates = new List<Match3Tile>(refillTiles);

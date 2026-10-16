@@ -148,8 +148,8 @@ public class TopBarUI : MonoBehaviour
         foreach (var objective in objectives)
         {
             var uiElement = Instantiate(match3UIElementPrefab, objectivesUIParent);
-            if (objective.ShowsTotal) uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress());
-            else uiElement.Setup(objective.ObjectiveSprite, objective.GetRequirementText(), objective.GetProgress().Item1);
+            if (objective.ShowsTotal) uiElement.Setup(objective.GetRequirementText(), objective.GetProgress());
+            else uiElement.Setup(objective.GetRequirementText(), objective.GetProgress().Item1);
             uiElement.gameObject.name = objective.GetName();
             if (!objective.StackedDisplay) uiElement.UseCompactRow();
             else uiElement.UseStackedLayout();
@@ -168,7 +168,7 @@ public class TopBarUI : MonoBehaviour
         foreach (var loseCondition in loseConditions)
         {
             var uiElement = Instantiate(match3UIElementPrefab, loseConditionsUIParent);
-            uiElement.Setup(loseCondition.ConditionSprite, loseCondition.GetRequirementText(), loseCondition.GetProgress().Item1);
+            uiElement.Setup(loseCondition.GetRequirementText(), loseCondition.GetProgress().Item1);
             uiElement.gameObject.name = loseCondition.GetName();
             uiElement.UseStackedLayout();
             _currentLoseConditions.Add(loseCondition, uiElement);

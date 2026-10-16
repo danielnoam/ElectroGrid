@@ -285,6 +285,21 @@ public class Match3Tile : MonoBehaviour, IPoolable
     }
     
     /// <summary>Flashes the cell in the colour of the piece a line break just destroyed on it, then fades back.</summary>
+    /// <summary>The lose ending: the tile flickers once, then dims to grey. Undone by the next visual update.</summary>
+    public void PowerDown(float delay, float duration, float brightness)
+    {
+        if (!isActive || !spriteRenderer) return;
+
+        var color = spriteRenderer.color;
+        float grey = (color.r * 0.299f + color.g * 0.587f + color.b * 0.114f) * brightness;
+        Tween.StopAll(spriteRenderer);
+        var sequence = Sequence.Create();
+        if (delay > 0f) sequence.ChainDelay(delay);
+        sequence.Chain(Tween.Alpha(spriteRenderer, color.a * 0.25f, 0.04f))
+            .Chain(Tween.Alpha(spriteRenderer, color.a, 0.04f))
+            .Chain(Tween.Color(spriteRenderer, new Color(grey, grey, grey, color.a), duration));
+    }
+
     public void PulseColor(Color color)
     {
         if (!isActive || !spriteRenderer) return;
@@ -311,10 +326,16 @@ public class Match3Tile : MonoBehaviour, IPoolable
     
     public void PunchTile(float multiplier = 1f)
     {
+        PunchTileTo(punchScaleAmount * multiplier);
+    }
+
+    /// <summary>Punches the tile to an exact multiple of its size, then back.</summary>
+    public void PunchTileTo(float scale)
+    {
         if (!isActive) return;
         
         _pulseSequence = Sequence.Create();
-        _pulseSequence.Group(Tween.Scale(transform, _baseScale * (punchScaleAmount * multiplier), punchDuration/2, Ease.OutElastic));
+        _pulseSequence.Group(Tween.Scale(transform, _baseScale * scale, punchDuration/2, Ease.OutElastic));
         _pulseSequence.Chain(Tween.Scale(transform, _baseScale, punchDuration/2, Ease.InQuad));
     }
 

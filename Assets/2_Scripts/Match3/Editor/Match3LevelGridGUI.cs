@@ -15,8 +15,8 @@ internal static class Match3LevelGridGUI
     private static readonly Color BackgroundColor = new Color(0.2f, 0.2f, 0.2f);
     private static readonly Color ActiveTileColor = new Color(0.17f, 0.15f, 0.3f);
     private static readonly Color InactiveTileColor = new Color(0.4f, 0.4f, 0.4f);
-    private static readonly Color DoubleStarColor = new Color(1f, 0.85f, 0.95f);
-    private static readonly Color SquareStarColor = new Color(0.55f, 0.8f, 1f);
+    private static readonly Color StarColor = new Color(1f, 0.85f, 0.95f);
+    private static readonly Color PlugColor = new Color(0.55f, 0.8f, 1f);
     private static readonly Color VirusColor = new Color(0.55f, 1f, 0.2f);
     private static readonly Color FuseColor = new Color(1f, 0.6f, 0.15f);
     private static readonly Color GlitchColor = new Color(0f, 1f, 0.9f);
@@ -47,8 +47,8 @@ internal static class Match3LevelGridGUI
 
     public static Color ColorFor(Match3TileObjectType type) => type switch
     {
-        Match3TileObjectType.Obstacle => DoubleStarColor,
-        Match3TileObjectType.Bottom => SquareStarColor,
+        Match3TileObjectType.Obstacle => StarColor,
+        Match3TileObjectType.Bottom => PlugColor,
         Match3TileObjectType.Virus => VirusColor,
         Match3TileObjectType.Fuse => FuseColor,
         _ => Color.white

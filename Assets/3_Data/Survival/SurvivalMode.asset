@@ -19,16 +19,16 @@ MonoBehaviour:
     pointsPerPiece: 10
     pointsPerExtraPiece: 20
     plusBonus: 100
-    squareStarBonus: 500
-    doubleStarBonus: 300
+    plugBonus: 500
+    starBonus: 300
     comboMultiplierPerStep: 1
     maxComboMultiplier: 10
   time:
     startTime: 45
     plusTime: 5
     fullComboTime: 0
-    squareStarTime: 3
-    doubleStarTime: 2
+    plugTime: 3
+    starTime: 2
     gainByMinute:
       serializedVersion: 2
       m_Curve:
@@ -54,11 +54,11 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   bonuses:
-    squareStarChance: 15
-    maxSquareStars: 2
-    squareStarMinHeight: 0.5
-    doubleStarChance: 8
-    maxDoubleStars: 2
+    plugChance: 15
+    maxPlugs: 2
+    plugMinHeight: 0.5
+    starChance: 8
+    maxStars: 2
     virusChance: 6
     maxViruses: 2
     fuseChance: 4

@@ -33,3 +33,5 @@ MonoBehaviour:
     audioObject: {fileID: 11400000, guid: 878920560ec27804b993f01b1d00a4b3, type: 2}
   - id: ScreenSwitch
     audioObject: {fileID: 11400000, guid: 752b090440da80646b3c8304b22b34ec, type: 2}
+  - id: PowerDown
+    audioObject: {fileID: 11400000, guid: 55e826fe65c49db4b90c228f24327ee4, type: 2}
