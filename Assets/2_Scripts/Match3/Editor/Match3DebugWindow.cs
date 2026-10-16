@@ -98,6 +98,21 @@ public class Match3DebugWindow : EditorWindow
             foreach (var code in Locales) Run(code, () => Match3DebugActions.SetLocale(code));
         }
 
+        Section("Controller");
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            Run("Up", () => Match3DebugActions.UiMove("up"));
+            Run("Down", () => Match3DebugActions.UiMove("down"));
+            Run("Left", () => Match3DebugActions.UiMove("left"));
+            Run("Right", () => Match3DebugActions.UiMove("right"));
+        }
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            Run("Submit", Match3DebugActions.UiSubmit);
+            Run("Back", Match3DebugActions.UiCancel);
+            Run("Focus", Match3DebugActions.UiStatus);
+        }
+
         Section("Checks");
         using (new EditorGUILayout.HorizontalScope())
         {

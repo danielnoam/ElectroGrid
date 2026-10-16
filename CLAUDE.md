@@ -28,6 +28,10 @@ Search case-insensitively for the old words (for example `square.?star|double.?s
 
 Group settings by the thing they configure, not by kind of value. Everything about one obstacle (spawn chance, cap, time gain, ...) sits under that obstacle's header, rather than all chances in one block and all time gains in another. Name sections for what they are: obstacles are obstacles, points are points.
 
+## Controller support
+
+Every screen and window needs a `FocusScope` on its root (first selection and back button), so a gamepad can reach it. Controller input goes through actions in the UI map of `InputSystem_Actions` (Cancel, Primary, Restart, Settings, Info); never read `Gamepad.current` or `Keyboard.current` buttons directly. A `ButtonPrompt` names its action and shows that action's bound icon. Vibrations go through the project's `MobileHaptics.Vibrate`, which turns into controller rumble while a gamepad is in use; don't call the DNExtensions haptics directly.
+
 ## Code style
 
 - No code comments; XML `<summary>` only where it explains something non-obvious, and kept short.

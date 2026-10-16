@@ -1,6 +1,6 @@
 {
     "moduleEnabled": true,
-    "forcedLegacyHierarchy": true,
+    "forcedLegacyHierarchy": false,
     "zebraStripesEnabled": true,
     "zebraColorEven": {
         "r": 0.0,
@@ -34,7 +34,7 @@
     "childCountEnabled": true,
     "childCountPosition": 2,
     "childCountHideWhenOneOrZero": false,
-    "animatedFoldsEnabled": true,
+    "animatedFoldsEnabled": false,
     "sceneMenuEnabled": true,
     "toggleActiveKey": {
         "key": 97,

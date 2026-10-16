@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using DNExtensions.Utilities;
 using DNExtensions.Systems.VFXManager;
 using PrimeTween;
@@ -9,12 +8,16 @@ using UnityEngine.UI;
 
 public class LevelSelectionScreen : MenuScreen
 {
-    [Header("Level Info Window")]
-    [SerializeField, MinMaxRange(25f, 35f)] private RangedFloat cellSize = 35f;
-    [SerializeField] private float cellSpacing = 2.5f;
-    [SerializeField] private int maxGridWidthForLargeSize = 8;
-    [SerializeField] private Color activeCellColor = new Color(0.3f, 0.7f, 0.3f);
-    [SerializeField] private Color inactiveCellColor = new Color(0.4f, 0.4f, 0.4f);
+    [Header("Board Preview")]
+    [Tooltip("The area above the levels where the selected level's board is drawn, sized to fit like the board in game")]
+    [SerializeField] private RectTransform shapePreviewArea;
+    [Tooltip("The board tile prefab: the preview copies its sprite, material and sorting so it glows like the real board")]
+    [SerializeField] private Match3Tile previewTilePrefab;
+    [SerializeField] private Color previewTileColor = new Color(0.72f, 0f, 1f, 1f);
+    [Tooltip("Gap between cells, as a fraction of a cell")]
+    [SerializeField, Range(0f, 0.5f)] private float previewCellGap = 0.1f;
+    [SerializeField, Min(0f)] private float previewPopDuration = 0.25f;
+    [SerializeField, Min(0f)] private float previewPopStagger = 0.012f;
     [SerializeField] private string lockedLevelLabel = "?";
 
     [Header("Level Buttons")]
@@ -41,11 +44,7 @@ public class LevelSelectionScreen : MenuScreen
     [Header("References")]
     [SerializeField] private Transform buttonsHolder;
     [SerializeField] private Button levelButtonPrefab;
-    [SerializeField] private TextMeshProUGUI levelTitleText;
-    [SerializeField] private TextMeshProUGUI levelInfoText;
     [SerializeField] private Button levelStartButton;
-    [SerializeField] private RectTransform gridContainer;
-    [SerializeField] private Image gridCellPrefab;
     [SerializeField] private MenuManager menuManager;
     [SerializeField] private Button backButton;
 
@@ -53,6 +52,9 @@ public class LevelSelectionScreen : MenuScreen
     private Tween _nextLevelPulse;
     private readonly System.Collections.Generic.Dictionary<SOMatch3Level, Button> _levelButtons = new System.Collections.Generic.Dictionary<SOMatch3Level, Button>();
     private Image _selectedOutline;
+    private Transform _previewRoot;
+    private TextMeshProUGUI _startLabel;
+    private UnityEngine.Localization.Components.LocalizeStringEvent _startLabelEvent;
 
     private void Start()
     {
@@ -70,7 +72,23 @@ public class LevelSelectionScreen : MenuScreen
     {
         if (!_selectedLevel) _selectedLevel = NextLevel();
         UpdateLevelInfo();
-        base.Show(animated, onComplete);
+        base.Show(animated, () =>
+        {
+            DrawPreview(_selectedLevel);
+            onComplete?.Invoke();
+        });
+    }
+
+    public override void Hide(bool animated = true, Action onComplete = null)
+    {
+        ClearPreview(true);
+        base.Hide(animated, onComplete);
+    }
+
+    public override void HideByFade(float durationMultiplier, Action onComplete = null)
+    {
+        ClearPreview(true);
+        base.HideByFade(durationMultiplier, onComplete);
     }
 
     /// <summary>The first unlocked level not yet completed, or the last unlocked one when everything is done.</summary>
@@ -97,6 +115,7 @@ public class LevelSelectionScreen : MenuScreen
     private void OnDestroy()
     {
         _nextLevelPulse.Stop();
+        ClearPreview(false);
         if (SaveManager.Instance) SaveManager.Instance.SaveReset -= OnSaveReset;
         L10n.LanguageChanged -= UpdateLevelInfo;
     }
@@ -182,6 +201,7 @@ public class LevelSelectionScreen : MenuScreen
             if (!level) continue;
 
             Button levelButton = Instantiate(levelButtonPrefab, buttonsHolder);
+            levelButton.gameObject.AddComponent<ScrollRectDragRelay>();
             int levelIndex = i;
             bool unlocked = !SaveManager.Instance || SaveManager.Instance.IsLevelUnlocked(levelIndex);
 
@@ -335,14 +355,14 @@ public class LevelSelectionScreen : MenuScreen
         }
     }
 
-    /// <summary>Stretches the level list down to just above the Back button, whatever the screen's aspect ratio.</summary>
+    /// <summary>Stretches the level list down to just above the Start button, whatever the screen's aspect ratio.</summary>
     private void FitListAboveBackButton()
     {
         if (!levelsScroll || !backButton) return;
 
         Canvas.ForceUpdateCanvases();
         var window = (RectTransform)levelsScroll.transform;
-        var back = (RectTransform)backButton.transform;
+        var back = levelStartButton && levelStartButton.gameObject.activeInHierarchy ? (RectTransform)levelStartButton.transform : (RectTransform)backButton.transform;
         var windowCorners = new Vector3[4];
         var backCorners = new Vector3[4];
         window.GetWorldCorners(windowCorners);
@@ -403,6 +423,12 @@ public class LevelSelectionScreen : MenuScreen
 
     private void OnLevelButtonClicked(SOMatch3Level level)
     {
+        if (_selectedLevel == level && ControllerFocus.ControllerActive)
+        {
+            OnStartButtonClicked();
+            return;
+        }
+
         CameraManager.Instance?.ShakeCamera(0.1f);
         _selectedLevel = _selectedLevel == level ? null : level;
         UpdateLevelInfo();
@@ -411,120 +437,115 @@ public class LevelSelectionScreen : MenuScreen
     private void UpdateLevelInfo()
     {
         UpdateSelectedOutline();
-        ClearGrid();
-        
-        if (!_selectedLevel)
+        var scope = GetComponent<FocusScope>();
+        if (scope) scope.FirstSelected = _selectedLevel && _levelButtons.TryGetValue(_selectedLevel, out var selectedButton) ? selectedButton : levelStartButton;
+        if (levelStartButton) levelStartButton.interactable = _selectedLevel;
+        UpdateStartLabel();
+        if (isActiveAndEnabled) DrawPreview(_selectedLevel);
+    }
+
+    private void UpdateStartLabel()
+    {
+        if (!levelStartButton) return;
+
+        if (!_startLabel)
         {
-            if (levelTitleText) levelTitleText.text = L10n.Get("levelselect.none.title");
-            if (levelInfoText) levelInfoText.text = L10n.Get("levelselect.none.info");
-            if (levelStartButton) levelStartButton.interactable = false;
+            _startLabel = levelStartButton.GetComponentInChildren<TextMeshProUGUI>(true);
+            _startLabelEvent = _startLabel ? _startLabel.GetComponent<UnityEngine.Localization.Components.LocalizeStringEvent>() : null;
+            if (_startLabelEvent) _startLabelEvent.enabled = false;
+        }
+        if (!_startLabel) return;
+
+        int number = _selectedLevel && GameManager.Instance ? Array.IndexOf(GameManager.Instance.Match3Levels, _selectedLevel) + 1 : 0;
+        if (number > 0) _startLabel.text = L10n.Get("levelselect.play", ("level", number));
+        else if (_startLabelEvent) _startLabel.text = L10n.Get(_startLabelEvent.StringReference);
+    }
+
+    private void DrawPreview(SOMatch3Level level)
+    {
+        ClearPreview(false);
+        if (!level || !level.GridShape || level.GridShape.Grid == null || !shapePreviewArea || !previewTilePrefab) return;
+
+        var camera = Camera.main;
+        var canvas = shapePreviewArea.GetComponentInParent<Canvas>();
+        if (!camera || !canvas) return;
+
+        var uiCamera = canvas.rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.rootCanvas.worldCamera;
+        var corners = new Vector3[4];
+        shapePreviewArea.GetWorldCorners(corners);
+        Vector3 ToWorld(Vector3 corner)
+        {
+            var point = camera.ScreenToWorldPoint(RectTransformUtility.WorldToScreenPoint(uiCamera, corner));
+            point.z = 0f;
+            return point;
+        }
+
+        var bottomLeft = ToWorld(corners[0]);
+        var topRight = ToWorld(corners[2]);
+        var grid = level.GridShape.Grid;
+        float step = Mathf.Min((topRight.x - bottomLeft.x) / grid.Width, (topRight.y - bottomLeft.y) / grid.Height);
+        float cell = step / (1f + previewCellGap);
+        var center = (bottomLeft + topRight) * 0.5f;
+        var origin = center - new Vector3((grid.Width - 1) * step * 0.5f, (grid.Height - 1) * step * 0.5f, 0f);
+
+        _previewRoot = new GameObject("Level Preview").transform;
+        var tileSource = previewTilePrefab.GetComponentInChildren<SpriteRenderer>(true);
+
+        for (int y = 0; y < grid.Height; y++)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                if (!grid.IsCellActive(x, y)) continue;
+
+                var position = origin + new Vector3(x * step, y * step, 0f);
+                float delay = (x + grid.Height - 1 - y) * previewPopStagger;
+                PreviewSprite("Tile", tileSource, tileSource.sprite, previewTileColor, position, cell, 0, delay);
+            }
+        }
+    }
+
+    private void PreviewSprite(string name, SpriteRenderer source, Sprite sprite, Color color, Vector3 position, float size, int orderOffset, float delay)
+    {
+        if (!sprite) return;
+
+        var spriteObject = new GameObject(name);
+        spriteObject.transform.SetParent(_previewRoot, false);
+        spriteObject.transform.position = position;
+
+        var renderer = spriteObject.AddComponent<SpriteRenderer>();
+        renderer.sprite = sprite;
+        renderer.color = color;
+        if (source)
+        {
+            renderer.sharedMaterial = source.sharedMaterial;
+            renderer.sortingLayerID = source.sortingLayerID;
+            renderer.sortingOrder = source.sortingOrder + orderOffset;
+        }
+
+        float spriteSize = Mathf.Max(sprite.bounds.size.x, sprite.bounds.size.y);
+        var scale = Vector3.one * (spriteSize > 0f ? size / spriteSize : 1f);
+        spriteObject.transform.localScale = Vector3.zero;
+        Tween.Scale(spriteObject.transform, scale, previewPopDuration, Ease.OutBack, startDelay: delay);
+    }
+
+    private void ClearPreview(bool fade)
+    {
+        if (!_previewRoot) return;
+
+        var root = _previewRoot;
+        _previewRoot = null;
+        if (!fade)
+        {
+            Destroy(root.gameObject);
             return;
         }
 
-        if (levelTitleText) levelTitleText.text = _selectedLevel.DisplayName;
-        if (levelInfoText) levelInfoText.text = GenerateLevelInfo(_selectedLevel);
-        if (levelStartButton) levelStartButton.interactable = true;
-        
-        DrawGrid(_selectedLevel.GridShape.Grid);
-    }
-
-    private string GenerateLevelInfo(SOMatch3Level level)
-    {
-        StringBuilder info = new StringBuilder();
-        
-        if (level.Objectives is { Count: > 0 })
+        foreach (var renderer in root.GetComponentsInChildren<SpriteRenderer>())
         {
-            info.AppendLine(L10n.Get("levelselect.objectives"));
-            foreach (var objective in level.Objectives)
-            {
-                if (objective != null)
-                {
-                    info.AppendLine($"• {objective.GetDescription()}");
-                }
-            }
-            info.AppendLine();
+            Tween.StopAll(renderer.transform);
+            Tween.Alpha(renderer, 0f, 0.2f);
         }
-
-        if (level.LoseConditions is { Count: > 0 })
-        {
-            info.AppendLine(L10n.Get("levelselect.loseconditions"));
-            foreach (var condition in level.LoseConditions)
-            {
-                if (condition != null)
-                {
-                    info.AppendLine($"• {condition.GetDescription()}");
-                }
-            }
-        }
-
-        AppendBestStats(info, level);
-
-        return info.ToString();
+        Destroy(root.gameObject, 0.25f);
     }
 
-    private void AppendBestStats(StringBuilder info, SOMatch3Level level)
-    {
-        var record = SaveManager.Instance ? SaveManager.Instance.GetRecord(level) : null;
-        if (record is not { completed: true }) return;
-
-        int minutes = Mathf.FloorToInt(record.bestTime / 60f);
-        int seconds = Mathf.FloorToInt(record.bestTime % 60f);
-
-        info.AppendLine();
-        info.AppendLine(L10n.Get("levelselect.best"));
-        info.AppendLine($"• {L10n.Get("levelselect.best.moves", ("moves", record.bestMoves))}");
-        info.AppendLine($"• {L10n.Get("levelselect.best.time", ("minutes", minutes), ("seconds", seconds))}");
-        info.AppendLine($"• {L10n.Get("levelselect.best.pieces", ("pieces", record.bestPiecesCleared))}");
-    }
-
-    private void DrawGrid(Grid grid)
-    {
-        if (!gridContainer || !gridCellPrefab || grid == null) return;
-
-        int width = grid.Width;
-        int height = grid.Height;
-
-        // Use max size if grid width is below threshold, otherwise use min size
-        float actualCellSize = width <= maxGridWidthForLargeSize ? cellSize.maxValue : cellSize.minValue;
-
-        float totalWidth = (width * actualCellSize) + ((width - 1) * cellSpacing);
-        float totalHeight = (height * actualCellSize) + ((height - 1) * cellSpacing);
-
-        gridContainer.sizeDelta = new Vector2(totalWidth, totalHeight);
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                CreateCell(x, y, grid, actualCellSize);
-            }
-        }
-    }
-
-    private void CreateCell(int x, int y, Grid grid, float actualCellSize)
-    {
-        Image cell = Instantiate(gridCellPrefab, gridContainer);
-        cell.name = $"Cell ({x},{y})";
-    
-        RectTransform cellRect = cell.rectTransform;
-        cellRect.sizeDelta = new Vector2(actualCellSize, actualCellSize);
-
-        float posX = (x * (actualCellSize + cellSpacing)) - (gridContainer.sizeDelta.x / 2f) + (actualCellSize / 2f);
-        float posY = (y * (actualCellSize + cellSpacing)) - (gridContainer.sizeDelta.y / 2f) + (actualCellSize / 2f);
-    
-        cellRect.anchoredPosition = new Vector2(posX, posY);
-
-        bool isActive = grid.IsCellActive(x, y);
-        cell.color = isActive ? activeCellColor : inactiveCellColor;
-    }
-
-    private void ClearGrid()
-    {
-        if (!gridContainer) return;
-
-        foreach (Transform child in gridContainer)
-        {
-            Destroy(child.gameObject);
-        }
-    }
 }

@@ -465,6 +465,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141700
+  - m_Id: 3937629413302272
+    m_Localized: Jouer {level}
+    m_Metadata:
+      m_Items:
+      - rid: 5242841009418141700
   references:
     version: 2
     RefIds:
@@ -503,3 +508,4 @@ MonoBehaviour:
         - id: 2792580076003328
         - id: 3163188735500288
         - id: 3163188739694593
+        - id: 3937629413302272

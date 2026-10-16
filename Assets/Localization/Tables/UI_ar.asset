@@ -465,6 +465,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841020651274371
+  - m_Id: 3937629413302272
+    m_Localized: "\u0627\u0644\u0639\u0628 \u0627\u0644\u0645\u0633\u062A\u0648\u0649 {level}"
+    m_Metadata:
+      m_Items:
+      - rid: 5242841020651274371
   references:
     version: 2
     RefIds:
@@ -503,3 +508,4 @@ MonoBehaviour:
         - id: 2792580076003328
         - id: 3163188735500288
         - id: 3163188739694593
+        - id: 3937629413302272

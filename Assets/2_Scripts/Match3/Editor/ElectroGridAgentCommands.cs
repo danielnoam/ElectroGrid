@@ -30,6 +30,9 @@ internal static class ElectroGridAgentCommands
     [CliCommand("eg_play_level", "ElectroGrid: load a level in play mode, by play-order number or asset name (12, Level_12, Level_SurgeTest)")]
     private static string PlayLevel([CliArg("level", "Play-order number or asset name", Required = true)] string level) => Match3DebugActions.PlayLevel(level);
 
+    [CliCommand("eg_menu", "ElectroGrid: switch the main menu screen: main, levels or survival")]
+    private static string Menu([CliArg("screen", "main, levels or survival", Required = true)] string screen) => Match3DebugActions.ShowMenu(screen);
+
     [CliCommand("eg_play_survival", "ElectroGrid: start a Survival run in play mode")]
     private static string PlaySurvival() => Match3DebugActions.PlaySurvival();
 
@@ -81,6 +84,21 @@ internal static class ElectroGridAgentCommands
 
     [CliCommand("eg_clear_errors", "ElectroGrid: clear the collected errors, to check a test run starts clean")]
     private static string ClearErrors() => Match3DebugActions.ClearErrors();
+
+    [CliCommand("eg_ui", "ElectroGrid: controller focus state: whether a controller is in use, the open screen or window, and what is selected")]
+    private static string Ui() => Match3DebugActions.UiStatus();
+
+    [CliCommand("eg_ui_move", "ElectroGrid: move the controller selection one step (up, down, left, right), as the d-pad does")]
+    private static string UiMove([CliArg("dir", "up, down, left or right", Required = true)] string dir) => Match3DebugActions.UiMove(dir);
+
+    [CliCommand("eg_ui_device", "ElectroGrid: pretend the last input came from a gamepad, the keyboard or a pointer, which switches the button prompts")]
+    private static string UiDevice([CliArg("device", "gamepad, keyboard or pointer", Required = true)] string device) => Match3DebugActions.UiDevice(device);
+
+    [CliCommand("eg_ui_submit", "ElectroGrid: press the selected button, as A or Enter does")]
+    private static string UiSubmit() => Match3DebugActions.UiSubmit();
+
+    [CliCommand("eg_ui_cancel", "ElectroGrid: press back on the open screen or window, as B or Escape does")]
+    private static string UiCancel() => Match3DebugActions.UiCancel();
 
     [CliCommand("eg_levels", "ElectroGrid: the play order with each level's grid, goals and validation result")]
     private static string Levels()

@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be04f8df9fcaf1144801ba88f3583210, type: 3}
+  m_Name: ButtonPromptIcons
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPromptIcons
+  xbox:
+  - control: buttonSouth
+    sprite: {fileID: 21300000, guid: fc0136cebcda91c4d91096f13b22e51f, type: 3}
+  - control: buttonEast
+    sprite: {fileID: 21300000, guid: 0dcc91794f2b3654b8f6a31a88a506e1, type: 3}
+  - control: buttonWest
+    sprite: {fileID: 21300000, guid: 3b7436916a7d988439b9dd6ad83c2307, type: 3}
+  - control: buttonNorth
+    sprite: {fileID: 21300000, guid: f2bf7cb6807737647a3476290949cad5, type: 3}
+  - control: start
+    sprite: {fileID: 21300000, guid: 0ecc56d38a3a2f74fa77b0bba76ee23f, type: 3}
+  - control: select
+    sprite: {fileID: 21300000, guid: a4766e2404a05354aba815b79fa9b0e9, type: 3}
+  - control: leftShoulder
+    sprite: {fileID: 21300000, guid: 7d974328c286e4e4497fe9b1cea15b4d, type: 3}
+  - control: rightShoulder
+    sprite: {fileID: 21300000, guid: ce1526400cdf12149b8357ad808e4548, type: 3}
+  playStation:
+  - control: buttonSouth
+    sprite: {fileID: 21300000, guid: 4baec4c2c3bf32d4aa97f45500105efb, type: 3}
+  - control: buttonEast
+    sprite: {fileID: 21300000, guid: a3d0488ee480d564282f9d24654202df, type: 3}
+  - control: buttonWest
+    sprite: {fileID: 21300000, guid: e6e3fd4afff0ef64eb0a4cdfc58b8878, type: 3}
+  - control: buttonNorth
+    sprite: {fileID: 21300000, guid: 8f11847c419880c49ac4d0800bb93638, type: 3}
+  - control: start
+    sprite: {fileID: 21300000, guid: 3f88392ab73404f49821d3d38d8a87ac, type: 3}
+  - control: select
+    sprite: {fileID: 21300000, guid: 3ffc258da8186aa4d977ce238d87beb1, type: 3}
+  - control: leftShoulder
+    sprite: {fileID: 21300000, guid: 761130666ed7baa4483dc774b456d45d, type: 3}
+  - control: rightShoulder
+    sprite: {fileID: 21300000, guid: 3e4ccb5e259596b4ba3d65582bf4413a, type: 3}
+  keyboard:
+  - control: enter
+    sprite: {fileID: 21300000, guid: f123f4aec3aadba438a4bd10aed0c200, type: 3}
+  - control: escape
+    sprite: {fileID: 21300000, guid: e44d617b5e033854b9abfa2029217f62, type: 3}
+  - control: space
+    sprite: {fileID: 21300000, guid: 50ca4c1446cd8ec4c84508126015afeb, type: 3}
+  - control: i
+    sprite: {fileID: 21300000, guid: b78a4724fbcd92d4e95b00e8e72ff24c, type: 3}
+  - control: tab
+    sprite: {fileID: 21300000, guid: 894782f30855d914d81ef769fa1646db, type: 3}
+  - control: r
+    sprite: {fileID: 21300000, guid: 0283e2a395c44b446b44673bc7454b33, type: 3}
+  - control: q
+    sprite: {fileID: 21300000, guid: 046c5153c5f2aca40a23e1a863894396, type: 3}
+  - control: e
+    sprite: {fileID: 21300000, guid: dc1fd27274550a24ba656902cf0febab, type: 3}

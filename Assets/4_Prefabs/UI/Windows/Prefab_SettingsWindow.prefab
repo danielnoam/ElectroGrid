@@ -4665,9 +4665,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8022792731608711051, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8361011379719816778}
+    - targetCorrespondingSourceObject: {fileID: 8022792731608711051, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2357915400864275182}
+    - targetCorrespondingSourceObject: {fileID: 8022792731608711051, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5101017418944431705}
     - targetCorrespondingSourceObject: {fileID: 6663393182614078679, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5960319560507028965}
+    - targetCorrespondingSourceObject: {fileID: 3640549032641204997, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1329347746847129752}
     - targetCorrespondingSourceObject: {fileID: 3546307578218313696, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1543596091257651521}
@@ -4717,6 +4726,27 @@ MonoBehaviour:
   references:
     version: 2
     RefIds: []
+--- !u!1 &1322418450317764454 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3640549032641204997, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+  m_PrefabInstance: {fileID: 2368885279837942883}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1329347746847129752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1322418450317764454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Cancel
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80
 --- !u!224 &1403470694641276629 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3721620040058397366, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
@@ -4772,6 +4802,44 @@ MonoBehaviour:
   titleText: {fileID: 6829595534532920167}
   backgroundImage: {fileID: 7728879288623569988}
   versionText: {fileID: 6598537799035937912}
+--- !u!114 &2357915400864275182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5731208654355106792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e89cadf2215c6346aafd56019f99c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FocusScope
+  firstSelected: {fileID: 2981975041180069384}
+  cancelButton: {fileID: 8595228810142600207}
+  rememberSelection: 1
+--- !u!114 &5101017418944431705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5731208654355106792}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9392cbe1b4af33745aafa217d6c33b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NavigationChain
+  selectables:
+  - {fileID: 2981975041180069384}
+  - {fileID: 594755075141637841}
+  - {fileID: 542880836796306974}
+  - {fileID: 4033374149876567413}
+  - {fileID: 5125166544285016609}
+  - {fileID: 7277886450422532292}
+  - {fileID: 3749581388181968216}
+  - {fileID: 322748936966701471}
+  - {fileID: 8595228810142600207}
+  wrap: 0
 --- !u!114 &6829595534532920167 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9086118249103996676, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
@@ -4810,7 +4878,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6311684429549189228, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
   m_PrefabInstance: {fileID: 2368885279837942883}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1322418450317764454}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}

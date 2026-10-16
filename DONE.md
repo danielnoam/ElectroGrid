@@ -997,3 +997,44 @@ of as a new blob per edit.
       list opens every Survival setting (score, time, obstacles, milestones) with
       Play Survival, and the board below it is painted like any level. Agent
       commands eg_survival_settings and eg_survival_set read and change them.
+
+## Level selection without the panel (after 1.10.0)
+
+- [x] **Level selection**: the top info panel is gone. The selected level’s
+      board is drawn in its own area above the level circuit, sized to fit like
+      the board in game, built from the board’s own glowing tiles, and pops in
+      cell by cell. The level list fades softly at its top and bottom, and dragging
+      that starts on a level button scrolls it (`ScrollRectDragRelay`). Start reads
+      “Play 10” (all 7 languages) above a centred Back.
+      The old grid preview and goal text code went with the panel. New agent
+      command `eg_menu` switches between the main, levels and Survival screens.
+- [x] **DNExtensions** updated to the latest commit.
+
+## Controller support for menus and windows (after 1.10.0)
+
+- [x] **Menus and windows work with a gamepad or the keyboard.** Every screen and
+      window has a `FocusScope` (first selection and back button). `ControllerFocus`
+      notices the last input device, keeps something selected in the newest open
+      screen or window, and turns B or Escape into its back button; mouse and touch
+      are left alone. In a level, B opens Settings. Sliders and toggles get a frame
+      when selected, and Settings is linked top to bottom (`NavigationChain`).
+      Pressing A on the selected level in level selection starts it, and the level
+      list scrolls to keep the selected button in view.
+- [x] **Controller rumble**: while a gamepad is in use, every vibration in the game
+      plays as rumble through the DNExtensions ControllerRumble system (listener
+      and source on the InputManager prefab).
+- [x] **Agent commands** `eg_ui`, `eg_ui_move`, `eg_ui_submit`, `eg_ui_cancel`, and
+      matching Controller buttons in the Match3 Debug window.
+- [x] **Button prompts** (`ButtonPrompt`): while a gamepad or the keyboard is in use,
+      mapped buttons show a small badge, and that pad button or key presses them.
+      In a level: Restart = View / R, Settings = Menu / Tab, Info = Y / I, Home = X /
+      Space; Back = B / Escape everywhere; Play = X / Space. Icons are Kenney’s Input
+      Prompts (CC0), Xbox, PlayStation and keyboard sets in `Resources/ButtonPromptIcons`,
+      picked by the connected pad. Keyboard counts as controller input (arrows or
+      WASD to move, Enter to press). Agent command `eg_ui_device`.
+- [x] **Controller input runs on input actions.** Back, the prompt buttons and the
+      gamepad / keyboard / pointer detection read the UI map of `InputSystem_Actions`
+      (Cancel, plus new Primary, Restart, Settings and Info actions with gamepad and
+      keyboard bindings), and each prompt shows the icon of its action’s current
+      binding. Changing a binding in the asset changes both the button and the icon.
+

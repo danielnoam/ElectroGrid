@@ -1015,6 +1015,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8022792731608711051, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8243143340057431168}
+    - targetCorrespondingSourceObject: {fileID: 8022792731608711051, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3408021398719492362}
+    - targetCorrespondingSourceObject: {fileID: 3640549032641204997, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8968283919435289800}
   m_SourcePrefab: {fileID: 100100000, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
 --- !u!1 &485398420191893404 stripped
 GameObject:
@@ -1058,6 +1064,21 @@ MonoBehaviour:
   tutorialElementsParent: {fileID: 6727378135287716865}
   backgroundImage: {fileID: 2483544352121536560}
   tutorialElementPrefab: {fileID: 8804968279864379365, guid: a1afbe02327339d4697c9c47a4b1b0c4, type: 3}
+--- !u!114 &3408021398719492362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 485398420191893404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e89cadf2215c6346aafd56019f99c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FocusScope
+  firstSelected: {fileID: 4502842876776484987}
+  cancelButton: {fileID: 4502842876776484987}
+  rememberSelection: 1
 --- !u!114 &1725639902672199443 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9086118249103996676, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
@@ -1085,7 +1106,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6311684429549189228, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
   m_PrefabInstance: {fileID: 7632145825452107799}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 6588485052696705810}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -1096,3 +1117,24 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3721620040058397366, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
   m_PrefabInstance: {fileID: 7632145825452107799}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &6588485052696705810 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3640549032641204997, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}
+  m_PrefabInstance: {fileID: 7632145825452107799}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8968283919435289800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6588485052696705810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Cancel
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80

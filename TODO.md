@@ -73,6 +73,10 @@ rework, since it changes how every level plays.
       and a Steam leaderboard later (section 5). The best score already shows
       on the main menu Survival button.
 
+- [ ] **Controller gameplay.** Menus and windows already work with a gamepad
+      (see DONE.md). Still to do: playing the board with a controller (moving a
+      cursor over the board and swapping pieces), and rumble tuned per event.
+
 - [ ] **Spark power-up.** An L or T match leaves a Spark that clears a 3x3
       area when matched or swapped. Surge is done (see DONE.md); the Drone
       (2x2) was dropped because Plus already fills the helper role.

@@ -527,6 +527,7 @@ GameObject:
   - component: {fileID: 219113972}
   - component: {fileID: 219113973}
   - component: {fileID: 219113974}
+  - component: {fileID: 219113975}
   m_Layer: 5
   m_Name: LevelCompleteWindow
   m_TagString: Untagged
@@ -610,6 +611,21 @@ MonoBehaviour:
   levelCompleteWinSfx: LevelCompleteWindowWin
   levelCompleteFailSfx: LevelCompleteWindowFail
   match3UIElementPrefab: {fileID: 2074164471178117848, guid: f946419640c3cc44aaafb207336f556c, type: 3}
+--- !u!114 &219113975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 219113969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e89cadf2215c6346aafd56019f99c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FocusScope
+  firstSelected: {fileID: 1882723607}
+  cancelButton: {fileID: 2026211596}
+  rememberSelection: 1
 --- !u!1 &229920320
 GameObject:
   m_ObjectHideFlags: 0
@@ -1689,7 +1705,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1397829337447724179, guid: b8f739b130f048e4288478e9caaecbe9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 874541282}
   m_SourcePrefab: {fileID: 100100000, guid: b8f739b130f048e4288478e9caaecbe9, type: 3}
 --- !u!224 &874541279 stripped
 RectTransform:
@@ -1701,12 +1720,33 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8535546023579017210, guid: b8f739b130f048e4288478e9caaecbe9, type: 3}
   m_PrefabInstance: {fileID: 874541278}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 874541281}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!1 &874541281 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1397829337447724179, guid: b8f739b130f048e4288478e9caaecbe9, type: 3}
+  m_PrefabInstance: {fileID: 874541278}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &874541282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874541281}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Primary
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80
 --- !u!1 &980465612
 GameObject:
   m_ObjectHideFlags: 0
@@ -1870,6 +1910,7 @@ GameObject:
   - component: {fileID: 1040713038}
   - component: {fileID: 1040713039}
   - component: {fileID: 1040713040}
+  - component: {fileID: 1040713041}
   m_Layer: 5
   m_Name: BottomBar
   m_TagString: Untagged
@@ -1944,6 +1985,21 @@ MonoBehaviour:
   settingsWindowUI: {fileID: 1767761746}
   match3EffectManager: {fileID: 586155254}
   topBarUI: {fileID: 1971832041}
+--- !u!114 &1040713041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040713037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e89cadf2215c6346aafd56019f99c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FocusScope
+  firstSelected: {fileID: 1998016238}
+  cancelButton: {fileID: 1998016238}
+  rememberSelection: 1
 --- !u!1 &1063539252
 GameObject:
   m_ObjectHideFlags: 0
@@ -2152,6 +2208,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: InputManager
       objectReference: {fileID: 0}
+    - target: {fileID: 4958043623181425276, guid: b4853befcd479f744b1c91ff139210c6, type: 3}
+      propertyPath: playerInput
+      value: 
+      objectReference: {fileID: 1105389519}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2168,6 +2228,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e7ea91dfbd4e3b46b833e32591440fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp-firstpass::DNExtensions.InputSystem.InputManager
+--- !u!114 &1105389519 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1895425048657667939, guid: b4853befcd479f744b1c91ff139210c6, type: 3}
+  m_PrefabInstance: {fileID: 1105389517}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
 --- !u!1 &1145269570
 GameObject:
   m_ObjectHideFlags: 0
@@ -4425,14 +4496,17 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1397829337447724179, guid: b2bb264de546261449dcc22e037e328e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1904739839}
   m_SourcePrefab: {fileID: 100100000, guid: b2bb264de546261449dcc22e037e328e, type: 3}
 --- !u!114 &1904739836 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8535546023579017210, guid: b2bb264de546261449dcc22e037e328e, type: 3}
   m_PrefabInstance: {fileID: 1904739835}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1904739838}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -4443,6 +4517,27 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1586226910567422150, guid: b2bb264de546261449dcc22e037e328e, type: 3}
   m_PrefabInstance: {fileID: 1904739835}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1904739838 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1397829337447724179, guid: b2bb264de546261449dcc22e037e328e, type: 3}
+  m_PrefabInstance: {fileID: 1904739835}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1904739839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904739838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Restart
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80
 --- !u!224 &1922627328 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1030263153832584111, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
@@ -4560,7 +4655,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8535546023579017210, guid: e324b35a5fd58a840b339c749bc28e98, type: 3}
   m_PrefabInstance: {fileID: 1310237531106385738}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1310237531106385739}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -4571,7 +4666,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3208736288784191921, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
   m_PrefabInstance: {fileID: 7255514202370865254}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 7255514202370865255}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -4587,7 +4682,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7702763336138284464, guid: 7f1d107fde7580148a70d4419247566a, type: 3}
   m_PrefabInstance: {fileID: 753673759831843991}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 753673759831843992}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
@@ -4688,8 +4783,32 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1150663054962259673, guid: 7f1d107fde7580148a70d4419247566a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 753673759831843993}
   m_SourcePrefab: {fileID: 100100000, guid: 7f1d107fde7580148a70d4419247566a, type: 3}
+--- !u!1 &753673759831843992 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1150663054962259673, guid: 7f1d107fde7580148a70d4419247566a, type: 3}
+  m_PrefabInstance: {fileID: 753673759831843991}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &753673759831843993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 753673759831843992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Info
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80
 --- !u!1001 &1310237531106385738
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4785,8 +4904,32 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1397829337447724179, guid: e324b35a5fd58a840b339c749bc28e98, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1310237531106385740}
   m_SourcePrefab: {fileID: 100100000, guid: e324b35a5fd58a840b339c749bc28e98, type: 3}
+--- !u!1 &1310237531106385739 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1397829337447724179, guid: e324b35a5fd58a840b339c749bc28e98, type: 3}
+  m_PrefabInstance: {fileID: 1310237531106385738}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1310237531106385740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1310237531106385739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Settings
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80
 --- !u!1001 &7255514202370865254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4903,10 +5046,34 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5302415877516245720, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7255514202370865256}
     - targetCorrespondingSourceObject: {fileID: 5343275625798819389, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1811724092}
   m_SourcePrefab: {fileID: 100100000, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
+--- !u!1 &7255514202370865255 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5302415877516245720, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
+  m_PrefabInstance: {fileID: 7255514202370865254}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7255514202370865256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7255514202370865255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e5d4060818c9054494be7f1d86d2e0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
+  actionName: Cancel
+  corner: {x: 1, y: 1}
+  offset: {x: -12, y: -12}
+  size: 80
 --- !u!1001 &8726594008269231255
 PrefabInstance:
   m_ObjectHideFlags: 0

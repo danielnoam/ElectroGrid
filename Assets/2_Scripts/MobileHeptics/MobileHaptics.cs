@@ -1,13 +1,13 @@
 using UnityEngine;
 
 /// <summary>
-/// Provides cross-platform haptic feedback (vibration) for mobile devices.
-/// Supports Android with duration control and iOS with system haptics.
-/// No GameObject required - initializes automatically on first use.
+/// Provides cross-platform haptic feedback: phone vibration, or controller rumble through the DNExtensions
+/// ControllerRumble system while a gamepad is the active input. No GameObject required.
 /// </summary>
 public static class MobileHaptics
 {
     private static bool _isInitialized;
+    private static DNExtensions.Systems.ControllerRumble.ControllerRumbleSource _rumbleSource;
     
 #if UNITY_ANDROID && !UNITY_EDITOR
     private static AndroidJavaObject vibrator;
@@ -49,6 +49,12 @@ public static class MobileHaptics
         if (FirebaseManager.Instance && !FirebaseManager.Instance.HapticsEnabled) return;
         if (SaveManager.Instance && !SaveManager.Instance.HapticsEnabled) return;
 
+        if (ControllerFocus.GamepadActive)
+        {
+            Rumble(milliseconds);
+            return;
+        }
+
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (vibrator != null)
         {
@@ -57,6 +63,17 @@ public static class MobileHaptics
 #elif UNITY_IOS && !UNITY_EDITOR
         Handheld.Vibrate();
 #endif
+    }
+
+    /// <summary>A short controller rumble, stronger and longer for longer vibrations.</summary>
+    private static void Rumble(long milliseconds)
+    {
+        if (!_rumbleSource) _rumbleSource = Object.FindAnyObjectByType<DNExtensions.Systems.ControllerRumble.ControllerRumbleSource>();
+        if (!_rumbleSource) return;
+
+        float strength = Mathf.Clamp(milliseconds / 100f, 0.15f, 0.7f);
+        float duration = Mathf.Clamp(milliseconds / 1000f * 2f, 0.08f, 0.4f);
+        _rumbleSource.Rumble(strength, strength * 0.8f, duration);
     }
 
     /// <summary>

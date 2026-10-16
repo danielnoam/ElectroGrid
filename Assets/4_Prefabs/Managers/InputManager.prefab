@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 4052887448178901417}
   - component: {fileID: 1895425048657667939}
   - component: {fileID: 3635964787785189804}
+  - component: {fileID: 4958043623181425276}
+  - component: {fileID: 8183196382195910393}
   m_Layer: 0
   m_Name: InputManager
   m_TagString: Untagged
@@ -79,6 +81,63 @@ MonoBehaviour:
   hideCursor: 0
   keyboardMouseSpriteAsset: {fileID: 0}
   gamepadSpriteAsset: {fileID: 0}
-  isCurrentDeviceGamepad: 0
-  isCurrentDeviceTouchscreen: 0
-  isCurrentDeviceMobile: 0
+--- !u!114 &4958043623181425276
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465048672239161041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dffa83163bd4a041ab121b85dd1ac55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DNExtensions.Systems::DNExtensions.Systems.ControllerRumble.ControllerRumbleListener
+  playerInput: {fileID: 0}
+  lowFrequencyRange:
+    minValue: 0
+    maxValue: 1
+  highFrequencyRange:
+    minValue: 0
+    maxValue: 1
+  fakeGamepad: 0
+  drawInformation: 0
+--- !u!114 &8183196382195910393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4465048672239161041}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcae686dfb6f4e95ab416ccb595ef855, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DNExtensions.Systems::DNExtensions.Systems.ControllerRumble.ControllerRumbleSource
+  is3DSource: 0
+  minRumbleDistance: 1
+  maxRumbleDistance: 10
+  distanceFalloffCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

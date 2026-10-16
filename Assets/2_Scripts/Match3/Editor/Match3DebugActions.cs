@@ -6,6 +6,7 @@ using DNExtensions.Systems.ObjectPooling;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Localization.Settings;
 
 /// <summary>
@@ -152,6 +153,23 @@ internal static class Match3DebugActions
         GameManager.Instance.SelectMatch3Level(asset);
         GameManager.Instance.Match3Scene.LoadScene();
         return $"Loading {asset.name}.";
+    }
+
+    /// <summary>Switches the main menu to one of its screens: main, levels or survival.</summary>
+    public static string ShowMenu(string screen)
+    {
+        if (!EditorApplication.isPlaying) return "Enter play mode first.";
+
+        var menu = Object.FindAnyObjectByType<MenuManager>();
+        if (!menu) return "Not on the main menu.";
+
+        switch ((screen ?? "").ToLowerInvariant())
+        {
+            case "main": menu.ShowMainMenu(); return "Showing the main menu.";
+            case "levels": menu.ShowMatch3LevelSelection(); return "Showing level selection.";
+            case "survival": menu.ShowSurvival(); return "Showing the Survival screen.";
+            default: return "Use main, levels or survival.";
+        }
     }
 
     public static string PlaySurvival()
@@ -384,6 +402,86 @@ internal static class Match3DebugActions
         }
 
         return $"Spawned {kind} at ({x}, {y}).";
+    }
+
+    #endregion
+
+    #region Controller
+
+    public static string UiStatus()
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        var selected = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
+        var top = ControllerFocus.TopScope;
+        return $"controller={ControllerFocus.ControllerActive} gamepad={ControllerFocus.GamepadActive} scope={(top ? top.name : "none")} selected={(selected ? selected.name + " (" + selected.transform.parent.name + ")" : "none")}";
+    }
+
+    /// <summary>Moves the controller selection one step: up, down, left or right.</summary>
+    public static string UiMove(string direction)
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        if (!ControllerFocus.ControllerActive) ControllerFocus.SimulateController(true);
+        var eventSystem = EventSystem.current;
+        var current = eventSystem && eventSystem.currentSelectedGameObject ? eventSystem.currentSelectedGameObject.GetComponent<UnityEngine.UI.Selectable>() : null;
+        if (!current)
+        {
+            ControllerFocus.FocusTopScope();
+            return UiStatus();
+        }
+
+        var next = (direction ?? "").ToLowerInvariant() switch
+        {
+            "up" => current.FindSelectableOnUp(),
+            "down" => current.FindSelectableOnDown(),
+            "left" => current.FindSelectableOnLeft(),
+            "right" => current.FindSelectableOnRight(),
+            _ => null
+        };
+        if (next) eventSystem.SetSelectedGameObject(next.gameObject);
+        return (next ? "" : "Nothing that way. ") + UiStatus();
+    }
+
+    /// <summary>Pretends the last input came from a gamepad, the keyboard or a pointer (mouse or touch).</summary>
+    public static string UiDevice(string device)
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        switch ((device ?? "").ToLowerInvariant())
+        {
+            case "gamepad": ControllerFocus.SimulateController(true); break;
+            case "keyboard": ControllerFocus.SimulateController(true, false); break;
+            case "pointer": ControllerFocus.SimulateController(false); break;
+            default: return "Use gamepad, keyboard or pointer.";
+        }
+
+        return UiStatus();
+    }
+
+    public static string UiSubmit()
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        ControllerFocus.SimulateController(true);
+        var selected = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
+        if (!selected) return "Nothing is selected.";
+
+        ExecuteEvents.Execute(selected, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+        return $"Pressed {selected.name}.";
+    }
+
+    public static string UiCancel()
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        ControllerFocus.SimulateController(true);
+        var top = ControllerFocus.TopScope;
+        if (!top) return "No open screen.";
+        if (!top.CancelButton) return $"{top.name} has no back button.";
+
+        ControllerFocus.PressCancel();
+        return $"Pressed back on {top.name}.";
     }
 
     #endregion
