@@ -531,6 +531,42 @@ MonoBehaviour:
     m_Key: levelselect.play
     m_Metadata:
       m_Items: []
+  - m_Id: 3989722417324032
+    m_Key: credits.fonts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Key: controls.move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Key: controls.select
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Key: controls.rowends
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Key: controls.restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Key: controls.menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Key: settings.rumble
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Key: survival.unlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Key: survival.unlock.piece
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

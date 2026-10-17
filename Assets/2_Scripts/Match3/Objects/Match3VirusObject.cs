@@ -5,7 +5,6 @@ using UnityEngine;
 [SelectionBase]
 public class Match3VirusObject : Match3ObstacleObject
 {
-    private static readonly int EmissionMaskId = Shader.PropertyToID("_Emission_Mask");
 
     [Header("Virus")]
     [SerializeField] private Texture2D emissionMask;
@@ -14,13 +13,18 @@ public class Match3VirusObject : Match3ObstacleObject
     [SerializeField, Min(0.01f)] private float spreadDuration = 0.35f;
 
     private float _wobbleOffset;
+    private bool _sharedMaterialSet;
 
     public override void Initialize(SOItemData data, Match3GridHandler gridHandler)
     {
         base.Initialize(data, gridHandler);
 
         _wobbleOffset = Random.Range(0f, 10f);
-        if (emissionMask && itemRenderer) itemRenderer.material.SetTexture(EmissionMaskId, emissionMask);
+        if (emissionMask && itemRenderer && !_sharedMaterialSet)
+        {
+            itemRenderer.sharedMaterial = EmissionMaterials.Get(itemRenderer.sharedMaterial, emissionMask);
+            _sharedMaterialSet = true;
+        }
     }
 
     private void LateUpdate()

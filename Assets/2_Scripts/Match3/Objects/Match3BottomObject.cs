@@ -7,7 +7,6 @@ using UnityEngine;
 [SelectionBase]
 public class Match3BottomObject : Match3Object
 {
-    private static readonly int EmissionMaskId = Shader.PropertyToID("_Emission_Mask");
 
     [Header("Plug")]
     [SerializeField] private Texture2D emissionMask;
@@ -39,7 +38,7 @@ public class Match3BottomObject : Match3Object
 
         if (!itemRenderer) return;
         _spriteBasePosition = itemRenderer.transform.localPosition;
-        if (emissionMask) itemRenderer.material.SetTexture(EmissionMaskId, emissionMask);
+        if (emissionMask) itemRenderer.sharedMaterial = EmissionMaterials.Get(itemRenderer.sharedMaterial, emissionMask);
     }
 
     private void Update()
@@ -115,7 +114,7 @@ public class Match3BottomObject : Match3Object
         _movementSequence.Group(Tween.Scale(transform, _baseScale * 0.75f, duration/1.75f, Ease.OutQuart, startDelay: duration/3));
         _movementSequence.InsertCallback(duration * 0.5f, () => {
             
-            MobileHaptics.Vibrate(50);
+            MobileHaptics.Play(Haptic.Collect);
             SpawnDestroyParticle();
         });
 

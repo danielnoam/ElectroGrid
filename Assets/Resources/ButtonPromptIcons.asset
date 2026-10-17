@@ -29,6 +29,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 7d974328c286e4e4497fe9b1cea15b4d, type: 3}
   - control: rightShoulder
     sprite: {fileID: 21300000, guid: ce1526400cdf12149b8357ad808e4548, type: 3}
+  - control: dpad
+    sprite: {fileID: 21300000, guid: 060407b136768c54197ffa46f2e12189, type: 3}
   playStation:
   - control: buttonSouth
     sprite: {fileID: 21300000, guid: 4baec4c2c3bf32d4aa97f45500105efb, type: 3}
@@ -46,6 +48,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 761130666ed7baa4483dc774b456d45d, type: 3}
   - control: rightShoulder
     sprite: {fileID: 21300000, guid: 3e4ccb5e259596b4ba3d65582bf4413a, type: 3}
+  - control: dpad
+    sprite: {fileID: 21300000, guid: 9d8392b6a58eb95428bc32dc007bcc18, type: 3}
   keyboard:
   - control: enter
     sprite: {fileID: 21300000, guid: f123f4aec3aadba438a4bd10aed0c200, type: 3}
@@ -63,3 +67,7 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 046c5153c5f2aca40a23e1a863894396, type: 3}
   - control: e
     sprite: {fileID: 21300000, guid: dc1fd27274550a24ba656902cf0febab, type: 3}
+  - control: arrows
+    sprite: {fileID: 21300000, guid: 74f59a0dd4c9fcd43900e0107d5b8eac, type: 3}
+  - control: c
+    sprite: {fileID: 21300000, guid: 75a5030abac2ab24f823f34d40484068, type: 3}

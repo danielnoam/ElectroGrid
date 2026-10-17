@@ -3,6 +3,7 @@ using DNExtensions.Systems.MenuSystem;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 /// <summary>
@@ -22,7 +23,9 @@ public class ControllerFocus : MonoBehaviour
     private readonly Dictionary<GameObject, bool> _hasOwnHighlight = new Dictionary<GameObject, bool>();
     private RectTransform _frame;
     private static InputActionMap _uiMap;
+    private static InputActionAsset _uiAsset;
     private static InputActionAsset _uiMapSource;
+    private static int _cancelConsumedFrame = -1;
 
     public static ControllerFocus Instance { get; private set; }
 
@@ -33,6 +36,18 @@ public class ControllerFocus : MonoBehaviour
     public static bool GamepadActive { get; private set; }
 
     public static FocusScope TopScope { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        ControllerActive = false;
+        GamepadActive = false;
+        TopScope = null;
+        _uiMap = null;
+        _uiAsset = null;
+        _uiMapSource = null;
+        _cancelConsumedFrame = -1;
+    }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Create()
@@ -57,11 +72,13 @@ public class ControllerFocus : MonoBehaviour
     private void Update()
     {
         DetectInputDevice();
+        DriveUiModule();
         TopScope = FindTopScope();
         if (ControllerActive && TopScope)
         {
-            KeepSelectionInScope();
-            if (CancelPressed()) PressCancel();
+            if (TopScope.ControlsGame) ClearSelection();
+            else KeepSelectionInScope();
+            if (CancelPressed() && _cancelConsumedFrame != Time.frameCount) PressCancel();
         }
 
         UpdateFrame();
@@ -101,7 +118,7 @@ public class ControllerFocus : MonoBehaviour
     {
         if (!_hasOwnHighlight.TryGetValue(selected, out bool own))
         {
-            own = selected.GetComponent<SelectableAnimator>();
+            own = selected.GetComponent<SelectableAnimator>() || selected.GetComponentInParent<TMPro.TMP_Dropdown>();
             _hasOwnHighlight[selected] = own;
         }
 
@@ -141,13 +158,15 @@ public class ControllerFocus : MonoBehaviour
             var asset = PlayerInput.all.Count > 0 ? PlayerInput.all[0].actions : null;
             if (_uiMap != null && asset == _uiMapSource) return _uiMap;
 
-            _uiMap?.Dispose();
-            _uiMap = null;
+            ReleaseUiMap();
             _uiMapSource = asset;
             var source = asset ? asset.FindActionMap(UiMapName) : null;
             if (source == null) return null;
 
             _uiMap = source.Clone();
+            _uiAsset = ScriptableObject.CreateInstance<InputActionAsset>();
+            _uiAsset.name = "UI (ControllerFocus)";
+            _uiAsset.AddActionMap(_uiMap);
             _uiMap.Enable();
             return _uiMap;
         }
@@ -163,8 +182,27 @@ public class ControllerFocus : MonoBehaviour
     {
         if (Instance != this) return;
 
-        _uiMap?.Dispose();
+        ReleaseUiMap();
+    }
+
+    private static void ReleaseUiMap()
+    {
+        _uiMap?.Disable();
+        if (_uiAsset) Destroy(_uiAsset);
+        _uiAsset = null;
         _uiMap = null;
+    }
+
+    /// <summary>
+    /// The EventSystem's input module reads the same UI map copy, so buttons answer to the game's own bindings (Space
+    /// selects too) and PlayerInput's scheme switches never cut off the mouse or touch.
+    /// </summary>
+    private static void DriveUiModule()
+    {
+        var module = EventSystem.current ? EventSystem.current.GetComponent<InputSystemUIInputModule>() : null;
+        if (!module || !_uiAsset || module.actionsAsset == _uiAsset) return;
+
+        module.actionsAsset = _uiAsset;
     }
 
     private void DetectInputDevice()
@@ -241,6 +279,18 @@ public class ControllerFocus : MonoBehaviour
         if (target) eventSystem.SetSelectedGameObject(target.gameObject);
     }
 
+    private static void ClearSelection()
+    {
+        var eventSystem = EventSystem.current;
+        if (eventSystem && eventSystem.currentSelectedGameObject) eventSystem.SetSelectedGameObject(null);
+    }
+
+    /// <summary>Keeps this frame's Cancel press from reaching the top scope, for game input that used it already.</summary>
+    public static void ConsumeCancel()
+    {
+        _cancelConsumedFrame = Time.frameCount;
+    }
+
     private static bool CancelPressed()
     {
         var cancel = FindUiAction("Cancel");
@@ -252,8 +302,20 @@ public class ControllerFocus : MonoBehaviour
     {
         if (!TopScope) return;
 
-        var button = TopScope.CancelButton;
+        foreach (var dropdown in TopScope.GetComponentsInChildren<TMPro.TMP_Dropdown>())
+        {
+            if (!dropdown.IsExpanded) continue;
+
+            dropdown.Hide();
+            if (EventSystem.current) EventSystem.current.SetSelectedGameObject(dropdown.gameObject);
+            return;
+        }
+
+        var button = GamepadActive ? TopScope.CancelButton : TopScope.KeyboardCancelButton;
         if (!button || !button.isActiveAndEnabled || !button.IsInteractable()) return;
+
+        var prompt = button.GetComponent<ButtonPrompt>();
+        if (prompt && prompt.HoldsAction("Cancel")) return;
 
         ExecuteEvents.Execute(button.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
     }

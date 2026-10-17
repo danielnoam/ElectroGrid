@@ -103,6 +103,7 @@ public class ComboBarUI : MonoBehaviour
 
         AudioLibrary.Play(stepSfx, Mathf.Min(maxPitch, 1f + pitchPerStep * (count - 1)));
         CameraManager.Instance?.ShakeCamera(Mathf.Min(maxShake, baseShake + shakePerStep * (count - 1)));
+        MobileHaptics.Play(Haptic.ComboStep, Mathf.Min(2f, 1f + 0.15f * (count - 1)));
     }
 
     private void OnFilled()
@@ -111,6 +112,7 @@ public class ComboBarUI : MonoBehaviour
         _shownFill = 1f;
         AudioLibrary.Play(filledSfx);
         CameraManager.Instance?.ShakeCamera(filledShake);
+        MobileHaptics.Play(Haptic.ComboFull);
     }
 
     private void OnReset(int reached)

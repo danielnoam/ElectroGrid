@@ -40,7 +40,7 @@ public class Match3TutorialUIElement : MonoBehaviour
             .Where(term => !string.IsNullOrWhiteSpace(term))
             .Distinct()
             .OrderByDescending(term => term.Length)
-            .Select(Regex.Escape)
+            .Select(term => $@"(?<!\w){Regex.Escape(term)}(?!\w)")
             .Append(@"\d+");
 
         string hex = ColorUtility.ToHtmlStringRGB(accentColor);

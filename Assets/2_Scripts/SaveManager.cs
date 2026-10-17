@@ -30,6 +30,7 @@ public class SettingsData
     public float musicVolume = 1f;
     public float sfxVolume = 1f;
     public bool hapticsEnabled = true;
+    public bool rumbleEnabled = true;
     public bool screenShakeEnabled = true;
     public bool highFrameRate;
     public bool tiltEnabled = true;
@@ -72,6 +73,7 @@ public class SaveManager : MonoBehaviour
     public IReadOnlyList<SurvivalRunRecord> SurvivalRuns => _data.survivalRuns;
 
     public bool HapticsEnabled => _data.settings.hapticsEnabled;
+    public bool RumbleEnabled => _data.settings.rumbleEnabled;
     public bool ScreenShakeEnabled => _data.settings.screenShakeEnabled;
 
     /// <summary>Raised when progress is wiped, so menus showing unlock state can rebuild.</summary>

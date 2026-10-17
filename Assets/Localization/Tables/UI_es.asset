@@ -317,7 +317,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776392
-    m_Localized: Un juego de Daniel noam
+    m_Localized: Un juego de Daniel Noam
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776393
@@ -470,6 +470,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141697
+  - m_Id: 3989722417324032
+    m_Localized: Fuentes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Localized: Mover
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Localized: Elegir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Localized: Extremos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Localized: "Men\xFA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Localized: "Vibraci\xF3n del mando"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Localized: Desbloqueado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Localized: Nueva pieza
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

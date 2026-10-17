@@ -129,7 +129,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1437589504
-    m_Localized: Item
+    m_Localized: Objekte
     m_Metadata:
       m_Items: []
   - m_Id: 1437589505
@@ -317,7 +317,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776392
-    m_Localized: Ein Spiel von Daniel noam
+    m_Localized: Ein Spiel von Daniel Noam
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776393
@@ -470,6 +470,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141699
+  - m_Id: 3989722417324032
+    m_Localized: Schriftarten
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Localized: Bewegen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Localized: "W\xE4hlen"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Localized: Reihenende
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Localized: Neustart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Localized: "Men\xFC"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Localized: Controller-Vibration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Localized: Freigeschaltet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Localized: Neues Teil
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

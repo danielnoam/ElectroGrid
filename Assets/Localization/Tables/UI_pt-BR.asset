@@ -317,7 +317,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776392
-    m_Localized: Um jogo de Daniel noam
+    m_Localized: Um jogo de Daniel Noam
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776393
@@ -470,6 +470,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141698
+  - m_Id: 3989722417324032
+    m_Localized: Fontes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Localized: Mover
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Localized: Escolher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Localized: Pontas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Localized: Reiniciar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Localized: Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Localized: "Vibra\xE7\xE3o do controle"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Localized: Desbloqueado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Localized: "Nova pe\xE7a"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

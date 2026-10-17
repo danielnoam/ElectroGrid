@@ -4,7 +4,6 @@ using UnityEngine;
 [SelectionBase]
 public class Match3MatchableObject : Match3SwappableObject
 {
-    private static readonly int EmissionMask = Shader.PropertyToID("_Emission_Mask");
 
     public override bool IsMatchable => true;
 
@@ -33,8 +32,11 @@ public class Match3MatchableObject : Match3SwappableObject
         poolableParticle.Play(transform.position);
     }
 
+    private Material _baseMaterial;
+
     private void UpdateEmissionMask(Texture2D emissionMask)
     {
-        itemRenderer.material.SetTexture(EmissionMask, emissionMask);
+        if (!_baseMaterial) _baseMaterial = itemRenderer.sharedMaterial;
+        itemRenderer.sharedMaterial = EmissionMaterials.Get(_baseMaterial, emissionMask);
     }
 }

@@ -484,8 +484,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Version x.y.z is out.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -735,8 +735,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Download size 0 MB.
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -766,7 +766,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1050,8 +1050,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1081,7 +1081,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 16
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -1445,8 +1445,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Update
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1476,7 +1476,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -1572,6 +1572,10 @@ PrefabInstance:
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_fontSize
       value: 72
+      objectReference: {fileID: 0}
+    - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
+      propertyPath: originalText
+      value: Later
       objectReference: {fileID: 0}
     - target: {fileID: 5302415877516245720, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_Name
@@ -1753,6 +1757,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
   actionName: Cancel
+  keyboardActionName: 
   corner: {x: 1, y: 1}
   offset: {x: -12, y: -12}
   size: 80
@@ -1951,7 +1956,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FocusScope
   firstSelected: {fileID: 1433598298882583311}
   cancelButton: {fileID: 3933415191472433618}
+  keyboardCancelButton: {fileID: 0}
   rememberSelection: 1
+  controlsGame: 0
 --- !u!114 &4201955513142720195 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9086118249103996676, guid: fd4d58116bfef0b449139fdaea723ddf, type: 3}

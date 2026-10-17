@@ -118,7 +118,7 @@ public class Match3ObstacleObject : Match3Object
             damageSequence.InsertCallback(destroyDuration * 0.5f, () =>
             {
                 RefreshHealthSprite();
-                MobileHaptics.Vibrate(30);
+                MobileHaptics.Play(Haptic.Hit);
                 CameraManager.Instance?.ShakeCamera(0.1f);
                 AudioLibrary.Play(destroySfx);
                 if (hitParticle)

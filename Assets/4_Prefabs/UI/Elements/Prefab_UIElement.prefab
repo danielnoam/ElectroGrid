@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 14
   m_fontSizeMax: 75
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -209,8 +209,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Moves Left:'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -240,7 +240,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 14
   m_fontSizeMax: 75
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 4
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -351,8 +351,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: /0
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -382,7 +382,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 14
   m_fontSizeMax: 75
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -479,7 +479,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4dec48b7206439d975b8759920a3eeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Match3UIElement
-  image: {fileID: 0}
   progressText: {fileID: 7788117495133503406}
   progressCount: {fileID: 4606325421490924872}
   amountCount: {fileID: 3987839520088464318}
@@ -521,3 +520,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93c67af693727604b97de7ca78ff76c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RtlMirrorIgnore
+  mirrorSelf: 0

@@ -67,8 +67,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Tutorial Title
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
-  m_sharedMaterial: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  m_sharedMaterial: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 14
   m_fontSizeMax: 77
-  m_fontStyle: 1
+  m_fontStyle: 17
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -489,3 +489,4 @@ MonoBehaviour:
   image: {fileID: 1319470883755994977}
   titleText: {fileID: 7788117495133503406}
   descriptionText: {fileID: 1679975187762100677}
+  accentColor: {r: 1, g: 0.031, b: 0.38, a: 1}

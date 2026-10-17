@@ -40,6 +40,17 @@ rework, since it changes how every level plays.
       the full bar (numbers playtested 2026-10-11). In Survival a full bar adds
       uncapped time (`SurvivalMode`).
 
+- [ ] **Plus: rainbow look, and maybe a wildcard rule.**
+      - **Rainbow effect** on the Plus so it's clear it can be moved: it cycles
+        through the colours of the matchable pieces in play (the level's piece
+        colours, not a fixed rainbow).
+      - **Idea to decide: Plus as a wildcard.** Today a Plus is cleared by a match
+        next to it (or a line break). Instead it would count as any piece: swap it
+        into a line and it completes the match for whatever colour is there, and it
+        has to be used that way. Changes the Info card text in all 7 languages, the
+        bot, and level balance (levels that relied on Plus clearing by adjacency),
+        so decide before the level curve rework.
+
 - [ ] **New-mechanic visuals, what is left.** Shaders for glitches (`Glitch.shader`),
       fuse rings (`FuseRing.shader`) and conveyor belts (`ConveyorBelt.shader`),
       a real virus sprite with a glow mask, spread and glitch-clear particles are
@@ -68,14 +79,10 @@ rework, since it changes how every level plays.
       score and what it unlocks (a piece, viruses, fuses, Plugs or Double
       Stars). Set now: Stars at 0, Diamond 25,000, viruses 40,000, Trapezoid
       60,000, fuses 75,000 (a blown fuse ends the run). Thresholds need a
-      playtest on the phone. Numbers playtested 2026-10-11. Still to do: a
-      pop-in when a milestone unlocks (`MilestoneReached` is already raised),
-      and a Steam leaderboard later (section 5). The best score already shows
+      playtest on the phone. Numbers playtested 2026-10-11. The milestone
+      banner is in (see DONE.md). Still to do: a Steam leaderboard later
+      (section 5). The best score already shows
       on the main menu Survival button.
-
-- [ ] **Controller gameplay.** Menus and windows already work with a gamepad
-      (see DONE.md). Still to do: playing the board with a controller (moving a
-      cursor over the board and swapping pieces), and rumble tuned per event.
 
 - [ ] **Spark power-up.** An L or T match leaves a Spark that clears a 3x3
       area when matched or swapped. Surge is done (see DONE.md); the Drone
@@ -120,24 +127,16 @@ Everything a store page and a paying audience can hold against the game.
       Windows exe icon, and later the Steam and itch.io capsules) with one that
       fits the neon ElectroGrid look and reads at small sizes.
 
-- [ ] **License check for everything shipped.** Go through every asset,
-      plugin, package, font, sound, music track and shader the build uses and
-      confirm its license allows a commercial release (selling, or a free game
-      with store distribution) and what attribution it requires. Keep a list
-      (name, source, license, link) in the repo, and remove or replace
-      anything that is unclear.
-
-- [ ] **Credits complete.** Every entry from the license check that asks for
-      attribution is in the Credits screen, plus Unity and Firebase notices
-      where their terms ask for them.
-
-- [ ] **Localization pass.** Check every word and sentence in every language:
-      menus, objectives, Info cards, tutorials, Survival rules, settings, the
-      results screens and the update prompt. Look for wrong or literal
-      translations, text that overflows or is cut off, and RTL layout in Hebrew
-      and Arabic. As part of it, look at how other games handle credits: whether
-      they translate the headings (usually yes) and keep names and license
-      notices in their original form (usually yes), and do the same.
+- [ ] **Find new fonts for both the UI text and the titles.** Share Tech Mono
+      replaced DS-Digital for licence reasons, but it isn't the look we want:
+      find a better free (or bought) font for the UI text. Abduction2002 (logo,
+      window titles, settings labels) has no commercial licence, so it needs a
+      replacement too, one that keeps the logo's striped neon feel. Options tried
+      so far are in [IDEAS.md](IDEAS.md); every candidate must cover the accents
+      of Spanish, Portuguese, German and French (see [LICENSES.md](LICENSES.md)).
+      Also move the unused TextMesh Pro example fonts out of their `Resources`
+      folder so they stop shipping, and confirm the sprites and shaders are own
+      work.
 
 ---
 
@@ -148,18 +147,24 @@ Everything a store page and a paying audience can hold against the game.
       Dropping quality to 0.5-0.7 would roughly halve the build size and is
       normally transparent for game music, but A/B it by ear before changing it.
 
-- [ ] **Performance pass.** Do it together with the music quality pass:
-      - **Sprite atlases.** Only the small shape masks are in one
-        (`SmallShapes.spriteatlasv2`). Pack the piece, Star, obstacle and UI
-        sprites too so the board batches into fewer draw calls. Check first
-        that the custom-material sprites (glitch, fuse ring, conveyor) still
-        work when packed.
-      - **Shaders.** Review the glitch, fuse ring and conveyor shaders for
-        mobile cost (overdraw from the additive ones, per-pixel noise), and use
-        shared materials with property blocks everywhere.
-      - **Pooling.** Find anything still created and destroyed at runtime that
-        happens often enough to matter, and pool it. Check with the Profiler on
-        a phone, not just in the editor.
+- [ ] **Performance, what is left** (measured in the editor on 2026-10-16, see
+      DONE.md for what was done). A level draws about 300 sprites: 128 background
+      grid tiles, 70 board tiles and 71 pieces. With the SRP Batcher that is only
+      about 30 SetPass calls, so the draw count is cheap, and only a phone Profiler
+      run can say whether it matters. In order:
+      - **Profile on a phone** (a low-end Android): frame time in a busy level, a
+        line break and the win sweep, and GC allocations per frame.
+      - **The background grid** is the biggest group (128 sprites in a level, more
+        on the menu). If the phone shows draw cost, draw it as one tiled sprite or
+        a shader, keeping its pulse effects.
+      - **Sprite atlases**: no gain in the editor. A UI atlas was tried and moved
+        the draw count by 1 to 3, so it was dropped. Pieces can't be packed as they
+        are: their emission masks are separate textures that line up with the
+        sprite's own UVs, and packing moves those UVs. Packing them needs the masks
+        turned into sprite secondary textures first.
+      - **Property blocks** are used on fuse rings, glitch overlays and conveyors.
+        In URP they take a renderer out of the SRP Batcher, which is fine for the
+        handful there are, but don't add them to pieces or tiles.
 
 ---
 

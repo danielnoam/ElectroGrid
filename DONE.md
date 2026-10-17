@@ -1038,3 +1038,183 @@ of as a new blob per edit.
       keyboard bindings), and each prompt shows the icon of its action’s current
       binding. Changing a binding in the asset changes both the button and the icon.
 
+## Controller gameplay and rumble per moment (after 1.11.0)
+
+- [x] **Playing the board with a controller** (`Match3BoardCursor`, on Match3Manager).
+      While a gamepad or the keyboard is in use, a white frame sits on the board: the
+      d-pad, either stick, arrows or WASD move it (holding repeats, holes in the
+      board's shape are stepped over), LB and RB (Q and E) jump to the ends of the
+      row, A or Enter picks up the piece under it, and a
+      direction swaps it with that neighbour. A again or B puts it back; B with
+      nothing held still opens Settings. The frame dims while the board resolves and
+      hides as soon as the mouse or touch is used. The level's top bar scope is set to
+      **Controls Game** (new `FocusScope` option), so nothing is selected there and its
+      buttons stay on their prompts. All numbers are on the component.
+- [x] **Rumble tuned per moment** (`MobileHaptics.Play(Haptic)`): Pop, Hit, Collect,
+      ComboStep (stronger as the combo grows), ComboFull, LineBreak, SurgeMade, Surge,
+      FuseBlown, Win and Lose each have their own motor mix and length, and repeats
+      within a few frames play once. Phones keep exactly the vibrations they had;
+      the new moments only rumble on a gamepad.
+- [x] **Agent commands** `eg_cursor`, `eg_cursor_move`, `eg_cursor_press`,
+      `eg_cursor_back`, `eg_cursor_goto`, and a Board row in the Match3 Debug
+      window's Controller section.
+
+## License check and credits (after 1.11.0)
+
+- [x] **Everything that ships was checked** (worked out from the build's
+      dependencies, not the folder list) and written up in `LICENSES.md`. Two fonts
+      are still open (see TODO).
+- [x] **Credits fixed and completed.** The Shooter Synthwave tracks are credited
+      to alkakrab (they were under Alpine Audio by mistake), AD Sounds is credited
+      as Alan Dalcastagne (AD Sounds) as the author asks, and Kenney's Input
+      Prompts and Firebase were added, plus a new Fonts group (Abduction2002,
+      DS-Digital, Noto Sans, Roboto, Anton) with a `credits.fonts` key in all 7
+      languages. The Free UI Soundpack entry was removed because none of its
+      sounds ship.
+
+## Localization pass (after 1.11.0)
+
+- [x] **Every string checked in all 7 languages**: none missing, placeholders and
+      smart flags match English. Fixed: German item fallback (Objekte), Arabic using
+      المستوى in two places where the rest says المرحلة, Hebrew Start in the
+      singular (now התחילו), Hebrew Plus and Surge cards saying "move" instead of
+      "swap", the Spanish and Arabic combo card wording, Arabic credits title
+      (شكر وتقدير), and "Daniel Noam" capitalised.
+- [x] **Every screen photographed at phone size in all 7 languages** (main menu,
+      level select, Survival, Settings, Info, Credits, a level, the intro card, win,
+      lose, the Survival HUD and results). Fixed:
+      - The level select title was wider than the screen and cut off in English,
+        Spanish and Portuguese (its width was the parent plus 965). The Survival
+        title had the same layout.
+      - Info cards coloured the French word "plus" as if it were the Plus piece.
+        Highlights now only match whole words, and the two French cards say
+        "au moins".
+      - Survival's Runs Played turned its number into an Arabic-Indic digit in
+        Hebrew and Arabic. Seven RTL labels in Main had Preserve Numbers off.
+      - The Arabic win and lose titles put the "!" between the word and the level
+        number. They now put the level first.
+      - Survival results showed scores without thousands separators.
+      - The German credits group title wrapped a letter onto a second line. Group
+        titles now shrink to fit.
+      - The update window wasn't photographed (it needs a real update to open).
+        Its strings were checked as text.
+
+## Performance pass, editor part (after 1.11.0)
+
+- [x] **Pieces share materials.** Pieces, Plugs and viruses used to call
+      `renderer.material` to set their emission mask, which gave every pooled piece
+      its own material copy. `EmissionMaterials` now keeps one material per base
+      material and mask: a level went from one material per piece to 8 in total.
+- [x] **The level select preview is pooled.** It created and destroyed a GameObject
+      per cell (up to about 100) on every level tap. It now reuses its tiles.
+- [x] **Checked and left alone**: the glitch, fuse ring and conveyor shaders are a
+      few math ops and one texture read each, and all three are SRP Batcher
+      compatible. Everything spawned during play (pieces, tiles, particles, bursts)
+      already goes through ObjectPooler. What's left is in TODO.
+
+## Keyboard keys and level select fix (after 1.11.0)
+
+- [x] **Space and Enter select, Escape goes home in a level.** Space moved from
+      Primary to Submit, so on the keyboard both keys press the selected button and
+      pick up or put back a board piece. In a level, Escape presses Home (new
+      `FocusScope` option, Keyboard Cancel Button) and the Home badge shows Esc
+      (new `ButtonPrompt` option, Keyboard Action Name). With a piece held, Escape
+      puts it back first. B on a gamepad still opens Settings. Prompts with no key
+      on the device in use now hide instead of showing "?".
+- [x] **Level select drew its board preview twice the first time it opened.**
+      The screen's first `Start` drew it, then the end of the show animation drew
+      it again. It now only draws once the screen is shown.
+
+## Controls bar in levels (after 1.11.0)
+
+- [x] **A bar of the board controls along the bottom of a level** (`ControlHintsBar`
+      on Match3UIManager): Move, Select, Row Ends, Restart and Menu, each with
+      the icon of its key or button for the device in use (arrows, Space, Q and E,
+      R, Tab on the keyboard; d-pad, A, LB and RB, View, Menu on a gamepad). It
+      slides up while a gamepad or the keyboard is in use and the board has the
+      input, and slides away on mouse or touch, or when a window opens. Labels
+      are in all 7 languages (`controls.*`); right-to-left languages reverse the
+      order but keep Q to the left of E. New icons: d-pad (Xbox, PlayStation) and
+      arrow keys from Kenney's pack. `eg_ui` reports whether it is shown.
+
+## Share Tech Mono replaces DS-Digital (after 1.11.0)
+
+- [x] **Every DS-Digital text now uses Share Tech Mono** (OFL, in
+      `Assets/Plugins/Fonts/ShareTechMono`), drawn in capitals so it reads like
+      DS-Digital did. Swapped in 7 prefabs and both scenes; nothing references
+      DS-Digital any more, so it no longer ships. Credits, LICENSES.md and TODO are
+      updated, and the other fonts that were tried are listed in IDEAS.md.
+- [x] **Controls bar bigger and steadier**: larger icons and capital labels,
+      shrinks to fit when a language runs long, and stays up while pieces fall. It
+      only slides away on mouse or touch, or when the level ends.
+
+## Main menu keys, Space in every menu, RULES.md (after 1.11.0)
+
+- [x] **Main menu Credits and Quit have their own keys**: Credits is View / C (new
+      Credits action), Quit is B / Escape (the main menu's back button), each with a
+      badge.
+- [x] **Space selects in every menu, not just the board.** The EventSystem's input
+      module used Unity's default UI actions, which only know Enter. `ControllerFocus`
+      now hands the module its own copy of the game's UI map, so every binding in
+      `InputSystem_Actions` drives the menus too, and PlayerInput switching to the
+      Gamepad scheme can no longer cut off mouse or touch. Checked: Space starts
+      Continue, C opens Credits, Escape closes it, a mouse click still opens Levels.
+- [x] **RULES.md**: the definition of done for every change (every control, all 7
+      languages, Info cards for new mechanics, TODO to DONE, licences). CLAUDE.md
+      keeps only how to drive the editor and points to it.
+
+## Settings dropdown, Rumble option, level list scrolling (after 1.11.0)
+
+- [x] **Language is a dropdown in Settings** (each language in its own name),
+      reachable with a controller; B closes the open list before it closes the
+      window. The pseudo-language is left out of the list: its circled digits
+      were what caused the "character ⑨ was not found" warnings.
+- [x] **Rumble option in Settings**, separate from Haptics: Haptics is the phone's
+      vibration, Rumble the gamepad's. Shown on PC, and on phones only while a
+      gamepad is connected. Label in all 7 languages (`settings.rumble`).
+- [x] **Level select: the right stick scrolls the list** (Page Up and Page Down on
+      the keyboard, new Scroll action); the left stick and d-pad still move the
+      selection. The right stick no longer moves selections anywhere.
+- [x] **Controls bar** shows only Move, Select and Row Ends.
+- [x] **Credits**: more space between Assets and Plugins.
+
+## Glitch fix and Survival milestone banner (after 1.11.0)
+
+- [x] **Glitch effect showed only its outline after a while.** The shader's random
+      numbers came from `sin` of a value that grows with time, which loses
+      precision once the game (or the editor) has run a long time, so the moving
+      blocks and band shifts stopped and only the frame was left. It now uses a
+      hash without `sin` and wraps the time. The fuse ring flicker and conveyor
+      scroll got the same time wrap.
+- [x] **Survival milestone banner** (`SurvivalMilestonePopup` on Match3UIManager):
+      when a run reaches a milestone, a banner drops in under the top bar with the
+      new piece (its sprite and name) or the obstacle (viruses, fuses, Plugs,
+      Stars), with a sound, rumble and a small shake. Milestones reached together
+      queue up. Text in all 7 languages (`survival.unlock`, `survival.unlock.piece`).
+      Agent command `eg_milestone`, and buttons in the Match3 Debug window's
+      Survival section.
+- [x] **Controller state resets with each play session** in the editor (domain
+      reload is off, so a gamepad from the last session used to stay "active").
+- [x] **`eg_errors` shows where each error came from** (the first stack line).
+
+## Hold to quit or restart, dropdown fixes, Selectable error (after 1.11.0)
+
+- [x] **Quit and Restart need a 1.5s hold on keyboard and controller** (main menu
+      Quit, the level's Home and Restart). The badge fills as the key is held and
+      the button presses when it is full; letting go early cancels. Mouse and touch
+      press as before. `ButtonPrompt` has a new Hold Seconds setting, and
+      `ControllerFocus` leaves a held Cancel to the prompt.
+- [x] **Language dropdown**: the list now opens upward so it stays on screen, and
+      the button shows the chosen language (it had lost its label when it was built
+      from the old button).
+- [x] **Controls bar hides while Settings or Info is open.**
+- [x] **"IndexOutOfRangeException in Selectable.OnDisable" fixed** (editor only).
+      uGUI's static list of selectables drifted out of step with the indexes the
+      selectables hold (domain reload off plus scenes opened by tools), so closing a
+      scene threw. `SelectableRegistryRepair` rebuilds the list from the enabled
+      selectables before a scene closes and around play mode. Checked over three
+      recompile-and-play rounds: no errors (it failed every round before).
+- [x] **Language list restyled** to match the game: white button-style items with
+      dark text in a dark panel with the window's white frame, the current language
+      outlined in pink, and the highlighted one tinted pink. All 7 fit without
+      scrolling, and the controller frame no longer draws a second box inside it.

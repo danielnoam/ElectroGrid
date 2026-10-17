@@ -23,7 +23,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 833609728
-    m_Localized: "\xC9change des pi\xE8ces voisines pour aligner 3 formes identiques ou plus sur une ligne ou une colonne."
+    m_Localized: "\xC9change des pi\xE8ces voisines pour aligner au moins 3 formes identiques sur une ligne ou une colonne."
     m_Metadata:
       m_Items: []
   - m_Id: 837804032
@@ -39,7 +39,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 837804035
-    m_Localized: "Aligne 4 pi\xE8ces ou plus sur une ligne ou une colonne pour d\xE9truire toute la ligne."
+    m_Localized: "Aligne au moins 4 pi\xE8ces sur une ligne ou une colonne pour d\xE9truire toute la ligne."
     m_Metadata:
       m_Items: []
   - m_Id: 837804036

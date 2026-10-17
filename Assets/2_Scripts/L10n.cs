@@ -23,6 +23,12 @@ public static class L10n
         return LocalizationSettings.StringDatabase.GetLocalizedString(Table, key, Locale);
     }
 
+    /// <summary>A string from the Content table (Info cards, item names).</summary>
+    public static string GetContent(string key)
+    {
+        return LocalizationSettings.StringDatabase.GetLocalizedString(ContentTable, key, Locale);
+    }
+
     /// <summary>Resolves a LocalizedString field on an asset, with the same editor fallback as the key lookups.</summary>
     public static string Get(LocalizedString text)
     {
@@ -58,10 +64,30 @@ public static class L10n
         if (locales.Count < 2) return;
 
         int next = (locales.IndexOf(LocalizationSettings.SelectedLocale) + 1) % locales.Count;
-        LocalizationSettings.SelectedLocale = locales[next];
+        SetLanguage(locales[next]);
+    }
+
+    /// <summary>Switches to a language and remembers it in the save.</summary>
+    public static void SetLanguage(Locale locale)
+    {
+        if (!locale) return;
+
+        LocalizationSettings.SelectedLocale = locale;
 
         // The pseudo-locale shares English's code, so it is never saved; a relaunch comes back in English
-        if (SaveManager.Instance && locales[next] is not PseudoLocale) SaveManager.Instance.Settings.language = locales[next].Identifier.Code;
+        if (SaveManager.Instance && locale is not PseudoLocale) SaveManager.Instance.Settings.language = locale.Identifier.Code;
+    }
+
+    /// <summary>The languages a player can pick: every available one except the pseudo-locale.</summary>
+    public static List<Locale> PlayerLanguages()
+    {
+        var list = new List<Locale>();
+        foreach (var locale in LocalizationSettings.AvailableLocales.Locales)
+        {
+            if (locale is not PseudoLocale) list.Add(locale);
+        }
+
+        return list;
     }
 
     /// <summary>The language's own name for itself, "Deutsch" rather than "German", so a player can find it in any language.</summary>

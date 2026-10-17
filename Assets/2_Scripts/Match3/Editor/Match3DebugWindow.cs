@@ -84,6 +84,17 @@ public class Match3DebugWindow : EditorWindow
             Run("Add", () => Match3DebugActions.AddSurvivalScore(_score), 60);
         }
 
+        Section("Survival");
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            EditorGUILayout.LabelField("Milestone banner", GUILayout.Width(110));
+            for (int i = 0; i < 6; i++)
+            {
+                int index = i;
+                Run(index.ToString(), () => Match3DebugActions.PreviewMilestone(index));
+            }
+        }
+
         Section("Spawn");
         using (new EditorGUILayout.HorizontalScope())
         {
@@ -111,6 +122,26 @@ public class Match3DebugWindow : EditorWindow
             Run("Submit", Match3DebugActions.UiSubmit);
             Run("Back", Match3DebugActions.UiCancel);
             Run("Focus", Match3DebugActions.UiStatus);
+        }
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            EditorGUILayout.LabelField("Open", GUILayout.Width(40));
+            Run("Settings", () => Match3DebugActions.OpenWindow("settings"));
+            Run("Info", () => Match3DebugActions.OpenWindow("info"));
+            Run("Credits", () => Match3DebugActions.OpenWindow("credits"));
+            Run("Close", () => Match3DebugActions.OpenWindow("close"));
+        }
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            EditorGUILayout.LabelField("Board", GUILayout.Width(40));
+            Run("Up", () => Match3DebugActions.CursorMove("up"));
+            Run("Down", () => Match3DebugActions.CursorMove("down"));
+            Run("Left", () => Match3DebugActions.CursorMove("left"));
+            Run("Right", () => Match3DebugActions.CursorMove("right"));
+            Run("LB", () => Match3DebugActions.CursorMove("lb"));
+            Run("RB", () => Match3DebugActions.CursorMove("rb"));
+            Run("A", Match3DebugActions.CursorPress);
+            Run("B", Match3DebugActions.CursorBack);
         }
 
         Section("Checks");

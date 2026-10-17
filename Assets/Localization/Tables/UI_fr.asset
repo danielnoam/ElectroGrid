@@ -317,7 +317,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776392
-    m_Localized: Un jeu de Daniel noam
+    m_Localized: Un jeu de Daniel Noam
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776393
@@ -470,6 +470,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841009418141700
+  - m_Id: 3989722417324032
+    m_Localized: Polices
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Localized: Bouger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Localized: Choisir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Localized: Bords
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Localized: Rejouer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Localized: Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Localized: Vibrations manette
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Localized: "D\xE9bloqu\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Localized: "Nouvelle pi\xE8ce"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

@@ -116,7 +116,7 @@ public abstract class Match3Object : MonoBehaviour, IPoolable
         destroySequence.Group(Tween.Scale(transform, _baseScale * destroyScaleMultiplier, destroyDuration, Ease.OutBack));
         destroySequence.InsertCallback(destroyDuration * 0.5f, () =>
         {
-            MobileHaptics.Vibrate(50);
+            MobileHaptics.Play(Haptic.Pop);
             CameraManager.Instance?.ShakeCamera(0.2f);
             AudioLibrary.Play(destroySfx);
 

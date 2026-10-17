@@ -15,8 +15,12 @@ public class FocusScope : MonoBehaviour
     [SerializeField] private Selectable firstSelected;
     [Tooltip("Pressed by Cancel (B on a gamepad, Escape on a keyboard). Empty means Cancel does nothing here")]
     [SerializeField] private Button cancelButton;
+    [Tooltip("Pressed by Escape instead of the cancel button while the keyboard is in use. Empty uses the cancel button")]
+    [SerializeField] private Button keyboardCancelButton;
     [Tooltip("Coming back to this scope selects what was selected last, rather than the first selectable")]
     [SerializeField] private bool rememberSelection = true;
+    [Tooltip("Nothing is selected while this scope is on top: directions and Submit go to the game (the board cursor), and the buttons are reached through their Button Prompts")]
+    [SerializeField] private bool controlsGame;
 
     private static readonly List<FocusScope> Scopes = new List<FocusScope>();
     private readonly List<CanvasGroup> _groups = new List<CanvasGroup>();
@@ -26,7 +30,9 @@ public class FocusScope : MonoBehaviour
     public static IReadOnlyList<FocusScope> All => Scopes;
     public float OpenedAt { get; private set; }
     public Button CancelButton => cancelButton;
+    public Button KeyboardCancelButton => keyboardCancelButton ? keyboardCancelButton : cancelButton;
     public bool IsOpen { get; private set; }
+    public bool ControlsGame => controlsGame;
 
     public Selectable FirstSelected
     {

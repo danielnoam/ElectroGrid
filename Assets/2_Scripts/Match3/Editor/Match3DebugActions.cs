@@ -34,7 +34,8 @@ internal static class Match3DebugActions
 
         lock (Errors)
         {
-            Errors.Add($"{type}: {message.Split('\n')[0]}");
+            string where = (stackTrace ?? "").Split('\n').FirstOrDefault(line => line.Contains("(at ")) ?? "";
+            Errors.Add($"{type}: {message.Split('\n')[0]}" + (where.Length > 0 ? $" [{where.Trim()}]" : ""));
             if (Errors.Count > 200) Errors.RemoveAt(0);
         }
     }
@@ -85,13 +86,15 @@ internal static class Match3DebugActions
         string opened = scene.path == Match3Scene ? "Match3 already open" : scene.isDirty ? $"{scene.name} has unsaved changes, left open" : "opened Match3";
         if (scene.path != Match3Scene && !scene.isDirty) EditorSceneManager.OpenScene(Match3Scene);
 
-        SetGameView(1080, 1920);
+        string view = SetGameView(1080, 1920);
         PlayerSettings.runInBackground = false;
-        return $"Restored: {opened}, Game view 1080x1920, run in background off.";
+        return $"Restored: {opened}, {view} Run in background off.";
     }
 
     public static string SetGameView(int width, int height)
     {
+        if (PlayModeWindow.GetViewType() == PlayModeWindow.PlayModeViewTypes.SimulatorView) return "The play window is the Simulator, left on its device size.";
+
         PlayModeWindow.SetCustomRenderingResolution((uint)width, (uint)height, $"{width}x{height}");
         PlayModeWindow.GetRenderingResolution(out uint w, out uint h);
         if (w != width || h != height) return $"Could not set {width}x{height}: the play window is {w}x{h}, probably the Simulator, which only takes its device sizes.";
@@ -408,13 +411,131 @@ internal static class Match3DebugActions
 
     #region Controller
 
+    /// <summary>Opens a window on the current scene: settings, info or credits. Close shuts every open one.</summary>
+    public static string OpenWindow(string name)
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        switch ((name ?? "").ToLowerInvariant())
+        {
+            case "settings":
+                var settings = Object.FindAnyObjectByType<SettingsWindowUI>();
+                if (!settings) return "No settings window in this scene.";
+                settings.Show();
+                return "Opened settings.";
+            case "info":
+                var info = Object.FindAnyObjectByType<InformationWindowUI>();
+                if (!info) return "No information window in this scene.";
+                info.ShowAllTutorials();
+                return "Opened information.";
+            case "credits":
+                var credits = Object.FindAnyObjectByType<CreditsWindowUI>();
+                if (!credits) return "No credits window here (it lives on the main menu).";
+                credits.Show();
+                return "Opened credits.";
+            case "close":
+                foreach (var s in Object.FindObjectsByType<SettingsWindowUI>(FindObjectsSortMode.None)) s.Toggle(false);
+                foreach (var i in Object.FindObjectsByType<InformationWindowUI>(FindObjectsSortMode.None)) i.Toggle(false);
+                foreach (var c in Object.FindObjectsByType<CreditsWindowUI>(FindObjectsSortMode.None)) c.Toggle(false);
+                return "Closed windows.";
+            default:
+                return "Use settings, info, credits or close.";
+        }
+    }
+
+    /// <summary>Shows the Survival milestone banner for one of the Survival Mode milestones (0 is the first), in play mode.</summary>
+    public static string PreviewMilestone(int index)
+    {
+        if (!EditorApplication.isPlaying) return NotInLevel;
+
+        var popup = Object.FindAnyObjectByType<SurvivalMilestonePopup>();
+        if (!popup) return "No milestone banner in this scene (it lives in the level scene).";
+
+        var mode = AssetDatabase.LoadAssetAtPath<SOSurvivalMode>("Assets/3_Data/Survival/SurvivalMode.asset");
+        if (!mode || mode.Milestones.Count == 0) return "Survival Mode has no milestones.";
+        if (index < 0 || index >= mode.Milestones.Count) return $"Use 0 to {mode.Milestones.Count - 1}.";
+
+        var milestone = mode.Milestones[index];
+        popup.Preview(milestone);
+        return $"Showing milestone {index}: {milestone.unlock}{(milestone.piece ? " " + milestone.piece.name : "")} at {milestone.score}.";
+    }
+
+    private static Match3BoardCursor Cursor => EditorApplication.isPlaying ? Object.FindAnyObjectByType<Match3BoardCursor>() : null;
+
+    public static string CursorStatus()
+    {
+        var cursor = Cursor;
+        if (!cursor) return NotInLevel;
+
+        var play = Object.FindAnyObjectByType<Match3PlayHandler>();
+        return $"shown={cursor.Shown} cell={cursor.Cell.x},{cursor.Cell.y} holding={(play && play.IsHolding)} input={(play && play.AcceptsInput)} scope={(ControllerFocus.TopScope ? ControllerFocus.TopScope.name : "none")}";
+    }
+
+    /// <summary>A direction on the board, as the d-pad does in a level: moves the cursor, or swaps a held piece.</summary>
+    public static string CursorMove(string direction)
+    {
+        var cursor = Cursor;
+        if (!cursor) return NotInLevel;
+
+        Vector2Int step = (direction ?? "").ToLowerInvariant() switch
+        {
+            "up" => Vector2Int.up,
+            "down" => Vector2Int.down,
+            "left" => Vector2Int.left,
+            "right" => Vector2Int.right,
+            _ => Vector2Int.zero
+        };
+        var edge = (direction ?? "").ToLowerInvariant() switch { "lb" => -1, "rb" => 1, _ => 0 };
+        if (step == Vector2Int.zero && edge == 0) return "Use up, down, left, right, lb or rb.";
+        if (!cursor.Shown) return "The cursor is hidden: use a gamepad first (eg_ui_device gamepad). " + CursorStatus();
+
+        if (edge != 0)
+        {
+            cursor.JumpToEdge(edge);
+            return CursorStatus();
+        }
+
+        cursor.Step(step);
+        return CursorStatus();
+    }
+
+    /// <summary>Picks up the piece under the cursor, or puts the held one back, as A does in a level.</summary>
+    public static string CursorPress()
+    {
+        var cursor = Cursor;
+        if (!cursor) return NotInLevel;
+        if (!cursor.Shown) return "The cursor is hidden: use a gamepad first (eg_ui_device gamepad). " + CursorStatus();
+
+        cursor.Submit();
+        return CursorStatus();
+    }
+
+    public static string CursorBack()
+    {
+        var cursor = Cursor;
+        if (!cursor) return NotInLevel;
+
+        return (cursor.Back() ? "Put the piece back. " : "Nothing held. ") + CursorStatus();
+    }
+
+    /// <summary>Puts the cursor on a cell (x, y with row 0 at the bottom).</summary>
+    public static string CursorGoto(int x, int y)
+    {
+        var cursor = Cursor;
+        if (!cursor) return NotInLevel;
+
+        cursor.MoveTo(new Vector2Int(x, y));
+        return CursorStatus();
+    }
+
     public static string UiStatus()
     {
         if (!EditorApplication.isPlaying) return NotInLevel;
 
         var selected = EventSystem.current ? EventSystem.current.currentSelectedGameObject : null;
         var top = ControllerFocus.TopScope;
-        return $"controller={ControllerFocus.ControllerActive} gamepad={ControllerFocus.GamepadActive} scope={(top ? top.name : "none")} selected={(selected ? selected.name + " (" + selected.transform.parent.name + ")" : "none")}";
+        var hints = Object.FindAnyObjectByType<ControlHintsBar>();
+        return $"controller={ControllerFocus.ControllerActive} gamepad={ControllerFocus.GamepadActive} scope={(top ? top.name : "none")} selected={(selected ? selected.name + " (" + selected.transform.parent.name + ")" : "none")}" + (hints ? $" controlsBar={(hints.Shown ? "shown" : "hidden")}" : "");
     }
 
     /// <summary>Moves the controller selection one step: up, down, left or right.</summary>

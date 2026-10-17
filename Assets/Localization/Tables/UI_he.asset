@@ -317,7 +317,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776392
-    m_Localized: "\u05DE\u05E9\u05D7\u05E7 \u05DE\u05D0\u05EA Daniel noam"
+    m_Localized: "\u05DE\u05E9\u05D7\u05E7 \u05DE\u05D0\u05EA Daniel Noam"
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776393
@@ -341,7 +341,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776398
-    m_Localized: "\u05D4\u05EA\u05D7\u05DC"
+    m_Localized: "\u05D4\u05EA\u05D7\u05D9\u05DC\u05D5"
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776399
@@ -470,6 +470,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841020651274370
+  - m_Id: 3989722417324032
+    m_Localized: "\u05D2\u05D5\u05E4\u05E0\u05D9\u05DD"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Localized: "\u05D4\u05D6\u05D6\u05D4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Localized: "\u05D1\u05D7\u05D9\u05E8\u05D4"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Localized: "\u05E7\u05E6\u05D5\u05D5\u05EA"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Localized: "\u05D4\u05EA\u05D7\u05DC\u05D4 \u05DE\u05D7\u05D3\u05E9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Localized: "\u05EA\u05E4\u05E8\u05D9\u05D8"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Localized: "\u05E8\u05D8\u05D8 \u05D1\u05E9\u05DC\u05D8"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Localized: "\u05E0\u05E4\u05EA\u05D7"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Localized: "\u05D7\u05DC\u05E7 \u05D7\u05D3\u05E9"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

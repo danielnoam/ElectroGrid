@@ -69,7 +69,7 @@ Shader "ElectroGrid/FuseRing"
 
                 float sparkAngle = _Fill * 2.0 * PI;
                 float2 sparkPos = float2(sin(sparkAngle), cos(sparkAngle)) * _Radius;
-                float flicker = 0.7 + 0.3 * sin(_Time.y * 40.0);
+                float flicker = 0.7 + 0.3 * sin(frac(_Time.y * 6.36620) * 6.28318);
                 float spark = (1.0 - smoothstep(0.0, _Thickness * 1.8, length(p - sparkPos))) * flicker * step(0.001, _Fill);
 
                 float3 color = _Color.rgb * ring * (lit + (1.0 - lit) * _TrackAlpha) + _SparkColor.rgb * spark;

@@ -64,7 +64,7 @@ Shader "ElectroGrid/ConveyorBelt"
                 float2 uv = input.uv;
                 float rails = step(uv.y, 0.035) + step(0.965, uv.y);
 
-                float x = uv.x * _Cells * _ChevronsPerCell - _Time.y * _Speed * _ChevronsPerCell * _Direction;
+                float x = uv.x * _Cells * _ChevronsPerCell - fmod(_Time.y, 3600.0) * _Speed * _ChevronsPerCell * _Direction;
                 float local = frac(x);
                 float y = abs(uv.y - 0.5);
                 float chevronX = _Direction > 0 ? local + y : (1.0 - local) + y;

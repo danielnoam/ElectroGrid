@@ -56,7 +56,9 @@ Shader "ElectroGrid/Glitch"
 
             float Hash(float2 p)
             {
-                return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453);
+                float3 p3 = frac(float3(p.xyx) * 0.1031);
+                p3 += dot(p3, p3.yzx + 33.33);
+                return frac((p3.x + p3.y) * p3.z);
             }
 
             Varyings vert(Attributes input)
@@ -71,7 +73,8 @@ Shader "ElectroGrid/Glitch"
             half4 frag(Varyings input) : SV_Target
             {
                 float2 uv = input.uv;
-                float t = floor(_Time.y * _Speed + _Seed * 13.0);
+                float time = fmod(_Time.y, 1000.0);
+                float t = floor(time * _Speed + _Seed * 13.0);
 
                 float band = floor(uv.y * _BandCount);
                 float bandNoise = Hash(float2(band, t + _Seed));
@@ -85,7 +88,7 @@ Shader "ElectroGrid/Glitch"
                 float blockNoise = Hash(floor(shifted * float2(4.0, _BandCount)) + float2(t, _Seed));
                 float blocks = step(0.82, blockNoise) * inside * 0.55;
 
-                float scan = 0.65 + 0.35 * sin(uv.y * 80.0 + _Time.y * 20.0);
+                float scan = 0.65 + 0.35 * sin(uv.y * 80.0 + frac(_Time.y * 3.18310) * 6.28318);
 
                 float split = 0.04;
                 float a = step(abs(uv.x - 0.5 + shift - split), 0.5) * (frame + blocks);

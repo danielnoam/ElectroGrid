@@ -312,7 +312,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776392
-    m_Localized: A Game By Daniel noam
+    m_Localized: A Game By Daniel Noam
     m_Metadata:
       m_Items: []
   - m_Id: 2298741776393
@@ -470,6 +470,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items:
       - rid: 5242841005928218761
+  - m_Id: 3989722417324032
+    m_Localized: Fonts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998323675136
+    m_Localized: Move
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618176
+    m_Localized: Select
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618177
+    m_Localized: Row Ends
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618178
+    m_Localized: Restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4056998365618179
+    m_Localized: Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4211323347918848
+    m_Localized: Rumble
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003902439424
+    m_Localized: Unlocked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 4214003910828032
+    m_Localized: New piece
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

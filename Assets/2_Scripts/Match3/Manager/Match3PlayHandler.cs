@@ -52,9 +52,36 @@ public class Match3PlayHandler : MonoBehaviour
         set => canInteract = value;
     }
 
+    public bool AcceptsInput => canInteract && !isPaused;
+    public bool IsHolding => heldMatch3Object;
+
+    /// <summary>Picks up the piece on a tile, as pressing on it does. For the controller's board cursor.</summary>
+    public bool Grab(Match3Tile tile)
+    {
+        if (!AcceptsInput || heldMatch3Object || !gridHandler.CanSelectTile(tile)) return false;
+
+        SelectObjectInTile(tile);
+        return heldMatch3Object;
+    }
+
+    /// <summary>Swaps the held piece with its neighbour in a direction, as a swipe does.</summary>
+    public void SwapHeld(Vector2Int direction)
+    {
+        if (!AcceptsInput || !heldMatch3Object || !selectedMatch3Tile) return;
+
+        var target = gridHandler.GetTile(selectedMatch3Tile.GridPosition + direction);
+        if (gridHandler.CanSelectTile(target)) TrySwapHeldObject(target);
+    }
+
+    public void Release()
+    {
+        if (heldMatch3Object) ReleaseObject(true);
+    }
+
     private void Awake()
     {
         _camera = Camera.main;
+
     }
 
     private void Start()
@@ -620,6 +647,7 @@ public class Match3PlayHandler : MonoBehaviour
                 gameManager.NotifySurgeCreated();
                 surgeTile.PulseColor(matchColors.TryGetValue(surgeTile, out var surgeColor) ? surgeColor : Color.white);
                 CameraManager.Instance?.ShakeCamera(1.5f, 0.4f);
+                MobileHaptics.Play(Haptic.SurgeMade);
                 yield return new WaitForSeconds(0.2f);
             }
             yield break;
@@ -649,6 +677,7 @@ public class Match3PlayHandler : MonoBehaviour
             {
                 yield return new WaitForSeconds(0.3f);
                 CameraManager.Instance?.ShakeCamera(3, 0.75f);
+                MobileHaptics.Play(Haptic.LineBreak);
             }
             
             // If vertical, destroy all columns that have more than MinMatchForSpecial matches
@@ -791,6 +820,7 @@ public class Match3PlayHandler : MonoBehaviour
         surgeTile.PulseColor(color);
         surge.DestroyWithAnimation();
         CameraManager.Instance?.ShakeCamera(2.5f, 0.6f);
+        MobileHaptics.Play(Haptic.Surge);
 
         foreach (var tile in targets.OrderBy(tile => (tile.GridPosition - surgeTile.GridPosition).sqrMagnitude))
         {
@@ -925,6 +955,7 @@ public class Match3PlayHandler : MonoBehaviour
     public IEnumerator SweepClearObjects()
     {
         var tiles = gridHandler.Tiles.Values.Where(t => t.HasObject).ToList();
+        MobileHaptics.Play(Haptic.Win);
 
         foreach (var tile in tiles)
         {
@@ -940,6 +971,7 @@ public class Match3PlayHandler : MonoBehaviour
     {
         var objects = gridHandler.Tiles.Values.Where(t => t && t.HasObject).Select(t => t.CurrentMatch3Object).OrderBy(_ => Random.value).ToList();
         CameraManager.Instance?.ShakeCamera(0.6f, 0.2f);
+        MobileHaptics.Play(Haptic.Lose);
         foreach (var tile in gridHandler.Tiles.Values)
         {
             if (tile && tile.GridPosition.y >= 0) tile.PowerDown(Random.value * greyOutSpread, greyOutDuration, greyOutBrightness);
@@ -1114,7 +1146,7 @@ public class Match3PlayHandler : MonoBehaviour
             foreach (var tileObjectMatch in layout)
             {
                 CameraManager.Instance?.ShakeCamera(1, 0.25f);
-                MobileHaptics.Vibrate(50);
+                MobileHaptics.Play(Haptic.Pop);
                 gridHandler.CreateMatchableObject(tileObjectMatch.Value, tileObjectMatch.Key);
                 yield return new WaitForSeconds(populationDuration / totalActiveTiles);
             }

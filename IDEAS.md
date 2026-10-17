@@ -41,3 +41,15 @@ when one is picked, it moves to TODO.md. Ordered by how much I'd recommend them.
 ## Suggested order
 
 Prototype beat sync first (small and very noticeable), then power the circuit as a new objective type.
+
+## Font alternatives
+
+DS-Digital was replaced by Share Tech Mono (OFL) on 2026-10-16, drawn in capitals. Other free fonts that were tried
+in the game and would also work, if Share Tech Mono is ever swapped out:
+
+- **Chakra Petch** (Google Fonts, OFL): wider and bolder; the result window buttons fit on one line.
+- **Doto** (Google Fonts, OFL): a dot-matrix look, lighter.
+- **DSEG14** (keshikan, OFL): a real 14-segment LCD font, the closest to DS-Digital's look, but it has no accented
+  letters, so Spanish, Portuguese, German and French would need another font for those. Fine for numbers only.
+- **DS-Digital** itself, if a commercial licence is bought from Dusit Supasawat. Its font asset is still in
+  `Assets/Plugins/Fonts`, unused, so it doesn't ship.

@@ -18,14 +18,15 @@ public class SettingsWindowUI : MonoBehaviour
     [SerializeField] private Slider musicVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
     [SerializeField] private Toggle hapticsToggle;
+    [SerializeField] private Toggle rumbleToggle;
+    [Tooltip("Shown on PC, and on phones only while a gamepad is connected")]
+    [SerializeField] private GameObject rumbleRow;
     [SerializeField] private Toggle screenShakeToggle;
     [SerializeField] private Toggle tiltToggle;
     [SerializeField] private Toggle highFrameRateToggle;
     [Tooltip("Hidden on displays that cannot refresh faster than 60Hz")]
     [SerializeField] private GameObject highFrameRateRow;
-    [Tooltip("Tapping it moves to the next available language")]
-    [SerializeField] private Button languageButton;
-    [SerializeField] private TextMeshProUGUI languageLabel;
+    [SerializeField] private TMP_Dropdown languageDropdown;
 
     [Header("Reset Progress")]
     [SerializeField] private Button resetProgressButton;
@@ -50,6 +51,7 @@ public class SettingsWindowUI : MonoBehaviour
     private Action _onClosed;
     private Coroutine _versionRestore;
     private float _resetConfirmExpiry;
+    private readonly System.Collections.Generic.List<UnityEngine.Localization.Locale> _languages = new System.Collections.Generic.List<UnityEngine.Localization.Locale>();
 
     private void Awake()
     {
@@ -167,15 +169,35 @@ public class SettingsWindowUI : MonoBehaviour
         if (versionText) versionText.horizontalAlignment = L10n.IsRightToLeft ? HorizontalAlignmentOptions.Left : HorizontalAlignmentOptions.Right;
     }
 
+    /// <summary>Fills the language dropdown with each language's own name and selects the current one.</summary>
     private void RefreshLanguageLabel()
     {
-        if (languageLabel) languageLabel.text = L10n.LanguageName(UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale);
+        if (!languageDropdown) return;
+
+        _languages.Clear();
+        _languages.AddRange(L10n.PlayerLanguages());
+        var options = new System.Collections.Generic.List<TMP_Dropdown.OptionData>();
+        foreach (var locale in _languages) options.Add(new TMP_Dropdown.OptionData(L10n.LanguageName(locale)));
+        languageDropdown.ClearOptions();
+        languageDropdown.AddOptions(options);
+        languageDropdown.SetValueWithoutNotify(Mathf.Max(0, _languages.IndexOf(UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale)));
+        languageDropdown.RefreshShownValue();
     }
 
-    private void OnLanguagePressed()
+    private void OnLanguagePicked(int index)
     {
+        if (index < 0 || index >= _languages.Count) return;
+
         CameraManager.Instance?.ShakeCamera(0.1f);
-        L10n.CycleLanguage();
+        L10n.SetLanguage(_languages[index]);
+    }
+
+    private void RefreshRumbleRow()
+    {
+        if (!rumbleRow) return;
+
+        bool mobile = Application.isMobilePlatform;
+        rumbleRow.SetActive(!mobile || UnityEngine.InputSystem.Gamepad.all.Count > 0);
     }
 
     public void Show(Action onClosed = null)
@@ -184,6 +206,7 @@ public class SettingsWindowUI : MonoBehaviour
         DisarmReset();
         PullValuesFromSettings();
         RefreshLanguageLabel();
+        RefreshRumbleRow();
         Toggle(true);
     }
 
@@ -220,6 +243,12 @@ public class SettingsWindowUI : MonoBehaviour
             hapticsToggle.onValueChanged.AddListener(OnHapticsChanged);
         }
 
+        if (rumbleToggle)
+        {
+            rumbleToggle.onValueChanged.RemoveAllListeners();
+            rumbleToggle.onValueChanged.AddListener(OnRumbleChanged);
+        }
+
         if (screenShakeToggle)
         {
             screenShakeToggle.onValueChanged.RemoveAllListeners();
@@ -240,10 +269,10 @@ public class SettingsWindowUI : MonoBehaviour
             highFrameRateToggle.onValueChanged.AddListener(OnHighFrameRateChanged);
         }
 
-        if (languageButton)
+        if (languageDropdown)
         {
-            languageButton.onClick.RemoveAllListeners();
-            languageButton.onClick.AddListener(OnLanguagePressed);
+            languageDropdown.onValueChanged.RemoveAllListeners();
+            languageDropdown.onValueChanged.AddListener(OnLanguagePicked);
         }
 
         if (resetProgressButton)
@@ -299,6 +328,7 @@ public class SettingsWindowUI : MonoBehaviour
         if (musicVolumeSlider) musicVolumeSlider.SetValueWithoutNotify(settings.musicVolume);
         if (sfxVolumeSlider) sfxVolumeSlider.SetValueWithoutNotify(settings.sfxVolume);
         if (hapticsToggle) hapticsToggle.SetIsOnWithoutNotify(settings.hapticsEnabled);
+        if (rumbleToggle) rumbleToggle.SetIsOnWithoutNotify(settings.rumbleEnabled);
         if (screenShakeToggle) screenShakeToggle.SetIsOnWithoutNotify(settings.screenShakeEnabled);
         if (tiltToggle) tiltToggle.SetIsOnWithoutNotify(settings.tiltEnabled);
         if (highFrameRateToggle) highFrameRateToggle.SetIsOnWithoutNotify(settings.highFrameRate);
@@ -328,6 +358,14 @@ public class SettingsWindowUI : MonoBehaviour
 
         if (SaveManager.Instance) SaveManager.Instance.Settings.hapticsEnabled = value;
         if (value) MobileHaptics.Vibrate(50);
+    }
+
+    private void OnRumbleChanged(bool value)
+    {
+        if (_applyingValues) return;
+
+        if (SaveManager.Instance) SaveManager.Instance.Settings.rumbleEnabled = value;
+        if (value) MobileHaptics.Play(Haptic.ComboFull);
     }
 
     private void OnScreenShakeChanged(bool value)

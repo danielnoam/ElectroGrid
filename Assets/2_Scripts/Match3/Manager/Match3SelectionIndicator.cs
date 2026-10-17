@@ -115,8 +115,17 @@ public class Match3SelectionIndicator : MonoBehaviour
     private void UpdateIndicatorPosition()
     {
         if (!_camera || !_enabled || !_pressedMatch3Tile) return;
-        
-        
+
+        if (ControllerFocus.ControllerActive)
+        {
+            var tilePosition = _pressedMatch3Tile.transform.position;
+            tilePosition.z = spriteRenderer.transform.position.z;
+            spriteRenderer.transform.position = tilePosition;
+            lineRenderer.SetPosition(0, tilePosition);
+            lineRenderer.SetPosition(1, tilePosition);
+            return;
+        }
+
         Vector3 mousePosition = _camera.ScreenToWorldPoint(_inputReader.MousePosition);
         mousePosition.z = spriteRenderer.transform.position.z;
         spriteRenderer.transform.position = mousePosition;
@@ -128,6 +137,11 @@ public class Match3SelectionIndicator : MonoBehaviour
     private void UpdateHoveredTile()
     {
         if (!_camera || !match3PlayHandler.CanInteract || !_inputReader || _inputReader.IsTouch) return;
+        if (ControllerFocus.ControllerActive)
+        {
+            ResetHoveredTile();
+            return;
+        }
         
         Vector2 mousePos = _inputReader.MousePosition;
         Vector2 worldPos = _camera.ScreenToWorldPoint(mousePos);

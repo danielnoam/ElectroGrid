@@ -625,7 +625,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FocusScope
   firstSelected: {fileID: 1882723607}
   cancelButton: {fileID: 2026211596}
+  keyboardCancelButton: {fileID: 0}
   rememberSelection: 1
+  controlsGame: 0
 --- !u!1 &229920320
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,6 +910,7 @@ GameObject:
   - component: {fileID: 586155253}
   - component: {fileID: 586155254}
   - component: {fileID: 586155255}
+  - component: {fileID: 586155256}
   m_Layer: 0
   m_Name: Match3Manager
   m_TagString: Untagged
@@ -1124,6 +1127,33 @@ MonoBehaviour:
   pressStartPosition: {x: 0, y: 0}
   swipeDirection: {x: 0, y: 0}
   tileSwipeDistance: 0
+--- !u!114 &586155256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586155247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 646c23dce869f814fb03b22ca8bc1e6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Match3BoardCursor
+  deadZone: 0.5
+  repeatDelay: 0.3
+  repeatInterval: 0.1
+  moveDuration: 0.08
+  cursorColor: {r: 0.85, g: 0.95, b: 1, a: 1}
+  cursorScale: 1.12
+  pulseAmount: 0.04
+  pulseSpeed: 5
+  sortingOffset: 5
+  playHandler: {fileID: 586155253}
+  gridHandler: {fileID: 586155251}
+  gameManager: {fileID: 586155249}
+  selectionIndicator: {fileID: 586155252}
+  cell: {x: 0, y: 0}
+  shown: 0
 --- !u!1001 &604789036
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1316,6 +1346,8 @@ GameObject:
   - component: {fileID: 722603882}
   - component: {fileID: 722603886}
   - component: {fileID: 722603887}
+  - component: {fileID: 722603888}
+  - component: {fileID: 722603889}
   m_Layer: 5
   m_Name: Match3UIManager
   m_TagString: Untagged
@@ -1440,6 +1472,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d1f3c7d219a3c44c91e64cfbfb47561, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RtlLayoutMirror
+--- !u!114 &722603888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722603881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1546c3731c0f17f4fa0027b3b972e71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ControlHintsBar
+  height: 210
+  bottomOffset: 30
+  iconSize: 90
+  labelSize: 42
+  spacing: 40
+  sidePadding: 30
+  font: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  labelColor: {r: 0.92, g: 0.92, b: 1, a: 0.9}
+  backgroundColor: {r: 0.04, g: 0.03, b: 0.1, a: 0.75}
+  showDuration: 0.35
+  hideDuration: 0.25
+--- !u!114 &722603889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722603881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0ae0bdca31f1f244aabc0f4bbdb0405, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SurvivalMilestonePopup
+  size: {x: 760, y: 190}
+  topOffset: 730
+  iconSize: 120
+  titleSize: 40
+  nameSize: 64
+  font: {fileID: 11400000, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
+  backgroundColor: {r: 0.07, g: 0.05, b: 0.16, a: 0.95}
+  accentColor: {r: 1, g: 0.031, b: 0.38, a: 1}
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+  inDuration: 0.4
+  holdDuration: 1.8
+  outDuration: 0.3
+  sfx: PlusDestroy
+  virusIcon: {fileID: 21300000, guid: 12e451cf29bd07041ba28a9e36ccca1f, type: 3}
+  fuseIcon: {fileID: 21300000, guid: bf990c21cf2993e4e9d9ad2ed4c9308f, type: 3}
+  plugIcon: {fileID: 21300000, guid: 7f6ab2ab72cc275458445fb9ffc529dd, type: 3}
+  starIcon: {fileID: 21300000, guid: 5aae742932ad09946ae90ddbd3346e9f, type: 3}
 --- !u!1 &750709011
 GameObject:
   m_ObjectHideFlags: 0
@@ -1744,9 +1828,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
   actionName: Primary
+  keyboardActionName: Cancel
   corner: {x: 1, y: 1}
   offset: {x: -12, y: -12}
   size: 80
+  holdSeconds: 1.5
+  holdColor: {r: 1, g: 0.031, b: 0.38, a: 0.9}
 --- !u!1 &980465612
 GameObject:
   m_ObjectHideFlags: 0
@@ -1999,7 +2086,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FocusScope
   firstSelected: {fileID: 1998016238}
   cancelButton: {fileID: 1998016238}
+  keyboardCancelButton: {fileID: 874541280}
   rememberSelection: 1
+  controlsGame: 1
 --- !u!1 &1063539252
 GameObject:
   m_ObjectHideFlags: 0
@@ -3232,6 +3321,30 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114955749421125119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114955749421125119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114955749421125119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114955749421125119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114955749421125119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114955749421125119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 131064641352175604, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3450,7 +3563,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2285772603936061872, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_fontSize
-      value: 40
+      value: 35.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394588707409067519, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394588707409067519, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394588707409067519, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394588707409067519, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394588707409067519, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2394588707409067519, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2870767264758228999, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_AnchorMax.x
@@ -3498,7 +3635,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3443881559565020535, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_fontSize
-      value: 70
+      value: 62.1
       objectReference: {fileID: 0}
     - target: {fileID: 3738495406682381914, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -3670,6 +3807,30 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5150172165877055451, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184441216654465983, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184441216654465983, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184441216654465983, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184441216654465983, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184441216654465983, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5184441216654465983, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5723009261502948119, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
@@ -3859,6 +4020,38 @@ PrefabInstance:
     - target: {fileID: 6829595534532920167, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: originalText
       value: Settings
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6874567500373449458, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7209580656352593571, guid: 6040a6ef8c9c65b45bca0e56c58a8e0c, type: 3}
       propertyPath: m_AnchorMax.y
@@ -4535,9 +4728,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
   actionName: Restart
+  keyboardActionName: 
   corner: {x: 1, y: 1}
   offset: {x: -12, y: -12}
   size: 80
+  holdSeconds: 1.5
+  holdColor: {r: 1, g: 0.031, b: 0.38, a: 0.9}
 --- !u!224 &1922627328 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1030263153832584111, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
@@ -4806,9 +5002,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
   actionName: Info
+  keyboardActionName: 
   corner: {x: 1, y: 1}
   offset: {x: -12, y: -12}
   size: 80
+  holdSeconds: 0
+  holdColor: {r: 1, g: 0.031, b: 0.38, a: 0.9}
 --- !u!1001 &1310237531106385738
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4927,9 +5126,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
   actionName: Settings
+  keyboardActionName: 
   corner: {x: 1, y: 1}
   offset: {x: -12, y: -12}
   size: 80
+  holdSeconds: 0
+  holdColor: {r: 1, g: 0.031, b: 0.38, a: 0.9}
 --- !u!1001 &7255514202370865254
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4944,7 +5146,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_fontSize
-      value: 72
+      value: 60.4
       objectReference: {fileID: 0}
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: originalText
@@ -4953,7 +5155,7 @@ PrefabInstance:
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 9360774282327381, guid: d7ede9ca642ae5446a1b264708258928, type: 2}
+      objectReference: {fileID: -5769730299298871482, guid: 2c9120ef4480ed248857d51c1c6bdf49, type: 2}
     - target: {fileID: 3982775019398211998, guid: 0eb4dc90ef339c042861c6197977cab2, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
@@ -5071,9 +5273,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonPrompt
   actionName: Cancel
+  keyboardActionName: 
   corner: {x: 1, y: 1}
   offset: {x: -12, y: -12}
   size: 80
+  holdSeconds: 0
+  holdColor: {r: 1, g: 0.031, b: 0.38, a: 0.9}
 --- !u!1001 &8726594008269231255
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5200,7 +5405,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2719998104371570772, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
       propertyPath: m_fontSize
-      value: 63.8
+      value: 58.5
       objectReference: {fileID: 0}
     - target: {fileID: 3030736077530290492, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
       propertyPath: m_AnchorMax.x
@@ -5245,6 +5450,10 @@ PrefabInstance:
     - target: {fileID: 6727378135287716865, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6799710075729848918, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
+      propertyPath: m_fontSize
+      value: 56.25
       objectReference: {fileID: 0}
     - target: {fileID: 8243143340057431168, guid: 23acdb39831da8a4ca907cb9b39987bd, type: 3}
       propertyPath: topBarUI

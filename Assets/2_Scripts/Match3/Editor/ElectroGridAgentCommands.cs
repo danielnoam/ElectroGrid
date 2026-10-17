@@ -97,6 +97,29 @@ internal static class ElectroGridAgentCommands
     [CliCommand("eg_ui_submit", "ElectroGrid: press the selected button, as A or Enter does")]
     private static string UiSubmit() => Match3DebugActions.UiSubmit();
 
+    [CliCommand("eg_milestone", "ElectroGrid: show the Survival milestone banner for a milestone (0 is the first) in a level")]
+    private static string Milestone([CliArg("index", "Milestone number, 0 is the first", Required = true)] int index) => Match3DebugActions.PreviewMilestone(index);
+
+    [CliCommand("eg_window", "ElectroGrid: open a window in play mode (settings, info, credits) or close them all (close)")]
+    private static string Window([CliArg("name", "settings, info, credits or close", Required = true)] string name) => Match3DebugActions.OpenWindow(name);
+
+    [CliCommand("eg_cursor", "ElectroGrid: the board cursor in a level: shown, its cell, whether a piece is held")]
+    private static string BoardCursor() => Match3DebugActions.CursorStatus();
+
+    [CliCommand("eg_cursor_move", "ElectroGrid: a direction on the board (up, down, left, right) moves the cursor or swaps the held piece; lb and rb jump to the row's ends")]
+    private static string CursorMove([CliArg("dir", "up, down, left, right, lb or rb", Required = true)] string dir) => Match3DebugActions.CursorMove(dir);
+
+    [CliCommand("eg_cursor_press", "ElectroGrid: pick up the piece under the board cursor, or put the held one back, as A does")]
+    private static string CursorPress() => Match3DebugActions.CursorPress();
+
+    [CliCommand("eg_cursor_back", "ElectroGrid: put the held piece back, as B does in a level")]
+    private static string CursorBack() => Match3DebugActions.CursorBack();
+
+    [CliCommand("eg_cursor_goto", "ElectroGrid: put the board cursor on a cell (x, y with row 0 at the bottom)")]
+    private static string CursorGoto(
+        [CliArg("x", "Cell x", Required = true)] int x,
+        [CliArg("y", "Cell y", Required = true)] int y) => Match3DebugActions.CursorGoto(x, y);
+
     [CliCommand("eg_ui_cancel", "ElectroGrid: press back on the open screen or window, as B or Escape does")]
     private static string UiCancel() => Match3DebugActions.UiCancel();
 

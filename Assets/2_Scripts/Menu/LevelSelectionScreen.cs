@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using DNExtensions.Utilities;
 using DNExtensions.Systems.VFXManager;
 using PrimeTween;
@@ -37,6 +38,8 @@ public class LevelSelectionScreen : MenuScreen
     [SerializeField] private ScrollRect levelsScroll;
     [Tooltip("Space kept between the bottom of the level list and the top of the Back button")]
     [SerializeField] private float listBottomMargin = 40f;
+    [Tooltip("How fast the right stick or Page Up and Page Down scroll the level list, in pixels per second")]
+    [SerializeField, Min(0f)] private float stickScrollSpeed = 1600f;
 
     private float _cellSize;
     private float _cellGap;
@@ -53,8 +56,11 @@ public class LevelSelectionScreen : MenuScreen
     private readonly System.Collections.Generic.Dictionary<SOMatch3Level, Button> _levelButtons = new System.Collections.Generic.Dictionary<SOMatch3Level, Button>();
     private Image _selectedOutline;
     private Transform _previewRoot;
+    private readonly List<SpriteRenderer> _previewTiles = new List<SpriteRenderer>();
+    private int _previewUsed;
     private TextMeshProUGUI _startLabel;
     private UnityEngine.Localization.Components.LocalizeStringEvent _startLabelEvent;
+    private bool _previewOpen;
 
     private void Start()
     {
@@ -74,6 +80,7 @@ public class LevelSelectionScreen : MenuScreen
         UpdateLevelInfo();
         base.Show(animated, () =>
         {
+            _previewOpen = true;
             DrawPreview(_selectedLevel);
             onComplete?.Invoke();
         });
@@ -81,12 +88,14 @@ public class LevelSelectionScreen : MenuScreen
 
     public override void Hide(bool animated = true, Action onComplete = null)
     {
+        _previewOpen = false;
         ClearPreview(true);
         base.Hide(animated, onComplete);
     }
 
     public override void HideByFade(float durationMultiplier, Action onComplete = null)
     {
+        _previewOpen = false;
         ClearPreview(true);
         base.HideByFade(durationMultiplier, onComplete);
     }
@@ -112,10 +121,32 @@ public class LevelSelectionScreen : MenuScreen
         return lastUnlocked;
     }
 
+    private UnityEngine.InputSystem.InputAction _scrollAction;
+
+    /// <summary>The right stick (or Page Up and Page Down) scrolls the level list; the left stick still moves the selection.</summary>
+    private void Update()
+    {
+        if (!levelsScroll || !levelsScroll.vertical || !levelsScroll.content || ControllerFocus.TopScope != GetComponent<FocusScope>()) return;
+
+        _scrollAction ??= ControllerFocus.FindUiAction("Scroll");
+        if (_scrollAction == null) return;
+
+        float input = _scrollAction.ReadValue<Vector2>().y;
+        if (Mathf.Abs(input) < 0.2f) return;
+
+        float viewport = levelsScroll.viewport ? levelsScroll.viewport.rect.height : ((RectTransform)levelsScroll.transform).rect.height;
+        float scrollable = levelsScroll.content.rect.height - viewport;
+        if (scrollable <= 0f) return;
+
+        levelsScroll.StopMovement();
+        levelsScroll.verticalNormalizedPosition = Mathf.Clamp01(levelsScroll.verticalNormalizedPosition + input * stickScrollSpeed * Time.unscaledDeltaTime / scrollable);
+    }
+
     private void OnDestroy()
     {
         _nextLevelPulse.Stop();
         ClearPreview(false);
+        if (_previewRoot) Destroy(_previewRoot.gameObject);
         if (SaveManager.Instance) SaveManager.Instance.SaveReset -= OnSaveReset;
         L10n.LanguageChanged -= UpdateLevelInfo;
     }
@@ -441,7 +472,7 @@ public class LevelSelectionScreen : MenuScreen
         if (scope) scope.FirstSelected = _selectedLevel && _levelButtons.TryGetValue(_selectedLevel, out var selectedButton) ? selectedButton : levelStartButton;
         if (levelStartButton) levelStartButton.interactable = _selectedLevel;
         UpdateStartLabel();
-        if (isActiveAndEnabled) DrawPreview(_selectedLevel);
+        if (_previewOpen && isActiveAndEnabled) DrawPreview(_selectedLevel);
     }
 
     private void UpdateStartLabel()
@@ -488,7 +519,7 @@ public class LevelSelectionScreen : MenuScreen
         var center = (bottomLeft + topRight) * 0.5f;
         var origin = center - new Vector3((grid.Width - 1) * step * 0.5f, (grid.Height - 1) * step * 0.5f, 0f);
 
-        _previewRoot = new GameObject("Level Preview").transform;
+        if (!_previewRoot) _previewRoot = new GameObject("Level Preview").transform;
         var tileSource = previewTilePrefab.GetComponentInChildren<SpriteRenderer>(true);
 
         for (int y = 0; y < grid.Height; y++)
@@ -508,11 +539,22 @@ public class LevelSelectionScreen : MenuScreen
     {
         if (!sprite) return;
 
-        var spriteObject = new GameObject(name);
-        spriteObject.transform.SetParent(_previewRoot, false);
-        spriteObject.transform.position = position;
+        SpriteRenderer renderer;
+        if (_previewUsed < _previewTiles.Count)
+        {
+            renderer = _previewTiles[_previewUsed];
+        }
+        else
+        {
+            renderer = new GameObject(name).AddComponent<SpriteRenderer>();
+            renderer.transform.SetParent(_previewRoot, false);
+            _previewTiles.Add(renderer);
+        }
+        _previewUsed++;
 
-        var renderer = spriteObject.AddComponent<SpriteRenderer>();
+        var spriteObject = renderer.gameObject;
+        spriteObject.SetActive(true);
+        spriteObject.transform.position = position;
         renderer.sprite = sprite;
         renderer.color = color;
         if (source)
@@ -528,24 +570,28 @@ public class LevelSelectionScreen : MenuScreen
         Tween.Scale(spriteObject.transform, scale, previewPopDuration, Ease.OutBack, startDelay: delay);
     }
 
+    /// <summary>Hides the preview tiles, fading them out or at once. They are kept and reused by the next preview.</summary>
     private void ClearPreview(bool fade)
     {
-        if (!_previewRoot) return;
-
-        var root = _previewRoot;
-        _previewRoot = null;
-        if (!fade)
+        _previewUsed = 0;
+        foreach (var renderer in _previewTiles)
         {
-            Destroy(root.gameObject);
-            return;
-        }
+            if (!renderer) continue;
 
-        foreach (var renderer in root.GetComponentsInChildren<SpriteRenderer>())
-        {
             Tween.StopAll(renderer.transform);
-            Tween.Alpha(renderer, 0f, 0.2f);
+            Tween.StopAll(renderer);
+            if (!renderer.gameObject.activeSelf) continue;
+
+            if (fade)
+            {
+                var tile = renderer;
+                Tween.Alpha(tile, 0f, 0.2f).OnComplete(() => { if (tile && tile.color.a <= 0.01f) tile.gameObject.SetActive(false); });
+            }
+            else
+            {
+                renderer.gameObject.SetActive(false);
+            }
         }
-        Destroy(root.gameObject, 0.25f);
     }
 
 }

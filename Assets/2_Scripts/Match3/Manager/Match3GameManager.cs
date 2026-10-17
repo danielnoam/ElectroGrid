@@ -365,6 +365,7 @@ public class Match3GameManager : MonoBehaviour
         if (pieces == 0) return;
 
         CameraManager.Instance?.ShakeCamera(0.6f);
+        MobileHaptics.Play(Haptic.LineBreak);
         _currentLevelData?.Survival?.OnLineBreakPieces(pieces, Combo.Count);
         AddLevelPoints(pieces * levelScoreSettings.pointsPerPiece);
     }
@@ -413,6 +414,7 @@ public class Match3GameManager : MonoBehaviour
                 piece.BlowFuse();
                 tile.PunchTile(2f);
                 CameraManager.Instance?.ShakeCamera(1f);
+                MobileHaptics.Play(Haptic.FuseBlown);
             }
         }
     }
@@ -736,4 +738,6 @@ public class Match3GameManager : MonoBehaviour
     }
 
     public bool CanForceEnd => !levelComplete && !populatingGrid;
+    public bool IsPlaying => !levelComplete && !populatingGrid;
+    public bool IsLevelOver => levelComplete;
 }

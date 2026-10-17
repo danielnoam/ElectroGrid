@@ -1,7 +1,7 @@
 # ElectroGrid: notes for Claude
 
 Unity 6 (6000.6.2f1), URP, portrait match-3. Gameplay code is in `Assets/2_Scripts/Match3`, data in `Assets/3_Data`.
-Read `LEVELS.md` before touching levels, and keep `TODO.md` and `DONE.md` current: move a finished item from TODO to DONE in the same change.
+**Follow [RULES.md](RULES.md)**: what every change needs (all controls, all 7 languages, Info cards for new mechanics, TODO to DONE, licences). Read `LEVELS.md` before touching levels.
 
 ## Driving the editor
 
@@ -11,33 +11,4 @@ Read `LEVELS.md` before touching levels, and keep `TODO.md` and `DONE.md` curren
 - Several Unity projects can be open at once on the same port. Check `unity status` and pass `--project-path`; never send ElectroGrid commands to another project.
 - Hot Reload is installed. It starts newly added fields at 0 and can freeze the editor, so after adding fields or files do a real recompile (Refresh) before testing.
 - After testing, put things back: `eg_restore` (stops play mode, reopens Match3, Game view 1080x1920, run in background off). Never open another scene over unsaved changes.
-
-## Renaming a mechanic: sweep everything
-
-A rename is not done until no old name is left anywhere a person or a later change will read it. When a mechanic is renamed (Square Star became Plug, Double Star became Star), go through all of these in the same change:
-
-- Classes, methods, properties, fields, locals, enum values and test names.
-- Serialized fields: rename with `[FormerlySerializedAs("oldName")]` so assets and scenes keep their values, then check the values survived.
-- Inspector text: `[Header]`, `[Tooltip]`, labels and section names in custom editors and windows.
-- Localization keys and strings in all 7 languages, Info cards and tutorials.
-- Docs: `LEVELS.md`, `TODO.md`, `DONE.md`, `README.md`.
-
-Search case-insensitively for the old words (for example `square.?star|double.?star`) before calling it done.
-
-## Inspector layout
-
-Group settings by the thing they configure, not by kind of value. Everything about one obstacle (spawn chance, cap, time gain, ...) sits under that obstacle's header, rather than all chances in one block and all time gains in another. Name sections for what they are: obstacles are obstacles, points are points.
-
-## Controller support
-
-Every screen and window needs a `FocusScope` on its root (first selection and back button), so a gamepad can reach it. Controller input goes through actions in the UI map of `InputSystem_Actions` (Cancel, Primary, Restart, Settings, Info); never read `Gamepad.current` or `Keyboard.current` buttons directly. A `ButtonPrompt` names its action and shows that action's bound icon. Vibrations go through the project's `MobileHaptics.Vibrate`, which turns into controller rumble while a gamepad is in use; don't call the DNExtensions haptics directly.
-
-## Code style
-
-- No code comments; XML `<summary>` only where it explains something non-obvious, and kept short.
-- Match the surrounding code. Use PrimeTween for tweens, ObjectPooler for anything spawned often (register new pools in `Resources/ObjectPoolingSettings.asset`), and `AudioLibrary` ids for sounds.
-- Objects that come back from the pool must reset anything a tween or effect changed (scale, colour).
-
-## Before a release build
-
-EditMode tests pass, the phone shape (Game view 672x1496) and Hebrew are checked, and the level validator is clean (`eg_validate`). Builds go through the build tool (`eg_build`, then `eg_build_status`).
+- Dynamic TextMesh Pro font assets change on disk whenever text renders. Never `git checkout` them while the editor is open: it puts the atlas and the glyph tables out of step and letters vanish (a "B" missing from RUMBLE, Arabic going blank). To tidy them, call `ClearFontAssetData` on the dynamic fonts from the editor instead.

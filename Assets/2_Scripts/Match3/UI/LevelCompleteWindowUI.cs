@@ -144,8 +144,11 @@ public class LevelCompleteWindowUI : MonoBehaviour
         int best = Mathf.Max(survival.Score, survival.PreviousBest);
         int seconds = Mathf.FloorToInt(levelData.TimeSpent);
 
-        AddStat("Score", L10n.Get("survival.result.score", ("score", survival.Score)));
-        AddStat("Best", L10n.Get("survival.result.best", ("best", best)));
+        var locale = UnityEngine.Localization.Settings.LocalizationSettings.SelectedLocale;
+        var culture = locale ? locale.Identifier.CultureInfo : null;
+        culture ??= System.Globalization.CultureInfo.CurrentCulture;
+        AddStat("Score", L10n.Get("survival.result.score", ("score", survival.Score.ToString("N0", culture))));
+        AddStat("Best", L10n.Get("survival.result.best", ("best", best.ToString("N0", culture))));
         AddStat("Time", L10n.Get("survival.result.time", ("minutes", seconds / 60), ("seconds", seconds % 60)));
     }
 
